@@ -1,4 +1,5 @@
 #include <bulk.hpp>
+#include <iostream>
 
 int main() {
     bulk::spawn(bulk::available_processors(), [](int s, int p) {
