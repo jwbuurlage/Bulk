@@ -1,3 +1,4 @@
+#include <iostream>
 
 #include <bulk.hpp>
 
@@ -8,13 +9,15 @@ int main() {
         bulk::put(bulk::next_processor(), s, a);
         bulk::sync();
 
-        std::cout << s << " <- " << a.value << std::endl;
+        BULK_IN_ORDER(std::cout << s << " <- " << a.value() << std::endl;)
 
-        auto b = bulk::get<int>(bulk::next_processor(), a);
+        bulk::future<int> b = bulk::get<int>(bulk::next_processor(), a);
+
         bulk::sync();
 
+        //BULK_IN_ORDER(std::cout << "hi ()" << std::endl;)
 
-        std::cout << s << " -> " << b.value << std::endl;
+        BULK_IN_ORDER(std::cout << s << " -> " << b.value() << std::endl;)
     });
 
     return 0;

@@ -6,7 +6,7 @@ namespace bulk {
   * @param processors the number of processors to run on
   * @param spmd the spmd function that gets run on each (virtual) processor
   */
-void spawn(int processors, std::function<void(int, int)> spmd);
+void spawn(int processors, std::function<void()> spmd);
 
 /** @brief Obtain the total number of processors available on the system
   * @return the number of available processors */
@@ -34,29 +34,45 @@ int prev_processor();
   * @note a variable must be constructed in the same superstep by each
   * processor */
 template <typename T>
-struct var {
+class var {
+  public:
+    var();
+    ~var();
+
+    T& value();
+
+  private:
     /** value stored by the variable */
-    T value;
+    T value_;
 };
 
 /** @class future<T>
   * @note a future variable is validated after the next global syncronization */
 template <typename T>
-struct future {
-    T value;
+class future {
+  public:
+    future(T* buffer_);
+    ~future();
+
+    future(future<T>& other) = delete;
+    future(future<T>&& other);
+
+    T value();
+
+    T* buffer_;
 };
 
 /** @brief Put a value into a variable held by a (remote) processor
   * @param processor the id of a remote processor holding the variable
   * @param value the new value of the variable */
 template <typename T>
-void put(int processor, T value, var<T> variable);
+void put(int processor, T value, var<T>& variable);
 
 /** @brief Put a value into a variable held by a (remote) processor
   * @param processor the id of a remote processor holding the variable
   * @param value the new value of the variable */
 template <typename T>
-future<T> get(int processor, var<T> variable);
+future<T>&& get(int processor, var<T>& variable);
 
 /** @brief Perform a global barrier synchronization */
 void sync();
@@ -110,4 +126,4 @@ class messages {
 } // namespace bulk
 
 // FIXME: temporarily forward to cpp implementation by default
-#include <bulk_cpp.hpp>
+#include <bulk_bsp.hpp>
