@@ -1,21 +1,24 @@
 #include <iostream>
 
-#include <bulk.hpp>
+#include <bulk/bsp/bulk.hpp>
+#include <bulk/util/log.hpp>
 
 int main() {
-    bulk::spawn(bulk::available_processors(), [](int s, int p) {
+    namespace bulk = bulk_bsp;
+
+    auto center = bulk::center();
+
+    center.spawn(center.available_processors(), [&center](int s, int) {
         bulk::var<int> a;
 
-        bulk::put(bulk::next_processor(), s, a);
-        bulk::sync();
+        center.put(center.next_processor(), s, a);
+        center.sync();
 
         BULK_IN_ORDER(std::cout << s << " <- " << a.value() << std::endl;)
 
-        bulk::future<int> b = bulk::get<int>(bulk::next_processor(), a);
+        auto b = center.get<int>(center.next_processor(), a);
 
-        bulk::sync();
-
-        //BULK_IN_ORDER(std::cout << "hi ()" << std::endl;)
+        center.sync();
 
         BULK_IN_ORDER(std::cout << s << " -> " << b.value() << std::endl;)
     });
