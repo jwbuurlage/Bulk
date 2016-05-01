@@ -10,72 +10,74 @@
 
 namespace bulk {
 
+/** @class var<T>
+  * @note a variable must be constructed in the same superstep by each
+  * processor */
+template <typename T>
+class var {
+  public:
+    var();
+    ~var();
+
+    T& value();
+
+  private:
+    /** value stored by the variable */
+    T value_;
+};
+
+/** @class future<T>
+  * @note a future variable is validated after the next global syncronization */
+template <typename T>
+class future {
+  public:
+    future(T* buffer_);
+    ~future();
+
+    future(future<T>& other) = delete;
+    future(future<T>&& other);
+
+    T value();
+
+    T* buffer_;
+};
+
 class bulk_base {
     /** @brief Start an spmd section on a given number of processors.
       * @param processors the number of processors to run on
       * @param spmd the spmd function that gets run on each (virtual) processor
       */
-    void spawn(int processors, std::function<void()> spmd);
+    virtual void spawn(int processors, std::function<void()> spmd) = 0;
 
     /** @brief Obtain the total number of processors available on the system
       * @return the number of available processors */
-    int available_processors();
+    virtual int available_processors() = 0;
 
     /** @brief Obtain the total number of active processors in a spmd section
       * @return the number of active processors
       * @note should only be called inside a spmd section */
-    int active_processors();
+    virtual int active_processors() = 0;
 
     /** @brief Obtain the local processor id
       * @return an integer containing the id of the local processor
       * @note should only be called inside a spmd section */
-    int processor_id();
+    virtual int processor_id() = 0;
 
     /** @brief Obtain the id of the next logical processor
       * @return an integer containing the id of the next processor */
-    int next_processor();
+    virtual int next_processor() = 0;
 
     /** @brief Obtain the id of the previous logical processor
       * @return an integer containing the id of the previous processor */
-    int prev_processor();
-
-    /** @class var<T>
-      * @note a variable must be constructed in the same superstep by each
-      * processor */
-    template <typename T>
-    class var {
-      public:
-        var();
-        ~var();
-
-        T& value();
-
-      private:
-        /** value stored by the variable */
-        T value_;
-    };
-
-    /** @class future<T>
-      * @note a future variable is validated after the next global syncronization */
-    template <typename T>
-    class future {
-      public:
-        future(T* buffer_);
-        ~future();
-
-        future(future<T>& other) = delete;
-        future(future<T>&& other);
-
-        T value();
-
-        T* buffer_;
-    };
+    virtual int prev_processor() = 0;
 
     /** @brief Put a value into a variable held by a (remote) processor
       * @param processor the id of a remote processor holding the variable
       * @param value the new value of the variable */
     template <typename T>
-    void put(int processor, T value, var<T>& variable);
+    void put(int processor, T value, var<T>& variable) {
+        internal_put_(processor, value, variable, sizeof(T));
+    }
 
     /** @brief Put a value into a variable held by a (remote) processor
       * @param processor the id of a remote processor holding the variable
@@ -131,6 +133,10 @@ class bulk_base {
         message_iterator<TTag, TContent> begin();
         message_iterator<TTag, TContent> end();
     };
+
+    private:
+      virtual internal_put_(int processor, void* value, void* variable,
+                            size_t size) = 0;
 };
 
 } // namespace bulk

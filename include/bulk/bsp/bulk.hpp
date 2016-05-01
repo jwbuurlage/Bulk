@@ -12,8 +12,6 @@ extern "C" {
 
 namespace bulk_bsp {
 
-static std::function<void(int, int)> g_spmd;
-
 template <typename T>
 class var {
   public:
@@ -56,17 +54,16 @@ class future {
 
 class center {
   public:
-    void spawn(int processors, std::function<void(int, int)> spmd) {
-        g_spmd = spmd;
-
-        auto spmd_no_args = []() {
+    template <typename TFunc>
+    void spawn(int processors, TFunc spmd) {
+        auto spmd_no_args = [](void* f) {
             bsp_begin(bsp_nprocs());
-            g_spmd(bsp_pid(), bsp_nprocs());
+            (*(TFunc*)f)(bsp_pid(), bsp_nprocs());
             bsp_end();
         };
 
-        bsp_init(spmd_no_args, 0, nullptr);
-        spmd_no_args();
+        bsp_init_with_user_data(spmd_no_args, 0, nullptr, &spmd);
+        spmd_no_args(&spmd);
     }
 
     int available_processors() { return bsp_nprocs(); }
