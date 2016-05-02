@@ -24,7 +24,7 @@ set(
     EXAMPLE_SOURCES
     "hello.cpp"
     "communication.cpp"
-# "messaging.cpp"
+    "messaging.cpp"
 )
 
 set(

@@ -8,7 +8,7 @@
 
 #include <functional>
 
-namespace bulk {
+namespace bulk_base {
 
 /** @class var<T>
   * @note a variable must be constructed in the same superstep by each
@@ -42,7 +42,7 @@ class future {
     T* buffer_;
 };
 
-class bulk_base {
+class center {
     /** @brief Start an spmd section on a given number of processors.
       * @param processors the number of processors to run on
       * @param spmd the spmd function that gets run on each (virtual) processor
@@ -75,7 +75,8 @@ class bulk_base {
       * @param processor the id of a remote processor holding the variable
       * @param value the new value of the variable */
     template <typename T>
-    void put(int processor, T value, var<T>& variable) {
+    void put(int processor, T value, var<T>& variable, int offset = 0,
+             int count = 1) {
         internal_put_(processor, value, variable, sizeof(T));
     }
 
@@ -139,4 +140,4 @@ class bulk_base {
                             size_t size) = 0;
 };
 
-} // namespace bulk
+} // namespace bulk_base

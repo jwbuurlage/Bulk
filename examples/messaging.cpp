@@ -1,5 +1,10 @@
-#include <bulk.hpp>
 #include <iostream>
+
+#include <bulk/bsp/bulk.hpp>
+#include <bulk/util/log.hpp>
+
+namespace bulk = bulk_bsp;
+
 
 int main() {
     auto center = bulk::center();

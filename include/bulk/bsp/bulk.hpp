@@ -85,11 +85,9 @@ class center {
         return (bsp_pid() + bsp_nprocs() - 1) % bsp_nprocs();
     }
 
-    // Communication and synchronization
-    // ---------------------------------
-
     template <typename T>
-    void put(int processor, T value, var<T>& variable) {
+    void put(int processor, T value, var<T>& variable, int offset = 0,
+             int count = 1) {
         bsp_put(processor, &value, &variable.value(), 0, sizeof(T));
     }
 
@@ -101,7 +99,6 @@ class center {
     }
 
     inline void sync() { bsp_sync(); }
-
 
     template <typename TTag, typename TContent>
     void send(int processor, TTag tag, TContent content) {

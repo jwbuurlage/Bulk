@@ -5,7 +5,6 @@
 
 namespace bulk = bulk_bsp;
 
-
 int main() {
     auto center = bulk::center();
 
