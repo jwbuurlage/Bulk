@@ -7,35 +7,38 @@ Examples
 --------
 
 ```cpp
-// 1. Hello world!
-auto center = bulk::center();
-center.spawn(center.available_processors(), [&center](int s, int p) {
-    std::cout << "Hello, world " << s << "/" << p << std::endl;
+auto hub = bulk::bsp_hub();
+hub.spawn(hub.available_processors(), [&hub](int s, int p) {
+    // 1. Hello world!
+    BULK_IN_ORDER(
+        std::cout << "Hello, world " << s << "/" << p << std::endl;
+    )
+
+    // 2. Communication
+    auto a = hub.create_var<int>();
+
+    hub.put(hub.next_processor(), s, a);
+    hub.sync();
+
+    // ... a.value() is now updated
+
+    auto b = hub.get<int>(hub.next_processor(), a);
+    hub.sync();
+
+    // ... b.value() is now available
+
+    // 3. Message passing
+    for (int t = 0; t < p; ++t) {
+        hub.send<int, int>(t, s, s);
+    }
+
+    hub.sync();
+
+    for (auto message : hub.messages<int, int>()) {
+        std::cout << message.tag << ", " << message.content << std::endl;
+    }
 });
 
-// 2. Communication
-bulk::var<int> a;
-
-center.put(center.next_processor(), s, a);
-center.sync();
-
-// ... a.value() is now updated
-
-auto b = center.get<int>(center.next_processor(), a);
-center.sync();
-
-// ... b.value() is now available
-
-// 3. Message passing
-for (int t = 0; t < p; ++t) {
-    center.send<int, int>(t, s, s);
-}
-
-center.sync();
-
-for (auto message : center.messages<int, int>()) {
-    std::cout << message.tag << ", " << message.content << std::endl;
-}
 ```
 
 Installing
