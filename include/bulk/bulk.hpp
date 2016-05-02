@@ -1,53 +1,39 @@
-/* For now this file is meant as an interface definition only,
- * actual implementations should use this interface.
- *
- * There are a number of reasons for this, including (lack of)
- * templated virtual functions, and specialization of classes such
- * as var<T> and future<T>.
- */
-
 #include <functional>
 
-namespace bulk_base {
+namespace bulk {
 
-/** @class var<T>
-  * @note a variable must be constructed in the same superstep by each
-  * processor */
-template <typename T>
-class var {
-  public:
-    var();
-    ~var();
-
-    T& value();
-
-  private:
-    /** value stored by the variable */
-    T value_;
+/** @class message<TTag, TContent> */
+template <typename TTag, typename TContent>
+struct message {
+    TTag tag;
+    TContent content;
 };
 
-/** @class future<T>
-  * @note a future variable is validated after the next global syncronization */
-template <typename T>
-class future {
+template <template <typename> typename var, template <typename> typename future,
+          template <typename, typename> typename message_container>
+class base_hub {
   public:
-    future(T* buffer_);
-    ~future();
+    template <typename T>
+    var<T> create_var() {
+        return var<T>();
+    }
 
-    future(future<T>& other) = delete;
-    future(future<T>&& other);
+    template <typename T>
+    future<T> create_future() {
+        return future<T>();
+    }
 
-    T value();
+    template <typename T>
+    using var_type = var<T>;
 
-    T* buffer_;
-};
+    template <typename T>
+    using future_type = future<T>;
 
-class center {
     /** @brief Start an spmd section on a given number of processors.
       * @param processors the number of processors to run on
       * @param spmd the spmd function that gets run on each (virtual) processor
       */
-    virtual void spawn(int processors, std::function<void()> spmd) = 0;
+    virtual void spawn(int processors, std::function<void(int, int)> spmd) = 0;
 
     /** @brief Obtain the total number of processors available on the system
       * @return the number of available processors */
@@ -77,67 +63,49 @@ class center {
     template <typename T>
     void put(int processor, T value, var<T>& variable, int offset = 0,
              int count = 1) {
-        internal_put_(processor, value, variable, sizeof(T));
+        internal_put_(processor, &value, &variable.value(), sizeof(T), offset,
+                      count);
     }
 
     /** @brief Put a value into a variable held by a (remote) processor
       * @param processor the id of a remote processor holding the variable
       * @param value the new value of the variable */
     template <typename T>
-    future<T>&& get(int processor, var<T>& variable);
+    future<T> get(int processor, var<T>& variable, int offset = 0,
+                  int count = 1) {
+        future<T> result;
+        internal_get_(processor, &variable.value(), result.buffer_, sizeof(T),
+                      offset, count);
+        return result;
+    }
 
     /** @brief Perform a global barrier synchronization */
-    void sync();
+    virtual void sync() = 0;
 
     /** @brief Send a message to a remote processor
       * @param processor the id of the remote processor receiving the message
       * @param tag a tag to attach to the message
       * @param content the content (payload) of the message */
     template <typename TTag, typename TContent>
-    void send(int processor, TTag tag, TContent content);
+    void send(int processor, TTag tag, TContent content) {
+        internal_send_(processor, &tag, &content, sizeof(TTag),
+                       sizeof(TContent));
+    }
 
-    /** @class message<TTag, TContent> */
     template <typename TTag, typename TContent>
-    struct message {
-        TTag tag;
-        TContent content;
-    };
+    message_container<TTag, TContent> messages() {
+        return message_container<TTag, TContent>();
+    }
 
-    /** @class message_iterator<TTag, TContent> */
-    template <typename TTag, typename TContent>
-    class message_iterator
-        : std::iterator<std::forward_iterator_tag, message<TTag, TContent>> {
-      public:
-        message_iterator() {}
+  protected:
+    virtual void internal_put_(int processor, void* value, void* variable,
+                               size_t size, int offset, int count) = 0;
 
-        message_iterator& operator--(int);
-        message_iterator& operator++(int);
+    virtual void internal_get_(int processor, void* variable, void* target,
+                               size_t size, int offset, int count) = 0;
 
-        bool operator==(const message_iterator& other) const;
-        bool operator!=(const message_iterator& other) const;
-
-        message<TTag, TContent> operator*();
-
-        message_iterator& operator--();
-        message_iterator& operator++();
-
-      private:
-        int i_;
-    };
-
-    /** @class messages<TTag, TContent> */
-    template <typename TTag, typename TContent>
-    class messages {
-      public:
-        messages();
-
-        message_iterator<TTag, TContent> begin();
-        message_iterator<TTag, TContent> end();
-    };
-
-    private:
-      virtual internal_put_(int processor, void* value, void* variable,
-                            size_t size) = 0;
+    virtual void internal_send_(int processor, void* tag, void* content,
+                                size_t tag_size, size_t content_size);
 };
 
 } // namespace bulk_base
