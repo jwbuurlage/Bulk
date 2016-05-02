@@ -13,6 +13,7 @@ TEST_CASE("initializing bulk", "[init]") {
         hub.spawn(hub.available_processors(),
                      [&hub](int s, int p) {
              BULK_CHECK_ONCE(s == hub.processor_id());
+             BULK_CHECK_ONCE(p == hub.active_processors());
          });
     }
 }
