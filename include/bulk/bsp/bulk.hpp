@@ -41,10 +41,16 @@ class future {
     };
 
     future(future<T>& other) = delete;
+    void operator=(future<T>& other) = delete;
+
     future(future<T>&& other) {
+        *this = std::move(other);
+    }
+
+    void operator=(future<T>&& other) {
         auto tmp_buffer = buffer_;
         buffer_ = other.buffer_;
-        other.buffer_ = tmp_buffer;
+        other.buffer_ = tmp_buffer;       
     }
 
     T value() { return *buffer_; }
