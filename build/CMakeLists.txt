@@ -25,6 +25,7 @@ set(
     "hello.cpp"
     "communication.cpp"
     "messaging.cpp"
+    "dot_product.cpp"
 )
 
 set(

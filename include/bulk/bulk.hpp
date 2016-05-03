@@ -1,4 +1,5 @@
 #include <functional>
+#include <vector>
 
 namespace bulk {
 
@@ -95,6 +96,22 @@ class base_hub {
     template <typename TTag, typename TContent>
     message_container<TTag, TContent> messages() {
         return message_container<TTag, TContent>();
+    }
+
+
+    // convenience functions
+    template <typename T, typename TFunc>
+    T reduce(var<T>& variable, TFunc f, T start_value = 0) {
+        T result = start_value;
+        std::vector<future<T>> images(active_processors());
+        for (int t = 0; t < active_processors(); ++t) {
+            images[t] = get<T>(t, variable);
+        }
+        sync();
+        for (int t = 0; t < active_processors(); ++t) {
+            f(result, images[t].value());
+        }
+        return result;
     }
 
   protected:
