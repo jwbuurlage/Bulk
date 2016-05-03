@@ -1,7 +1,3 @@
-.. sectionauthor:: Jan-Willem Buurlage <janwillembuurlage@gmail.com>
-
-.. highlight:: cpp
-
 Introduction
 ============
 

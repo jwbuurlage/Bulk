@@ -1,7 +1,3 @@
-.. sectionauthor:: Jan-Willem Buurlage <janwillembuurlage@gmail.com>
-
-.. highlight:: cpp
-
 Main concepts
 =============
 
@@ -12,13 +8,15 @@ Initializing the system
 
 To use Bulk, you can choose an implementation. The default implementation of a hub for shared memory systems is implemented with the C++ standard library. A simple C++ program written in Bulk looks like this::
 
-    auto hub = bulk::bsp_hub();
+```cpp
+auto hub = bulk::bsp_hub();
 
-    hub.spawn(hub.available_processors(), [&hub](int s, int p) {
-        if (s == 0) {
-            std::cout << "Hello, world " << s << "/" << p << std::endl;
-        }
-    });
+hub.spawn(hub.available_processors(), [&hub](int s, int p) {
+    if (s == 0) {
+        std::cout << "Hello, world " << s << "/" << p << std::endl;
+    }
+});
+```
 
 Requesting system information
 -----------------------------
