@@ -17,8 +17,9 @@ set(TEST_NAME "bulk_test")
 set(
     TEST_SOURCES
     "../catch.cpp"
-    "../initialization.cpp"
+    "../algorithm.cpp"
     "../communication.cpp"
+    "../initialization.cpp"
 )
 
 set(
