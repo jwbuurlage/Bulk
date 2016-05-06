@@ -97,4 +97,21 @@ TEST_CASE("basic communication", "[communication]") {
             BULK_CHECK_ONCE(compare_result == contents);
         });
     }
+
+    SECTION("coarrays") {
+        auto hub = bulk::bsp_hub();
+
+        hub.spawn(hub.available_processors(), [&hub](int s, int p) {
+            auto xs = hub.create_coarray<int>(10);
+            xs(hub.next_processor())[1] = s;
+
+            hub.sync();
+
+            BULK_CHECK_ONCE(xs[1] == hub.prev_processor());
+
+            xs[3] = 2;
+
+            BULK_CHECK_ONCE(xs[3] == 2);
+        });
+    }
 }
