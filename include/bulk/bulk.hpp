@@ -1,7 +1,14 @@
+#pragma once
+
 #include <functional>
+#include <memory>
 #include <vector>
 
+
 namespace bulk {
+
+template <typename T>
+class coarray;
 
 /** @class message<TTag, TContent> */
 template <typename TTag, typename TContent>
@@ -10,10 +17,83 @@ struct message {
     TContent content;
 };
 
-template <template <typename> typename var, template <typename> typename future,
+template <template <typename> typename var, template <typename> typename array,
+          template <typename> typename future,
           template <typename, typename> typename message_container>
 class base_hub {
   public:
+    template <typename T>
+    using var_type = var<T>;
+
+    template <typename T>
+    using array_type = array<T>;
+
+    template <typename T>
+    using future_type = future<T>;
+
+    template <typename T>
+    class coarray;
+
+    template <typename T>
+    class coarray_writer {
+      public:
+        coarray_writer(base_hub& hub, coarray<T>& parent, int t, int i)
+            : hub_(hub), parent_(parent), t_(t), i_(i) {}
+
+        void operator=(T value) {
+            hub_.put<T>(t_, value, parent_.data(), i_, 1);
+        }
+
+      private:
+        base_hub& hub_;
+        coarray<T>& parent_;
+        int t_;
+        int i_;
+    };
+
+    template <typename T>
+    class coarray_image {
+      public:
+        coarray_image(base_hub& hub, coarray<T>& parent, int t)
+            : hub_(hub), parent_(parent), t_(t) {}
+
+        coarray_writer<T> operator[](int i) {
+            return coarray_writer<T>(hub_, parent_, t_, i);
+        }
+
+      private:
+        base_hub& hub_;
+        coarray<T>& parent_;
+        int t_;
+    };
+
+    template <typename T>
+    class coarray {
+      public:
+        coarray(base_hub& hub, int local_size) : hub_(hub) {
+            data_ = hub.create_array<T>(local_size);
+        }
+
+        coarray_image<T> operator()(int t) {
+            return coarray_image<T>(hub_, *this, t);
+        }
+
+        T& operator[](int i) {
+            return (*data_)[i];
+        }
+
+        friend coarray_image<T>;
+        friend coarray_writer<T>;
+
+      private:
+        base_hub& hub_;
+        std::unique_ptr<base_hub::array_type<T>> data_;
+
+        base_hub::array_type<T>& data() { return *data_; }
+    };
+
+    // TODO: maybe these should return unique_ptrs to handle destruction
+    // properly
     template <typename T>
     var<T> create_var() {
         return var<T>();
@@ -25,10 +105,14 @@ class base_hub {
     }
 
     template <typename T>
-    using var_type = var<T>;
-
+    std::unique_ptr<array<T>> create_array(int local_size) {
+        return std::make_unique<array<T>>(local_size);
+    }
+    
     template <typename T>
-    using future_type = future<T>;
+    coarray<T> create_coarray(int size) {
+        return coarray<T>(*this, size);
+    }
 
     /** @brief Start an spmd section on a given number of processors.
       * @param processors the number of processors to run on
@@ -68,6 +152,13 @@ class base_hub {
                       count);
     }
 
+    template <typename T>
+    void put(int processor, T value, array<T>& variable, int offset = 0,
+             int count = 1) {
+        internal_put_(processor, &value, variable.data(), sizeof(T), offset,
+                      count);
+    }
+
     /** @brief Put a value into a variable held by a (remote) processor
       * @param processor the id of a remote processor holding the variable
       * @param value the new value of the variable */
@@ -98,7 +189,6 @@ class base_hub {
         return message_container<TTag, TContent>();
     }
 
-
     // convenience functions
     template <typename T, typename TFunc>
     T reduce(var<T>& variable, TFunc f, T start_value = 0) {
@@ -125,4 +215,4 @@ class base_hub {
                                 size_t tag_size, size_t content_size);
 };
 
-} // namespace bulk_base
+} // namespace bulk

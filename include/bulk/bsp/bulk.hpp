@@ -14,6 +14,30 @@ extern "C" {
 namespace bulk {
 
 template <typename T>
+class bsp_array {
+  public:
+    bsp_array(int size) {
+        data_ = new T[size];
+        bsp_push_reg(data_, sizeof(T) * size);
+        bsp_sync();
+    };
+
+    ~bsp_array() {
+        if (data_ != nullptr) {
+            bsp_pop_reg(data_);
+            delete[] data_;
+        }
+    }
+
+    T* data() { return data_; }
+
+    T& operator[](int i) { return data_[i]; }
+
+  private:
+    T* data_;
+};
+
+template <typename T>
 class bsp_var {
   public:
     bsp_var() {
@@ -124,7 +148,8 @@ class bsp_message_container {
     int queue_size_;
 };
 
-class bsp_hub : public base_hub<bsp_var, bsp_future, bsp_message_container> {
+class bsp_hub
+    : public base_hub<bsp_var, bsp_array, bsp_future, bsp_message_container> {
   public:
     bsp_hub() { tag_size_ = 0; }
 
