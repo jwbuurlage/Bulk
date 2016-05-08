@@ -1,4 +1,5 @@
 #include <vector>
+#include <numeric>
 
 #include <catch.hpp>
 
@@ -101,7 +102,7 @@ TEST_CASE("basic communication", "[communication]") {
     SECTION("coarrays") {
         auto hub = bulk::bsp_hub();
 
-        hub.spawn(hub.available_processors(), [&hub](int s, int p) {
+        hub.spawn(hub.available_processors(), [&hub](int s, int) {
             auto xs = hub.create_coarray<int>(10);
             xs(hub.next_processor())[1] = s;
 

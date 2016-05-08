@@ -1,5 +1,5 @@
 #include <iostream>
-#include <algorithm>
+#include <numeric>
 #include <vector>
 
 #include <bulk/bsp/bulk.hpp>
