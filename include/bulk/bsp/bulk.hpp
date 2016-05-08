@@ -9,106 +9,42 @@ extern "C" {
 }
 
 #include <bulk/util/log.hpp>
-#include <bulk/bulk.hpp>
+#include <bulk/hub.hpp>
+
 
 namespace bulk {
-
-template <typename T>
-class bsp_array {
-  public:
-    bsp_array(int size) {
-        data_ = new T[size];
-        bsp_push_reg(data_, sizeof(T) * size);
-        bsp_sync();
-    };
-
-    ~bsp_array() {
-        if (data_ != nullptr) {
-            bsp_pop_reg(data_);
-            delete[] data_;
-        }
-    }
-
-    T* data() { return data_; }
-
-    T& operator[](int i) { return data_[i]; }
-
-  private:
-    T* data_;
-};
-
-template <typename T>
-class bsp_var {
-  public:
-    bsp_var() {
-        bsp_push_reg(&value(), sizeof(T));
-        bsp_sync();
-    };
-
-    ~bsp_var() { bsp_pop_reg(&value()); }
-
-    T& value() { return value_; }
-
-  private:
-    T value_;
-};
-
-template <typename T>
-class bsp_future {
-  public:
-    bsp_future() { buffer_ = new T; }
-
-    ~bsp_future() {
-        if (buffer_ != nullptr)
-            delete buffer_;
-    };
-
-    bsp_future(bsp_future<T>& other) = delete;
-    void operator=(bsp_future<T>& other) = delete;
-
-    bsp_future(bsp_future<T>&& other) { *this = std::move(other); }
-
-    void operator=(bsp_future<T>&& other) {
-        auto tmp_buffer = buffer_;
-        buffer_ = other.buffer_;
-        other.buffer_ = tmp_buffer;
-    }
-
-    T value() { return *buffer_; }
-
-    T* buffer_;
-};
+namespace bsp {
 
 template <typename TTag, typename TContent>
-class bsp_message_iterator
+class message_iterator
     : std::iterator<std::forward_iterator_tag, message<TTag, TContent>> {
   public:
-    bsp_message_iterator(int i, bool get_message) : i_(i) {
+    message_iterator(int i, bool get_message) : i_(i) {
         if (get_message) {
             get_message_();
         }
     }
 
-    bsp_message_iterator(const bsp_message_iterator& other)
+    message_iterator(const message_iterator& other)
         : i_(other.i_), current_message_(other.current_message_) {}
 
-    bsp_message_iterator& operator++(int) {
+    message_iterator& operator++(int) {
         auto current = *this;
         ++(*this);
         return current;
     }
 
-    bool operator==(const bsp_message_iterator& other) const {
+    bool operator==(const message_iterator& other) const {
         return i_ == other.i_;
     }
 
-    bool operator!=(const bsp_message_iterator& other) const {
+    bool operator!=(const message_iterator& other) const {
         return !(*this == other);
     }
 
     message<TTag, TContent> operator*() { return current_message_; }
 
-    bsp_message_iterator& operator++() {
+    message_iterator& operator++() {
         ++i_;
         get_message_();
         return *this;
@@ -126,9 +62,9 @@ class bsp_message_iterator
 };
 
 template <typename TTag, typename TContent>
-class bsp_message_container {
+class message_container {
   public:
-    bsp_message_container() {
+    message_container() {
         int packets = 0;
         int accum_bytes = 0;
         bsp_qsize(&packets, &accum_bytes);
@@ -136,24 +72,26 @@ class bsp_message_container {
         queue_size_ = packets;
     }
 
-    bsp_message_iterator<TTag, TContent> begin() {
-        return bsp_message_iterator<TTag, TContent>(0, true);
+    message_iterator<TTag, TContent> begin() {
+        return message_iterator<TTag, TContent>(0, true);
     }
 
-    bsp_message_iterator<TTag, TContent> end() {
-        return bsp_message_iterator<TTag, TContent>(queue_size_, false);
+    message_iterator<TTag, TContent> end() {
+        return message_iterator<TTag, TContent>(queue_size_, false);
     }
 
   private:
     int queue_size_;
 };
 
-class bsp_hub
-    : public base_hub<bsp_var, bsp_array, bsp_future, bsp_message_container> {
+class provider {
   public:
-    bsp_hub() { tag_size_ = 0; }
+    template <typename TTag, typename TContent>
+    using message_container_type = message_container<TTag, TContent>;
 
-    void spawn(int processors, std::function<void(int, int)> spmd) override {
+    provider() { tag_size_ = 0; }
+
+    void spawn(int processors, std::function<void(int, int)> spmd) {
         struct spmd_parameters {
             std::function<void(int, int)>* f;
             int* processors;
@@ -172,27 +110,28 @@ class bsp_hub
         spmd_no_args(&parameters);
     }
 
-    int available_processors() override { return bsp_nprocs(); }
-    int active_processors() override { return bsp_nprocs(); }
-    int processor_id() override { return bsp_pid(); }
+    int available_processors() const { return bsp_nprocs(); }
+    int active_processors() const { return bsp_nprocs(); }
+    int processor_id() const { return bsp_pid(); }
 
-    int next_processor() override { return (bsp_pid() + 1) % bsp_nprocs(); }
-    int prev_processor() override {
-        return (bsp_pid() + bsp_nprocs() - 1) % bsp_nprocs();
-    }
-
-    void sync() override { bsp_sync(); }
-
-  private:
-    size_t tag_size_ = 0;
+    void sync() const { bsp_sync(); }
 
     void internal_put_(int processor, void* value, void* variable, size_t size,
-                       int offset, int count) override {
+                       int offset, int count) {
         bsp_put(processor, value, variable, offset * size, count * size);
     }
 
+    void register_location_(void* location, size_t size) {
+        bsp_push_reg(location, size);
+        sync();
+    }
+
+    void unregister_location_(void* location) {
+        bsp_pop_reg(location);
+    }
+
     void internal_get_(int processor, void* variable, void* target, size_t size,
-                       int offset, int count) override {
+                       int offset, int count) {
         bsp_get(processor, variable, offset * size, target, count * size);
     }
 
@@ -209,6 +148,13 @@ class bsp_hub
 
         bsp_send(processor, tag, content, content_size);
     }
+
+
+  protected:
+    friend bulk::hub<bulk::bsp::provider>;
+
+    size_t tag_size_ = 0;
 };
 
+} // namespace bsp
 } // namespace bulk

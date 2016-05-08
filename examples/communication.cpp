@@ -1,21 +1,24 @@
 #include <iostream>
 
+#include <bulk/hub.hpp>
+#include <bulk/variable.hpp>
+#include <bulk/communication.hpp>
 #include <bulk/bsp/bulk.hpp>
 #include <bulk/util/log.hpp>
 
 
 int main() {
-    auto hub = bulk::bsp_hub();
+    auto hub = bulk::hub<bulk::bsp::provider>();
 
     hub.spawn(hub.available_processors(), [&hub](int s, int) {
-        auto a = hub.create_var<int>();
+        auto a = bulk::create_var<int>(hub);
 
-        hub.put(hub.next_processor(), s, a);
+        bulk::put(hub.next_processor(), s, a);
         hub.sync();
 
         BULK_IN_ORDER(std::cout << s << " <- " << a.value() << std::endl;)
 
-        auto b = hub.get(hub.next_processor(), a);
+        auto b = bulk::get(hub.next_processor(), a);
 
         hub.sync();
 

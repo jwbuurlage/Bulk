@@ -3,20 +3,26 @@
 
 #include <catch.hpp>
 
+#include <bulk/hub.hpp>
+#include <bulk/variable.hpp>
+#include <bulk/future.hpp>
+#include <bulk/coarray.hpp>
+#include <bulk/communication.hpp>
 #include <bulk/bsp/bulk.hpp>
 #include <bulk/util/log.hpp>
 
 #include "bulk_test_common.hpp"
 
+using provider = bulk::bsp::provider;
 
 TEST_CASE("basic communication", "[communication]") {
     SECTION("put") {
-        auto hub = bulk::bsp_hub();
+        auto hub = bulk::hub<provider>();
 
         hub.spawn(hub.available_processors(), [&hub](int s, int p) {
-            auto a = hub.create_var<int>();
+            auto a = bulk::create_var<int>(hub);
 
-            hub.put(hub.next_processor(), s, a);
+            bulk::put(hub.next_processor(), s, a);
             hub.sync();
 
             BULK_CHECK_ONCE(a.value() == ((s + p - 1) % p));
@@ -24,15 +30,18 @@ TEST_CASE("basic communication", "[communication]") {
     }
 
     SECTION("multiple put") {
-        auto hub = bulk::bsp_hub();
+        auto hub = bulk::hub<provider>();
 
         hub.spawn(hub.available_processors(), [&hub](int s, int p) {
             int size = 5;
-            std::vector<bulk::bsp_hub::var_type<int>> xs(size);
+            std::vector<bulk::var<int, decltype(hub)>> xs;
+            for (int i = 0; i < size; ++i)
+                xs.push_back(bulk::create_var<int>(hub));
 
             for (int i = 0; i < size; ++i) {
-                hub.put(hub.next_processor(), s + i, xs[i]);
+                bulk::put(hub.next_processor(), s + i, xs[i]);
             }
+
             hub.sync();
 
             for (int i = 0; i < size; ++i) {
@@ -42,13 +51,13 @@ TEST_CASE("basic communication", "[communication]") {
     }
 
     SECTION("get") {
-        auto hub = bulk::bsp_hub();
+        auto hub = bulk::hub<provider>();
 
         hub.spawn(hub.available_processors(), [&hub](int s, int) {
-            auto a = hub.create_var<int>();
+            auto a = bulk::create_var<int>(hub);
             a.value() = s;
 
-            auto b = hub.get(hub.next_processor(), a);
+            auto b = bulk::get(hub.next_processor(), a);
             hub.sync();
 
             BULK_CHECK_ONCE(b.value() == hub.next_processor());
@@ -56,16 +65,16 @@ TEST_CASE("basic communication", "[communication]") {
     }
 
     SECTION("multiple get") {
-        auto hub = bulk::bsp_hub();
+        auto hub = bulk::hub<provider>();
 
         hub.spawn(hub.available_processors(), [&hub](int s, int) {
-            auto x = hub.create_var<int>();
+            auto x = bulk::create_var<int>(hub);
             x.value() = s;
 
             int size = 5;
-            std::vector<bulk::bsp_hub::future_type<int>> ys(5);
-            for (auto& y : ys) {
-                y = hub.get(hub.next_processor(), x);
+            std::vector<bulk::future<int, decltype(hub)>> ys;
+            for (int i = 0; i < size; ++i) {
+                ys.push_back(bulk::get(hub.next_processor(), x));
             }
 
             hub.sync();
@@ -77,7 +86,7 @@ TEST_CASE("basic communication", "[communication]") {
     }
 
     SECTION("message passing") {
-        auto hub = bulk::bsp_hub();
+        auto hub = bulk::hub<provider>();
 
         hub.spawn(hub.available_processors(), [&hub](int s, int p) {
             for (int t = 0; t < p; ++t) {
@@ -100,10 +109,10 @@ TEST_CASE("basic communication", "[communication]") {
     }
 
     SECTION("coarrays") {
-        auto hub = bulk::bsp_hub();
+        auto hub = bulk::hub<provider>();
 
         hub.spawn(hub.available_processors(), [&hub](int s, int) {
-            auto xs = hub.create_coarray<int>(10);
+            auto xs = bulk::create_coarray<int>(hub, 10);
             xs(hub.next_processor())[1] = s;
 
             hub.sync();

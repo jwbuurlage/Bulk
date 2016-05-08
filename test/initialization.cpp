@@ -1,5 +1,6 @@
 #include <catch.hpp>
 
+#include <bulk/hub.hpp>
 #include <bulk/bsp/bulk.hpp>
 #include <bulk/util/log.hpp>
 
@@ -8,7 +9,7 @@
 
 TEST_CASE("initializing bulk", "[init]") {
     SECTION("spawn") {
-        auto hub = bulk::bsp_hub();
+    auto hub = bulk::hub<bulk::bsp::provider>();
 
         hub.spawn(hub.available_processors(),
                      [&hub](int s, int p) {
