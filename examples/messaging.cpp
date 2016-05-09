@@ -2,7 +2,6 @@
 
 #include <bulk/bulk.hpp>
 #include <bulk/bsp/bulk.hpp>
-#include <bulk/util/log.hpp>
 
 
 int main() {

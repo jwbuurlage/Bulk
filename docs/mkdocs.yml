@@ -1,5 +1,5 @@
 site_name: Bulk
-theme: bootstrap
+theme: cinder
 google_analytics: ['UA-59249373-1', 'http://codu.in/bulk/docs']
 
 docs_dir: pages
@@ -8,19 +8,44 @@ pages:
 - Home: 'index.md'
 - API:
     - 'Index': 'api/index.md'
-    - 'bulk::hub':
-        - 'bulk::hub': 'api/hub.md'
-        - 'active_processors': 'api/hub/active_processors.md'
-        - 'available_processors': 'api/hub/available_processors.md'
-        - 'messages' : 'api/hub/messages.md'
-        - 'next_processor' : 'api/hub/next_processor.md'
-        - 'prev_processor' : 'api/hub/prev_processor.md'
-        - 'processor_id' : 'api/hub/processor_id.md'
-        - 'provider' : 'api/hub/provider.md'
-        - 'send' : 'api/hub/send.md'
-        - 'spawn' : 'api/hub/spawn.md'
-        - 'sync' : 'api/hub/sync.md'
-
+    - Classes:
+        - 'hub': 'api/hub.md'
+        - 'provider': 'api/provider.md'
+        - 'var': 'api/var.md'
+        - 'future': 'api/future.md'
+        - 'array': 'api/array.md'
+        - 'coarray': 'api/coarray.md'
+        - 'put': 'api/put.md'
+        - 'get': 'api/get.md'
+        - 'message': 'api/message.md'
+        - 'message_container': 'api/message_container.md'
+        - 'reduce': 'api/reduce.md'
+    - Functions:
+        - hub:
+            - 'active_processors': 'api/hub/active_processors.md'
+            - 'available_processors': 'api/hub/available_processors.md'
+            - 'messages' : 'api/hub/messages.md'
+            - 'next_processor' : 'api/hub/next_processor.md'
+            - 'prev_processor' : 'api/hub/prev_processor.md'
+            - 'processor_id' : 'api/hub/processor_id.md'
+            - 'provider' : 'api/hub/provider.md'
+            - 'send' : 'api/hub/send.md'
+            - 'spawn' : 'api/hub/spawn.md'
+            - 'sync' : 'api/hub/sync.md'
+        - var:
+            - '(constructor)' : 'api/var/constructor.md'
+            - '(deconstructor)' : 'api/var/deconstructor.md'
+            - 'operator=' : 'api/var/assignment_operator.md'
+            - 'create_var' : 'api/var/create_var.md'
+            - 'value' : 'api/var/value.md'
+            - 'hub' : 'api/var/hub.md'
+        - future:
+            - '(constructor)' : 'api/future/constructor.md'
+            - '(deconstructor)' : 'api/future/deconstructor.md'
+            - 'operator=' : 'api/future/assignment_operator.md'
+            - 'create_future' : 'api/future/create_future.md'
+            - 'value' : 'api/future/value.md'
+            - 'hub' : 'api/future/hub.md'
 
 extra:
     release: "0.0.1"
