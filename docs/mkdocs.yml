@@ -8,8 +8,18 @@ pages:
 - Home: 'index.md'
 - API:
     - 'Index': 'api/index.md'
-    - 'bulk::hub': 'api/hub.md'
-    - 'available_processors': 'api/hub/available_processors.md'
+    - 'bulk::hub':
+        - 'bulk::hub': 'api/hub.md'
+        - 'active_processors': 'api/hub/active_processors.md'
+        - 'available_processors': 'api/hub/available_processors.md'
+        - 'messages' : 'api/hub/messages.md'
+        - 'next_processor' : 'api/hub/next_processor.md'
+        - 'prev_processor' : 'api/hub/prev_processor.md'
+        - 'processor_id' : 'api/hub/processor_id.md'
+        - 'provider' : 'api/hub/provider.md'
+        - 'send' : 'api/hub/send.md'
+        - 'spawn' : 'api/hub/spawn.md'
+        - 'sync' : 'api/hub/sync.md'
 
 
 extra:

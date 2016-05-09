@@ -44,6 +44,7 @@ class hub;
 ```cpp
 #include <iostream>
 
+#include <bulk/hub.hpp>
 #include <bulk/bsp/bulk.hpp>
 
 

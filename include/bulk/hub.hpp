@@ -62,7 +62,7 @@ class hub {
         return (processor_id() + active_processors() - 1) % active_processors();
     }
 
-    /// Performs a global barrier synchronization
+    /// Performs a global barrier synchronization of the active processors.
     void sync() const { provider_.sync(); }
 
     /// Sends a message to a remote processor
@@ -76,6 +76,9 @@ class hub {
                                  sizeof(TContent));
     }
 
+    /// Returns an iterable container containing the messages sent in the previous superstep.
+    ///
+    /// \returns an iterable message container
     template <typename TTag, typename TContent>
     message_container<TTag, TContent> messages() const {
         return message_container<TTag, TContent>();
@@ -88,6 +91,9 @@ class hub {
         provider_.unregister_location_(location);
     }
 
+    /// Returns the provider of the distributed system
+    ///
+    /// \returns the distributed system provider
     Provider& provider() { return provider_; }
 
   private:
