@@ -1,0 +1,22 @@
+h1 {
+    font-size: 32px;
+    font-weight: bold
+}
+
+h2 {
+    font-size: 18px;
+    font-weight: bold
+}
+
+h3 {
+    font-size: 14px;
+    font-weight: bold
+}
+
+code {
+    color: #3366aa;
+}
+
+a code {
+    font-weight: bold;
+}

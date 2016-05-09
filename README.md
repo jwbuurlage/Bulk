@@ -48,7 +48,6 @@ Authors
 -------
 
 * Jan-Willem Buurlage
-* Tom Bannink
 
 License
 -------

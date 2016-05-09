@@ -17,14 +17,15 @@ A `return_type` containing foobar
 
 ## Complexity and cost
 
-* Complexity is `O(n^2)`.
-* Cost is `2g + l`
+* **Complexity** - `O(n^2)`.
+* **Cost** - `2g + l`
 
 ## Example
 
 ```cpp
 #include <iostream>
 
+#include <bulk/hub.hpp>
 #include <bulk/bsp/bulk.hpp>
 
 

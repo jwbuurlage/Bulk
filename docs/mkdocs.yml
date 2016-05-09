@@ -1,6 +1,9 @@
 site_name: Bulk
-theme: bootstrap
+
+theme: cinder
 google_analytics: ['UA-59249373-1', 'http://codu.in/bulk/docs']
+repo_url: "https://github.com/jwbuurlage/bulk"
+copyright: "Bulk is licensed under the <a href='https://github.com/jwbuurlage/bulk/blob/master/LICENSE.md'>MIT license</a>"
 
 docs_dir: pages
 
@@ -8,9 +11,63 @@ pages:
 - Home: 'index.md'
 - API:
     - 'Index': 'api/index.md'
-    - 'bulk::hub': 'api/hub.md'
-    - 'available_processors': 'api/hub/available_processors.md'
+    - Classes:
+        - 'hub': 'api/hub.md'
+        - 'provider': 'api/provider.md'
+        - 'var': 'api/var.md'
+        - 'future': 'api/future.md'
+        - 'coarray': 'api/coarray.md'
+        - 'message': 'api/message.md'
+        - 'message_container': 'api/message_container.md'
+    - Functions:
+        - 'put': 'api/put.md'
+        - 'get': 'api/get.md'
+        - 'reduce': 'api/reduce.md'
+        - hub:
+            - 'active_processors': 'api/hub/active_processors.md'
+            - 'available_processors': 'api/hub/available_processors.md'
+            - 'messages' : 'api/hub/messages.md'
+            - 'next_processor' : 'api/hub/next_processor.md'
+            - 'prev_processor' : 'api/hub/prev_processor.md'
+            - 'processor_id' : 'api/hub/processor_id.md'
+            - 'provider' : 'api/hub/provider.md'
+            - 'send' : 'api/hub/send.md'
+            - 'spawn' : 'api/hub/spawn.md'
+            - 'sync' : 'api/hub/sync.md'
+        - var:
+            - '(constructor)' : 'api/var/constructor.md'
+            - '(deconstructor)' : 'api/var/deconstructor.md'
+            - 'operator=' : 'api/var/assignment_operator.md'
+            - 'value' : 'api/var/value.md'
+            - 'hub' : 'api/var/hub.md'
+            - 'bulk::create_var' : 'api/var/create_var.md'
+        - future:
+            - '(constructor)' : 'api/future/constructor.md'
+            - '(deconstructor)' : 'api/future/deconstructor.md'
+            - 'operator=' : 'api/future/assignment_operator.md'
+            - 'value' : 'api/future/value.md'
+            - 'hub' : 'api/future/hub.md'
+            - 'bulk::create_future' : 'api/future/create_future.md'
+        - coarray:
+            - '(constructor)' : 'api/coarray/constructor.md'
+            - '(deconstructor)' : 'api/coarray/deconstructor.md'
+            - 'operator()' : 'api/coarray/parentheses_operator.md'
+            - 'operator[]' : 'api/coarray/square_brackets_operator.md'
+            - 'hub' : 'api/coarray/hub.md'
+            - 'bulk::create_coarray' : 'api/coarray/create_coarray.md'
+            - '(class) image' : 'api/coarray/image.md'
+            - '(class) writer' : 'api/coarray/writer.md'
+    - Utility:
+        - 'log': 'api/log.md'
 
+- Providers:
+    - Multicore:
+        - 'Native C++': 'providers/cpp.md'
+        - 'Multicore-BSP': 'providers/mcbsp.md'
+    - Clusters:
+        - 'gRPC': 'providers/grpc.md'
+    - Embedded:
+        - 'Epiphany BSP': 'providers/ebsp.md'
 
 extra:
     release: "0.0.1"
