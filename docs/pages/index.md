@@ -1,5 +1,5 @@
-Welcome to Bulk's documentation!
-================================
+Bulk
+====
 
 Bulk is a library for writing parallel and distributed software.
 

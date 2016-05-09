@@ -1,26 +1,26 @@
-# `bulk::create_var`
+# `bulk::create_future`
 
-Defined in header `<bulk/variables.hpp>`.
+Defined in header `<bulk/future.hpp>`.
 
 ```cpp
 template<typename T, typename Hub>
-var<T, Hub> create_var(Hub& hub);
+future<T, Hub> create_future(Hub& hub);
 ```
 
-Alternative method of constructing a variable.
+Alternative method of constructing a future.
 
 ## Template parameters
 
-* `T` - the type of the value stored in the local image of the variable.
-* `Hub` - the type of hub to which this variable belongs.
+* `T` - the type of the value stored in the local image of the future.
+* `Hub` - the type of hub to which this future belongs.
 
 ## Parameters
 
-* `hub` - the hub this variable belongs to
+* `hub` - the hub this future belongs to
 
 ## Return value
 
-A newly constructed variable
+A newly constructed future
 
 ## Complexity and cost
 
@@ -32,6 +32,7 @@ A newly constructed variable
 #include <iostream>
 
 #include <bulk/hub.hpp>
+#include <bulk/future.hpp>
 #include <bulk/bsp/bulk.hpp>
 
 
@@ -39,7 +40,7 @@ int main() {
     auto hub = bulk::hub<bulk::bsp::provider>();
 
     hub.spawn(hub.available_processors(), [&hub](int s, int p) {
-        auto x = bulk::create_var<int>(hub);
+        auto x = bulk::create_future<int>(hub);
     });
 
     return 0;

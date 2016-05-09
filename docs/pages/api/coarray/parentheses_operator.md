@@ -1,14 +1,14 @@
-# `bulk::future::future`
+# `bulk::coarray::operator()`
 
 ```cpp
-future(Hub& hub); // 1.
+image operator()(int t);
 ```
 
-1. Constructs a future for use in `hub`.
+Obtain an object encapsulating the image of the coarray.
 
 ## Parameters
 
-* `hub` - the hub this future belongs to
+* `t` - the image index
 
 ## Example
 
@@ -16,7 +16,7 @@ future(Hub& hub); // 1.
 #include <iostream>
 
 #include <bulk/hub.hpp>
-#include <bulk/future.hpp>
+#include <bulk/coarray.hpp>
 #include <bulk/bsp/bulk.hpp>
 
 
@@ -24,7 +24,8 @@ int main() {
     auto hub = bulk::hub<bulk::bsp::provider>();
 
     hub.spawn(hub.available_processors(), [&hub](int s, int p) {
-        auto f = bulk::future<int, decltype(hub)>(hub);
+        auto xs = bulk::create_coarray<int>(hub, 10);
+        auto xs_image = xs(0);
     });
 
     return 0;

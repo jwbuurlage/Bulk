@@ -1,4 +1,6 @@
+
 # `bulk::provider`
+
 
 Defined in header `<bulk/provider.hpp>`.
 
@@ -7,6 +9,11 @@ class provider;
 ```
 
 `bulk::provider` providers low-level transport layer functionality for the hub.
+
+
+## To-do
+
+Because the provider interface is still unstable, there is no detailed documentation available.
 
 ## Example
 

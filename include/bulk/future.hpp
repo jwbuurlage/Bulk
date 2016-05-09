@@ -39,7 +39,7 @@ class future {
 
   private:
     template <typename S, typename Gub>
-    friend future<S, Gub> get(int, var<S, Gub>&, int, int);
+    friend future<S, Gub> get(int, var<S, Gub>&);
 
     T* buffer_ = nullptr;
     Hub& hub_;

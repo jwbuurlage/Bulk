@@ -9,8 +9,7 @@ Bulk API reference
 | **Distributed objects and communication**         |                                                                 |
 | [`bulk::var`](var.md)                             | a distributed variable with an image for each processor         |
 | [`bulk::future`](future.md)                       | an object which encapsulates a value known in future supersteps |
-| [`bulk::array`](array.md)                         | a distributed array with a local array image for each processor |
-| [`bulk::coarray`](coarray.md)                     | a co-array implementation on top of `array`                     |
+| [`bulk::coarray`](coarray.md)                     | a distributed array with a local array image for each processor |
 | [`bulk::put`](put.md)                             | send information to a remote processor                          |
 | [`bulk::get`](get.md)                             | obtain information from a remote processor                      |
 | **Message passing**                               |                                                                 |
