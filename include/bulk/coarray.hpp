@@ -16,12 +16,12 @@ namespace bulk {
 /// and the second dimension is over local 1-dimensional array indices.
 ///
 /// \example
-///     auto xs = create_coarray<int>(hub, 10);
+///     auto xs = create_coarray<int>(world, 10);
 ///     // set the 5th element on the 1st processor to 4
 ///     xs(1)[5] = 4;
 ///     // set the 3rd element on the local processor to 2
 ///     xs[3] = 2;
-template <typename T, class Hub>
+template <typename T, class World>
 class coarray {
   public:
     class writer {
@@ -34,42 +34,42 @@ class coarray {
         }
 
       private:
-        friend coarray<T, Hub>;
+        friend coarray<T, World>;
 
-        writer(Hub& hub, coarray<T, Hub>& parent, int t, int i)
-            : hub_(hub), parent_(parent), t_(t), i_(i) {}
+        writer(World& world, coarray<T, World>& parent, int t, int i)
+            : world_(world), parent_(parent), t_(t), i_(i) {}
 
-        Hub& hub_;
-        coarray<T, Hub>& parent_;
+        World& world_;
+        coarray<T, World>& parent_;
         int t_;
         int i_;
     };
 
     class image {
       public:
-        image(Hub& hub, coarray<T, Hub>& parent, int t)
-            : hub_(hub), parent_(parent), t_(t) {}
+        image(World& world, coarray<T, World>& parent, int t)
+            : world_(world), parent_(parent), t_(t) {}
 
         /// Returns a writer to the remote element
         /// 
         /// \param i the index of the remote element
         writer operator[](int i) {
-            return writer(hub_, parent_, t_, i);
+            return writer(world_, parent_, t_, i);
         }
 
       private:
-        Hub& hub_;
-        coarray<T, Hub>& parent_;
+        World& world_;
+        coarray<T, World>& parent_;
         int t_;
     };
 
-    /// Initialize and registers the coarray with the hub
-    coarray(Hub& hub, int local_size) : hub_(hub), data_(hub_, local_size) {}
+    /// Initialize and registers the coarray with the world
+    coarray(World& world, int local_size) : world_(world), data_(world_, local_size) {}
 
-    /// Initialize and registers the coarray with the hub. In addition, also
+    /// Initialize and registers the coarray with the world. In addition, also
     /// sets the elements to a default value
-    coarray(Hub& hub, int local_size, T default_value)
-        : hub_(hub), data_(hub_, local_size) {
+    coarray(World& world, int local_size, T default_value)
+        : world_(world), data_(world_, local_size) {
         for (int i = 0; i < local_size; ++i) {
             data_[i] = default_value;
         }
@@ -80,7 +80,7 @@ class coarray {
     /// \param t index of the target image
     /// \returns the coarray image with index t
     image operator()(int t) {
-        return image(hub_, *this, t);
+        return image(world_, *this, t);
     }
 
     /// Access the i-th element of the local coarray image
@@ -89,24 +89,24 @@ class coarray {
     /// \returns reference to the i-th element of the local image
     T& operator[](int i) { return data_[i]; }
 
-    /// Returns the hub the coarray belongs to
+    /// Returns the world the coarray belongs to
     ///
-    /// \returns reference to hub corresponding to the coarray
-    Hub& hub() { return hub_; }
+    /// \returns reference to world corresponding to the coarray
+    World& world() { return world_; }
 
   private:
     friend image;
     friend writer;
 
-    Hub& hub_;
-    array<T, Hub> data_;
+    World& world_;
+    array<T, World> data_;
 
-    array<T, Hub>& data() { return data_; }
+    array<T, World>& data() { return data_; }
 };
 
-template<typename T, typename Hub>
-coarray<T, Hub> create_coarray(Hub& hub, int local_size) {
-      return coarray<T, Hub>(hub, local_size);
+template<typename T, typename World>
+coarray<T, World> create_coarray(World& world, int local_size) {
+      return coarray<T, World>(world, local_size);
 }
 
 } // namespace bulk

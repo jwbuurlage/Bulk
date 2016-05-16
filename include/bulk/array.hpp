@@ -2,17 +2,17 @@
 
 namespace bulk {
 
-template <typename T, class Hub>
+template <typename T, class World>
 class array {
   public:
-    array(Hub& hub, int size) : hub_(hub) {
+    array(World& world, int size) : world_(world) {
         data_ = new T[size];
-        hub_.register_location_(data_, sizeof(T) * size);
+        world_.register_location_(data_, sizeof(T) * size);
     }
 
     ~array() {
         if (data_ != nullptr) {
-            hub_.unregister_location_(data_);
+            world_.unregister_location_(data_);
             delete[] data_;
         }
     }
@@ -20,16 +20,16 @@ class array {
     T* data() { return data_; }
     T& operator[](int i) { return data_[i]; }
 
-    Hub& hub() { return hub_; }
+    World& world() { return world_; }
 
   private:
-    Hub& hub_;
+    World& world_;
     T* data_;
 };
 
-template<typename T, typename Hub>
-array<T, Hub> create_array(Hub& hub, int size) {
-      return array<T, Hub>(hub, size);
+template<typename T, typename World>
+array<T, World> create_array(World& world, int size) {
+      return array<T, World>(world, size);
 }
 
 } // namespace bulk
