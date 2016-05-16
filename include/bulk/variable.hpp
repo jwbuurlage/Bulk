@@ -20,9 +20,7 @@ class var {
     void operator=(var<T, Hub>& other) = delete;
 
     /// Move from one var to another
-    var(var<T, Hub>&& other) : hub_(other.hub_) {
-        *this = std::move(other);
-    }
+    var(var<T, Hub>&& other) : hub_(other.hub_) { *this = std::move(other); }
 
     /// Move from one var to another
     void operator=(var<T, Hub>&& other) {
@@ -30,8 +28,22 @@ class var {
         value_ = other.value();
     }
 
-    /// Returns the value held by the local image of the var
+    /// Explicitly get the value held by the local image of the var
     T& value() { return value_; }
+
+    /// Implicitly get the value held by the local image of the var
+    ///
+    /// \note This is for code like `myint = myvar + 5;`.
+    operator T&() { return value_; }
+    operator const T&() const { return value_; }
+
+    /// Write to the local image
+    ///
+    /// \note This is for code like `myvar = 5;`.
+    var<T, Hub>& operator=(const T& rhs) {
+        value_ = rhs;
+        return *this;
+    }
 
     /// Returns the hub to which this variable belongs
     Hub& hub() { return hub_; }
@@ -45,9 +57,9 @@ class var {
 ///
 /// \note this function is included so that the programmer does not explicitely
 /// has to pass the type of the hub
-template<typename T, typename Hub>
+template <typename T, typename Hub>
 var<T, Hub> create_var(Hub& hub) {
-      return var<T, Hub>(hub);
+    return var<T, Hub>(hub);
 }
 
 } // namespace bulk
