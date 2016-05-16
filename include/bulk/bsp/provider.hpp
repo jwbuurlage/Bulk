@@ -9,7 +9,7 @@ extern "C" {
 }
 
 #include <bulk/util/log.hpp>
-#include <bulk/hub.hpp>
+#include <bulk/world.hpp>
 
 
 namespace bulk {
@@ -84,33 +84,13 @@ class message_container {
     int queue_size_;
 };
 
-class provider {
+class world_provider {
   public:
     template <typename TTag, typename TContent>
     using message_container_type = message_container<TTag, TContent>;
 
-    provider() { tag_size_ = 0; }
+    world_provider() { tag_size_ = 0; }
 
-    void spawn(int processors, std::function<void(int, int)> spmd) {
-        struct spmd_parameters {
-            std::function<void(int, int)>* f;
-            int* processors;
-        };
-
-        auto spmd_no_args = [](void* parameters_ptr) {
-            spmd_parameters* parameters = (spmd_parameters*)parameters_ptr;
-
-            bsp_begin(*(parameters->processors));
-            (*(parameters->f))(bsp_pid(), bsp_nprocs());
-            bsp_end();
-        };
-
-        spmd_parameters parameters = {&spmd, &processors};
-        bsp_init_with_user_data(spmd_no_args, 0, nullptr, &parameters);
-        spmd_no_args(&parameters);
-    }
-
-    int available_processors() const { return bsp_nprocs(); }
     int active_processors() const { return bsp_nprocs(); }
     int processor_id() const { return bsp_pid(); }
 
@@ -142,8 +122,7 @@ class provider {
             bsp_set_tagsize(&tag_size_copy);
             sync();
 
-            if (processor_id() == 0)
-                tag_size_ = tag_size;
+            tag_size_ = tag_size;
         }
 
         bsp_send(processor, tag, content, content_size);
@@ -151,9 +130,34 @@ class provider {
 
 
   protected:
-    friend bulk::hub<bulk::bsp::provider>;
-
     size_t tag_size_ = 0;
+};
+
+class provider {
+  public:
+    using world_provider_type = world_provider;
+
+    void spawn(int processors,
+               std::function<void(bulk::world<world_provider>, int, int)> spmd) {
+        struct spmd_parameters {
+            std::function<void(bulk::world<world_provider>, int, int)>* f;
+            int* processors;
+        };
+
+        auto spmd_no_args = [](void* parameters_ptr) {
+            spmd_parameters* parameters = (spmd_parameters*)parameters_ptr;
+
+            bsp_begin(*(parameters->processors));
+            (*(parameters->f))(bulk::world<world_provider>(), bsp_pid(), bsp_nprocs());
+            bsp_end();
+        };
+
+        spmd_parameters parameters = {&spmd, &processors};
+        bsp_init_with_user_data(spmd_no_args, 0, nullptr, &parameters);
+        spmd_no_args(&parameters);
+    }
+
+    int available_processors() const { return bsp_nprocs(); }
 };
 
 } // namespace bsp

@@ -14,7 +14,7 @@
     }
 
 #define BULK_LOG_VAR_BODY(var)                                                 \
-    std::cout << "$" << hub.processor_id() << ": "                             \
+    std::cout << "$" << world.processor_id() << ": "                             \
               << #var " = " << var << std::endl;
 
 #define BULK_LOG_VAR(var) BULK_IN_ORDER(BULK_LOG_VAR_BODY(var))

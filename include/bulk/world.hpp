@@ -14,27 +14,12 @@ struct message {
     TContent content;
 };
 
-template <class Provider>
-class hub {
+template <class WorldProvider>
+class world {
   public:
     template <typename TTag, typename TContent>
     using message_container =
-        typename Provider::template message_container_type<TTag, TContent>;
-
-    /// Start an spmd section on a given number of processors.
-    ///
-    /// \param processors the number of processors to run on
-    /// \param spmd the spmd function that gets run on each (virtual) processor
-    void spawn(int processors, std::function<void(int, int)> spmd) {
-        provider_.spawn(processors, spmd);
-    }
-
-    /// Returns the total number of processors available on the system
-    ///
-    /// \returns the number of available processors
-    int available_processors() const {
-        return provider_.available_processors();
-    }
+        typename WorldProvider::template message_container_type<TTag, TContent>;
 
     /// Returns the total number of active processors in a spmd section
     ///
@@ -91,13 +76,13 @@ class hub {
         provider_.unregister_location_(location);
     }
 
-    /// Returns the provider of the distributed system
+    /// Returns the provider of the world
     ///
     /// \returns the distributed system provider
-    Provider& provider() { return provider_; }
+    WorldProvider& provider() { return provider_; }
 
   private:
-    Provider provider_;
+    WorldProvider provider_;
 };
 
 } // namespace bulk

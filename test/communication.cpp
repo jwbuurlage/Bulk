@@ -3,46 +3,43 @@
 
 #include <catch.hpp>
 
-#include <bulk/hub.hpp>
-#include <bulk/variable.hpp>
-#include <bulk/future.hpp>
-#include <bulk/coarray.hpp>
-#include <bulk/communication.hpp>
-#include <bulk/bsp/bulk.hpp>
+#include <bulk/bulk.hpp>
+#include <bulk/bsp/provider.hpp>
 #include <bulk/util/log.hpp>
 
 #include "bulk_test_common.hpp"
 
 using provider = bulk::bsp::provider;
 
+
 TEST_CASE("basic communication", "[communication]") {
     SECTION("put") {
-        auto hub = bulk::hub<provider>();
+        auto env = bulk::environment<provider>();
 
-        hub.spawn(hub.available_processors(), [&hub](int s, int p) {
-            auto a = bulk::create_var<int>(hub);
+        env.spawn(env.available_processors(), [](auto world, int s, int p) {
+            auto a = bulk::create_var<int>(world);
 
-            bulk::put(hub.next_processor(), s, a);
-            hub.sync();
+            bulk::put(world.next_processor(), s, a);
+            world.sync();
 
             BULK_CHECK_ONCE(a.value() == ((s + p - 1) % p));
         });
     }
 
     SECTION("multiple put") {
-        auto hub = bulk::hub<provider>();
+        auto env = bulk::environment<provider>();
 
-        hub.spawn(hub.available_processors(), [&hub](int s, int p) {
+        env.spawn(env.available_processors(), [](auto world, int s, int p) {
             int size = 5;
-            std::vector<bulk::var<int, decltype(hub)>> xs;
+            std::vector<bulk::var<int, decltype(world)>> xs;
             for (int i = 0; i < size; ++i)
-                xs.push_back(bulk::create_var<int>(hub));
+                xs.push_back(bulk::create_var<int>(world));
 
             for (int i = 0; i < size; ++i) {
-                bulk::put(hub.next_processor(), s + i, xs[i]);
+                bulk::put(world.next_processor(), s + i, xs[i]);
             }
 
-            hub.sync();
+            world.sync();
 
             for (int i = 0; i < size; ++i) {
                 BULK_CHECK_ONCE(xs[i].value() == ((s + p - 1) % p) + i);
@@ -51,73 +48,75 @@ TEST_CASE("basic communication", "[communication]") {
     }
 
     SECTION("get") {
-        auto hub = bulk::hub<provider>();
+        auto env = bulk::environment<provider>();
 
-        hub.spawn(hub.available_processors(), [&hub](int s, int) {
-            auto a = bulk::create_var<int>(hub);
+        env.spawn(env.available_processors(), [](auto world, int s, int) {
+            auto a = bulk::create_var<int>(world);
             a.value() = s;
 
-            auto b = bulk::get(hub.next_processor(), a);
-            hub.sync();
+            auto b = bulk::get(world.next_processor(), a);
+            world.sync();
 
-            BULK_CHECK_ONCE(b.value() == hub.next_processor());
+            BULK_CHECK_ONCE(b.value() == world.next_processor());
         });
     }
 
     SECTION("multiple get") {
-        auto hub = bulk::hub<provider>();
+        auto env = bulk::environment<provider>();
 
-        hub.spawn(hub.available_processors(), [&hub](int s, int) {
-            auto x = bulk::create_var<int>(hub);
+        env.spawn(env.available_processors(), [](auto world, int s, int) {
+            auto x = bulk::create_var<int>(world);
             x.value() = s;
 
             int size = 5;
-            std::vector<bulk::future<int, decltype(hub)>> ys;
+            std::vector<bulk::future<int, decltype(world)>> ys;
             for (int i = 0; i < size; ++i) {
-                ys.push_back(bulk::get(hub.next_processor(), x));
+                ys.push_back(bulk::get(world.next_processor(), x));
             }
 
-            hub.sync();
+            world.sync();
 
             for (auto& y : ys) {
-                BULK_CHECK_ONCE(y.value() == hub.next_processor());
+                BULK_CHECK_ONCE(y.value() == world.next_processor());
             }
         });
     }
 
     SECTION("message passing") {
-        auto hub = bulk::hub<provider>();
+        auto env = bulk::environment<provider>();
 
-        hub.spawn(hub.available_processors(), [&hub](int s, int p) {
-            for (int t = 0; t < p; ++t) {
-                hub.send<int, int>(t, s, s);
-            }
+        env.spawn(
+            env.available_processors(),
+            [](bulk::environment<provider>::world_type world, int s, int p) {
+                for (int t = 0; t < p; ++t) {
+                    world.send<int, int>(t, s, s);
+                }
 
-            hub.sync();
+                world.sync();
 
-            std::vector<int> contents;
-            for (auto message : hub.messages<int, int>()) {
-                contents.push_back(message.content);
-            }
-            std::sort(contents.begin(), contents.end());
+                std::vector<int> contents;
+                for (auto message : world.messages<int, int>()) {
+                    contents.push_back(message.content);
+                }
+                std::sort(contents.begin(), contents.end());
 
-            std::vector<int> compare_result(p);
-            std::iota(compare_result.begin(), compare_result.end(), 0);
+                std::vector<int> compare_result(p);
+                std::iota(compare_result.begin(), compare_result.end(), 0);
 
-            BULK_CHECK_ONCE(compare_result == contents);
-        });
+                BULK_CHECK_ONCE(compare_result == contents);
+            });
     }
 
     SECTION("coarrays") {
-        auto hub = bulk::hub<provider>();
+        auto env = bulk::environment<provider>();
 
-        hub.spawn(hub.available_processors(), [&hub](int s, int) {
-            auto xs = bulk::create_coarray<int>(hub, 10);
-            xs(hub.next_processor())[1] = s;
+        env.spawn(env.available_processors(), [](auto world, int s, int) {
+            auto xs = bulk::create_coarray<int>(world, 10);
+            xs(world.next_processor())[1] = s;
 
-            hub.sync();
+            world.sync();
 
-            BULK_CHECK_ONCE(xs[1] == hub.prev_processor());
+            BULK_CHECK_ONCE(xs[1] == world.prev_processor());
 
             xs[3] = 2;
 
