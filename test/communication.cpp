@@ -110,17 +110,19 @@ TEST_CASE("basic communication", "[communication]") {
     SECTION("coarrays") {
         auto env = bulk::environment<provider>();
 
-        env.spawn(env.available_processors(), [](auto world, int s, int) {
-            auto xs = bulk::create_coarray<int>(world, 10);
-            xs(world.next_processor())[1] = s;
+        env.spawn(
+            env.available_processors(),
+            [](bulk::environment<provider>::world_type world, int s, int) {
+                auto xs = bulk::create_coarray<int>(world, 10);
+                xs(world.next_processor())[1] = s;
 
-            world.sync();
+                world.sync();
 
-            BULK_CHECK_ONCE(xs[1] == world.prev_processor());
+                BULK_CHECK_ONCE(xs[1] == world.prev_processor());
 
-            xs[3] = 2;
+                xs[3] = 2;
 
-            BULK_CHECK_ONCE(xs[3] == 2);
-        });
+                BULK_CHECK_ONCE(xs[3] == 2);
+            });
     }
 }

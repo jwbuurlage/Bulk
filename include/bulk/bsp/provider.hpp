@@ -10,6 +10,10 @@ extern "C" {
 
 #include <bulk/util/log.hpp>
 #include <bulk/world.hpp>
+#include <bulk/variable.hpp>
+#include <bulk/future.hpp>
+#include <bulk/coarray.hpp>
+#include <bulk/array.hpp>
 
 
 namespace bulk {
@@ -89,6 +93,18 @@ class world_provider {
     template <typename TTag, typename TContent>
     using message_container_type = message_container<TTag, TContent>;
 
+    template <typename T>
+    using var_type = bulk::var<T, bulk::world<world_provider>>;
+
+    template <typename T>
+    using future_type = bulk::future<T, bulk::world<world_provider>>;
+
+    template <typename T>
+    using coarray_type = bulk::coarray<T, bulk::world<world_provider>>;
+
+    template <typename T>
+    using array_type = bulk::array<T, bulk::world<world_provider>>;
+
     world_provider() { tag_size_ = 0; }
 
     int active_processors() const { return bsp_nprocs(); }
@@ -128,8 +144,7 @@ class world_provider {
         bsp_send(processor, tag, content, content_size);
     }
 
-
-  protected:
+  private:
     size_t tag_size_ = 0;
 };
 

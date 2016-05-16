@@ -28,7 +28,7 @@ class array {
 };
 
 template<typename T, typename World>
-array<T, World> create_array(World& world, int size) {
+typename World::template array_type<T> create_array(World& world, int size) {
       return array<T, World>(world, size);
 }
 

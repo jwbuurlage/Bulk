@@ -105,7 +105,7 @@ class coarray {
 };
 
 template<typename T, typename World>
-coarray<T, World> create_coarray(World& world, int local_size) {
+typename World::template coarray_type<T> create_coarray(World& world, int local_size) {
       return coarray<T, World>(world, local_size);
 }
 

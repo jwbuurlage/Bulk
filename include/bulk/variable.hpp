@@ -11,7 +11,9 @@ template <typename T, class World>
 class var {
   public:
     /// Initialize and registers the variable with the world
-    var(World& world) : world_(world) { world_.register_location_(&value_, sizeof(T)); }
+    var(World& world) : world_(world) {
+        world_.register_location_(&value_, sizeof(T));
+    }
 
     /// Deconstructs and deregisters the variable with the world
     ~var() { world_.unregister_location_(&value_); }
@@ -46,7 +48,7 @@ class var {
 /// \note this function is included so that the programmer does not explicitely
 /// has to pass the type of the world
 template<typename T, typename World>
-var<T, World> create_var(World& world) {
+typename World::template var_type<T> create_var(World& world) {
       return var<T, World>(world);
 }
 

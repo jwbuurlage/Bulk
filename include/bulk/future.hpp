@@ -50,7 +50,7 @@ class future {
 /// \note this function is included so that the programmer does not explicitely
 /// has to pass the type of the world
 template<typename T, typename World>
-future<T, World> create_future(World& world) {
+typename World::template future<T> create_future(World& world) {
       return future<T, World>(world);
 }
 

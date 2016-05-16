@@ -21,6 +21,18 @@ class world {
     using message_container =
         typename WorldProvider::template message_container_type<TTag, TContent>;
 
+    template <typename T>
+    using var_type = typename WorldProvider::template var_type<T>;
+
+    template <typename T>
+    using future_type = typename WorldProvider::template future_type<T>;
+
+    template <typename T>
+    using coarray_type = typename WorldProvider::template coarray_type<T>;
+
+    template <typename T>
+    using array_type = typename WorldProvider::template array_type<T>;
+
     /// Returns the total number of active processors in a spmd section
     ///
     /// \returns the number of active processors
