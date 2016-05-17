@@ -1,41 +1,67 @@
 #pragma once
 
+/**
+ * \file variable.hpp
+ *
+ * This header defines a distributed variable, which has a value on each
+ * processor.
+ */
+
 namespace bulk {
 
 template <typename T, class World>
 class future;
 
-/// Represents a distributed object with an image for each processor, that is
-/// readable and writable from remote processors.
+/**
+ * Represents a distributed object with an image for each processor, that is
+ * readable and writable from remote processors.
+ */
 template <typename T, class World>
 class var {
   public:
-    /// Initialize and registers the variable with the world
+    /**
+     * \brief Initialize and registers the variable with the world
+     */
     var(World& world) : world_(world) {
         world_.register_location_(&value_, sizeof(T));
     }
 
-    /// Deconstructs and deregisters the variable with the world
+    /**
+     * \brief Deconstructs and deregisters the variable with the world
+     */
     ~var() { world_.unregister_location_(&value_); }
 
     var(var<T, World>& other) = delete;
     void operator=(var<T, World>& other) = delete;
 
-    /// Move from one var to another
+    /**
+     * \brief Move from one var to another
+     */
     var(var<T, World>&& other) : world_(other.world_) {
         *this = std::move(other);
     }
 
-    /// Move from one var to another
+    /**
+     * \brief Move from one var to another
+     */
     void operator=(var<T, World>&& other) {
         world_.register_location_(&value_, sizeof(T));
         value_ = other.value();
     }
 
-    /// Returns the value held by the local image of the var
+    /**
+     * \brief Returns the value held by the local image of the var
+     *
+     * \returns a reference to the value held by the local image
+     */
     T& value() { return value_; }
 
-    /// Returns the world to which this variable belongs
+
+    /**
+     * \brief Retrieve the world to which this array is registed.
+     *
+     * \returns a reference to the world of the array
+     */
     World& world() { return world_; }
 
   private:
@@ -43,10 +69,14 @@ class var {
     World& world_;
 };
 
-/// Create a variable and register it with a world
-///
-/// \note this function is included so that the programmer does not explicitely
-/// has to pass the type of the world
+/**
+ * \brief Constructs a variable, and registers it with `world`.
+ *
+ * \param world the distributed layer in which the variable is defined.
+ * \param size the size of the local variable
+ * 
+ * \returns a newly allocated and registered variable
+ */
 template<typename T, typename World>
 typename World::template var_type<T> create_var(World& world) {
       return var<T, World>(world);

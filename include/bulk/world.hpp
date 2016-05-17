@@ -1,5 +1,12 @@
 #pragma once
 
+/**
+ * \file world.hpp
+ *
+ * This header provides an object that can be used to retrieve information of
+ * the processors' world, and its position within it.
+ */
+
 #include <functional>
 #include <memory>
 #include <vector>
@@ -7,19 +14,24 @@
 
 namespace bulk {
 
-// FIXME: Tag / Content i.o. TTag / TContent
-template <typename TTag, typename TContent>
+/**
+ * \brief This object contains a message for or from another processor.
+ */
+template <typename Tag, typename Content>
 struct message {
-    TTag tag;
-    TContent content;
+    Tag tag;
+    Content content;
 };
 
+/**
+ * \brief This objects encodes the world of a processor and its place within it.
+ */
 template <class WorldProvider>
 class world {
   public:
-    template <typename TTag, typename TContent>
+    template <typename Tag, typename Content>
     using message_container =
-        typename WorldProvider::template message_container_type<TTag, TContent>;
+        typename WorldProvider::template message_container_type<Tag, Content>;
 
     template <typename T>
     using var_type = typename WorldProvider::template var_type<T>;
@@ -33,52 +45,64 @@ class world {
     template <typename T>
     using array_type = typename WorldProvider::template array_type<T>;
 
-    /// Returns the total number of active processors in a spmd section
-    ///
-    /// \returns the number of active processors
-    /// \note should only be called inside a spmd section
+    /**
+     * \brief Retrieve the total number of active processors in a spmd section
+     *
+     * \returns the number of active processors
+     */
     int active_processors() const { return provider_.active_processors(); }
 
-    /// Returns the local processor id
-    ///
-    /// \returns an integer containing the id of the local processor
-    /// \note should only be called inside a spmd section
+    /**
+     * \brief Retrieve the local processor id
+     *
+     * \returns an integer containing the id of the local processor
+     */
     int processor_id() const { return provider_.processor_id(); }
 
-    /// Returns the id of the next logical processor
-    ///
-    /// \returns an integer containing the id of the next processor
+    /**
+     * \brief Retrieve the id of the next logical processor
+     *
+     * \returns an integer containing the id of the next processor
+     */
     int next_processor() const {
         return (processor_id() + 1) % active_processors();
     }
 
-    /// Returns the id of the previous logical processor
-    ///
-    /// \returns an integer containing the id of the previous processor
+    /**
+     * \brief Retrieve the id of the previous logical processor
+     *
+     * \returns an integer containing the id of the previous processor
+     */
     int prev_processor() const {
         return (processor_id() + active_processors() - 1) % active_processors();
     }
 
-    /// Performs a global barrier synchronization of the active processors.
+    /**
+     * \brief Performs a global barrier synchronization of the active processors.
+     */
     void sync() const { provider_.sync(); }
 
-    /// Sends a message to a remote processor
-    ///
-    /// \param processor the id of the remote processor receiving the message
-    /// \param tag a tag to attach to the message
-    /// \param content the content (payload) of the message */
-    template <typename TTag, typename TContent>
-    void send(int processor, TTag tag, TContent content) {
-        provider_.internal_send_(processor, &tag, &content, sizeof(TTag),
-                                 sizeof(TContent));
+    /**
+     * Sends a message to a remote processor
+     *
+     * \param processor the id of the remote processor receiving the message
+     * \param tag a tag to attach to the message
+     * \param content the content (payload) of the message
+     */
+    template <typename Tag, typename Content>
+    void send(int processor, Tag tag, Content content) {
+        provider_.internal_send_(processor, &tag, &content, sizeof(Tag),
+                                 sizeof(Content));
     }
 
-    /// Returns an iterable container containing the messages sent in the previous superstep.
-    ///
-    /// \returns an iterable message container
-    template <typename TTag, typename TContent>
-    message_container<TTag, TContent> messages() const {
-        return message_container<TTag, TContent>();
+    /**
+     * \brief Retrieve an iterable container containing the messages sent in the previous superstep.
+     *
+     * \returns an iterable message container
+     */
+    template <typename Tag, typename Content>
+    message_container<Tag, Content> messages() const {
+        return message_container<Tag, Content>();
     }
 
     void register_location_(void* location, size_t size) {
@@ -88,9 +112,11 @@ class world {
         provider_.unregister_location_(location);
     }
 
-    /// Returns the provider of the world
-    ///
-    /// \returns the distributed system provider
+    /**
+     * \brief Retrieve the provider of the world
+     *
+     * \returns the distributed system provider
+     */
     WorldProvider& provider() { return provider_; }
 
   private:

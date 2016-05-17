@@ -11,7 +11,7 @@
 using provider = bulk::bsp::provider;
 
 TEST_CASE("convenience functions", "[algorithm]") {
-    SECTION("reduce") {
+    SECTION("foldl") {
         auto env = bulk::environment<provider>();
 
         env.spawn(env.available_processors(), [](auto world, int s, int p) {
@@ -21,7 +21,7 @@ TEST_CASE("convenience functions", "[algorithm]") {
             world.sync();
 
             auto reduce_result =
-                bulk::reduce(result, [](int& lhs, int rhs) { lhs += rhs; });
+                bulk::foldl(result, [](int& lhs, int rhs) { lhs += rhs; });
 
             int test_value = 0;
             for (int t = 0; t < p; ++t) {
