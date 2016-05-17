@@ -3,8 +3,7 @@
 /**
  * \file world.hpp
  *
- * This header provides an object that can be used to retrieve information of
- * the processors' world, and its position within it.
+ * This objects encodes the world of a processor and its place within it.
  */
 
 #include <functional>
