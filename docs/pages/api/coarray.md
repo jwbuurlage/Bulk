@@ -3,7 +3,7 @@
 Defined in header `<bulk/coarray.hpp>`.
 
 ```cpp
-template <typename T, class Hub>
+template <typename T, class World>
 class coarray;
 ```
 
@@ -17,7 +17,7 @@ as a 2-dimensional array, where the first dimension is over the processors,
 and the second dimension is over local 1-dimensional array indices.
 
 ```cpp
-auto xs = create_coarray<int>(hub, 10);
+auto xs = create_coarray<int>(world, 10);
 // set the 5th element on the 1st processor to 4
 xs(1)[5] = 4;
 // set the 3rd element on the local processor to 2
@@ -27,7 +27,7 @@ xs[3] = 2;
 ## Template parameters
 
 * `T` - the type of the value stored in the local image of the coarray.
-* `Hub` - the type of hub to which this coarray belongs.
+* `World` - the type of world to which this coarray belongs.
 
 ## Member classes
 |                               |                                                  |
@@ -36,39 +36,16 @@ xs[3] = 2;
 | [`writer`](coarray/writer.md) | allows for modification for remote coarray image |
 
 ## Member functions
-|                                                     |                                              |
-|-----------------------------------------------------|----------------------------------------------|
-| [(constructor)](coarray/constructor.md)             | constructs the coarray                       |
-| [(deconstructor)](coarray/deconstructor.md)         | deconstructs the coarray                     |
-| **Value access**                                    |                                              |
-| [`operator()`](coarray/parentheses_operator.md)     | obtain an image of the coarray               |
-| [`operator[]`](coarray/square_brackets_operator.md) | access the local elements of the coarray     |
-| **Hub access**                                      |                                              |
-| [`hub`](coarray/hub.md)                             | returns the hub to which the coarray belongs |
+|                                                     |                                                |
+|-----------------------------------------------------|------------------------------------------------|
+| [(constructor)](coarray/constructor.md)             | constructs the coarray                         |
+| [(deconstructor)](coarray/deconstructor.md)         | deconstructs the coarray                       |
+| **Value access**                                    |                                                |
+| [`operator()`](coarray/parentheses_operator.md)     | obtain an image of the coarray                 |
+| [`operator[]`](coarray/square_brackets_operator.md) | access the local elements of the coarray       |
+| **World access**                                    |                                                |
+| [`world`](coarray/world.md)                         | returns the world to which the coarray belongs |
 
 ## See also
 
 - [`create_coarray`](coarray/create_coarray.md)
-
-## Example
-
-```cpp
-#include <iostream>
-
-#include <bulk/hub.hpp>
-#include <bulk/coarray.hpp>
-#include <bulk/bsp/bulk.hpp>
-
-
-int main() {
-    auto hub = bulk::hub<bulk::bsp::provider>();
-
-    hub.spawn(hub.available_processors(), [&hub](int s, int) {
-        auto xs = bulk::create_coarray<int>(hub, 10);
-        xs(hub.next_processor())[0] = s;
-        hub.sync();
-    });
-
-    return 0;
-}
-```
