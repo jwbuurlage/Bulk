@@ -10,20 +10,20 @@
 namespace bulk {
 
 /**
- * \brief Represents a value that will become known in the upcoming superstep
+ * Represents a value that will become known in the upcoming superstep
  */
 template <typename T, class World>
 class future {
   public:
     /**
-     * \brief Initializes the future and the buffer
+     * Initializes the future and the buffer
      */
     future(World& world) : world_(world) {
         buffer_ = new T;
     }
 
     /**
-     * \brief Deconstructs the future and its buffer
+     * Deconstructs the future and its buffer
      */
     ~future() {
         if (buffer_ != nullptr)
@@ -38,7 +38,7 @@ class future {
     }
 
     /**
-     * \brief Move a future to another
+     * Move a future to another
      */
     void operator=(future<T, World>&& other) {
         auto tmp_buffer = buffer_;
@@ -47,14 +47,14 @@ class future {
     }
 
     /**
-     * \brief Returns the value held by the future
+     * Returns the value held by the future
      *
      * \returns a reference to the value
      */
     T& value() { return *buffer_; }
 
     /**
-     * \brief Retrieve the world to which this array is registed.
+     * Retrieve the world to which this array is registed.
      * \returns a reference to the world of the array
      */
     World& world() { return world_; }
@@ -68,7 +68,7 @@ class future {
 };
 
 /**
- * \brief Constructs a future, and registers it with `world`.
+ * Constructs a future, and registers it with `world`.
  *
  * \param world the distributed layer in which the future is defined.
  * \param size the size of the local future

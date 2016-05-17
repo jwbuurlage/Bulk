@@ -16,7 +16,7 @@
 namespace bulk {
 
 /**
- * \brief Perform a left-associative fold over a distributed variable.
+ * Perform a left-associative fold over a distributed variable.
  * 
  * This function applies a function to the images of a variable. This function
  * should be called in the same step on each processor.

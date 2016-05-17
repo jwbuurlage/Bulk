@@ -15,7 +15,7 @@
 namespace bulk {
 
 /**
- * \brief This object contains a message for or from another processor.
+ * This object contains a message for or from another processor.
  */
 template <typename Tag, typename Content>
 struct message {
@@ -24,7 +24,7 @@ struct message {
 };
 
 /**
- * \brief This objects encodes the world of a processor and its place within it.
+ * This objects encodes the world of a processor and its place within it.
  */
 template <class WorldProvider>
 class world {
@@ -46,21 +46,21 @@ class world {
     using array_type = typename WorldProvider::template array_type<T>;
 
     /**
-     * \brief Retrieve the total number of active processors in a spmd section
+     * Retrieve the total number of active processors in a spmd section
      *
      * \returns the number of active processors
      */
     int active_processors() const { return provider_.active_processors(); }
 
     /**
-     * \brief Retrieve the local processor id
+     * Retrieve the local processor id
      *
      * \returns an integer containing the id of the local processor
      */
     int processor_id() const { return provider_.processor_id(); }
 
     /**
-     * \brief Retrieve the id of the next logical processor
+     * Retrieve the id of the next logical processor
      *
      * \returns an integer containing the id of the next processor
      */
@@ -69,7 +69,7 @@ class world {
     }
 
     /**
-     * \brief Retrieve the id of the previous logical processor
+     * Retrieve the id of the previous logical processor
      *
      * \returns an integer containing the id of the previous processor
      */
@@ -78,7 +78,7 @@ class world {
     }
 
     /**
-     * \brief Performs a global barrier synchronization of the active processors.
+     * Performs a global barrier synchronization of the active processors.
      */
     void sync() const { provider_.sync(); }
 
@@ -96,7 +96,7 @@ class world {
     }
 
     /**
-     * \brief Retrieve an iterable container containing the messages sent in the previous superstep.
+     * Retrieve an iterable container containing the messages sent in the previous superstep.
      *
      * \returns an iterable message container
      */
@@ -113,7 +113,7 @@ class world {
     }
 
     /**
-     * \brief Retrieve the provider of the world
+     * Retrieve the provider of the world
      *
      * \returns the distributed system provider
      */

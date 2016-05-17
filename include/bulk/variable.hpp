@@ -20,14 +20,14 @@ template <typename T, class World>
 class var {
   public:
     /**
-     * \brief Initialize and registers the variable with the world
+     * Initialize and registers the variable with the world
      */
     var(World& world) : world_(world) {
         world_.register_location_(&value_, sizeof(T));
     }
 
     /**
-     * \brief Deconstructs and deregisters the variable with the world
+     * Deconstructs and deregisters the variable with the world
      */
     ~var() { world_.unregister_location_(&value_); }
 
@@ -35,14 +35,14 @@ class var {
     void operator=(var<T, World>& other) = delete;
 
     /**
-     * \brief Move from one var to another
+     * Move from one var to another
      */
     var(var<T, World>&& other) : world_(other.world_) {
         *this = std::move(other);
     }
 
     /**
-     * \brief Move from one var to another
+     * Move from one var to another
      */
     void operator=(var<T, World>&& other) {
         world_.register_location_(&value_, sizeof(T));
@@ -50,7 +50,7 @@ class var {
     }
 
     /**
-     * \brief Returns the value held by the local image of the var
+     * Returns the value held by the local image of the var
      *
      * \returns a reference to the value held by the local image
      */
@@ -58,7 +58,7 @@ class var {
 
 
     /**
-     * \brief Retrieve the world to which this array is registed.
+     * Retrieve the world to which this array is registed.
      *
      * \returns a reference to the world of the array
      */
@@ -70,7 +70,7 @@ class var {
 };
 
 /**
- * \brief Constructs a variable, and registers it with `world`.
+ * Constructs a variable, and registers it with `world`.
  *
  * \param world the distributed layer in which the variable is defined.
  * \param size the size of the local variable

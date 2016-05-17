@@ -15,7 +15,7 @@
 namespace bulk {
 
 /**
- * \brief Put a value into a variable held by a (remote) processor
+ * Put a value into a variable held by a (remote) processor
  *
  * \param processor the id of a remote processor holding the variable
  * \param value the new value of the variable
@@ -35,7 +35,7 @@ void put(int processor, T value, array<T, World>& the_array, int offset = 0,
 }
 
 /**
- * \brief Get a value from a variable held by a (remote) processor
+ * Get a value from a variable held by a (remote) processor
  *
  * \param processor the id of a remote processor holding the variable
  * \param the_variable the variable to obtain the value from

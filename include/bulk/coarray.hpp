@@ -38,7 +38,7 @@ class coarray {
     class writer {
       public:
         /**
-         * \brief Assign a value to a remote image element.
+         * Assign a value to a remote image element.
          * 
          * \param value the new value of the element
          */
@@ -64,7 +64,7 @@ class coarray {
             : world_(world), parent_(parent), t_(t) {}
 
         /**
-         * \brief Obtain a writer to the remote element.
+         * Obtain a writer to the remote element.
          *
          * \param i the index of the remote element
          *
@@ -79,7 +79,7 @@ class coarray {
     };
 
     /**
-     * \brief Initialize and registers the coarray with the world
+     * Initialize and registers the coarray with the world
      *
      * \param world the distributed layer in which the array is defined.
      * \param local_size the size of the local array
@@ -87,7 +87,7 @@ class coarray {
     coarray(World& world, int local_size) : world_(world), data_(world_, local_size) {}
 
     /**
-     * \brief Initialize and registers the coarray with the world
+     * Initialize and registers the coarray with the world
      *
      * \param world the distributed layer in which the array is defined.
      * \param local_size the size of the local array
@@ -101,7 +101,7 @@ class coarray {
     }
 
     /**
-     * \brief Retrieve the coarray image with index t
+     * Retrieve the coarray image with index t
      *
      * \param t index of the target image
      *
@@ -112,7 +112,7 @@ class coarray {
     }
 
     /**
-     * \brief Access the `i`th element of the local coarray image
+     * Access the `i`th element of the local coarray image
      *
      * \param i index of the element
      * \returns reference to the i-th element of the local image
@@ -120,7 +120,7 @@ class coarray {
     T& operator[](int i) { return data_[i]; }
 
     /**
-     * \brief Retrieve the world to which this coarray is registed.
+     * Retrieve the world to which this coarray is registed.
      * \returns a reference to the world of the coarray
      */
     World& world() { return world_; }
@@ -136,7 +136,7 @@ class coarray {
 };
 
 /**
- * \brief Constructs a coarray, and registers it with `world`.
+ * Constructs a coarray, and registers it with `world`.
  *
  * \param world the distributed layer in which the coarray is defined.
  * \param size the size of the local coarray
