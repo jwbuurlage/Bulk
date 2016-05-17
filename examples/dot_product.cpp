@@ -3,16 +3,14 @@
 #include <vector>
 
 #include <bulk/bulk.hpp>
-#include <bulk/variable.hpp>
-#include <bulk/algorithm.hpp>
-#include <bulk/bsp/bulk.hpp>
+#include <bulk/bsp/provider.hpp>
 #include <bulk/util/log.hpp>
 
 
 int main() {
-    auto hub = bulk::hub<bulk::bsp::provider>();
+    auto env = bulk::environment<bulk::bsp::provider>();
 
-    hub.spawn(hub.available_processors(), [&hub](int s, int) {
+    env.spawn(env.available_processors(), [](auto world, int s, int p) {
         // block distribution
         int size = 10;
         std::vector<int> xs(size);
@@ -21,15 +19,15 @@ int main() {
         std::iota(ys.begin(), ys.end(), s * size);
 
         // compute local dot product
-        auto result = bulk::create_var<int>(hub);
+        auto result = bulk::create_var<int>(world);
         for (int i = 0; i < size; ++i) {
             result.value() += xs[i] * ys[i];
         }
 
-        hub.sync();
+        world.sync();
 
         // reduce to find global dot product
-        auto alpha = bulk::reduce(result, [](int& lhs, int rhs) { lhs += rhs; });
+        auto alpha = bulk::foldl(result, [](int& lhs, int rhs) { lhs += rhs; });
 
         BULK_LOG_VAR(alpha);
     });

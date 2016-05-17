@@ -12,7 +12,8 @@ pages:
 - API:
     - 'Index': 'api/index.md'
     - Classes:
-        - 'hub': 'api/hub.md'
+        - 'hub': 'api/environment.md'
+        - 'world': 'api/world.md'
         - 'provider': 'api/provider.md'
         - 'var': 'api/var.md'
         - 'future': 'api/future.md'
@@ -22,18 +23,20 @@ pages:
     - Functions:
         - 'put': 'api/put.md'
         - 'get': 'api/get.md'
-        - 'reduce': 'api/reduce.md'
-        - hub:
-            - 'active_processors': 'api/hub/active_processors.md'
-            - 'available_processors': 'api/hub/available_processors.md'
-            - 'messages' : 'api/hub/messages.md'
-            - 'next_processor' : 'api/hub/next_processor.md'
-            - 'prev_processor' : 'api/hub/prev_processor.md'
-            - 'processor_id' : 'api/hub/processor_id.md'
-            - 'provider' : 'api/hub/provider.md'
-            - 'send' : 'api/hub/send.md'
-            - 'spawn' : 'api/hub/spawn.md'
-            - 'sync' : 'api/hub/sync.md'
+        - 'foldl': 'api/foldl.md'
+        - environment:
+            - 'available_processors': 'api/environment/available_processors.md'
+            - 'spawn' : 'api/environment/spawn.md'
+            - 'provider' : 'api/environment/provider.md'
+        - world:
+            - 'active_processors': 'api/world/active_processors.md'
+            - 'messages' : 'api/world/messages.md'
+            - 'next_processor' : 'api/world/next_processor.md'
+            - 'prev_processor' : 'api/world/prev_processor.md'
+            - 'processor_id' : 'api/world/processor_id.md'
+            - 'provider' : 'api/world/provider.md'
+            - 'send' : 'api/world/send.md'
+            - 'sync' : 'api/world/sync.md'
         - var:
             - '(constructor)' : 'api/var/constructor.md'
             - '(deconstructor)' : 'api/var/deconstructor.md'
