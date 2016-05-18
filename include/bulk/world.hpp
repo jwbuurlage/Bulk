@@ -14,15 +14,6 @@
 namespace bulk {
 
 /**
- * This object contains a message for or from another processor.
- */
-template <typename Tag, typename Content>
-struct message {
-    Tag tag;
-    Content content;
-};
-
-/**
  * This objects encodes the world of a processor and its place within it.
  */
 template <class WorldProvider>
@@ -87,28 +78,6 @@ class world {
      */
     void sync() const { provider_.sync(); }
 
-    /**
-     * Sends a message to a remote processor
-     *
-     * \param processor the id of the remote processor receiving the message
-     * \param tag a tag to attach to the message
-     * \param content the content (payload) of the message
-     */
-    template <typename Tag, typename Content>
-    void send(int processor, Tag tag, Content content) {
-        provider_.internal_send_(processor, &tag, &content, sizeof(Tag),
-                                 sizeof(Content));
-    }
-
-    /**
-     * Retrieve an iterable container containing the messages sent in the previous superstep.
-     *
-     * \returns an iterable message container
-     */
-    template <typename Tag, typename Content>
-    message_container<Tag, Content> messages() const {
-        return message_container<Tag, Content>();
-    }
 
     void register_location_(void* location, size_t size) {
         provider_.register_location_(location, size);

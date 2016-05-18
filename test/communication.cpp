@@ -89,13 +89,13 @@ TEST_CASE("basic communication", "[communication]") {
             env.available_processors(),
             [](bulk::environment<provider>::world_type world, int s, int p) {
                 for (int t = 0; t < p; ++t) {
-                    world.send<int, int>(t, s, s);
+                bulk::send<int, int>(world,t, s, s);
                 }
 
                 world.sync();
 
                 std::vector<int> contents;
-                for (auto message : world.messages<int, int>()) {
+                for (auto message : bulk::messages<int, int>(world)) {
                     contents.push_back(message.content);
                 }
                 std::sort(contents.begin(), contents.end());
