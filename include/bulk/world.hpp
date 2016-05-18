@@ -64,7 +64,10 @@ class world {
      * \returns an integer containing the id of the next processor
      */
     int next_processor() const {
-        return (processor_id() + 1) % active_processors();
+        auto next = processor_id() + 1;
+        if (next >= active_processors())
+            next -= active_processors();
+        return next;
     }
 
     /**
@@ -73,7 +76,10 @@ class world {
      * \returns an integer containing the id of the previous processor
      */
     int prev_processor() const {
-        return (processor_id() + active_processors() - 1) % active_processors();
+        auto prev = processor_id() + active_processors() - 1;
+        if (prev >= active_processors())
+            prev -= active_processors();
+        return prev;
     }
 
     /**
