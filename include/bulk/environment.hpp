@@ -18,7 +18,7 @@ template <class WorldProvider>
 class world;
 
 /**
- * This objects encodes the parallel environment of this layer, and
+ * This object encodes the parallel environment of this layer, and
  * provides information on the system.
  */
 template <class Provider>

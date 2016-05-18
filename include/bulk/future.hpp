@@ -54,8 +54,8 @@ class future {
     T& value() { return *buffer_; }
 
     /**
-     * Retrieve the world to which this array is registed.
-     * \returns a reference to the world of the array
+     * Retrieve the world to which this future is registed.
+     * \returns a reference to the world of the future
      */
     World& world() { return world_; }
 

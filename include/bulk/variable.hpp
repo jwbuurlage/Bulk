@@ -76,9 +76,9 @@ class var {
 
 
     /**
-     * Retrieve the world to which this array is registed.
+     * Retrieve the world to which this var is registed.
      *
-     * \returns a reference to the world of the array
+     * \returns a reference to the world of the var
      */
     World& world() { return world_; }
 
