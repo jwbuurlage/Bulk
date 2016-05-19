@@ -29,7 +29,7 @@ class environment {
 
     /**
      * Start an spmd section on a given number of processors.
-     * 
+     *
      * \param processors the number of processors to run on
      * \param spmd the spmd function that gets run on each (virtual) processor
      */
@@ -40,7 +40,7 @@ class environment {
 
     /**
      * Retrieve the total number of processors available on the system
-     * 
+     *
      * \returns the number of available processors
     */
     int available_processors() const {
@@ -49,7 +49,7 @@ class environment {
 
     /**
      * Retrieve the provider of the distributed system
-     * 
+     *
      * \returns the distributed system provider
     */
     Provider& provider() { return provider_; }

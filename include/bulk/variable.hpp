@@ -92,7 +92,7 @@ class var {
  *
  * \param world the distributed layer in which the variable is defined.
  * \param size the size of the local variable
- * 
+ *
  * \returns a newly allocated and registered variable
  */
 template<typename T, typename World>

@@ -72,7 +72,7 @@ class future {
  *
  * \param world the distributed layer in which the future is defined.
  * \param size the size of the local future
- * 
+ *
  * \returns a newly allocated and registered future
  */
 template<typename T, typename World>

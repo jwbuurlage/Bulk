@@ -70,7 +70,7 @@ class array {
  *
  * \param world the distributed layer in which the array is defined.
  * \param size the size of the local array
- * 
+ *
  * \returns a newly allocated and registered array
  */
 template<typename T, typename World>

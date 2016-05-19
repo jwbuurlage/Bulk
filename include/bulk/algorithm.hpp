@@ -12,12 +12,11 @@
 
 #include "communication.hpp"
 
-
 namespace bulk {
 
 /**
  * Perform a left-associative fold over a distributed variable.
- * 
+ *
  * This function applies a function to the images of a variable. This function
  * should be called in the same step on each processor.
  *
@@ -33,22 +32,22 @@ namespace bulk {
  *          which is computed at the each core.
  */
 template <typename T, typename World, typename Func>
-T foldl(var<T, World>& x, Func f, T start_value = 0) {
-    auto& world = x.world();
-    T result = start_value;
+T foldl(var<T, World> &x, Func f, T start_value = 0) {
+  auto &world = x.world();
+  T result = start_value;
 
-	// allocate space to store each remote value locally
-    std::vector<bulk::future<T, World>> images;
-    for (int t = 0; t < world.active_processors(); ++t) {
-		// obtain the remote values
-		images.push_back(bulk::get<T>(t, x));
-    }
-    world.sync();
-    for (int t = 0; t < world.active_processors(); ++t) {
-        // apply f iteratively to the current value, and each remote value
-        f(result, images[t].value());
-    }
-    return result;
+  // allocate space to store each remote value locally
+  std::vector<bulk::future<T, World>> images;
+  for (int t = 0; t < world.active_processors(); ++t) {
+    // obtain the remote values
+    images.push_back(bulk::get<T>(t, x));
+  }
+  world.sync();
+  for (int t = 0; t < world.active_processors(); ++t) {
+    // apply f iteratively to the current value, and each remote value
+    f(result, images[t].value());
+  }
+  return result;
 }
 
 } // namespace bulk
