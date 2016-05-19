@@ -125,4 +125,18 @@ TEST_CASE("basic communication", "[communication]") {
                 BULK_CHECK_ONCE(xs[3] == 2);
             });
     }
+
+    SECTION("coarray iteration") {
+        auto env = bulk::environment<provider>();
+
+        env.spawn(
+            env.available_processors(),
+            [](bulk::environment<provider>::world_type world, int s, int) {
+                auto xs = bulk::gather_all(world, s);
+                int t = 0;
+                for (auto x : xs) {
+                    BULK_CHECK_ONCE(x == t++);
+                }
+            });
+    }
 }

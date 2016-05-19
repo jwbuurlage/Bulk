@@ -125,6 +125,20 @@ class coarray {
      */
     World& world() { return world_; }
 
+    /**
+     * Get an iterator to the beginning of the local image of the co-array.
+     *
+     * \returns a pointer to the first element of the local data.
+     */
+    T* begin() { return data_.begin(); }
+
+    /**
+     * Get an iterator to the end of the local image of the co-array.
+     *
+     * \returns a pointer beyond the last element of the local data.
+     */
+    T* end() { return data_.end(); }
+
   private:
     friend image;
     friend writer;
