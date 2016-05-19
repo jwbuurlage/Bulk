@@ -31,4 +31,13 @@ TEST_CASE("convenience functions", "[algorithm]") {
             BULK_CHECK_ONCE(reduce_result == test_value);
         });
     }
+
+    SECTION("gather_all") {
+        auto env = bulk::environment<provider>();
+
+        env.spawn(env.available_processors(), [](auto world, int s, int) {
+            auto gather = bulk::gather_all(world, s);
+            BULK_CHECK_ONCE(gather[world.next_processor()] == world.next_processor());
+        });
+    }
 }
