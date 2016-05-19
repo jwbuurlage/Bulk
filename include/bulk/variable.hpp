@@ -1,5 +1,8 @@
 #pragma once
 
+#include <iostream>
+#include <memory>
+
 /**
  * \file variable.hpp
  *
@@ -23,20 +26,24 @@ class var {
      * Initialize and registers the variable with the world
      */
     var(World& world) : world_(world) {
-        world_.register_location_(&value_, sizeof(T));
+        value_ = std::make_unique<T>();
+        world_.register_location_(value_.get(), sizeof(T));
     }
 
     /**
      * Deconstructs and deregisters the variable with the world
      */
-    ~var() { world_.unregister_location_(&value_); }
+    ~var() {
+        if (value_.get())
+            world_.unregister_location_(value_.get());
+    }
 
     var(var<T, World>& other) = delete;
     void operator=(var<T, World>& other) = delete;
 
-   /**
-     * Move from one var to another
-     */
+    /**
+      * Move from one var to another
+      */
     var(var<T, World>&& other) : world_(other.world_) {
         *this = std::move(other);
     }
@@ -45,8 +52,10 @@ class var {
      * Move from one var to another
      */
     void operator=(var<T, World>&& other) {
-        world_.register_location_(&value_, sizeof(T));
-        value_ = other.value();
+        if (value_.get()) {
+            world_.unregister_location_(value_.get());
+        }
+        value_ = std::move(other.value_);
     }
 
     /**
@@ -54,8 +63,8 @@ class var {
      *
      * \note This is for code like `myint = myvar + 5;`.
      */
-    operator T&() { return value_; }
-    operator const T&() const { return value_; }
+    operator T&() { return *value_.get(); }
+    operator const T&() const { return *value_.get(); }
 
     /**
      * Write to the local image
@@ -63,7 +72,7 @@ class var {
      * \note This is for code like `myvar = 5;`.
      */
     var<T, World>& operator=(const T& rhs) {
-        value_ = rhs;
+        *value_.get() = rhs;
         return *this;
     }
 
@@ -72,8 +81,7 @@ class var {
      *
      * \returns a reference to the value held by the local image
      */
-    T& value() { return value_; }
-
+    T& value() { return *value_.get(); }
 
     /**
      * Retrieve the world to which this var is registed.
@@ -83,7 +91,7 @@ class var {
     World& world() { return world_; }
 
   private:
-    T value_;
+    std::unique_ptr<T> value_;
     World& world_;
 };
 
@@ -95,9 +103,9 @@ class var {
  *
  * \returns a newly allocated and registered variable
  */
-template<typename T, typename World>
+template <typename T, typename World>
 typename World::template var_type<T> create_var(World& world) {
-      return var<T, World>(world);
+    return typename World::template var_type<T>(world);
 }
 
 } // namespace bulk
