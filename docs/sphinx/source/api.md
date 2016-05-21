@@ -1,5 +1,0 @@
-API
-===
-
-.. doxygenindex::
-   :project: bulk

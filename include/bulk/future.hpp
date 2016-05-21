@@ -19,16 +19,13 @@ class future {
      * Initializes the future and the buffer
      */
     future(World& world) : world_(world) {
-        buffer_ = new T;
+        buffer_ = std::make_unique<T>();
     }
 
     /**
      * Deconstructs the future and its buffer
      */
-    ~future() {
-        if (buffer_ != nullptr)
-            delete buffer_;
-    }
+    ~future() {}
 
     future(const future<T, World>& other) = delete;
     void operator=(const future<T, World>& other) = delete;
@@ -41,9 +38,7 @@ class future {
      * Move a future to another
      */
     void operator=(future<T, World>&& other) {
-        auto tmp_buffer = buffer_;
-        buffer_ = other.buffer_;
-        other.buffer_ = tmp_buffer;
+        buffer_ = std::move(other.buffer_);
     }
 
     /**
@@ -51,11 +46,11 @@ class future {
      *
      * \returns a reference to the value
      */
-    T& value() { return *buffer_; }
+    T& value() { return *buffer_.get(); }
 
     /**
-     * Retrieve the world to which this array is registed.
-     * \returns a reference to the world of the array
+     * Retrieve the world to which this future is registed.
+     * \returns a reference to the world of the future
      */
     World& world() { return world_; }
 
@@ -63,7 +58,7 @@ class future {
     template <typename S, typename Gub>
     friend future<S, Gub> get(int, var<S, Gub>&);
 
-    T* buffer_ = nullptr;
+    std::unique_ptr<T> buffer_;
     World& world_;
 };
 
@@ -72,12 +67,12 @@ class future {
  *
  * \param world the distributed layer in which the future is defined.
  * \param size the size of the local future
- * 
+ *
  * \returns a newly allocated and registered future
  */
 template<typename T, typename World>
 typename World::template future<T> create_future(World& world) {
-      return future<T, World>(world);
+      return typename World::template future<T>(world);
 }
 
 } // namespace bulk

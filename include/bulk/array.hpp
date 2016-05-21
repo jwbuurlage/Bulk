@@ -24,7 +24,7 @@ class array {
      * \param world the distributed layer in which the array is defined.
      * \param size the size of the local array
      */
-    array(World& world, int size) : world_(world) {
+    array(World& world, int size) : world_(world), size_(size) {
         data_ = new T[size];
         world_.register_location_(data_, sizeof(T) * size);
     }
@@ -60,9 +60,24 @@ class array {
      */
     World& world() { return world_; }
 
+    /**
+     * Get an iterator to the beginning of the local image of the array.
+     *
+     * \returns a pointer to the first element of the local data.
+     */
+    T* begin() { return data_; }
+
+    /**
+     * Get an iterator to the end of the local image of the array.
+     *
+     * \returns a pointer beyond the last element of the local data.
+     */
+    T* end() { return data_ + size_; }
+
   private:
     World& world_;
     T* data_;
+    int size_;
 };
 
 /**
@@ -70,7 +85,7 @@ class array {
  *
  * \param world the distributed layer in which the array is defined.
  * \param size the size of the local array
- * 
+ *
  * \returns a newly allocated and registered array
  */
 template<typename T, typename World>

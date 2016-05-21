@@ -16,4 +16,20 @@ TEST_CASE("initializing bulk", "[init]") {
             BULK_CHECK_ONCE(p == world.active_processors());
         });
     }
+
+    SECTION("making vars") {
+        auto env = bulk::environment<bulk::bsp::provider>();
+
+        env.spawn(env.available_processors(), [](auto world, int, int) {
+            // we can create a variable
+            auto x = bulk::create_var<int>(world);
+            x = 5;
+            BULK_CHECK_ONCE(x.value() == 5);
+            // we can create multiple variables in one step
+            auto y = bulk::create_var<int>(world);
+            // we can reassign variables
+            x = bulk::create_var<int>(world);
+            BULK_CHECK_ONCE(x.value() == 0);
+        });
+    }
 }

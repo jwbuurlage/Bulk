@@ -9,9 +9,10 @@ Welcome to Bulk's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 1
 
-   api
+    introduction
+    api/index
 
 
 

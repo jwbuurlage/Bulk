@@ -47,7 +47,7 @@ template <typename T, typename World>
 future<T, World> get(int processor, var<T, World>& the_variable) {
     future<T, World> result(the_variable.world());
     the_variable.world().provider().internal_get_(
-        processor, &the_variable.value(), result.buffer_, sizeof(T), 0, 1);
+        processor, &the_variable.value(), result.buffer_.get(), sizeof(T), 0, 1);
     return result;
 }
 

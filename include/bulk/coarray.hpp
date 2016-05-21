@@ -39,7 +39,7 @@ class coarray {
       public:
         /**
          * Assign a value to a remote image element.
-         * 
+         *
          * \param value the new value of the element
          */
         void operator=(T value) {
@@ -125,6 +125,20 @@ class coarray {
      */
     World& world() { return world_; }
 
+    /**
+     * Get an iterator to the beginning of the local image of the co-array.
+     *
+     * \returns a pointer to the first element of the local data.
+     */
+    T* begin() { return data_.begin(); }
+
+    /**
+     * Get an iterator to the end of the local image of the co-array.
+     *
+     * \returns a pointer beyond the last element of the local data.
+     */
+    T* end() { return data_.end(); }
+
   private:
     friend image;
     friend writer;
@@ -140,7 +154,7 @@ class coarray {
  *
  * \param world the distributed layer in which the coarray is defined.
  * \param size the size of the local coarray
- * 
+ *
  * \returns a newly allocated and registered coarray
  */
 template<typename T, typename World>
