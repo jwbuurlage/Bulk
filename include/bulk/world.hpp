@@ -79,7 +79,7 @@ class world {
     /**
      * Performs a global barrier synchronization of the active processors.
      */
-    void sync() const { provider_.sync(); }
+    void sync() { provider_.sync(); }
 
     /**
      * Sends a message to a remote processor

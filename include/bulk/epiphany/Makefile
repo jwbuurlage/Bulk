@@ -24,6 +24,8 @@ E_INCLUDES 	  = -I./include -I../..
 HOST_LIBS = -L${ESDK}/tools/host/lib -le-hal
 E_LIBS    = -le-lib
 
+# no-tree-loop-distribute-patters makes sure the compiler
+# does NOT replace loops with calls to memcpy, residing in external memory
 CFLAGS    = $(HOST_INCLUDES) $(HOST_LIBS) -std=c99 -O3 -Wall -Wfatal-errors
 CXXFLAGS  = $(HOST_INCLUDES) $(HOST_LIBS) -std=c++14 -O3 -ffast-math -Wall -Wfatal-errors
 E_CFLAGS  = $(E_INCLUDES)    $(E_LIBS) 	  -std=c99 -O3 -fno-strict-aliasing -ffast-math -fno-tree-loop-distribute-patterns -Wall -Wfatal-errors
