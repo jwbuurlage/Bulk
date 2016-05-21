@@ -1,4 +1,5 @@
 #pragma once
+#include "variable_indirect.hpp"
 
 /**
  * \file future.hpp
@@ -55,9 +56,6 @@ class future {
     World& world() { return world_; }
 
   private:
-    template <typename S, typename Gub>
-    friend future<S, Gub> get(int, var<S, Gub>&);
-
     std::unique_ptr<T> buffer_;
     World& world_;
 };

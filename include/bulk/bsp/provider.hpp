@@ -10,7 +10,7 @@ extern "C" {
 
 #include <bulk/util/log.hpp>
 #include <bulk/world.hpp>
-#include <bulk/variable.hpp>
+#include <bulk/variable_indirect.hpp>
 #include <bulk/future.hpp>
 #include <bulk/coarray.hpp>
 #include <bulk/array.hpp>
@@ -94,7 +94,7 @@ class world_provider {
     using message_container_type = message_container<TTag, TContent>;
 
     template <typename T>
-    using var_type = bulk::var<T, bulk::world<world_provider>>;
+    using var_type = bulk::var_indirect<T, bulk::world<world_provider>>;
 
     template <typename T>
     using future_type = bulk::future<T, bulk::world<world_provider>>;
