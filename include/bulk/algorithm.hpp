@@ -10,6 +10,7 @@
 
 #include <vector>
 
+#include "world.hpp"
 #include "coarray.hpp"
 #include "communication.hpp"
 
@@ -33,8 +34,8 @@ namespace bulk {
  *              \f[ f(f(f(f(x(0), x(1)), x(2)), ...), x(p)). \f]
  *          which is computed at the each core.
  */
-template <typename T, typename World, typename Func>
-T foldl(var<T, World>& x, Func f, T start_value = 0) {
+template <typename T, typename World, template<typename,class> class var_type, typename Func>
+T foldl(var_type<T, World>& x, Func f, T start_value = 0) {
     auto& world = x.world();
     T result = start_value;
 

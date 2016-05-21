@@ -15,5 +15,4 @@
 #include <bulk/environment.hpp>
 #include <bulk/future.hpp>
 #include <bulk/messages.hpp>
-#include <bulk/variable.hpp>
 #include <bulk/world.hpp>

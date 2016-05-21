@@ -2,22 +2,16 @@
 #include <cstdint>
 #include <functional>
 #include <bulk/world.hpp>
-#include <bulk/variable.hpp>
 #include <bulk/future.hpp>
 #include <bulk/coarray.hpp>
 #include <bulk/array.hpp>
+#include <bulk/messages.hpp>
 
 #include "epiphany_internals.hpp"
+#include "var.hpp"
 
 namespace bulk {
 namespace epiphany {
-
-// Update the type below if this value changes
-constexpr int MAX_VARS = 20;
-
-// Update pid type if NPROCS changes
-typedef int8_t pid_t;
-typedef uint8_t var_id_t;
 
 template <typename TTag, typename TContent>
 class message_iterator
@@ -94,7 +88,7 @@ class world_provider {
     using message_container_type = message_container<TTag, TContent>;
 
     template <typename T>
-    using var_type = bulk::var<T, bulk::world<world_provider>>;
+    using var_type = bulk::epiphany::var<T>;
 
     template <typename T>
     using future_type = bulk::future<T, bulk::world<world_provider>>;

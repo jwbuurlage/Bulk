@@ -1,3 +1,5 @@
+#pragma once
+
 // Use this define to place functions or variables in external memory
 // TEXT is for functions and normal variables
 // RO is for read only globals
@@ -12,4 +14,17 @@
 
 extern "C" {
 #include <e-lib.h>
+}
+
+namespace bulk {
+namespace epiphany {
+
+// Update the type below if this value changes
+constexpr int MAX_VARS = 20;
+
+// Update pid type if NPROCS changes
+typedef int8_t pid_t;
+typedef uint8_t var_id_t;
+
+}
 }

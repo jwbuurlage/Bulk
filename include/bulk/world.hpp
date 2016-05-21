@@ -10,7 +10,6 @@
 #include <memory>
 #include <vector>
 
-
 namespace bulk {
 
 /**
@@ -78,7 +77,6 @@ class world {
      */
     void sync() { provider_.sync(); }
 
-
     void register_location_(void* location, size_t size) {
         provider_.register_location_(location, size);
     }
@@ -96,5 +94,17 @@ class world {
   private:
     WorldProvider provider_;
 };
+
+/**
+ * Constructs a variable that is registered with `world`.
+ *
+ * \param T the type of the variable
+ *
+ * \returns a newly allocated and registered variable
+ */
+template <typename T, class World>
+typename World::template var_type<T> create_var(World& world) {
+    return typename World::template var_type<T>(world);
+}
 
 } // namespace bulk

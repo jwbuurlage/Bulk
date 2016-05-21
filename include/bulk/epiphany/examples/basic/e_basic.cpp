@@ -1,5 +1,4 @@
 #include <bulk/world.hpp>
-#include <bulk/variable.hpp>
 #include <bulk/coarray.hpp>
 #include <bulk/epiphany/epiphany.hpp>
 #include <vector>
