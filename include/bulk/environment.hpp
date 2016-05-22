@@ -24,9 +24,6 @@ class world;
 template <class Provider>
 class environment {
   public:
-    //using world_provider = typename Provider::world_provider_type;
-    //using world_type = world<world_provider>;
-
     /**
      * Start an spmd section on a given number of processors.
      *
