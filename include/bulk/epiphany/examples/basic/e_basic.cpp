@@ -5,52 +5,32 @@
 
 int s, p;
 
-#if 0
 void example_var() {
-    bulk::var<int> a;
+    auto a = bulk::create_var<int>(world);
     
     // local explicit
     a.value() = 5;
 
     // local implicit
     a = 3;
-}
-
-void example_var_array() {
-    constexpr int size = 16;
-    bulk::var<float[size]> b;
-
-    // Explicit local operators
-    for (int i = 0; i < size; i++)
-        b.value()[i] = 1.0f;
-
-    // Implicit (local) cast operators
-    b[0] = -18.0f;
 
     world.sync();
 
-    // Remote access operator ()
-    for (int k = 0; k < p; k++)
-        b(k)[s] = 100.0f * ((float)s) + ((float)k);
+    // remote
+    a(world.next_processor()) = s;
 
     world.sync();
 
-    bulk::epiphany::print("first three values of b: %f, %f, %f", b[0], b[1], b[2]);
+    bulk::epiphany::print("value of a is %d", a.value());
 }
 
 void example_coarray() {
     int size = 2 * p;
-    bulk::coarray<int> c(size);
+    auto c = bulk::create_coarray<int>(world, size);
 
-    // Explicit local
-    for (int i = 0; i < size; i++)
-        c.value()[i] = i;
-
-    // Implicit local
+    // Local
     c[3] = 3.2f;
-
 }
-#endif
 
 int main() {
     s = world.processor_id();
@@ -62,11 +42,8 @@ int main() {
 
     bulk::epiphany::print("Using variables for communication!");
 
-#if 0
     example_var();
-    example_var_array();
     example_coarray();
-#endif
 
     world.sync();
 

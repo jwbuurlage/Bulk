@@ -5,10 +5,10 @@
 #include <bulk/future.hpp>
 #include <bulk/coarray.hpp>
 #include <bulk/array.hpp>
+#include <bulk/variable_direct.hpp>
 #include <bulk/messages.hpp>
 
 #include "epiphany_internals.hpp"
-#include "var.hpp"
 
 namespace bulk {
 namespace epiphany {
@@ -88,7 +88,7 @@ class world_provider {
     using message_container_type = message_container<TTag, TContent>;
 
     template <typename T>
-    using var_type = bulk::epiphany::var<T>;
+    using var_type = bulk::var_direct<T, bulk::world<world_provider>>;
 
     template <typename T>
     using future_type = bulk::future<T, bulk::world<world_provider>>;
@@ -127,6 +127,11 @@ class world_provider {
         return id;
     }
 
+    void move_location_(int id, void* newlocation) {
+        var_list_[id] = newlocation;
+        barrier();
+    }
+
     void unregister_location_(void* location) {
         for (var_id_t i = 0; i < MAX_VARS; ++i) {
             if (var_list_[i] == location) {
@@ -136,38 +141,28 @@ class world_provider {
         }
     }
 
-    void unregister_location_(var_id_t id) { var_list_[id] = 0; }
+    // This gets an int from `world` so do not use `var_id_t` here.
+    void unregister_location_(int id) { var_list_[id] = 0; }
 
     // TODO
     void internal_put_(int processor, void* value, void* variable, size_t size,
                        int offset, int count) {
-        // bsp_put(processor, value, variable, offset * size, count * size);
         return;
     }
 
     // TODO
     void internal_get_(int processor, void* variable, void* target, size_t size,
                        int offset, int count) {
-        // bsp_get(processor, variable, offset * size, target, count * size);
         return;
     }
 
     // TODO
     void internal_send_(int processor, void* tag, void* content,
                         size_t tag_size, size_t content_size) {
-        // if (tag_size_ != tag_size) {
-        //    int tag_size_copy = tag_size;
-        //    bsp_set_tagsize(&tag_size_copy);
-        //    sync();
-
-        //    tag_size_ = tag_size;
-        //}
-
-        // bsp_send(processor, tag, content, content_size);
         return;
     }
 
-    void* get_direct_address_(pid_t pid, var_id_t id) {
+    void* get_direct_address_(int pid, int id) {
         void** var_list_remote =
             (void**)transform_address_((void*)var_list_, pid);
         // the remote var list already contains global versions of addresses
@@ -207,12 +202,6 @@ class world_provider {
 
     // Mutex for ext_malloc (internal malloc does not have mutex)
     // e_mutex_t malloc_mutex_;
-
-    // Base address of malloc table for internal malloc
-    // void* local_malloc_base_;
-
-    // TODO
-    // size_t tag_size_ = 0;
 };
 
 } // namespace epiphany
