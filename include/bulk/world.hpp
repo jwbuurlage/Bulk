@@ -77,11 +77,17 @@ class world {
      */
     void sync() { provider_.sync(); }
 
-    void register_location_(void* location, size_t size) {
-        provider_.register_location_(location, size);
+    int register_location_(void* location, size_t size) {
+        return provider_.register_location_(location, size);
+    }
+    void move_location_(int var_id, void* newlocation) {
+        provider_.move_location_(var_id, newlocation);
     }
     void unregister_location_(void* location) {
         provider_.unregister_location_(location);
+    }
+    void unregister_location_(int var_id) {
+        provider_.unregister_location_(var_id);
     }
 
     /**
