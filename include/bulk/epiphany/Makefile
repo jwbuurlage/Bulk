@@ -13,6 +13,7 @@ E_HEADERS = \
 		include/world_provider.hpp
 
 E_SRCS = \
+		backend.cpp \
 		malloc.cpp \
 		reduce_binary_size.cpp \
 		utility.cpp \
