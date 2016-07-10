@@ -3,9 +3,6 @@ extern "C" {
 #include <e-lib.h>
 }
 
-// The global instance of world
-bulk::world<bulk::epiphany::world_provider> world;
-
 namespace bulk {
 namespace epiphany {
 

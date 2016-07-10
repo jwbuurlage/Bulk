@@ -16,6 +16,8 @@ extern "C" {
 #include <e-lib.h>
 }
 
+#include <cstdint>
+
 namespace bulk {
 namespace epiphany {
 

@@ -15,24 +15,24 @@ namespace bulk {
 /**
  * This objects encodes the world of a processor and its place within it.
  */
-template <class WorldProvider>
+template <class WorldBackend>
 class world {
   public:
     template <typename Tag, typename Content>
     using message_container =
-        typename WorldProvider::template message_container_type<Tag, Content>;
+        typename WorldBackend::template message_container_type<Tag, Content>;
 
     template <typename T>
-    using var_type = typename WorldProvider::template var_type<T>;
+    using var_type = typename WorldBackend::template var_type<T>;
 
     template <typename T>
-    using future_type = typename WorldProvider::template future_type<T>;
+    using future_type = typename WorldBackend::template future_type<T>;
 
     template <typename T>
-    using coarray_type = typename WorldProvider::template coarray_type<T>;
+    using coarray_type = typename WorldBackend::template coarray_type<T>;
 
     template <typename T>
-    using array_type = typename WorldProvider::template array_type<T>;
+    using array_type = typename WorldBackend::template array_type<T>;
 
     /**
      * Retrieve the total number of active processors in a spmd section
@@ -95,10 +95,10 @@ class world {
      *
      * \returns the distributed system provider
      */
-    WorldProvider& provider() { return provider_; }
+    typename WorldBackend::implementation& provider() { return provider_; }
 
   private:
-    WorldProvider provider_;
+    typename WorldBackend::implementation provider_;
 };
 
 /**
