@@ -38,7 +38,7 @@ void memcpy(void* dest, const void* source, unsigned int nbytes) {
 
 void EXT_MEM_TEXT print(const char* format, ...) {
     // Lock mutex
-    e_mutex_lock(0, 0, &::world.provider().print_mutex_);
+    e_mutex_lock(0, 0, &::world.implementation().print_mutex_);
 
     // Write the message to a buffer
     char buf[128];
@@ -51,13 +51,13 @@ void EXT_MEM_TEXT print(const char* format, ...) {
     bulk::epiphany::memcpy(&combuf->msgbuf[0], buf, sizeof(combuf->msgbuf));
 
     // Wait for message to be written
-    ::world.provider().write_syncstate_(SYNCSTATE::MESSAGE);
-    while (::world.provider().syncstate_ != SYNCSTATE::CONTINUE) {
+    ::world.implementation().write_syncstate_(SYNCSTATE::MESSAGE);
+    while (::world.implementation().syncstate_ != SYNCSTATE::CONTINUE) {
     };
-    ::world.provider().write_syncstate_(SYNCSTATE::RUN);
+    ::world.implementation().write_syncstate_(SYNCSTATE::RUN);
 
     // Unlock mutex
-    e_mutex_unlock(0, 0, &::world.provider().print_mutex_);
+    e_mutex_unlock(0, 0, &::world.implementation().print_mutex_);
 }
 }
 }

@@ -28,7 +28,7 @@ struct message {
  */
 template <typename Tag, typename Content, typename World>
 void send(World& world, int processor, Tag tag, Content content) {
-    world.provider().internal_send_(processor, &tag, &content, sizeof(Tag),
+    world.implementation().internal_send_(processor, &tag, &content, sizeof(Tag),
                              sizeof(Content));
 }
 
