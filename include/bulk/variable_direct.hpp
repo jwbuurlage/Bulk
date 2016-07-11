@@ -94,7 +94,7 @@ class var_direct {
         // However we want the compiler to optimize so we denote it as `const`
         // so that `for (int i ...) { a(pid)[i]; }` might not call the ()
         // operator every iteration
-        return *((T*)world_.provider().get_direct_address_(pid, var_id_));
+        return *((T*)world_.implementation().get_direct_address_(pid, var_id_));
     }
 
     /**

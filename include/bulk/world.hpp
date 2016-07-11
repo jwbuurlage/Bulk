@@ -18,6 +18,8 @@ namespace bulk {
 template <class WorldBackend>
 class world {
   public:
+    using Implementation = typename WorldBackend::implementation;
+
     template <typename Tag, typename Content>
     using message_container =
         typename WorldBackend::template message_container_type<Tag, Content>;
@@ -39,14 +41,14 @@ class world {
      *
      * \returns the number of active processors
      */
-    int active_processors() const { return provider_.active_processors(); }
+    int active_processors() const { return implementation_.active_processors(); }
 
     /**
      * Retrieve the local processor id
      *
      * \returns an integer containing the id of the local processor
      */
-    int processor_id() const { return provider_.processor_id(); }
+    int processor_id() const { return implementation_.processor_id(); }
 
     /**
      * Retrieve the id of the next logical processor
@@ -75,30 +77,30 @@ class world {
     /**
      * Performs a global barrier synchronization of the active processors.
      */
-    void sync() { provider_.sync(); }
+    void sync() { implementation_.sync(); }
 
     int register_location_(void* location, size_t size) {
-        return provider_.register_location_(location, size);
+        return implementation_.register_location_(location, size);
     }
     void move_location_(int var_id, void* newlocation) {
-        provider_.move_location_(var_id, newlocation);
+        implementation_.move_location_(var_id, newlocation);
     }
     void unregister_location_(void* location) {
-        provider_.unregister_location_(location);
+        implementation_.unregister_location_(location);
     }
     void unregister_location_(int var_id) {
-        provider_.unregister_location_(var_id);
+        implementation_.unregister_location_(var_id);
     }
 
     /**
-     * Retrieve the provider of the world
+     * Retrieve the implementation of the world
      *
-     * \returns the distributed system provider
+     * \returns the distributed system implementation
      */
-    typename WorldBackend::implementation& provider() { return provider_; }
+    Implementation& implementation() { return implementation_; }
 
   private:
-    typename WorldBackend::implementation provider_;
+    Implementation implementation_;
 };
 
 /**
