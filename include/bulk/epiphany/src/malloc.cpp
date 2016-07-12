@@ -1,5 +1,5 @@
-#include <world_provider.hpp>
 #include <utility.hpp>
+#include <backend.hpp>
 
 // This variable indicates end of global vars (end of .bss section)
 // So 'end' until 'stack' can be used by malloc
@@ -24,15 +24,16 @@ class malloc_starter_ {
     void* ptr;
 };
 
-malloc_starter_ malloc_instance_; // global so that it is initialized before main
+malloc_starter_
+    malloc_instance_; // global so that it is initialized before main
 
-// void* EXT_MEM_TEXT ext_malloc(unsigned int nbytes) {
-//    void* ret = 0;
-//    e_mutex_lock(0, 0, &coredata.malloc_mutex);
-//    ret = _malloc((void*)E_DYNMEM_ADDR, nbytes);
-//    e_mutex_unlock(0, 0, &coredata.malloc_mutex);
-//    return ret;
-//}
+void* EXT_MEM_TEXT ext_malloc(unsigned int nbytes) {
+    void* ret = 0;
+    ::world.implementation().mutex_lock_(MUTEX_EXTMALLOC);
+    ret = _malloc((void*)E_DYNMEM_ADDR, nbytes);
+    ::world.implementation().mutex_unlock_(MUTEX_EXTMALLOC);
+    return ret;
+}
 
 const char err_allocation[] EXT_MEM_RO =
     "BULK ERROR: allocation of %d bytes of local memory overwrites the stack";
@@ -59,13 +60,13 @@ void* EXT_MEM_TEXT malloc(unsigned int nbytes) {
 }
 
 void EXT_MEM_TEXT free(void* ptr) {
-    // if (((unsigned)ptr) & 0xfff00000) {
-    //    e_mutex_lock(0, 0, &coredata.malloc_mutex);
-    //    _free((void*)E_DYNMEM_ADDR, ptr);
-    //    e_mutex_unlock(0, 0, &coredata.malloc_mutex);
-    //} else {
-    _free(malloc_instance_.ptr, ptr);
-    //}
+    if (((unsigned)ptr) & 0xfff00000) {
+        ::world.implementation().mutex_lock_(MUTEX_EXTMALLOC);
+        _free((void*)E_DYNMEM_ADDR, ptr);
+        ::world.implementation().mutex_unlock_(MUTEX_EXTMALLOC);
+    } else {
+        _free(malloc_instance_.ptr, ptr);
+    }
 }
 }
 }

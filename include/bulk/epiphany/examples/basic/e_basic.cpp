@@ -32,6 +32,16 @@ void example_coarray() {
     c[3] = 3.2f;
 }
 
+void example_extmem() {
+    int count = 2 * p;
+    int* mem = (int*)bulk::epiphany::ext_malloc(count * sizeof(int));
+
+    for (int i = 0; i < count; i++)
+        mem[i] = s;
+
+    bulk::epiphany::free(mem);
+}
+
 int main() {
     s = world.processor_id();
     p = world.active_processors();
@@ -44,6 +54,7 @@ int main() {
 
     example_var();
     example_coarray();
+    example_extmem();
 
     world.sync();
 

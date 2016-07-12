@@ -1,9 +1,18 @@
 #pragma once
 #include <cstdint>
+#include <cstddef>
 #include "epiphany_internals.hpp"
 
 namespace bulk {
 namespace epiphany {
+
+// There can be at most NPROCS mutexes,
+// because each core stores exactly one.
+enum MUTEXID : int {
+        MUTEX_PRINT = 0,
+        MUTEX_EXTMALLOC = 1
+    };
+
 
 class world_provider {
   public:
@@ -77,6 +86,31 @@ class world_provider {
         return var_list_remote[id];
     }
 
+    // Optimizes version of `e_mutex_lock`
+    void mutex_lock_(MUTEXID mutex_id) {
+        int* pmutex = (int*)transform_address_(&mutexes_, mutex_id);
+        uint32_t coreid = coreids_[local_pid_];
+        uint32_t offset = 0;
+        uint32_t val;
+        do {
+            val = coreid;
+            __asm__ __volatile__("testset	%[val], [%[pmutex], %[offset]]"
+                                 : [val] "+r"(val)
+                                 : [pmutex] "r"(pmutex), [offset] "r"(offset)
+                                 : "memory");
+        } while (val != 0);
+    }
+
+    void mutex_unlock_(MUTEXID mutex_id) {
+        const register uint32_t zero = 0;
+        int* pmutex = (int*)transform_address_(&mutexes_, mutex_id);
+        __asm__ __volatile__("str %[zero], [%[pmutex]]"
+                             : /* no outputs */
+                             : [zero] "r"(zero), [pmutex] "r"(pmutex)
+                             : "memory");
+        return;
+    }
+
   private:
     // Transform local address to global address,
     // unless it already is global
@@ -86,10 +120,16 @@ class world_provider {
         return addr;
     }
 
-    void write_syncstate_(int8_t state);
+    void write_syncstate_(int8_t state) {
+        syncstate_ = state;                    // local variable
+        combuf->syncstate[local_pid_] = state; // being polled by ARM
+    }
 
     // This is our own version of e_barrier_init which is shorter
     void barrier_init_();
+
+    // print needs access to syncstate_
+    friend void print(const char* format, ...);
 
     // ARM core will set this, epiphany will poll this
     volatile int8_t syncstate_;
@@ -104,12 +144,8 @@ class world_provider {
     volatile int8_t sync_barrier_[NPROCS];
     volatile int8_t* sync_barrier_tgt_[NPROCS];
 
-    // Mutex for print
-    e_mutex_t print_mutex_;
-    friend void print(const char* format, ...);
-
-    // Mutex for ext_malloc (internal malloc does not have mutex)
-    // e_mutex_t malloc_mutex_;
+    // Every core has a copy, all are different mutexes.
+    int mutexes_;
 };
 
 } // namespace epiphany

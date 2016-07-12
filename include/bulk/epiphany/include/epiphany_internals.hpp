@@ -12,10 +12,6 @@
 #define combuf ((combuf*)E_COMBUF_ADDR)
 // combuf * const combuf = (combuf*)E_COMBUF_ADDR;
 
-extern "C" {
-#include <e-lib.h>
-}
-
 #include <cstdint>
 
 namespace bulk {
