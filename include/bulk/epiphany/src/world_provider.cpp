@@ -70,11 +70,6 @@ void world_provider::barrier() {
     }
 }
 
-void world_provider::write_syncstate_(int8_t state) {
-    syncstate_ = state;                    // local variable
-    combuf->syncstate[local_pid_] = state; // being polled by ARM
-}
-
 void world_provider::barrier_init_() {
     if (local_pid_ == 0) {
         for (int s = 0; s < nprocs_; s++)

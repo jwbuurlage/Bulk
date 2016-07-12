@@ -38,7 +38,7 @@ void memcpy(void* dest, const void* source, unsigned int nbytes) {
 
 void EXT_MEM_TEXT print(const char* format, ...) {
     // Lock mutex
-    e_mutex_lock(0, 0, &::world.implementation().print_mutex_);
+    ::world.implementation().mutex_lock_(MUTEX_PRINT);
 
     // Write the message to a buffer
     char buf[128];
@@ -57,7 +57,7 @@ void EXT_MEM_TEXT print(const char* format, ...) {
     ::world.implementation().write_syncstate_(SYNCSTATE::RUN);
 
     // Unlock mutex
-    e_mutex_unlock(0, 0, &::world.implementation().print_mutex_);
+    ::world.implementation().mutex_unlock_(MUTEX_PRINT);
 }
 }
 }
