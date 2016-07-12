@@ -1,10 +1,13 @@
-// This file assumes the following preprocessor variable is defined:
-// MALLOC_FUNCTION_PREFIX - _malloc and _free are prefixed with this
-//                        - Empty variable on the host
-//                        - On the Epiphany, puts function itself in external
-//                          memory
 #pragma once
 #include <cstdint>
+
+// This file is used on both the host and epiphany side
+// On the epiphany side the functions are stored in extmem
+#ifdef __epiphany__
+#define MALLOC_FUNCTION_PREFIX EXT_MEM_TEXT
+#else
+#define MALLOC_FUNCTION_PREFIX
+#endif
 
 //
 // Layout of memory:

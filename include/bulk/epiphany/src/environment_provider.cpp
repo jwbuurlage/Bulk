@@ -146,6 +146,9 @@ void provider::initialize_() {
         return;
     }
     combuf_ = (combuf*)emem_.base;
+    malloc_base_ = (void*)(uint32_t(emem_.base) + COMBUF_SIZE);
+
+    malloc_init_();
 
     env_initialized_ = 2;
 }
@@ -214,5 +217,19 @@ void provider::microsleep_(int microseconds) {
     if (clock_nanosleep(CLOCK_MONOTONIC, 0, &request, &remain) != 0)
         std::cerr << "ERROR: clock_nanosleep was interrupted." << std::endl;
 }
+
+#include "malloc_implementation.cpp"
+
+void provider::malloc_init_() {
+    uint32_t size = DYNMEM_SIZE;
+    // possibly round up if combuf is not multiple of chunk size
+    void* new_base = (void*)chunk_roundup((uint32_t)malloc_base_);
+    if (new_base != malloc_base_) {
+        size = size - (uint32_t(new_base) - uint32_t(malloc_base_));
+        malloc_base_ = new_base;
+    }
+    _init_malloc_state(malloc_base_, size);
+}
+
 } // namespace epiphany
 } // namespace bulk

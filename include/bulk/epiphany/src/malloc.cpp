@@ -8,7 +8,6 @@ extern int end;
 namespace bulk {
 namespace epiphany {
 
-#define MALLOC_FUNCTION_PREFIX EXT_MEM_TEXT
 #include "malloc_implementation.cpp"
 
 // This class is made so that the constructor is called before main

@@ -59,6 +59,7 @@ class provider {
 
     // Points directly to external memory using memory-mapping
     combuf* combuf_;
+    void* malloc_base_;
 
     // Timer storage
     struct timespec ts_start_, ts_end_;
@@ -76,6 +77,9 @@ class provider {
     void update_remote_timer_();
 
     void microsleep_(int microseconds);
+
+    // Initialize the external memory malloc system
+    void malloc_init_();
 };
 
 } // namespace epiphany
