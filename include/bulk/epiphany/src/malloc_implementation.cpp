@@ -118,7 +118,6 @@ void* MALLOC_FUNCTION_PREFIX _malloc(void* base, uint32_t nbytes) {
     return 0;
 }
 
-// This assumes that mem_in_use(obj) is false and will crash otherwise
 void MALLOC_FUNCTION_PREFIX _merge_memory_objects(memory_object* obj) {
     if (mem_in_use(obj))
         return;
