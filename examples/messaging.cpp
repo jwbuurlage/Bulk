@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <bulk/bulk.hpp>
-#include <bulk/bsp/provider.hpp>
+#include <bulk/bsp/bsp.hpp>
 
 int main() {
     auto env = bulk::environment<bulk::bsp::provider>();

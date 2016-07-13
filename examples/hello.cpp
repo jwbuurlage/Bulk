@@ -1,7 +1,8 @@
 #include <iostream>
 
 #include <bulk/bulk.hpp>
-#include <bulk/bsp/provider.hpp>
+#include <bulk/bsp/bsp.hpp>
+#include <bulk/util/log.hpp>
 
 
 int main() {

@@ -1,0 +1,5 @@
+build/*
+test/build/*
+!build/CMakeLists.txt
+!test/build/CMakeLists.txt
+bin/*

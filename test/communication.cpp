@@ -31,7 +31,8 @@ TEST_CASE("basic communication", "[communication]") {
 
         env.spawn(env.available_processors(), [](auto world, int s, int p) {
             int size = 5;
-            std::vector<bulk::var<int, decltype(world)>> xs;
+
+            std::vector<decltype(bulk::create_var<int>(world))> xs;
             for (int i = 0; i < size; ++i)
                 xs.push_back(bulk::create_var<int>(world));
 
@@ -87,7 +88,7 @@ TEST_CASE("basic communication", "[communication]") {
 
         env.spawn(
             env.available_processors(),
-            [](bulk::environment<provider>::world_type world, int s, int p) {
+            [](auto world, int s, int p) {
                 for (int t = 0; t < p; ++t) {
                 bulk::send<int, int>(world,t, s, s);
                 }
@@ -112,7 +113,7 @@ TEST_CASE("basic communication", "[communication]") {
 
         env.spawn(
             env.available_processors(),
-            [](bulk::environment<provider>::world_type world, int s, int) {
+            [](auto world, int s, int) {
                 auto xs = bulk::create_coarray<int>(world, 10);
                 xs(world.next_processor())[1] = s;
 
@@ -131,7 +132,7 @@ TEST_CASE("basic communication", "[communication]") {
 
         env.spawn(
             env.available_processors(),
-            [](bulk::environment<provider>::world_type world, int s, int) {
+            [](auto world, int s, int) {
                 auto xs = bulk::gather_all(world, s);
                 int t = 0;
                 for (auto x : xs) {
