@@ -28,9 +28,9 @@ malloc_starter_
 
 void* EXT_MEM_TEXT ext_malloc(unsigned int nbytes) {
     void* ret = 0;
-    ::world.implementation().mutex_lock_(MUTEX_EXTMALLOC);
+    world.implementation().mutex_lock_(MUTEX_EXTMALLOC);
     ret = _malloc((void*)E_DYNMEM_ADDR, nbytes);
-    ::world.implementation().mutex_unlock_(MUTEX_EXTMALLOC);
+    world.implementation().mutex_unlock_(MUTEX_EXTMALLOC);
     return ret;
 }
 
@@ -60,9 +60,9 @@ void* EXT_MEM_TEXT malloc(unsigned int nbytes) {
 
 void EXT_MEM_TEXT free(void* ptr) {
     if (((unsigned)ptr) & 0xfff00000) {
-        ::world.implementation().mutex_lock_(MUTEX_EXTMALLOC);
+        world.implementation().mutex_lock_(MUTEX_EXTMALLOC);
         _free((void*)E_DYNMEM_ADDR, ptr);
-        ::world.implementation().mutex_unlock_(MUTEX_EXTMALLOC);
+        world.implementation().mutex_unlock_(MUTEX_EXTMALLOC);
     } else {
         _free(malloc_instance_.ptr, ptr);
     }

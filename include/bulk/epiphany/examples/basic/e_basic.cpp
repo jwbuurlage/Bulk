@@ -3,6 +3,8 @@
 #include <bulk/epiphany/epiphany.hpp>
 #include <vector>
 
+using bulk::epiphany::world;
+
 int s, p;
 
 void example_var() {
