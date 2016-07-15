@@ -115,4 +115,18 @@ typename World::template var_type<T> create_var(World& world) {
     return typename World::template var_type<T>(world);
 }
 
+/**
+ * Constructs a coarray, and registers it with `world`.
+ *
+ * \param world the distributed layer in which the coarray is defined.
+ * \param size the size of the local coarray
+ *
+ * \returns a newly allocated and registered coarray
+ */
+template <typename T, typename World>
+typename World::template coarray_type<T> create_coarray(World& world,
+                                                        int local_size) {
+    return typename World::template coarray_type<T>(world, local_size);
+}
+
 } // namespace bulk
