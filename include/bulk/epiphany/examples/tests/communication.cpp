@@ -1,6 +1,5 @@
 #include <bulk/environment.hpp>
 #include <bulk/epiphany/host.hpp>
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 TEST_CASE("basic communication", "[communication]") {
@@ -19,19 +18,19 @@ TEST_CASE("basic communication", "[communication]") {
 
     SECTION("var put") {
         success_count = 0;
-        env.spawn(env.available_processors(), "test_kernel1.elf");
+        env.spawn(env.available_processors(), "tests/test_kernel1.elf");
         CHECK( success_count == env.available_processors() );
     }
 
     SECTION("multiple var put") {
         success_count = 0;
-        env.spawn(env.available_processors(), "test_kernel2.elf");
-        CHECK( success_count == env.available_processors() * 5 );
+        env.spawn(env.available_processors(), "tests/test_kernel2.elf");
+        CHECK( success_count == env.available_processors() );
     }
 
     SECTION("coarrays") {
         success_count = 0;
-        env.spawn(env.available_processors(), "test_kernel3.elf");
+        env.spawn(env.available_processors(), "tests/test_kernel3.elf");
         CHECK( success_count == env.available_processors() * 2 );
     }
 }

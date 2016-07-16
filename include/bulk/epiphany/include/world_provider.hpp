@@ -45,7 +45,7 @@ class world_provider {
     }
 
     void move_location_(int id, void* newlocation) {
-        var_list_[id] = newlocation;
+        var_list_[id] = transform_address_(newlocation, local_pid_);
         barrier();
     }
 

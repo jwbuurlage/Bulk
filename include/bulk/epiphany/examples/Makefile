@@ -71,6 +71,10 @@ bin/%: %.cpp
 	@echo "CXX $<"
 	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $< $(CXXFLAGS)
 
+bin/%.o: %.cpp
+	@echo "CXX $<"
+	@$(ARM_PLATFORM_PREFIX)g++ -c -o $@ $< $(CXXFLAGS)
+
 ########################################################
 
 basic: bin/basic bin/basic/host_basic bin/basic/e_basic.elf
@@ -80,12 +84,14 @@ bin/basic:
 
 #######################################################
 
-vpath %.cpp tests
+tests: bin/tests bin/unittests bin/tests/test_kernel1.elf bin/tests/test_kernel2.elf bin/tests/test_kernel3.elf
 
-tests: bin bin/unittests bin/test_kernel1.elf bin/test_kernel2.elf bin/test_kernel3.elf
+bin/tests:
+	@mkdir -p bin/tests
 
-bin:
-	@mkdir -p bin
+bin/unittests: bin/tests/catch_main.o bin/tests/communication.o
+	@echo "$@"
+	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $^ $(HOST_LIBS)
 
 #######################################################
 

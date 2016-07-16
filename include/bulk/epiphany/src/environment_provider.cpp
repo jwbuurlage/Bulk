@@ -61,6 +61,11 @@ void provider::spawn(int processors, const char* image_name) {
         return;
     }
 
+#ifdef DEBUG
+    int iter = 0;
+    std::cerr << "Bulk DEBUG: Epiphany cores started.\n";
+#endif
+
     // Main program loop
     int extmem_corrupted = 0;
     for (;;) {
@@ -108,6 +113,37 @@ void provider::spawn(int processors, const char* image_name) {
         }
         if (counters[SYNCSTATE::FINISH] == nprocs_used_)
             break;
+
+#ifdef DEBUG
+        if (iter % 1000 == 0) {
+            std::cerr << "Core bulk states:";
+            for (int i = 0; i < nprocs_used_; i++)
+                std::cerr << ' ' << ((int)combuf_->syncstate[i]);
+            std::cerr << std::endl;
+
+            // Get the `PROGRAM COUNTER` register (instruction pointer)
+            // to see what code is currently being executed
+            uint32_t pc[NPROCS];
+            for (int i = 0; i < nprocs_used_; i++) {
+                e_read(&dev_, (i / cols_), (i % cols_), E_REG_PC, &pc[i],
+                       sizeof(uint32_t));
+            }
+
+            std::cerr << "Bulk DEBUG: current instruction for every core:";
+            for (int i = 0; i < nprocs_used_; i++) {
+                if ((i % 4) == 0)
+                    std::cerr << "\n\t";
+                std::cerr << ' ' << ((void*)pc[i]);
+                //Symbol* sym = _get_symbol_by_addr((void*)pc[i]);
+                //if (sym)
+                //    printf(" %s+%p", sym->name, (void*)(pc[i] - sym->value));
+                //else
+                //    printf(" %p", (void*)pc[i]);
+            }
+            std::cerr << '\n';
+        }
+        ++iter;
+#endif
     }
 
     env_initialized_ = 3;
