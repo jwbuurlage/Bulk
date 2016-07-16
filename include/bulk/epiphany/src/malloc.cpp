@@ -52,7 +52,7 @@ void* EXT_MEM_TEXT malloc(unsigned int nbytes) {
     if ((uint32_t)ret + nbytes + 128 > (uint32_t)&ret) // <-- only epiphany
     {
         _free(malloc_instance_.ptr, ret);
-        bulk::epiphany::print(err_allocation, nbytes);
+        print(err_allocation, nbytes);
         return 0;
     }
     return ret;
@@ -66,6 +66,26 @@ void EXT_MEM_TEXT free(void* ptr) {
     } else {
         _free(malloc_instance_.ptr, ptr);
     }
+}
+
+const char mem_info_local_[] EXT_MEM_RO =
+    "Local memory: %lu B total, %lu B used in %lu chunks.";
+
+const char mem_info_external_[] EXT_MEM_RO =
+    "External memory: %lu B total, %lu B used in %lu chunks.";
+
+void EXT_MEM_TEXT print_malloc_info_() {
+    uint32_t total, used, count;
+
+    _malloc_mem_info(malloc_instance_.ptr, &total, &used, &count);
+
+    print(mem_info_local_, total, used, count);
+
+    world.implementation().mutex_lock_(MUTEX_EXTMALLOC);
+    _malloc_mem_info((void*)E_DYNMEM_ADDR, &total, &used, &count);
+    world.implementation().mutex_unlock_(MUTEX_EXTMALLOC);
+
+    print(mem_info_external_, total, used, count);
 }
 }
 }

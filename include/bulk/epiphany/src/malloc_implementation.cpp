@@ -153,6 +153,7 @@ void MALLOC_FUNCTION_PREFIX _free(void* base, void* ptr) {
 
     // If there are free regions before or after this one, link them together
     // so that this does not have to be done in malloc.
+    // Note that if obj it the very first chunk, then prev_size is zero
     memory_object* prev = (memory_object*)(uint32_t(obj) - obj->prev_size);
 
     _merge_memory_objects(obj);
@@ -166,4 +167,33 @@ void MALLOC_FUNCTION_PREFIX _init_malloc_state(void* base, uint32_t size) {
     region->total_size = size;
     region->first_chunk.chunk_size = 0;
     region->first_chunk.prev_size = 0;
+}
+
+// For debugging: get amount of memory in use
+void MALLOC_FUNCTION_PREFIX _malloc_mem_info(void* base, uint32_t* total_size,
+                                             uint32_t* used_size,
+                                             uint32_t* used_count) {
+    malloc_region* region = (malloc_region*)base;
+
+    uint32_t used = 0;
+    uint32_t count = 0;
+
+    memory_object* cur = &(region->first_chunk);
+    for (;;) {
+        // chunk_size includes the size of memory_object
+        uint32_t chunk_size = (cur->chunk_size & ~0x1);
+        if (chunk_size == 0)
+            break;
+        if (mem_in_use(cur)) {
+            used += chunk_size;
+            count++;
+        }
+        cur = (memory_object*)(uint32_t(cur) + chunk_size);
+    }
+
+    *total_size = region->total_size;
+    *used_size = used;
+    *used_count = count;
+
+    return;
 }

@@ -29,7 +29,7 @@ EXT_MEM_TEXT world_provider::world_provider() {
 
     // Send &syncstate to ARM
     if (local_pid_ == 0)
-        combuf->syncstate_ptr = (int8_t*)&syncstate_;
+        combuf_->syncstate_ptr = (int8_t*)&syncstate_;
 
     write_syncstate_(SYNCSTATE::RUN);
     sync();

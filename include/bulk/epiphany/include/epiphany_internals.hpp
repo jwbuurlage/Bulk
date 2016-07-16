@@ -8,14 +8,12 @@
 
 #include "combuf.hpp"
 
-// The define is faster; it saves a pointer lookup
-#define combuf ((combuf*)E_COMBUF_ADDR)
-// combuf * const combuf = (combuf*)E_COMBUF_ADDR;
-
 #include <cstdint>
 
 namespace bulk {
 namespace epiphany {
+
+constexpr combuf* combuf_ = (combuf*)E_COMBUF_ADDR;
 
 // Update the type below if this value changes
 constexpr int MAX_VARS = 20;

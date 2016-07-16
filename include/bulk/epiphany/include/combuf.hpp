@@ -29,9 +29,10 @@ typedef struct {
 // https://github.com/buurlage-wits/epiphany-bsp/wiki/Memory-on-the-parallella
 
 // Sizes within external memory
+// Combuf is rounded up to multiple of 8
 #define EXTMEM_SIZE 0x02000000 // Total size, 32 MB
 #define NEWLIB_SIZE 0x01800000
-#define COMBUF_SIZE sizeof(combuf)
+#define COMBUF_SIZE (((sizeof(bulk::epiphany::combuf) + 7) / 8) * 8)
 #define DYNMEM_SIZE (EXTMEM_SIZE - COMBUF_SIZE - NEWLIB_SIZE)
 
 // Epiphany addresses

@@ -48,7 +48,7 @@ void EXT_MEM_TEXT print(const char* format, ...) {
     va_end(args);
 
     // Write the message
-    bulk::epiphany::memcpy(&combuf->msgbuf[0], buf, sizeof(combuf->msgbuf));
+    bulk::epiphany::memcpy(&combuf_->msgbuf[0], buf, sizeof(combuf_->msgbuf));
 
     // Wait for message to be written
     world.implementation().write_syncstate_(SYNCSTATE::MESSAGE);
