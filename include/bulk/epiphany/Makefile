@@ -49,6 +49,12 @@ endif
 
 all: host e
 
+debug: CFLAGS += -DDEBUG -g
+debug: CXXFLAGS += -DDEBUG -g
+debug: E_CFLAGS += -DDEBUG
+debug: E_CXXFLAGS += -DDEBUG
+debug: host e
+
 ########################################################
 
 E_OBJS    = $(E_SRCS:%.c=build/e/%.o) $(E_SRCS:%.cpp=build/e/%.o)
