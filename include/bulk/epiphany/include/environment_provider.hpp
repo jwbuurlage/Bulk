@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdint>
 #include <cstring>
+#include <functional>
 
 extern "C" {
 #include <e-hal.h>
@@ -26,11 +27,15 @@ class provider {
 
     /// Check if the hub is properly initialized and ready to run
     /// an Epiphany program
-    bool is_valid() const { return env_initialized_ == 2; }
+    bool is_valid() const { return env_initialized_ >= 2; }
 
     void spawn(int processors, const char* image_name );
 
     int available_processors() const { return nprocs_available_; }
+
+    void setLogCallback(std::function<void(int, const std::string&)> f) {
+        log_callback_ = f;
+    }
 
   private:
     // Zero if not properly initialized
@@ -63,6 +68,9 @@ class provider {
 
     // Timer storage
     struct timespec ts_start_, ts_end_;
+
+    // Logging
+    std::function<void(int, const std::string&)> log_callback_;
 
     void initialize_();
 

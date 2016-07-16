@@ -34,6 +34,13 @@ void provider::spawn(int processors, const char* image_name) {
         return;
     }
 
+    // Reset core registers to defaults
+    if (e_reset_group(&dev_) != E_OK) {
+        std::cerr << "ERROR: Could not reset workgroup.\n";
+        return;
+    }
+
+    // Load the kernel code to core memory
     if (e_load_group(e_fullpath_.c_str(), &dev_, 0, 0, rows_, cols_, E_FALSE) !=
         E_OK) {
         std::cerr << "ERROR: Could not load program to chip." << std::endl;
@@ -76,10 +83,16 @@ void provider::spawn(int processors, const char* image_name) {
             }
 
             if (s == SYNCSTATE::MESSAGE) {
-                printf("$%02d: %s\n", i, combuf_->msgbuf);
-                fflush(stdout);
+                std::string msg(combuf_->msgbuf);
                 // Reset flag to let epiphany core continue
                 set_core_syncstate_(i, SYNCSTATE::CONTINUE);
+                // Print message
+                if (log_callback_) {
+                    log_callback_(i, msg);
+                } else {
+                    printf("$%02d: %s\n", i, msg.c_str());
+                    fflush(stdout);
+                }
             }
         }
 
@@ -131,11 +144,6 @@ void provider::initialize_() {
     // Open the workgroup
     if (e_open(&dev_, 0, 0, rows_, cols_) != E_OK) {
         std::cerr << "ERROR: Could not open workgroup.\n";
-        return;
-    }
-
-    if (e_reset_group(&dev_) != E_OK) {
-        std::cerr << "ERROR: Could not reset workgroup.\n";
         return;
     }
 
@@ -227,6 +235,7 @@ void provider::malloc_init_() {
     if (new_base != malloc_base_) {
         size = size - (uint32_t(new_base) - uint32_t(malloc_base_));
         malloc_base_ = new_base;
+        std::cerr << "ERROR: External malloc base is not aligned." << std::endl;
     }
     _init_malloc_state(malloc_base_, size);
 }

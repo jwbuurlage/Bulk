@@ -5,7 +5,8 @@ ELDF=${ESDK}/bsps/current/fast.ldf
 
 HOST_INCLUDES = -I/usr/include/esdk \
 				-I${BULK}/include \
-				-I${ESDK}/tools/host/include
+				-I${ESDK}/tools/host/include \
+				-I${BULK}/ext/catch/include
 
 E_INCLUDES 	  = -I${BULK}/include
 
@@ -46,17 +47,9 @@ endif
 
 ########################################################
 
-all: basic
+all: basic tests
 
 ########################################################
-
-bin/%: %.c
-	@echo "CC $<"
-	@$(ARM_PLATFORM_PREFIX)gcc -o $@ $< $(CFLAGS)
-
-bin/%: %.cpp
-	@echo "CXX $<"
-	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $< $(CXXFLAGS)
 
 bin/%.elf: %.c
 	@echo "CC $<"
@@ -70,12 +63,29 @@ bin/%.s: %.c
 	@echo "CC $<"
 	@$(E_PLATFORM_PREFIX)gcc -T $(ELDF) -fverbose-asm -S $< -o $@ $(E_CFLAGS)
 
+bin/%: %.c
+	@echo "CC $< blabla"
+	@$(ARM_PLATFORM_PREFIX)gcc -o $@ $< $(CFLAGS)
+
+bin/%: %.cpp
+	@echo "CXX $<"
+	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $< $(CXXFLAGS)
+
 ########################################################
 
 basic: bin/basic bin/basic/host_basic bin/basic/e_basic.elf
 
 bin/basic:
 	@mkdir -p bin/basic
+
+#######################################################
+
+vpath %.cpp tests
+
+tests: bin bin/unittests bin/test_kernel1.elf bin/test_kernel2.elf bin/test_kernel3.elf
+
+bin:
+	@mkdir -p bin
 
 #######################################################
 

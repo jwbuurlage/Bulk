@@ -13,5 +13,8 @@ void* ext_malloc(unsigned int nbytes);
 void* malloc(unsigned int nbytes);
 
 void free(void* ptr);
+
+// For debugging purposes, prints memory allocation status
+void print_malloc_info_();
 }
 }
