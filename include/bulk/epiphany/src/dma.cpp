@@ -39,7 +39,7 @@ void init_dma_handlers() {
     unsigned* imask;
     __asm__("movfs %0, coreid" : "=r"(coreid));
     imask = (unsigned*)((coreid << 20) | E_REG_IMASK);
-    *imask |= (1 << (E_DMA0_INT - E_SYNC)) | (1 << (E_DMA1_INT - E_SYNC));
+    *imask &= ~((1 << (E_DMA0_INT - E_SYNC)) | (1 << (E_DMA1_INT - E_SYNC)));
 
     // Enable global interrupts
     __asm__("gie");

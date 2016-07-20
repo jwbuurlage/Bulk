@@ -52,22 +52,23 @@ void provider::spawn(int processors, const char* image_name) {
         combuf_->syncstate[i] = SYNCSTATE::INIT;
 
     // Write stream descriptors
-    combuf_->nstreams = streams.size();
-    combuf_->streams = (stream_descriptor*)ext_malloc_(
+    stream_descriptor* descriptors = (stream_descriptor*)ext_malloc_(
         streams.size() * sizeof(stream_descriptor));
-    if (combuf_->streams == 0) {
+    if (descriptors == 0) {
         std::cerr
             << "ERROR: Not enough external memory to write stream descriptors."
             << std::endl;
         return;
     }
+    combuf_->nstreams = streams.size();
+    combuf_->streams = (stream_descriptor*)host_to_e_pointer_(descriptors);
     for (size_t i = 0; i < streams.size(); ++i) {
-        streams[i].descriptor = &(combuf_->streams[i]);
-        combuf_->streams[i].buffer = host_to_e_pointer_(streams[i].buffer);
-        combuf_->streams[i].capacity = streams[i].capacity;
-        combuf_->streams[i].offset = 0;
-        combuf_->streams[i].size = 0;
-        combuf_->streams[i].pid = -1;
+        streams[i].descriptor = &(descriptors[i]);
+        descriptors[i].buffer = host_to_e_pointer_(streams[i].buffer);
+        descriptors[i].capacity = streams[i].capacity;
+        descriptors[i].offset = 0;
+        descriptors[i].size = 0;
+        descriptors[i].pid = -1;
     }
 
     // Starting time
