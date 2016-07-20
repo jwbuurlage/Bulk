@@ -51,6 +51,25 @@ void provider::spawn(int processors, const char* image_name) {
     for (int i = 0; i < NPROCS; i++)
         combuf_->syncstate[i] = SYNCSTATE::INIT;
 
+    // Write stream descriptors
+    combuf_->nstreams = streams.size();
+    combuf_->streams = (stream_descriptor*)ext_malloc_(
+        streams.size() * sizeof(stream_descriptor));
+    if (combuf_->streams == 0) {
+        std::cerr
+            << "ERROR: Not enough external memory to write stream descriptors."
+            << std::endl;
+        return;
+    }
+    for (size_t i = 0; i < streams.size(); ++i) {
+        streams[i].descriptor = &(combuf_->streams[i]);
+        combuf_->streams[i].buffer = host_to_e_pointer_(streams[i].buffer);
+        combuf_->streams[i].capacity = streams[i].capacity;
+        combuf_->streams[i].offset = 0;
+        combuf_->streams[i].size = 0;
+        combuf_->streams[i].pid = -1;
+    }
+
     // Starting time
     clock_gettime(CLOCK_MONOTONIC, &ts_start_);
     update_remote_timer_();
@@ -61,10 +80,16 @@ void provider::spawn(int processors, const char* image_name) {
         return;
     }
 
+    env_initialized_ = 3;
+
 #ifdef DEBUG
     int iter = 0;
     std::cerr << "Bulk DEBUG: Epiphany cores started.\n";
 #endif
+
+    // Load streams with data
+    for (auto& s : streams)
+        s.fill_stream();
 
     // Main program loop
     int extmem_corrupted = 0;
@@ -98,6 +123,12 @@ void provider::spawn(int processors, const char* image_name) {
                     printf("$%02d: %s\n", i, msg.c_str());
                     fflush(stdout);
                 }
+            }
+
+            if (s == SYNCSTATE::STREAMREQ) {
+                // TODO
+                std::cerr << "WARNING: Kernel requests stream data but feature "
+                             "is not implemented yet.\n";
             }
         }
 
@@ -146,7 +177,7 @@ void provider::spawn(int processors, const char* image_name) {
 #endif
     }
 
-    env_initialized_ = 3;
+    env_initialized_ = 4;
 }
 
 void provider::initialize_() {
@@ -192,12 +223,16 @@ void provider::initialize_() {
     combuf_ = (combuf*)emem_.base;
     malloc_base_ = (void*)(uint32_t(emem_.base) + COMBUF_SIZE);
 
-    malloc_init_();
+    ext_malloc_init_();
 
     env_initialized_ = 2;
 }
 
 void provider::finalize_() {
+    for (auto& s : streams)
+        ext_free_(s.buffer);
+    streams.clear();
+
     if (env_initialized_ >= 2)
         e_free(&emem_);
 
@@ -264,7 +299,7 @@ void provider::microsleep_(int microseconds) {
 
 #include "malloc_implementation.cpp"
 
-void provider::malloc_init_() {
+void provider::ext_malloc_init_() {
     uint32_t size = DYNMEM_SIZE;
     // possibly round up if combuf is not multiple of chunk size
     void* new_base = (void*)chunk_roundup((uint32_t)malloc_base_);
@@ -274,6 +309,14 @@ void provider::malloc_init_() {
         std::cerr << "ERROR: External malloc base is not aligned." << std::endl;
     }
     _init_malloc_state(malloc_base_, size);
+}
+
+void* provider::ext_malloc_(uint32_t size) {
+    return _malloc(malloc_base_, size);
+}
+
+void provider::ext_free_(void* ptr) {
+    return _free(malloc_base_, ptr);
 }
 
 } // namespace epiphany

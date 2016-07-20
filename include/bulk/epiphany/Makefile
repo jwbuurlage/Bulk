@@ -14,6 +14,7 @@ E_HEADERS = \
 
 E_SRCS = \
 		backend.cpp \
+		dma.cpp \
 		malloc.cpp \
 		reduce_binary_size.cpp \
 		utility.cpp \

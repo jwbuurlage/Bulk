@@ -10,7 +10,8 @@ namespace epiphany {
 // because each core stores exactly one.
 enum MUTEXID : int {
         MUTEX_PRINT = 0,
-        MUTEX_EXTMALLOC = 1
+        MUTEX_EXTMALLOC = 1,
+        MUTEX_STREAM = 2
     };
 
 
@@ -81,14 +82,14 @@ class world_provider {
 
     void* get_direct_address_(int pid, int id) {
         void** var_list_remote =
-            (void**)transform_address_((void*)var_list_, pid);
+            (void**)transform_address_local_((void*)var_list_, pid);
         // the remote var list already contains global versions of addresses
         return var_list_remote[id];
     }
 
-    // Optimizes version of `e_mutex_lock`
+    // Optimized version of `e_mutex_lock`
     void mutex_lock_(MUTEXID mutex_id) {
-        int* pmutex = (int*)transform_address_(&mutexes_, mutex_id);
+        int* pmutex = (int*)transform_address_local_(&mutexes_, mutex_id);
         uint32_t coreid = coreids_[local_pid_];
         uint32_t offset = 0;
         uint32_t val;
@@ -103,7 +104,7 @@ class world_provider {
 
     void mutex_unlock_(MUTEXID mutex_id) {
         const register uint32_t zero = 0;
-        int* pmutex = (int*)transform_address_(&mutexes_, mutex_id);
+        int* pmutex = (int*)transform_address_local_(&mutexes_, mutex_id);
         __asm__ __volatile__("str %[zero], [%[pmutex]]"
                              : /* no outputs */
                              : [zero] "r"(zero), [pmutex] "r"(pmutex)
@@ -118,6 +119,11 @@ class world_provider {
         if ((unsigned(addr) & 0xfff00000) == 0)
             return (void*)(unsigned(addr) | (uint32_t(coreids_[pid]) << 20));
         return addr;
+    }
+
+    // Same as above but assumes address is local to save one check
+    void* transform_address_local_(void* addr, int pid) const {
+        return (void*)(unsigned(addr) | (uint32_t(coreids_[pid]) << 20));
     }
 
     void write_syncstate_(int8_t state) {
