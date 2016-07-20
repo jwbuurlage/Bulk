@@ -40,7 +40,7 @@ class dma_task {
     // Wait for this task to complete
     void wait() const {
         // The interrupt handler will disable this specific bit
-        volatile unsigned* conf = (volatile unsigned*)&(this->config);
+        volatile unsigned* conf = (volatile unsigned*)&config;
         while (*conf & E_DMA_ENABLE) {
         }
     }
