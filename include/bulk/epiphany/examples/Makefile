@@ -32,6 +32,9 @@ CXXFLAGS  = $(HOST_INCLUDES) $(HOST_LIBS) -std=c++14 -O3 -ffast-math -Wall -Wfat
 E_CFLAGS  = $(E_INCLUDES)    $(E_LIBS) 	  -std=c99 -O3 -fno-strict-aliasing -ffast-math -fno-tree-loop-distribute-patterns -Wall -Wfatal-errors
 E_CXXFLAGS= $(E_INCLUDES)    $(E_LIBS) 	  -std=c++14 -Wall -Os -fno-tree-loop-distribute-patterns -fno-exceptions -fno-rtti -fno-threadsafe-statics -freg-struct-return -fno-default-inline
 
+E_DEPS    = $(BULK)/include/bulk/epiphany/lib/libbulk-epiphany-e.a
+HOST_DEPS = $(BULK)/include/bulk/epiphany/lib/libbulk-epiphany-host.a
+
 ########################################################
 
 # ARCH will be either x86_64, x86, or armv7l (parallella)
@@ -51,27 +54,27 @@ all: basic tests
 
 ########################################################
 
-bin/%.elf: %.c
+bin/%.elf: %.c $(E_DEPS)
 	@echo "CC $<"
-	@$(E_PLATFORM_PREFIX)gcc -T ${ELDF} -o $@ $< $(E_CFLAGS)
+	@$(E_PLATFORM_PREFIX)gcc -T $(ELDF) -o $@ $< $(E_CFLAGS)
 
-bin/%.elf: %.cpp
+bin/%.elf: %.cpp $(E_DEPS)
 	@echo "CXX $<"
-	@$(E_PLATFORM_PREFIX)g++ -T ${ELDF} -o $@ $< $(E_CXXFLAGS)
+	@$(E_PLATFORM_PREFIX)g++ -T $(ELDF) -o $@ $< $(E_CXXFLAGS)
 
-bin/%.s: %.c
+bin/%.s: %.c $(E_DEPS)
 	@echo "CC $<"
 	@$(E_PLATFORM_PREFIX)gcc -T $(ELDF) -fverbose-asm -S $< -o $@ $(E_CFLAGS)
 
-bin/%: %.c
-	@echo "CC $< blabla"
+bin/%: %.c $(HOST_DEPS)
+	@echo "CC $<"
 	@$(ARM_PLATFORM_PREFIX)gcc -o $@ $< $(CFLAGS)
 
-bin/%: %.cpp
+bin/%: %.cpp $(HOST_DEPS)
 	@echo "CXX $<"
 	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $< $(CXXFLAGS)
 
-bin/%.o: %.cpp
+bin/%.o: %.cpp $(HOST_DEPS)
 	@echo "CXX $<"
 	@$(ARM_PLATFORM_PREFIX)g++ -c -o $@ $< $(CXXFLAGS)
 
@@ -90,7 +93,7 @@ bin/tests:
 	@mkdir -p bin/tests
 
 bin/unittests: bin/tests/catch_main.o bin/tests/communication.o
-	@echo "$@"
+	@echo "CXX $@"
 	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $^ $(HOST_LIBS)
 
 #######################################################
