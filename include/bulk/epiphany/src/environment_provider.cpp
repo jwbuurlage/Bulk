@@ -131,6 +131,11 @@ void provider::spawn(int processors, const char* image_name) {
                 std::cerr << "WARNING: Kernel requests stream data but feature "
                              "is not implemented yet.\n";
             }
+            if (s == SYNCSTATE::STREAMWRITE) {
+                // TODO
+                std::cerr << "WARNING: Kernel has written data to stream but "
+                             "feature is not implemented yet.\n";
+            }
         }
 
         if (counters[SYNCSTATE::SYNC] == nprocs_used_) {

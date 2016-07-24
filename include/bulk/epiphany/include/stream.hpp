@@ -20,36 +20,7 @@ class stream {
     stream(stream&&) = delete;
     void operator=(stream&&) = delete;
 
-    void open(int id) {
-        // TODO: error messages
-        if (id < 0 || id > combuf_->nstreams)
-            return;
-
-        stream_descriptor* desc = &(combuf_->streams[id]);
-        int mypid = world.processor_id();
-
-        world.implementation().mutex_lock_(MUTEX_STREAM);
-        if (desc->pid == -1) {
-            desc->pid = mypid;
-            mypid = -1;
-        }
-        world.implementation().mutex_unlock_(MUTEX_STREAM);
-
-        if (mypid != -1)
-            return;
-
-        // We succesfully opened the stream
-
-        // Copy descriptor data
-        buffer = desc->buffer;
-        capacity = desc->capacity;
-        offset = desc->offset;
-        size = desc->size;
-
-        // Set local values
-        stream_id = id;
-        cursor = buffer;
-    }
+    void open(int id);
 
     void close() {
         if (stream_id == -1)
@@ -71,27 +42,32 @@ class stream {
     void seek_rel(int delta_bytes) {
         if (delta_bytes <= 0) {
             cursor = (void*)((unsigned)cursor + delta_bytes);
-            if (cursor < buffer)
+            if (cursor < buffer) {
+                // TODO: host request
                 cursor = buffer;
+            }
         } else {
-            size_t remaining = (unsigned)buffer + capacity - (unsigned)cursor;
+            size_t remaining = (unsigned)buffer + size - (unsigned)cursor;
             if ((unsigned)delta_bytes > remaining) {
+                // TODO: host request
                 delta_bytes = remaining;
             }
             cursor = (void*)((unsigned)cursor + delta_bytes);
         }
     }
 
-    // Seek with absolute offset
-    void seek_abs(size_t offset) {
-        if (offset > capacity)
+    // Seek with absolute offset from the start of the stream
+    void seek_abs(size_t offset_) {
+        // The buffer
+        // [buffer, buffer + capacity[
+        // corresponds to the stream part
+        // [offset, offset + capacity[
+        // Now we request to go to `offset_`
+        if ((int)offset_ < offset || offset_ > offset + capacity) {
+            // TODO: host seek request
             offset = capacity;
+        }
         cursor = (void*)((unsigned)buffer + offset);
-    }
-
-    // Size available in external memory
-    size_t available_size() {
-        return (unsigned)buffer + capacity - (unsigned)cursor;
     }
 
     /**
@@ -138,8 +114,10 @@ class stream {
      */
     int write(void* data, size_t size, bool wait_for_completion) {
         size_t remaining = (unsigned)buffer + capacity - (unsigned)cursor;
-        if (size > remaining)
+        if (size > remaining) {
+            // TODO: write to host request
             return -1;
+        }
         // Wait for any previous transfer to finish (either down or up)
         wait();
         // Round size up to a multiple of 8
@@ -166,9 +144,11 @@ class stream {
      * @remarks Memory is transferred using the `DMA1` engine.
      */
     int read(void* buffer, size_t size, bool wait_for_completion) {
-        size_t remaining = (unsigned)buffer + capacity - (unsigned)cursor;
-        if (remaining == 0)
+        size_t remaining = (unsigned)buffer + size - (unsigned)cursor;
+        if (remaining == 0) {
+            // TODO: read from host request
             return 0;
+        }
         if (size > remaining)
             size = remaining;
         wait();

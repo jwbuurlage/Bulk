@@ -24,7 +24,7 @@ typedef struct {
     // Data currently in the buffer
     // These two values are ONLY written to by the host
     int32_t offset;    // offset from the start of the stream
-    int32_t size;      // amount of data currently available in the stream
+    int32_t size;      // amount of data currently in the buffer (size <= capacity)
     // Processor currently owning the stream or -1 if none
     int32_t pid;
 } stream_descriptor;
@@ -71,6 +71,7 @@ enum SYNCSTATE : int8_t {
     ABORT = 7,
     MESSAGE = 8,
     STREAMREQ = 9,
+    STREAMWRITE = 10,
     COUNT
 };
 

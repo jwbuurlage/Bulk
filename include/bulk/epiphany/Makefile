@@ -17,6 +17,7 @@ E_SRCS = \
 		dma.cpp \
 		malloc.cpp \
 		reduce_binary_size.cpp \
+		stream.cpp \
 		utility.cpp \
 		world_provider.cpp
 

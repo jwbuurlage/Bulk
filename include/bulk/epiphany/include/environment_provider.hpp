@@ -1,9 +1,9 @@
 #pragma once
-#include <iostream>
-#include <string>
 #include <cstdint>
 #include <cstring>
 #include <functional>
+#include <iostream>
+#include <string>
 #include <vector>
 
 extern "C" {
@@ -21,7 +21,8 @@ class provider {
     class stream {
       public:
         void fill_stream() {
-            int ret = callback(buffer, descriptor->offset, capacity);
+            // TODO
+            int ret = read(buffer, descriptor->offset, capacity);
             if (ret > capacity) {
                 std::cerr << "ERROR: Written out of bounds to stream.\n";
             } else if (ret < -1) {
@@ -45,24 +46,43 @@ class provider {
         // Pointer to descriptor, accessible by Epiphany
         stream_descriptor* descriptor;
 
-        // Callback to get more stream data
-        // This function may be called by the environment anytime between
-        // the creation of the stream and the completion of `ebsp_spmd`.
-        // * void* buffer
-        //         A pointer to the buffer in external memory where the data
-        //         can be written, corresponding to `offset` in the stream.
-        // * int offset
-        //         The offset into the stream at which data is needed.
-        // * int size_requested
-        //         The amount of bytes requested.
-        // * return int size_written
-        //         The amount of bytes written to the stream by the function.
-        //         This MUST be at most `size_requested`.
-        //         The function can return `-1` to indicate the end of the
-        //         stream.
-        //         The function can return `0` to indicate no data is
-        //         available right now but might be later.
-        std::function<int(void*, int, int)> callback;
+        /**
+         * Read callback for stream
+         * This function may be called by the environment anytime between
+         * the creation of the stream and the completion of `ebsp_spmd`.
+         * - void* buffer
+         *         A pointer to the buffer in external memory where the data
+         *         can be written, corresponding to `offset` in the stream.
+         * - int offset
+         *         The offset into the stream at which data is needed,
+         *         this is already incorporated into `buffer`.
+         * - int size_requested
+         *         The amount of bytes requested.
+         * - return int size_written
+         *         The amount of bytes written to the stream by the function.
+         *         This MUST be at most `size_requested`.
+         *         The function can return `-1` to indicate the end of the
+         *         stream.
+         *         The function can return `0` to indicate no data is
+         *         available right now but might be later.
+         */
+        std::function<int(void*, uint32_t, uint32_t)> read;
+
+        /**
+         * Write callback for stream
+         * This function may be called by the environment anytime during
+         * the call to `ebsp_spmd`.
+         * The function can be left emtpy if no data from the kernels is needed.
+         * - const void* buffer
+         *         A pointer to the buffer in external memory where the data
+         *         written by the kernel is available.
+         * - int offset
+         *         The offset into the stream at which data is written.
+         * - int bytes_written
+         *         The amount of bytes written by the kernel.
+         * - return void
+         */
+        std::function<void(const void*, uint32_t, uint32_t)> write;
     };
 
     provider() {
@@ -75,7 +95,7 @@ class provider {
     /// an Epiphany program
     bool is_valid() const { return env_initialized_ >= 2; }
 
-    void spawn(int processors, const char* image_name );
+    void spawn(int processors, const char* image_name);
 
     int available_processors() const { return nprocs_available_; }
 
@@ -83,24 +103,31 @@ class provider {
         log_callback_ = f;
     }
 
-    /*
-     * Create a new stream that any processor can open
+    /**
+     * Create a new stream that any processor can open.
      *
-     * The capacity is the total size allocated for the stream.
-     * Capacity must be nonzero.
-     * Capacity will be rounded up to the nearest multiple of 8.
-     * The total size of the stream can be bigger, and does not have to
+     * @param read Called when more data is requested by the kernel
+     * @param write Called when data was written by the kernel
+     * @param capacity Size of external memory buffer
+     * @return true if stream was succesfully created
+     *
+     * See class `environment_provider::stream` for description of callbacks.
+     *
+     * Capacity must be nonzero and will be rounded up to the nearest multiple
+     * of 8.
+     *
+     * The total size of the data can be bigger, and does not have to
      * fit in this buffer at once.
      *
-     * The function passed will be called when more data is required by
-     * the system. See `stream` above for function description.
-     * Returns true if a stream was succesfully created.
+     * `read` will be called when more data is required by the system.
      *
-     * The function may be called by the environment anytime between
+     * `read` and `write` may be called by the environment anytime between
      * the creation of the stream and the completion of `ebsp_spmd`.
      */
-    bool create_stream(uint32_t capacity,
-                       std::function<int(void*, int, int)> f) {
+    bool
+    create_stream(std::function<uint32_t(void*, uint32_t, uint32_t)> read,
+                  std::function<void(const void*, uint32_t, uint32_t)> write,
+                  uint32_t capacity) {
         // Check if environment is initialized, but Epiphany is not running yet
         if (env_initialized_ != 2) {
             std::cerr
@@ -112,9 +139,9 @@ class provider {
             std::cerr << "ERROR: Stream capacity must be nonzero.\n";
             return false;
         }
-        if (f == nullptr) {
-            std::cerr
-                << "ERROR: Must provide a valid function to the stream.\n";
+        if (read == nullptr || write == nullptr) {
+            std::cerr << "ERROR: Must provide valid read and write functions "
+                         "to the stream.\n";
             return false;
         }
         capacity = ((capacity + 7) / 8) * 8; // round up
@@ -128,10 +155,57 @@ class provider {
         s.buffer = buffer;
         s.capacity = capacity;
         s.descriptor = 0;
-        s.callback = f;
+        s.read = read;
+        s.write = write;
         streams.push_back(s);
         // TODO: start requesting data?
         return true;
+    }
+
+    /**
+     * Create a new stream that any processor can open.
+     *
+     * @param data Buffer holding the initial data for the stream
+     * @param data_size Size of the data
+     * @param capacity Size of external memory buffer
+     * @return true if stream was succesfully created
+     *
+     * `capacity` must be nonzero and will be rounded up to the nearest multiple
+     * of 8.
+     *
+     * `data_size` must be large enough to hold any data that the kernel
+     * will write to the stream.
+     *
+     * The total size of the data (`data_size`) can be bigger than the
+     * size of the external memory buffer (`capacity`).
+     */
+    bool create_stream(void* data, uint32_t data_size, uint32_t capacity) {
+        int stream_id = streams.size();
+        return create_stream(
+            [data, data_size](void* dst, uint32_t offset,
+                              uint32_t size_requested) -> int {
+                // Kernel wants to read data
+                if (size_requested > data_size - offset)
+                    size_requested = data_size - offset;
+                if (size_requested <= 0)
+                    return -1;
+                memcpy(dst, (void*)(unsigned(data) + offset), size_requested);
+                return size_requested;
+            },
+            [data, data_size, stream_id](const void* buf, uint32_t offset,
+                                         uint32_t bytes_written) {
+                // Kernel has written data
+                if (offset + bytes_written > data_size) {
+                    std::cerr
+                        << "WARNING: Kernel is writing out of bounds on stream "
+                        << stream_id << '\n';
+                } else {
+                    memcpy((void*)(unsigned(&data) + offset), buf,
+                           bytes_written);
+                }
+                return;
+            },
+            capacity);
     }
 
   private:
