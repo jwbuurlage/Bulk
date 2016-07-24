@@ -32,8 +32,11 @@ CXXFLAGS  = $(HOST_INCLUDES) $(HOST_LIBS) -std=c++14 -O3 -ffast-math -Wall -Wfat
 E_CFLAGS  = $(E_INCLUDES)    $(E_LIBS) 	  -std=c99 -O3 -fno-strict-aliasing -ffast-math -fno-tree-loop-distribute-patterns -Wall -Wfatal-errors
 E_CXXFLAGS= $(E_INCLUDES)    $(E_LIBS) 	  -std=c++14 -Wall -Os -fno-tree-loop-distribute-patterns -fno-exceptions -fno-rtti -fno-threadsafe-statics -freg-struct-return -fno-default-inline
 
-E_DEPS    = $(BULK)/include/bulk/epiphany/lib/libbulk-epiphany-e.a
-HOST_DEPS = $(BULK)/include/bulk/epiphany/lib/libbulk-epiphany-host.a
+HOST_DEPS = $(BULK)/include/bulk/epiphany/lib/libbulk-epiphany-host.a \
+			$(BULK)/include/bulk/epiphany/include/environment_provider.hpp
+
+E_DEPS    = $(BULK)/include/bulk/epiphany/lib/libbulk-epiphany-e.a \
+			$(wildcard $(BULK)/include/bulk/epiphany/include/*.hpp)
 
 ########################################################
 
