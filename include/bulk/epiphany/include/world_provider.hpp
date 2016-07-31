@@ -29,7 +29,7 @@ class world_provider {
     void barrier();
 
     var_id_t register_location_(void* location, size_t size) {
-        var_id_t id = -1;
+        var_id_t id = VAR_INVALID;
         for (var_id_t i = 0; i < MAX_VARS; ++i) {
             if (var_list_[i] == 0) {
                 var_list_[i] = transform_address_(location, local_pid_);
@@ -38,7 +38,7 @@ class world_provider {
             }
         }
         barrier();
-        if (id == -1) {
+        if (id == VAR_INVALID) {
             // TODO: error message and return code
             return 0;
         }
@@ -103,7 +103,7 @@ class world_provider {
     }
 
     void mutex_unlock_(MUTEXID mutex_id) {
-        const register uint32_t zero = 0;
+        const uint32_t zero = 0;
         int* pmutex = (int*)transform_address_local_(&mutexes_, mutex_id);
         __asm__ __volatile__("str %[zero], [%[pmutex]]"
                              : /* no outputs */

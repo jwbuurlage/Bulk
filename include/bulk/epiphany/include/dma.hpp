@@ -1,9 +1,26 @@
 #pragma once
 #include <cstddef>
 
-extern "C" {
-#include <e_dma.h>
-}
+// Taken from e_dma.h
+// We do not want to include e_dma because they will not compile using
+// the host compiler.
+typedef enum
+{
+	E_DMA_ENABLE        = (1<<0),
+	E_DMA_MASTER        = (1<<1),
+	E_DMA_CHAIN         = (1<<2),
+	E_DMA_STARTUP       = (1<<3),
+	E_DMA_IRQEN         = (1<<4),
+	E_DMA_BYTE          = (0<<5),
+	E_DMA_HWORD         = (1<<5),
+	E_DMA_WORD          = (2<<5),
+	E_DMA_DWORD         = (3<<5),
+	E_DMA_MSGMODE       = (1<<10),
+	E_DMA_SHIFT_SRC_IN  = (1<<12),
+	E_DMA_SHIFT_DST_IN  = (1<<13),
+	E_DMA_SHIFT_SRC_OUT = (1<<14),
+	E_DMA_SHIFT_DST_OUT = (1<<15),
+} e_dma_config_t;
 
 extern unsigned dma_data_size[8]; // in epiphany library
 

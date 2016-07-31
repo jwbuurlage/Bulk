@@ -9,6 +9,11 @@
 namespace bulk {
 namespace epiphany {
 
+void provider::spawn(int processors, void (*kernelfunc)(bulk::world<backend>&, int, int)) {
+    std::cerr << "ERROR: program was not compiled using bulk compile tool\n";
+    return;
+}
+
 void provider::spawn(int processors, const char* image_name) {
     if (!is_valid()) {
         std::cerr << "ERROR: spawn called on hub that was not properly "
@@ -24,14 +29,20 @@ void provider::spawn(int processors, const char* image_name) {
                   << std::endl;
     }
 
-    e_fullpath_ = e_directory_;
-    e_fullpath_.append(image_name);
+    // First check if the file exists relative to working directory
+    if (access(image_name, R_OK) != -1) {
+        e_fullpath_ = image_name;
+    } else {
+        // Now check if it exits relative to host executable
+        e_fullpath_ = e_directory_;
+        e_fullpath_.append(image_name);
 
-    // Check if the file exists
-    if (access(e_fullpath_.c_str(), R_OK) == -1) {
-        std::cerr << "ERROR: Could not find epiphany executable: "
-                  << e_fullpath_ << std::endl;
-        return;
+        // Check if the file exists
+        if (access(e_fullpath_.c_str(), R_OK) == -1) {
+            std::cerr << "ERROR: Could not find epiphany executable: "
+                      << e_fullpath_ << std::endl;
+            return;
+        }
     }
 
     // Reset core registers to defaults
@@ -47,9 +58,9 @@ void provider::spawn(int processors, const char* image_name) {
         return;
     }
 
-    combuf_->nprocs = nprocs_used_;
+    host_combuf_->nprocs = nprocs_used_;
     for (int i = 0; i < NPROCS; i++)
-        combuf_->syncstate[i] = SYNCSTATE::INIT;
+        host_combuf_->syncstate[i] = SYNCSTATE::INIT;
 
     // Write stream descriptors
     stream_descriptor* descriptors = (stream_descriptor*)ext_malloc_(
@@ -60,8 +71,8 @@ void provider::spawn(int processors, const char* image_name) {
             << std::endl;
         return;
     }
-    combuf_->nstreams = streams.size();
-    combuf_->streams = (stream_descriptor*)host_to_e_pointer_(descriptors);
+    host_combuf_->nstreams = streams.size();
+    host_combuf_->streams = (stream_descriptor*)host_to_e_pointer_(descriptors);
     for (size_t i = 0; i < streams.size(); ++i) {
         streams[i].descriptor = &(descriptors[i]);
         descriptors[i].buffer = host_to_e_pointer_(streams[i].buffer);
@@ -102,7 +113,7 @@ void provider::spawn(int processors, const char* image_name) {
         int counters[SYNCSTATE::COUNT] = {0};
 
         for (int i = 0; i < NPROCS; i++) {
-            SYNCSTATE s = (SYNCSTATE)combuf_->syncstate[i];
+            SYNCSTATE s = (SYNCSTATE)host_combuf_->syncstate[i];
             if (s >= 0 && s < SYNCSTATE::COUNT) {
                 counters[s]++;
             } else {
@@ -114,7 +125,7 @@ void provider::spawn(int processors, const char* image_name) {
             }
 
             if (s == SYNCSTATE::MESSAGE) {
-                std::string msg(combuf_->msgbuf);
+                std::string msg(host_combuf_->msgbuf);
                 // Reset flag to let epiphany core continue
                 set_core_syncstate_(i, SYNCSTATE::CONTINUE);
                 // Print message
@@ -155,7 +166,7 @@ void provider::spawn(int processors, const char* image_name) {
         if (iter % 1000 == 0) {
             std::cerr << "Core bulk states:";
             for (int i = 0; i < nprocs_used_; i++)
-                std::cerr << ' ' << ((int)combuf_->syncstate[i]);
+                std::cerr << ' ' << ((int)host_combuf_->syncstate[i]);
             std::cerr << std::endl;
 
             // Get the `PROGRAM COUNTER` register (instruction pointer)
@@ -226,7 +237,7 @@ void provider::initialize_() {
         std::cerr << "ERROR: e_alloc failed.\n";
         return;
     }
-    combuf_ = (combuf*)emem_.base;
+    host_combuf_ = (combuf*)emem_.base;
     malloc_base_ = (void*)(uint32_t(emem_.base) + COMBUF_SIZE);
 
     ext_malloc_init_();
@@ -254,10 +265,10 @@ void provider::finalize_() {
 
 void provider::set_core_syncstate_(int pid, SYNCSTATE state) {
     // First write it to extmem
-    combuf_->syncstate[pid] = SYNCSTATE::CONTINUE;
+    host_combuf_->syncstate[pid] = SYNCSTATE::CONTINUE;
 
     // Then write it to the core itself
-    off_t dst = (off_t)combuf_->syncstate_ptr;
+    off_t dst = (off_t)host_combuf_->syncstate_ptr;
     if (e_write(&dev_, (pid / cols_), (pid % cols_), dst, &state,
                 sizeof(int8_t)) != sizeof(int8_t)) {
         std::cerr << "ERROR: unable to write syncstate to core memory."
@@ -292,7 +303,7 @@ void provider::update_remote_timer_() {
     float time_elapsed = (ts_end_.tv_sec - ts_start_.tv_sec +
                           (ts_end_.tv_nsec - ts_start_.tv_nsec) * 1.0e-9);
 
-    combuf_->remotetimer = time_elapsed;
+    host_combuf_->remotetimer = time_elapsed;
 }
 
 void provider::microsleep_(int microseconds) {

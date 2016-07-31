@@ -64,7 +64,7 @@ class message_container {
   public:
     message_container() {
         int packets = 0;
-        int accum_bytes = 0;
+        // int accum_bytes = 0;
         // bsp_qsize(&packets, &accum_bytes);
 
         queue_size_ = packets;

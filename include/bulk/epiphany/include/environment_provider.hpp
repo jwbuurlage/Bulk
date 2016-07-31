@@ -13,6 +13,9 @@ extern "C" {
 
 #include "combuf.hpp"
 
+// Include the epiphany side headers to make the lambda-kernels compile
+#include "../epiphany.hpp"
+
 namespace bulk {
 namespace epiphany {
 
@@ -97,9 +100,12 @@ class provider {
 
     void spawn(int processors, const char* image_name);
 
+    void spawn(int processors,
+               void (*kernelfunc)(bulk::world<backend>&, int, int));
+
     int available_processors() const { return nprocs_available_; }
 
-    void setLogCallback(std::function<void(int, const std::string&)> f) {
+    void set_log_callback(std::function<void(int, const std::string&)> f) {
         log_callback_ = f;
     }
 
@@ -189,7 +195,7 @@ class provider {
                     size_requested = data_size - offset;
                 if (size_requested <= 0)
                     return -1;
-                memcpy(dst, (void*)(unsigned(data) + offset), size_requested);
+                ::memcpy(dst, (void*)(unsigned(data) + offset), size_requested);
                 return size_requested;
             },
             [data, data_size, stream_id](const void* buf, uint32_t offset,
@@ -200,7 +206,7 @@ class provider {
                         << "WARNING: Kernel is writing out of bounds on stream "
                         << stream_id << '\n';
                 } else {
-                    memcpy((void*)(unsigned(&data) + offset), buf,
+                    ::memcpy((void*)(unsigned(&data) + offset), buf,
                            bytes_written);
                 }
                 return;
@@ -234,7 +240,7 @@ class provider {
     e_mem_t emem_; // Describes mmap info for external memory
 
     // Points directly to external memory using memory-mapping
-    combuf* combuf_;
+    combuf* host_combuf_;
     void* malloc_base_;
 
     // Timer storage
@@ -266,11 +272,11 @@ class provider {
     void ext_free_(void*);
 
     void* host_to_e_pointer_(void* ptr) {
-        return (void*)((unsigned)ptr - (unsigned)combuf_ + E_COMBUF_ADDR);
+        return (void*)((unsigned)ptr - (unsigned)host_combuf_ + E_COMBUF_ADDR);
     }
 
     void* e_to_host_pointer_(void* ptr) {
-        return (void*)((unsigned)ptr - E_COMBUF_ADDR + (unsigned)combuf_);
+        return (void*)((unsigned)ptr - E_COMBUF_ADDR + (unsigned)host_combuf_);
     }
 };
 

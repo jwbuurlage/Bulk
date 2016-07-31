@@ -1,4 +1,5 @@
 #pragma once
+#include "epiphany_internals.hpp"
 
 /**
  * \file coarray.hpp
@@ -44,7 +45,7 @@ class coarray {
      */
     ~coarray() {
         extern World world;
-        if (var_id_ != -1)
+        if (var_id_ != VAR_INVALID)
             world.unregister_location_(var_id_);
         if (data_)
             delete[] data_;
@@ -65,7 +66,7 @@ class coarray {
         size_ = other.size_;
         var_id_ = other.var_id_;
         data_ = other.data_;
-        other.var_id_ = -1;
+        other.var_id_ = VAR_INVALID;
         other.data_ = 0;
     }
 
@@ -137,7 +138,7 @@ class coarray {
   private:
     T* data_;
     int size_;
-    int var_id_;
+    var_id_t var_id_;
 };
 
 } // namespace epiphany
