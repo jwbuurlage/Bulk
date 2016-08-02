@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <utility>
 
 extern "C" {
 #include <e-hal.h>
@@ -100,8 +101,39 @@ class provider {
 
     void spawn(int processors, const char* image_name);
 
+#ifdef __clang__
+    // Actually we would prefer to have a raw function pointer instead of an
+    // std::function object because this makes sure that captures are
+    // not allowed.
+    // However, using a raw object will make generic lambdas
+    // (ones that use auto& for the first argument) not compile anymore.
+    // Therefore, the std::function is used instead of:
+    // void spawn(int processors,
+    //           void (*kernelfunc)(bulk::world<backend>&, int, int));
+    // Note that spawn is never implemented since the library is never compiled
+    // with clang so the linking stage is never reached.
     void spawn(int processors,
-               void (*kernelfunc)(bulk::world<backend>&, int, int));
+               std::function<void(bulk::world<backend>&, int, int)> f);
+#else
+    // When not compiling with the tool, there should be an error
+    // when the user tries to use the function, but NO error when the
+    // function is NOT called.
+    // This trick is taken from
+    // http://stackoverflow.com/questions/34745581/forbids-functions-with-static-assert
+    template <typename...>
+    struct always_false {
+        static constexpr bool value = false;
+    };
+    template <typename T>
+    void spawn(int processors, T f) {
+        static_assert(always_false<T>::value,
+                      "Use bulk-compile-tool to compile lambda kernels");
+    }
+
+    // This function is used when the kernel binary is embedded in the host
+    void spawn(int processors,
+               std::pair<unsigned char*, unsigned char*> file_start_end);
+#endif
 
     int available_processors() const { return nprocs_available_; }
 
@@ -207,7 +239,7 @@ class provider {
                         << stream_id << '\n';
                 } else {
                     ::memcpy((void*)(unsigned(&data) + offset), buf,
-                           bytes_written);
+                             bytes_written);
                 }
                 return;
             },

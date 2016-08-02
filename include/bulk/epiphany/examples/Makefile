@@ -31,6 +31,7 @@ CFLAGS    = $(HOST_INCLUDES) $(HOST_LIBS) -std=c99 -O3 -Wall -Wfatal-errors
 CXXFLAGS  = $(HOST_INCLUDES) $(HOST_LIBS) -std=c++14 -O3 -ffast-math -Wall -Wfatal-errors
 E_CFLAGS  = $(E_INCLUDES)    $(E_LIBS) 	  -std=c99 -O3 -fno-strict-aliasing -ffast-math -fno-tree-loop-distribute-patterns -Wall -Wfatal-errors
 E_CXXFLAGS= $(E_INCLUDES)    $(E_LIBS) 	  -std=c++14 -Wall -Os -fno-tree-loop-distribute-patterns -fno-exceptions -fno-rtti -fno-threadsafe-statics -freg-struct-return -fno-default-inline
+TOOL_FLAGS= $(HOST_INCLUDES) $(E_INCLUDES) -std=c++14 -O3 -Wall
 
 HOST_DEPS = $(BULK)/include/bulk/epiphany/lib/libbulk-epiphany-host.a \
 			$(BULK)/include/bulk/epiphany/include/environment_provider.hpp
@@ -77,9 +78,58 @@ bin/%: %.cpp $(HOST_DEPS)
 	@echo "CXX $<"
 	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $< $(CXXFLAGS)
 
-bin/%.o: %.cpp $(HOST_DEPS)
+#
+# This section uses bulk-compile-tool to compile source files
+# that have kernels written as lambdas
+#
+#
+# Say we want to create main.o from the source main.cpp
+#
+# bulk-compile-tool will generate the following files
+# main.cpp.host.cpp     <-- the host file with lambda's replaced
+# main.cpp.0.kernel.cpp <-- file containing the first lambda
+# main.cpp.1.kernel.cpp <-- file containing the second lambda
+#
+# The new host file expects to be linked with files names
+# main.cpp.0.kernel.elf.o
+# main.cpp.1.kernel.elf.o
+#
+# To build all of these, we have the following structure
+# main.o             depends on  main.cpp.host.cpp
+# main.cpp.host.cpp  depends on  main.cpp
+#
+# Building main.cpp.host.cpp will also build all kernels
+# Building main.o will link in any additional kernels
+#
+# bulk-compile-tool writes a list of kernel cpp files to stdout
+# We first compile
+# main.cpp.0.kernel.cpp  to  main.cpp.0.kernel.elf
+# Then objcopy
+# main.cpp.0.kernel.elf  to  main.cpp.0.kernel.elf.o
+# These last ones are then linked into main.o
+#
+
+bin/%.o: %.cpp.host.cpp $(HOST_DEPS)
 	@echo "CXX $<"
-	@$(ARM_PLATFORM_PREFIX)g++ -c -o $@ $< $(CXXFLAGS)
+	@$(ARM_PLATFORM_PREFIX)g++ -c -o $@.temp $< $(CXXFLAGS)
+	@echo "Linking any kernels into host object file"
+	@$(ARM_PLATFORM_PREFIX)ld -r -o $@ $@.temp $(KERNEL_LIST_OBJ)
+	@rm $@.temp
+	@echo $(KERNEL_LIST_OBJ) | xargs -r rm
+
+%.cpp.host.cpp: %.cpp
+	@echo "bulk-compile-tool $<"
+	$(eval KERNEL_LIST_CPP := $(shell bulk-compile-tool $< -- $(TOOL_FLAGS)))
+	$(eval KERNEL_LIST_OBJ := $(KERNEL_LIST_CPP:%.cpp=%.elf.o))
+	@echo $(KERNEL_LIST_OBJ) | xargs -r make
+	@echo $(KERNEL_LIST_CPP) | xargs -r rm
+
+%.kernel.elf.o: %.kernel.elf $(E_DEPS)
+	@$(ARM_PLATFORM_PREFIX)objcopy -I binary -O elf32-littlearm -B arm $< $@
+
+%.kernel.elf: %.kernel.cpp $(E_DEPS)
+	@echo "Compiling kernel $<"
+	@$(E_PLATFORM_PREFIX)g++ -T $(ELDF) -o $@ $< $(E_CXXFLAGS)
 
 ########################################################
 
@@ -95,7 +145,7 @@ tests: bin/tests bin/unittests bin/tests/test_kernel1.elf bin/tests/test_kernel2
 bin/tests:
 	@mkdir -p bin/tests
 
-bin/unittests: bin/tests/catch_main.o bin/tests/communication.o
+bin/unittests: bin/tests/catch_main.o bin/tests/communication.o bin/tests/lambda_kernels.o
 	@echo "CXX $@"
 	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $^ $(HOST_LIBS)
 

@@ -1,4 +1,6 @@
 #include <environment_provider.hpp>
+#include <cstdlib>
+#include <cstdio>
 
 // #define __USE_XOPEN2K // already defined in one of the C++ headers
 #include <unistd.h> // For `access` and `readlink`
@@ -9,9 +11,23 @@
 namespace bulk {
 namespace epiphany {
 
-void provider::spawn(int processors, void (*kernelfunc)(bulk::world<backend>&, int, int)) {
-    std::cerr << "ERROR: program was not compiled using bulk compile tool\n";
-    return;
+void provider::spawn(int processors,
+                     std::pair<unsigned char*, unsigned char*> file_buffer) {
+    // Create temporary file with kernel as contents
+    // Warning: ugly C code ahead
+    char filename[32];
+    strncpy(filename, "/tmp/bulk-XXXXXX", 32);
+    int filedescriptor = mkstemp(filename);
+    if (filedescriptor == -1) {
+        std::cerr << "ERROR: Could not create temporary file for kernel.\n";
+        return;
+    }
+
+    size_t file_size = size_t(file_buffer.second - file_buffer.first);
+    write(filedescriptor, file_buffer.first, file_size);
+    spawn(processors, (const char*)filename);
+    unlink(filename);
+    close(filedescriptor);
 }
 
 void provider::spawn(int processors, const char* image_name) {
