@@ -90,12 +90,16 @@ bin/%: %.cpp $(HOST_DEPS)
 # main.cpp.0.kernel.cpp <-- file containing the first lambda
 # main.cpp.1.kernel.cpp <-- file containing the second lambda
 #
-# The new host file expects to be linked with files names
+# We have to compile these into
+# main.cpp.host.o
 # main.cpp.0.kernel.elf.o
 # main.cpp.1.kernel.elf.o
 #
+# and then link all of those into main.o
+#
 # To build all of these, we have the following structure
-# main.o             depends on  main.cpp.host.cpp
+# main.o             depends on  main.cpp.host.o
+# main.cpp.host.o    depends on  main.cpp.host.cpp
 # main.cpp.host.cpp  depends on  main.cpp
 #
 # Building main.cpp.host.cpp will also build all kernels
@@ -109,20 +113,25 @@ bin/%: %.cpp $(HOST_DEPS)
 # These last ones are then linked into main.o
 #
 
-bin/%.o: %.cpp.host.cpp $(HOST_DEPS)
-	@echo "CXX $<"
-	@$(ARM_PLATFORM_PREFIX)g++ -c -o $@.temp $< $(CXXFLAGS)
-	@echo "Linking any kernels into host object file"
-	@$(ARM_PLATFORM_PREFIX)ld -r -o $@ $@.temp $(KERNEL_LIST_OBJ)
-	@rm $@.temp
-	@echo $(KERNEL_LIST_OBJ) | xargs -r rm
+bin/%.o: bin/%.cpp.host.o
+	@echo "Linking host object with any kernels"
+	@$(ARM_PLATFORM_PREFIX)ld -r -o $@ $< $(KERNEL_LIST_OBJ)
+	@echo $(KERNEL_LIST_OBJ) | xargs --no-run-if-empty rm
 
-%.cpp.host.cpp: %.cpp
+bin/%.cpp.host.o: %.cpp.host.cpp
+	@echo "CXX $<"
+	@$(ARM_PLATFORM_PREFIX)g++ -c -o $@ $< $(CXXFLAGS)
+
+%.cpp.host.cpp: %.cpp $(HOST_DEPS)
 	@echo "bulk-compile-tool $<"
 	$(eval KERNEL_LIST_CPP := $(shell bulk-compile-tool $< -- $(TOOL_FLAGS)))
 	$(eval KERNEL_LIST_OBJ := $(KERNEL_LIST_CPP:%.cpp=%.elf.o))
-	@echo $(KERNEL_LIST_OBJ) | xargs -r make
-	@echo $(KERNEL_LIST_CPP) | xargs -r rm
+	@echo $(KERNEL_LIST_OBJ) | xargs --no-run-if-empty make
+	@echo $(KERNEL_LIST_CPP) | xargs --no-run-if-empty rm
+
+#%.cpp.host.cpp: %.cpp $(HOST_DEPS)
+#	@echo "bulk-compile-tool $<"
+#	bulk-compile-tool $< -- $(TOOL_FLAGS) | sed s/.cpp$$/.elf.o/g | xargs --no-run-if-empty make
 
 %.kernel.elf.o: %.kernel.elf $(E_DEPS)
 	@$(ARM_PLATFORM_PREFIX)objcopy -I binary -O elf32-littlearm -B arm $< $@
