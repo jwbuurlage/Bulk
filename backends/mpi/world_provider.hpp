@@ -36,6 +36,10 @@ class world_provider {
     virtual void internal_send_(int processor, void* tag, void* content,
                                 size_t tag_size, size_t content_size) {}
 
+    std::string name() {
+        return std::string(name_);
+    }
+
    private:
     size_t tag_size_ = 0;
     char name_[MPI_MAX_PROCESSOR_NAME];

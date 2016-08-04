@@ -17,7 +17,7 @@ namespace bulk {
  */
 template <class WorldBackend>
 class world {
-  public:
+   public:
     using Implementation = typename WorldBackend::implementation;
 
     template <typename Tag, typename Content>
@@ -41,7 +41,9 @@ class world {
      *
      * \returns the number of active processors
      */
-    int active_processors() const { return implementation_.active_processors(); }
+    int active_processors() const {
+        return implementation_.active_processors();
+    }
 
     /**
      * Retrieve the local processor id
@@ -57,8 +59,7 @@ class world {
      */
     int next_processor() const {
         auto next = processor_id() + 1;
-        if (next >= active_processors())
-            next -= active_processors();
+        if (next >= active_processors()) next -= active_processors();
         return next;
     }
 
@@ -69,8 +70,7 @@ class world {
      */
     int prev_processor() const {
         auto prev = processor_id() + active_processors() - 1;
-        if (prev >= active_processors())
-            prev -= active_processors();
+        if (prev >= active_processors()) prev -= active_processors();
         return prev;
     }
 
@@ -96,10 +96,13 @@ class world {
      * Retrieve the implementation of the world
      *
      * \returns the distributed system implementation
+     *
      */
+    // FIXME: make a choice for the name
     Implementation& implementation() { return implementation_; }
+    Implementation& provider() { return implementation_; }
 
-  private:
+   private:
     Implementation implementation_;
 };
 
@@ -115,4 +118,4 @@ typename World::template var_type<T> create_var(World& world) {
     return typename World::template var_type<T>(world);
 }
 
-} // namespace bulk
+}  // namespace bulk

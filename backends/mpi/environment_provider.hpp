@@ -14,8 +14,6 @@ namespace mpi {
  */
 class provider {
    public:
-    using world_provider_type = world_provider;
-
     provider() { MPI_Init(nullptr, nullptr); }
 
     ~provider() { MPI_Finalize(); }
