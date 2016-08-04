@@ -13,7 +13,7 @@ namespace bsp {
 template <typename TTag, typename TContent>
 class message_iterator
     : std::iterator<std::forward_iterator_tag, message<TTag, TContent>> {
-  public:
+   public:
     message_iterator(int i, bool get_message) : i_(i) {
         if (get_message) {
             get_message_();
@@ -45,7 +45,7 @@ class message_iterator
         return *this;
     }
 
-  private:
+   private:
     void get_message_() {
         int dummy = 0;
         bsp_get_tag(&dummy, &current_message_.tag);
@@ -58,7 +58,7 @@ class message_iterator
 
 template <typename TTag, typename TContent>
 class message_container {
-  public:
+   public:
     message_container() {
         int packets = 0;
         int accum_bytes = 0;
@@ -75,9 +75,9 @@ class message_container {
         return message_iterator<TTag, TContent>(queue_size_, false);
     }
 
-  private:
+   private:
     int queue_size_;
 };
 
-} // namespace bsp
-}
+}  // namespace bsp
+}  // namespace bulk

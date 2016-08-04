@@ -9,6 +9,7 @@ extern "C" {
 
 #include <bulk/world.hpp>
 #include "backend.hpp"
+#include "world_provider.hpp"
 
 namespace bulk {
 namespace bsp {

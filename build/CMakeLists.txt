@@ -41,3 +41,9 @@ foreach(source_file ${EXAMPLE_SOURCES})
 endforeach(source_file)
 
 add_subdirectory(../test/build ../test/build)
+
+find_package(MPI QUIET)
+
+if(MPI_FOUND)
+    message("mpi found")
+endif(MPI_FOUND)
