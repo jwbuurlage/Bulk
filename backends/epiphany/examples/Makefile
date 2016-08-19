@@ -1,5 +1,5 @@
 # Home directory of the Bulk repository
-BULK=../../../..
+BULK=../../..
 ESDK=${EPIPHANY_HOME}
 ELDF=${ESDK}/bsps/current/fast.ldf
 
