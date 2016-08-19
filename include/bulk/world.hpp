@@ -118,4 +118,17 @@ typename World::template var_type<T> create_var(World& world) {
     return typename World::template var_type<T>(world);
 }
 
+/**
+ * Constructs a future, and registers it with `world`.
+ *
+ * \param world the distributed layer in which the future is defined.
+ * \param size the size of the local future
+ *
+ * \returns a newly allocated and registered future
+ */
+template<typename T, typename World>
+typename World::template future_type<T> create_future(World& world) {
+      return typename World::template future_type<T>(world);
+}
+
 }  // namespace bulk
