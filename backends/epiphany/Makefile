@@ -19,8 +19,8 @@ E_SRCS = \
 		utility.cpp \
 		world_provider.cpp
 
-HOST_INCLUDES = -I./include -I../.. -I${ESDK}/tools/host/include
-E_INCLUDES 	  = -I./include -I../..
+HOST_INCLUDES = -I./include -I../../include -I${ESDK}/tools/host/include
+E_INCLUDES 	  = -I./include -I../../include
 
 HOST_LIBS = -L${ESDK}/tools/host/lib -le-hal
 E_LIBS    = -le-lib
