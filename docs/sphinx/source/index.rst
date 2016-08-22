@@ -15,6 +15,9 @@ The |project_name| interface and reference backends are released under the MIT l
 
 ----
 
+.. image:: https://www.cwi.nl/sites/all/themes/newCWI/logo.png
+    :align: center
+
 |project_name| is currently developed at CWI_ by `Jan-Willem Buurlage <mailto:j.buurlage@cwi.nl>`_ and `Tom Bannink <mailto:t.bannink@cwi.nl>`_.
 
 ----
