@@ -7,10 +7,8 @@
  * distributed variables.
  */
 
-#include "world.hpp"
-#include "variable_indirect.hpp"
-#include "array.hpp"
 #include "future.hpp"
+#include "world.hpp"
 
 namespace bulk {
 
@@ -29,7 +27,6 @@ void put(int processor, T value, var_type& the_variable) {
 template <typename T, typename World>
 void put(int processor, T value, array<T, World>& the_array, int offset = 0,
          int count = 1) {
-
     the_array.world().implementation().internal_put_(
         processor, &value, the_array.data(), sizeof(T), offset, count);
 }
@@ -43,13 +40,13 @@ void put(int processor, T value, array<T, World>& the_array, int offset = 0,
  * \returns a `future` object that will contain the current remote value,
  * starting from the next superstep.
  */
-template <typename T, class World, template<typename,class> class var_type>
+template <typename T, class World, template <typename, class> class var_type>
 future<T, World> get(int processor, var_type<T, World>& the_variable) {
     future<T, World> result(the_variable.world());
     the_variable.world().implementation().internal_get_(
-        processor, &the_variable.value(), &result.value(), sizeof(T), 0,
-        1);
+        processor, &the_variable.value(), &result.value(), sizeof(T), 0, 1);
     return result;
 }
 
-} // namespace bulk
+
+}  // namespace bulk

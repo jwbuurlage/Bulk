@@ -24,6 +24,7 @@ class var_direct {
         var_id_ = world_.register_location_(&value_, sizeof(T));
     }
 
+
     /**
      * Deconstructs and deregisters the variable with the world
      */

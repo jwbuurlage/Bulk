@@ -19,6 +19,17 @@ void test_communication() {
                             "wrong value after putting");
         }
 
+        BULK_SECTION("Sugarized put") {
+            // test `put` to single variable
+            auto a = bulk::create_var<int>(world);
+
+            a(world.next_processor()) = s;
+            world.sync();
+
+            BULK_CHECK_ONCE(a.value() == ((s + p - 1) % p),
+                            "wrong value after sugarized putting");
+        }
+
         BULK_SECTION("Put to self") {
             auto a = bulk::create_var<int>(world);
 
@@ -107,6 +118,18 @@ void test_communication() {
 
             BULK_CHECK_ONCE(c.value() == world.next_processor(),
                             "wrong value after getting");
+        }
+
+        BULK_SECTION("Sugarized get") {
+            auto b = bulk::create_var<int>(world);
+            b.value() = s;
+            world.sync();
+
+            auto c = b(world.next_processor()).get();
+            world.sync();
+
+            BULK_CHECK_ONCE(c.value() == world.next_processor(),
+                            "wrong value after sugarized getting");
         }
 
         BULK_SECTION("Get multiple") {

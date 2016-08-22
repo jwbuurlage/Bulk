@@ -46,7 +46,7 @@ The reason to use a variable, is that a processor can *write* to a remote **imag
 
 .. code-block:: cpp
 
-    bulk::put(world.next_processor(), x, 4);
+    bulk::put(world.next_processor(), 4, x);
 
 This will overwrite the value of the variable :code:`x` on the next logical processor (i.e. processor :code:`s + 1 % p`) with :code:`4`. We can obtain the value of a remote image using:
 

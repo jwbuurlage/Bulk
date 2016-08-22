@@ -22,6 +22,10 @@ int main() {
         b = 5 + s;
         world.sync();
 
+        b(world.next_processor()) = 5;
+        auto d = b(world.next_processor()).get();
+        world.sync();
+
         std::cout << s << " <- " << a.value() << "\n";
         world.sync();
 

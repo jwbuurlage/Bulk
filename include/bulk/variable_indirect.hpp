@@ -1,4 +1,5 @@
 #pragma once
+
 #include <bulk/world.hpp>
 #include <memory>
 
@@ -20,7 +21,33 @@ class future;
  */
 template <typename T, class World>
 class var_indirect {
-  public:
+   public:
+    class image {
+       public:
+        using var_type = var_indirect<T, World>;
+        image(var_type& var, int t) : var_(var), t_(t) {}
+
+        /**
+         * Assign a value to a remote image
+         *
+         * \param value the new value of the image
+         */
+        void operator=(T value) {
+            bulk::put(t_, value, var_);
+        }
+
+        /**
+         * Obtain a future to the remote image value.
+         */
+        auto get() { return bulk::get(t_, var_); }
+
+       private:
+        var_type& var_;
+        int t_;
+    };
+
+    using value_type = T;
+
     /**
      * Initialize and registers the variable with the world
      */
@@ -33,8 +60,7 @@ class var_indirect {
      * Deconstructs and deregisters the variable with the world
      */
     ~var_indirect() {
-        if (value_.get())
-            world_.unregister_location_(value_.get());
+        if (value_.get()) world_.unregister_location_(value_.get());
     }
 
     var_indirect(var_indirect<T, World>& other) = delete;
@@ -46,6 +72,13 @@ class var_indirect {
     var_indirect(var_indirect<T, World>&& other) : world_(other.world_) {
         *this = std::move(other);
     }
+
+    /**
+     * Obtain a image object to a remote image, added for syntactic sugar
+     *
+     * \returns a `var_indirect::image` object to the image with index `t`.
+     */
+    image operator()(int t) { return image(*this, t); };
 
     /**
      * Move from one var to another
@@ -89,9 +122,9 @@ class var_indirect {
      */
     World& world() { return world_; }
 
-  private:
+   private:
     std::unique_ptr<T> value_;
     World& world_;
 };
 
-} // namespace bulk
+}  // namespace bulk

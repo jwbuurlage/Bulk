@@ -28,7 +28,7 @@ The main way to manipulate remote images of variables is using the communication
 
 .. code-block:: cpp
 
-    bulk::put(world.next_processor(), x, 1);
+    bulk::put(world.next_processor(), 1, x);
 
 To obtain the value of a remote image we write:
 
@@ -42,7 +42,7 @@ To obtain the value of a remote image we write:
     .. code-block:: cpp
 
         x(world.next_processor()) = 1;
-        auto y = x(world.next_processor());
+        auto y = x(world.next_processor()).get();
 
 .. image:: images/variable.png
     :align: center

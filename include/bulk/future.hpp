@@ -1,5 +1,4 @@
 #pragma once
-#include "variable_indirect.hpp"
 
 /**
  * \file future.hpp
