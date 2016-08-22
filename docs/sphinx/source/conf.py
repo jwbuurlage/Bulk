@@ -16,6 +16,7 @@
 import sys
 import os
 import sphinx_bootstrap_theme
+import sphinx_rtd_theme
 from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 
@@ -42,6 +43,7 @@ source_parsers = {
 	'.md': CommonMarkParser,
 }
 
+web_page = "http://www.github.com/jwbuurlage/Bulk"
 
 breathe_projects = { "bulk": "../../doxygen/output/xml/" }
 breathe_default_project = "bulk"
@@ -126,74 +128,74 @@ todo_include_todos = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'bootstrap'
-html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = sphinx_rtd_theme.get_html_theme_path()
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {
-    # Navigation bar title. (Default: ``project`` value)
-    # 'navbar_title': "Demo",
-
-    # Tab name for entire site. (Default: "Site")
-    'navbar_site_name': "Index",
-
-    # A list of tuples containing pages or urls to link to.
-    # Valid tuples should be in the following forms:
-    #    (name, page)                 # a link to a page
-    #    (name, "/aa/bb", 1)          # a link to an arbitrary relative url
-    #    (name, "http://example.com", True) # arbitrary absolute url
-    # Note the "1" or "True" value above as the third argument to indicate
-    # an arbitrary url.
-    'navbar_links': [
-        ("➤ GitHub", "http://www.github.com/jwbuurlage/Bulk", True),
-    ],
-
-    # Render the next and previous page links in navbar. (Default: true)
-    'navbar_sidebarrel': True,
-
-    # Render the current pages TOC in the navbar. (Default: true)
-    'navbar_pagenav': False,
-
-    # Tab name for the current pages TOC. (Default: "Page")
-    'navbar_pagenav_name': "Page",
-
-    # Global TOC depth for "site" navbar tab. (Default: 1)
-    # Switching to -1 shows all levels.
-    'globaltoc_depth': 2,
-
-    # Include hidden TOCs in Site navbar?
-    #
-    # Note: If this is "false", you cannot have mixed ``:hidden:`` and
-    # non-hidden ``toctree`` directives in the same page, or else the build
-    # will break.
-    #
-    # Values: "true" (default) or "false"
-    'globaltoc_includehidden': "true",
-
-    # HTML navbar class (Default: "navbar") to attach to <div> element.
-    # For black navbar, do "navbar navbar-inverse"
-    'navbar_class': "navbar navbar-inverse",
-
-    # Fix navigation bar to top of page?
-    # Values: "true" (default) or "false"
-    'navbar_fixed_top': "true",
-
-    # Location of link to source.
-    # Options are "nav" (default), "footer" or anything else to exclude.
-    'source_link_position': "footer",
-
-    # Bootswatch (http://bootswatch.com/) theme.
-    #
-    # Options are nothing (default) or the name of a valid theme
-    # such as "amelia" or "cosmo".
-    'bootswatch_theme': "cosmo",
-
-    # Choose Bootstrap version.
-    # Values: "3" (default) or "2" (in quotes)
-    'bootstrap_version': "3",
-}
+#html_theme_options = {
+#    # Navigation bar title. (Default: ``project`` value)
+#    # 'navbar_title': "Demo",
+#
+#    # Tab name for entire site. (Default: "Site")
+#    'navbar_site_name': "Index",
+#
+#    # A list of tuples containing pages or urls to link to.
+#    # Valid tuples should be in the following forms:
+#    #    (name, page)                 # a link to a page
+#    #    (name, "/aa/bb", 1)          # a link to an arbitrary relative url
+#    #    (name, "http://example.com", True) # arbitrary absolute url
+#    # Note the "1" or "True" value above as the third argument to indicate
+#    # an arbitrary url.
+#    'navbar_links': [
+#        ("➤", "http://www.github.com/jwbuurlage/Bulk", True),
+#    ],
+#
+#    # Render the next and previous page links in navbar. (Default: true)
+#    'navbar_sidebarrel': False,
+#
+#    # Render the current pages TOC in the navbar. (Default: true)
+#    'navbar_pagenav': False,
+#
+#    # Tab name for the current pages TOC. (Default: "Page")
+#    'navbar_pagenav_name': "Page",
+#
+#    # Global TOC depth for "site" navbar tab. (Default: 1)
+#    # Switching to -1 shows all levels.
+#    'globaltoc_depth': 2,
+#
+#    # Include hidden TOCs in Site navbar?
+#    #
+#    # Note: If this is "false", you cannot have mixed ``:hidden:`` and
+#    # non-hidden ``toctree`` directives in the same page, or else the build
+#    # will break.
+#    #
+#    # Values: "true" (default) or "false"
+#    'globaltoc_includehidden': "true",
+#
+#    # HTML navbar class (Default: "navbar") to attach to <div> element.
+#    # For black navbar, do "navbar navbar-inverse"
+#    'navbar_class': "navbar navbar-inverse",
+#
+#    # Fix navigation bar to top of page?
+#    # Values: "true" (default) or "false"
+#    'navbar_fixed_top': "true",
+#
+#    # Location of link to source.
+#    # Options are "nav" (default), "footer" or anything else to exclude.
+#    'source_link_position': "footer",
+#
+#    # Bootswatch (http://bootswatch.com/) theme.
+#    #
+#    # Options are nothing (default) or the name of a valid theme
+#    # such as "amelia" or "cosmo".
+#    #'bootswatch_theme': "yeti",
+#
+#    # Choose Bootstrap version.
+#    # Values: "3" (default) or "2" (in quotes)
+#    'bootstrap_version': "3",
+#}
 
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -350,7 +352,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Bulk', 'Bulk Documentation',
-     author, 'Bulk', 'One line description of project.',
+     author, 'Bulk', 'Modern and portable parallel programming.',
      'Miscellaneous'),
 ]
 
@@ -365,6 +367,13 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+
+rst_epilog = "";
+project_name = 'Bulk'
+rst_epilog += '.. |project_name| replace:: %s\n' % project_name
+rst_epilog += '.. |release| replace:: %s\n' % release
+rst_epilog += '.. |web_page| replace:: %s\n' % web_page
 
 def setup(app):
     app.add_config_value('recommonmark_config', {
