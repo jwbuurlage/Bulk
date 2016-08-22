@@ -1,14 +1,20 @@
 Introduction
 ============
 
-About Bulk
-----------
+About |project_name|
+--------------------
 
 |project_name| is a C++ library for writing parallel and distributed software. The main motivation is to provide a modern interface for writing parallel scientific and HPC software, but the resulting interface is general enough to use for many other applications.
 
 It provides a modern interface for writing performant parallel and distributed software. Internally, the specific code for communicating (the transport layer) is implemented by backends based on heavily optimized technologies such as MPI, while the higher levels provide a level of abstraction that allows average developers to develop efficient parallel software.
 
 The |project_name| project aims to provide the performance and fine-grain tunability and control of classic HPC software libraries such as MPI, with the ease-of-programming commonly found in Big Data platforms such as Hadoop and Spark.
+
+Why |project_name|
+--------
+
+.. image:: https://imgs.xkcd.com/comics/standards.png
+    :align: center
 
 Structure of this documentation
 -------------------------------

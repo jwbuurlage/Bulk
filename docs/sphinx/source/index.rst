@@ -11,7 +11,7 @@ Our main goal is to have a unified interface for programming modern computers, w
 
 We accomplish this by providing backends for specific platforms. For example, we support native C++ threads, MPI and the Adapteva Epiphany platform, and plan to add additional backends in the future. The code written using Bulk follows the bulk-synchronous paradigm.
 
-The |project_name| interface and reference backends are released under the MIT license. The source code and issue tracker are both hosted on GitHub. The latest |project_name| release is |release|.
+The |project_name| interface and reference backends are released under the MIT license. The source code and issue tracker are both hosted on GitHub_. The latest |project_name| release is |release|.
 
 ----
 
@@ -21,11 +21,16 @@ The |project_name| interface and reference backends are released under the MIT l
 
 .. toctree::
     :maxdepth: 2
-    :caption: User Documentation
+    :caption: Introduction
 
     introduction
     getting_started
     tour
+
+.. toctree::
+    :maxdepth: 2
+    :caption: User Documentation
+
     environment_world
     variables
     coarrays
@@ -55,4 +60,5 @@ Indices and tables
 * :ref:`search`
 
 .. _BSPlib: http://www.bsp-worldwide.org
+.. _GitHub: http://www.github.com/jwbuurlage/Bulk
 .. _CWI: http://www.cwi.nl

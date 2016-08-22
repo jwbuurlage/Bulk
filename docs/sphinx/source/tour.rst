@@ -30,7 +30,7 @@ On line `6`, we spawn the **SPMD** section of our program within the environment
 Communication between processors
 --------------------------------
 
-Next, we look at some basic forms of communication between processors. The main way to *talk* with other processors, is by using variables. A variable is created as follows:
+Next, we look at some basic forms of communication between processors. The main way to *talk* to other processors, is by using variables. A variable is created as follows:
 
 .. code-block:: cpp
 

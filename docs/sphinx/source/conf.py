@@ -43,6 +43,7 @@ source_parsers = {
 	'.md': CommonMarkParser,
 }
 
+web_page = "http://www.github.com/jwbuurlage/Bulk"
 
 breathe_projects = { "bulk": "../../doxygen/output/xml/" }
 breathe_default_project = "bulk"
@@ -372,6 +373,7 @@ rst_epilog = "";
 project_name = 'Bulk'
 rst_epilog += '.. |project_name| replace:: %s\n' % project_name
 rst_epilog += '.. |release| replace:: %s\n' % release
+rst_epilog += '.. |web_page| replace:: %s\n' % web_page
 
 def setup(app):
     app.add_config_value('recommonmark_config', {
