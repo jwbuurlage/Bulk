@@ -36,7 +36,7 @@ Next, we look at some basic forms of communication between processors. The main 
 
     auto x = bulk::create_var<T>(world);
 
-Here, :code:`T` is the type of the variable, say an :code:`int`. Values can be assigned to the (local) variable:
+Here, :code:`T` is the type of the variable, for example an :code:`int`. Values can be assigned to the (local) variable:
 
 .. code-block:: cpp
 
@@ -52,6 +52,46 @@ This will overwrite the value of the variable :code:`x` on the next logical proc
 
 .. code-block:: cpp
 
-    auto y = bulk::put(world.next_processor(), x);
+    auto y = bulk::get(world.next_processor(), x);
 
-Here, :code:`y` is a :code:`bulk::future` object.
+Here, :code:`y` is a :code:`bulk::future` object. A future object does not immediately hold the remote value of :code:`x`, but after a *future* call to :code:`world.sync()`, we can extract the remote value out of :code:`y`.
+
+.. code-block:: cpp
+
+    world.sync();
+    auto x_next = y.value();
+
+Co-arrays
+---------
+
+Co-arrays are a convenient way to store, and manipulate distributed data. We provide a co-array that is modeled after `Co-array Fortran`_. Arrays are initialized and used as follows:
+
+.. code-block:: cpp
+
+    auto xs = bulk::create_coarray<int>(world, s);
+    xs(3)[2] = 1;
+
+Here, we create a co-array of varying local  size (each processor holds :code:`s` many elements). Next we write the value :code:`1` to the element with local index :code:`2` on processor with index :code:`3`.
+
+Algorithmic skeletons
+---------------------
+
+|project_name| comes equipped with a number of higher-level functions, also known as *algorithmic skeletons*. For example, say we want to compute the dot-product of two coarrays, then we write this as:
+
+.. code-block:: cpp
+
+    auto xs = bulk::create_coarray<int>(world, s);
+    auto ys = bulk::create_coarray<int>(world, s);
+
+    // fill xs and ys with data
+    auto result = bulk::create_var<int>(world);
+    for (int i = 0; i < s; ++i) {
+        result.value() += xs[i] * ys[i];
+    }
+
+    // reduce to find global dot product
+    auto alpha = bulk::foldl(result, [](int& lhs, int rhs) { lhs += rhs; });
+
+Here we first compute the local inner product, and finally use the higher-level function :code:`bulk::foldl` to find the global result.
+
+.. _Co-array Fortran: https://en.wikipedia.org/wiki/Coarray_Fortran
