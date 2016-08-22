@@ -1,0 +1,30 @@
+\documentclass[tikz,14pt,border=10pt]{standalone}
+
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes,arrows}
+
+\begin{document}
+
+\tikzset{
+    block/.style = {draw, thick, rectangle, minimum height = 1.2cm, minimum width = 1.2cm, font=\footnotesize},
+}
+
+
+\begin{tikzpicture}[auto, thick, node distance=1.4cm]
+
+
+\draw
+    node [block, name=1] at (0, 0) {x(0)}
+    node [block, name=2, right of=1] {x(1)}
+    node [block, name=3, right of=2] {x(2)}
+    node [block, name=4, right of=3] {\ldots}
+    node [block, name=5, right of=4] {x(p - 1)};
+
+\draw
+    node [name=text] at (-3.5, 0) {\verb|bulk::create_var(world)|};
+
+\draw[->, out=-60, in=-120, shorten >= 0.1cm, shorten <= 0.1cm]
+    (1) edge node [pos=0.5, below=0.2cm] {\texttt{x(p - 1) = c}} (5) ;
+\end{tikzpicture}
+
+\end{document}

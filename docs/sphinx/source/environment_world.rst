@@ -40,6 +40,9 @@ The :code:`spawn` function takes two arguments. The first is the total number of
 The world of a processor
 ------------------------
 
+.. image:: images/environment.png
+    :align: center
+
 Each processor can communicate to other processors using the *world* object of type `bulk::world <api/world.html>`_. The world object contains some information on the specifics of SPMD section, such as the number of processors executing the section, and its identifier (as we have seen, these are also provided as arguments for programmer convenience). We can also obtain indices of the neighbouring processors:
 
 .. code-block:: cpp

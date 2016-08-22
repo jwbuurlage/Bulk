@@ -1,0 +1,36 @@
+\documentclass[tikz,14pt,border=10pt]{standalone}
+
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes,arrows}
+
+\begin{document}
+
+\tikzset{
+    block/.style = {draw, thick, rectangle, minimum height = 1.2cm, minimum width = 1.2cm, font=\footnotesize},
+}
+
+
+\begin{tikzpicture}[auto, thick, node distance=1.4cm]
+
+
+\draw
+    node [cloud, cloud puffs=15.7, name=1, minimum width=8cm, minimum height=6.5cm, draw, color=gray] at (0, 0) {};
+
+\draw
+    node [color=gray] at (0, 2.2) {Environment};
+
+\draw
+    node [block, name=1] at (-1.2, 1.2) {World 1}
+    node [block, name=2] at (1.2, 1.2) {World 2}
+    node [block, name=3] at (1.2, -1.2) {World \ldots}
+    node [block, name=4] at (-1.2, -1.2) {World p - 1};
+
+\draw[<->, shorten >= 0.1cm, shorten <= 0.1cm] (1) -- (2);
+\draw[<->, shorten >= 0.1cm, shorten <= 0.1cm] (1) -- (3);
+\draw[<->, shorten >= 0.1cm, shorten <= 0.1cm] (1) -- (4);
+\draw[<->, shorten >= 0.1cm, shorten <= 0.1cm] (2) -- (3);
+\draw[<->, shorten >= 0.1cm, shorten <= 0.1cm] (2) -- (4);
+\draw[<->, shorten >= 0.1cm, shorten <= 0.1cm] (3) -- (4);
+\end{tikzpicture}
+
+\end{document}
