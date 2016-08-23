@@ -27,4 +27,5 @@ Bulk API reference
    :maxdepth: 2
 
    message
+   queue
    send
