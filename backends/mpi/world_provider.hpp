@@ -5,6 +5,8 @@
 #include <mpi.h>
 #include <boost/bimap.hpp>
 
+#include "messages.hpp"
+
 namespace bulk {
 namespace mpi {
 
@@ -13,6 +15,7 @@ enum class receive_category : int {
     var_get = 1,
     var_get_response = 2,
     message = 3
+    // higher numbers reserved for message queues
 };
 
 using receive_type = std::underlying_type<receive_category>::type;
@@ -46,10 +49,17 @@ class world_provider {
 
         put_counts_.resize(nprocs_);
         get_counts_.resize(nprocs_);
+
         ones_.resize(nprocs_);
         std::fill(ones_.begin(), ones_.end(), 1);
 
         tag_size_ = 0;
+    }
+
+    ~world_provider() {
+        for (auto qb : queue_buffers_) {
+            if (qb) free(qb);
+        }
     }
 
     int active_processors() const { return nprocs_; }
@@ -64,6 +74,9 @@ class world_provider {
                            MPI_INT, MPI_SUM, MPI_COMM_WORLD);
         MPI_Reduce_scatter(get_counts_.data(), &remote_gets_, ones_.data(),
                            MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+        for (int q = 0; q < queue_count_; ++q)
+            MPI_Reduce_scatter(send_counts_[q].data(), &remote_sends_[q],
+                               ones_.data(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
         // probe for incoming puts
         while (remote_puts_ > 0) {
@@ -138,6 +151,34 @@ class world_provider {
             --remote_gets_;
         }
 
+        // probe for incoming messages for each queue
+        for (int q = 0; q < queue_count_; ++q) {
+            // optionally resize queue buffer
+            size_t incoming_size = remote_sends_[q] * message_sizes_[q];
+            if (!queue_buffers_[q] || queue_buffer_sizes_[q] < incoming_size) {
+                if (queue_buffers_[q]) free(queue_buffers_[q]);
+                queue_buffers_[q] = malloc(incoming_size);
+                queue_buffer_sizes_[q] = incoming_size;
+                *queue_buffer_references_[q] = queue_buffers_[q];
+            }
+            *buffer_counts_[q] = remote_sends_[q];
+
+            for (int message = 0; message < remote_sends_[q]; ++message) {
+                MPI_Status status = {};
+                MPI_Probe(MPI_ANY_SOURCE,
+                          static_cast<receive_type>(receive_category::message) + q,
+                          MPI_COMM_WORLD, &status);
+
+                MPI_Recv(
+                    (char*)queue_buffers_[q] + message_sizes_[q] * message,
+                    message_sizes_[q], MPI_BYTE, MPI_ANY_SOURCE,
+                    static_cast<receive_type>(receive_category::message) + q,
+                    MPI_COMM_WORLD, &status);
+            }
+
+            remote_sends_[q] = 0;
+        }
+
         MPI_Barrier(MPI_COMM_WORLD);
 
         // handle the get responses
@@ -169,6 +210,8 @@ class world_provider {
 
         std::fill(put_counts_.begin(), put_counts_.end(), 0);
         std::fill(get_counts_.begin(), get_counts_.end(), 0);
+        for (int q = 0; q < queue_count_; ++q)
+            std::fill(send_counts_[q].begin(), send_counts_[q].end(), 0);
         local_gets_ = 0;
         remote_puts_ = 0;
         remote_gets_ = 0;
@@ -207,16 +250,17 @@ class world_provider {
         put_counts_[processor]++;
     }
 
-    void put_to_self_(void* value, void* variable, size_t size,
-                       int offset, int count) {
-        // FIXME: if we decide to strictly do buffering communication only, then this is illegal
+    void put_to_self_(void* value, void* variable, size_t size, int offset,
+                      int count) {
+        // FIXME: if we decide to strictly do buffering communication only, then
+        // this is illegal
         memcpy((char*)variable + size * offset, value, count * size);
     }
 
-
-    void get_from_self_(void* variable, void* target, size_t size,
-                       int offset, int count) {
-        // FIXME: if we decide to strictly do buffering communication only, then this is illegal
+    void get_from_self_(void* variable, void* target, size_t size, int offset,
+                        int count) {
+        // FIXME: if we decide to strictly do buffering communication only, then
+        // this is illegal
         memcpy(target, (char*)variable + size * offset, count * size);
     }
 
@@ -227,6 +271,27 @@ class world_provider {
 
     void unregister_location_(void* location) {
         locations_.left.erase(location);
+    }
+
+    template <typename Tag, typename Content>
+    int register_queue_(void** buffer, int* count) {
+        queue_buffer_references_.push_back(buffer);
+        buffer_counts_.push_back(count);
+
+        send_counts_.push_back(std::vector<int>(nprocs_));
+        remote_sends_.push_back(0);
+
+        queue_buffers_.push_back(nullptr);
+        queue_buffer_sizes_.push_back(0);
+
+        message_sizes_.push_back(sizeof(message<Tag, Content>));
+
+        return queue_count_++;
+    }
+
+    void unregister_queue_(int /* id */) {
+        //        queue_buffer_references_[id] = nullptr;
+        //        buffer_counts_[id] = nullptr;
     }
 
     void internal_get_(int processor, void* variable, void* target, size_t size,
@@ -251,8 +316,27 @@ class world_provider {
         local_gets_++;
     }
 
-    virtual void internal_send_(int processor, void* tag, void* content,
-                                size_t tag_size, size_t content_size) {}
+    template <typename Tag, typename Content>
+    void internal_send_(int queue_id, int processor, Tag tag, Content content) {
+        if (processor == pid_) {
+            return;
+        }
+
+        auto data_size = sizeof(bulk::message<Tag, Content>);
+        bulk::message<Tag, Content>* msg =
+            (bulk::message<Tag, Content>*)malloc(data_size);
+        msg->content = content;
+        msg->tag = tag;
+
+        MPI_Send(
+            msg, data_size, MPI_BYTE, processor,
+            static_cast<receive_type>(receive_category::message) + queue_id,
+            MPI_COMM_WORLD);
+
+        free(msg);
+
+        send_counts_[queue_id][processor]++;
+    }
 
     std::string name() { return std::string(name_); }
 
@@ -267,14 +351,25 @@ class world_provider {
     boost::bimap<void*, var_id_type> locations_;
     using bimap_pair = decltype(locations_)::value_type;
 
+    std::vector<std::vector<int>> send_counts_;
     std::vector<int> put_counts_;
     std::vector<int> get_counts_;
 
+    std::vector<int> remote_sends_;
     int remote_puts_ = 0;
     int remote_gets_ = 0;
+
     int local_gets_ = 0;
 
     std::vector<int> ones_;
+
+    int queue_count_ = 0;
+    std::vector<void**> queue_buffer_references_;
+    std::vector<int*> buffer_counts_;
+    std::vector<size_t> message_sizes_;
+
+    std::vector<void*> queue_buffers_;
+    std::vector<size_t> queue_buffer_sizes_;
 };
 
 }  // namespace mpi

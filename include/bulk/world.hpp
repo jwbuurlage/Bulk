@@ -6,6 +6,8 @@
  * This objects encodes the world of a processor and its place within it.
  */
 
+#include "messages.hpp"
+
 #include <functional>
 #include <memory>
 #include <vector>
@@ -21,8 +23,7 @@ class world {
     using Implementation = typename WorldBackend::implementation;
 
     template <typename Tag, typename Content>
-    using message_container =
-        typename WorldBackend::template message_container_type<Tag, Content>;
+    using queue_type = typename WorldBackend::template queue_type<Tag, Content>;
 
     template <typename T>
     using var_type = typename WorldBackend::template var_type<T>;
@@ -92,6 +93,15 @@ class world {
         implementation_.unregister_location_(var_id);
     }
 
+    template <typename Tag, typename Content>
+    int register_queue_(void** buffer, int* count) {
+        return implementation_.template register_queue_<Tag, Content>(buffer, count);
+    };
+
+    void unregister_queue_(int id) {
+        implementation_.unregister_queue_(id);
+    };
+
     /**
      * Retrieve the implementation of the world
      *
@@ -109,9 +119,10 @@ class world {
 /**
  * Constructs a variable that is registered with `world`.
  *
- * \param T the type of the variable
+ * \tparam T the type of the variable
+ * \param world the distributed layer in which the variable is defined.
  *
- * \returns a newly allocated and registered variable
+ * \returns a newly constructed and registered variable
  */
 template <typename T, class World>
 typename World::template var_type<T> create_var(World& world) {
@@ -121,14 +132,30 @@ typename World::template var_type<T> create_var(World& world) {
 /**
  * Constructs a future, and registers it with `world`.
  *
- * \param world the distributed layer in which the future is defined.
- * \param size the size of the local future
+ * \tparam T the type of the variable
  *
- * \returns a newly allocated and registered future
+ * \param world the distributed layer in which the future is defined.
+ *
+ * \returns a newly constructed and registered future
  */
-template<typename T, typename World>
+template <typename T, typename World>
 typename World::template future_type<T> create_future(World& world) {
-      return typename World::template future_type<T>(world);
+    return typename World::template future_type<T>(world);
+}
+
+/**
+ * Constructs a message queue, and registers it with `world`.
+ *
+ * \tparam Tag the tag type of the queue
+ * \tparam Conent the content type of the queue
+ *
+ * \param world the distributed layer in which the queue is defined.
+ *
+ * \returns a newly constructed and registered queue
+ */
+template <typename Tag, typename Content, typename World>
+typename World::template queue_type<Tag, Content> create_queue(World& world) {
+    return typename World::template queue_type<Tag, Content>(world);
 }
 
 }  // namespace bulk

@@ -27,9 +27,8 @@ struct message {
  * \param content the content (payload) of the message
  */
 template <typename Tag, typename Content, typename World>
-void send(World& world, int processor, Tag tag, Content content) {
-    world.implementation().internal_send_(processor, &tag, &content, sizeof(Tag),
-                             sizeof(Content));
+void send(int queue_id, World& world, int processor, Tag tag, Content content) {
+    world.implementation().template internal_send_<Tag, Content>(queue_id, processor, tag, content);
 }
 
 /**
