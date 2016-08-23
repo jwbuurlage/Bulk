@@ -52,6 +52,7 @@ The |project_name| interface and reference backends are released under the MIT l
     :caption: Reference & Background
 
     bsp
+    api/index
 
 
 

@@ -55,11 +55,13 @@ class queue {
 
     class sender {
        public:
-        sender(queue& q, int t) : q_(q), t_(t) {}
-
-        void push(Tag tag, Content content) { q_.send(t_, tag, content); }
+        void push(Tag tag, Content content) { q_.send_(t_, tag, content); }
 
        private:
+        friend queue;
+
+        sender(queue& q, int t) : q_(q), t_(t) {}
+
         queue& q_;
         int t_;
     };
@@ -71,9 +73,6 @@ class queue {
 
     auto operator()(int t) { return sender(*this, t); }
 
-    void send(int t, Tag tag, Content content) {
-        bulk::send(id_, world_, t, tag, content);
-    }
 
     auto begin() { return buffer_iterator(*this, 0); }
     auto end() { return buffer_iterator(*this, count_); }
@@ -81,6 +80,10 @@ class queue {
    private:
     friend sender;
     friend buffer_iterator;
+
+    void send_(int t, Tag tag, Content content) {
+        bulk::send(id_, world_, t, tag, content);
+    }
 
     int id_ = -1;
 
