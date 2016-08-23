@@ -13,8 +13,8 @@ class backend {
   public:
     using implementation = bulk::mpi::world_provider;
 
-    template <typename TTag, typename TContent>
-    using message_container_type = message_container<TTag, TContent>;
+    template <typename Tag, typename Content>
+    using queue_type = queue<Tag, Content, bulk::world<backend>>;
 
     template <typename T>
     using var_type = bulk::var_indirect<T, bulk::world<backend>>;

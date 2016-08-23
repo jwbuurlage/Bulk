@@ -173,5 +173,65 @@ void test_communication() {
                 BULK_CHECK_ONCE(x == t++, "gather operation failed");
             }
         }
+
+        BULK_SECTION("Single message passing") {
+            auto q = bulk::create_queue<int, int>(world);
+            q(world.next_processor()).push(123, 1337);
+            world.sync();
+            for (auto msg : q) {
+                BULK_CHECK_ONCE(msg.tag == 123 && msg.content == 1337,
+                                "message passing failed");
+            }
+        }
+
+        BULK_SECTION("Multiple message passing") {
+            std::vector<int> contents = {1337, 12345, 1230519, 5, 8};
+
+            auto q = bulk::create_queue<int, int>(world);
+            for (size_t i = 0; i < contents.size(); ++i) {
+                q(world.next_processor()).push(s, contents[i]);
+            }
+
+            world.sync();
+
+            int k = 0;
+            for (auto msg : q) {
+                BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
+                                    msg.content == contents[k++],
+                                "multiple message passing failed");
+            }
+        }
+
+        BULK_SECTION("Multiple queue and types message passing") {
+            std::vector<int> contents = {1337, 12345, 1230519, 5, 8};
+            std::vector<float> contents2 = {1.0f, 2.0f, 3.0f, 4.0f};
+
+            auto q = bulk::create_queue<int, int>(world);
+            auto q2 = bulk::create_queue<int, float>(world);
+
+            for (size_t i = 0; i < contents.size(); ++i) {
+                q(world.next_processor()).push(s, contents[i]);
+            }
+            for (size_t i = 0; i < contents2.size(); ++i) {
+                q2(world.next_processor()).push(s, contents2[i]);
+            }
+
+            world.sync();
+
+            int k = 0;
+            for (auto msg : q) {
+                BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
+                                    msg.content == contents[k++],
+                                "failed to receive correct result on q");
+            }
+
+            int l = 0;
+            for (auto msg : q2) {
+                BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
+                                    msg.content == contents2[l++],
+                                "failed to receive correct result on q2");
+            }
+        }
+
     });
 }
