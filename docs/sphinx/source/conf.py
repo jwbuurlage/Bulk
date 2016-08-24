@@ -15,7 +15,6 @@
 
 import sys
 import os
-import sphinx_bootstrap_theme
 import sphinx_rtd_theme
 from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify

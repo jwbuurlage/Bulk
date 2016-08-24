@@ -31,8 +31,8 @@ namespace bulk {
  * \param f a binary function that takes two arguments of type `T`.
  *
  * \returns the result of the expression
- *              \f[ f(f(f(f(x(0), x(1)), x(2)), ...), x(p)). \f]
- *          which is computed at the each core.
+ *              \f[ f(f(f(f(x(0), x(1)), x(2)), ...), x(p-1)). \f]
+ *          which is computed at each core.
  */
 template <typename T, typename World, template<typename,class> class var_type, typename Func>
 T foldl(var_type<T, World>& x, Func f, T start_value = 0) {
