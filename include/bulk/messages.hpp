@@ -37,7 +37,7 @@ class queue {
      * This helper class adds syntactic sugar to the message passing interface
      * In particular it allows the programmer to write
      *
-     *     q(pid).push(tag, content);
+     *     q(pid).send(tag, content);
      */
     class sender {
         /**
@@ -46,7 +46,7 @@ class queue {
          * \param tag the tag to attach to the message
          * \param content the content of the message
          */
-        void push(Tag tag, Content content);
+        void send(Tag tag, Content content);
 
        private:
         sender(queue& q, int t);

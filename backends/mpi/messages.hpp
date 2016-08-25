@@ -55,7 +55,7 @@ class queue {
 
     class sender {
        public:
-        void push(Tag tag, Content content) { q_.send_(t_, tag, content); }
+        void send(Tag tag, Content content) { q_.send_(t_, tag, content); }
 
        private:
         friend queue;

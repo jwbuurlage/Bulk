@@ -47,7 +47,7 @@ int main() {
 
         // queues
         auto q = bulk::create_queue<int, int>(world);
-        q(world.next_processor()).push(1, 1);
+        q(world.next_processor()).send(1, 1);
 
         world.sync();
 
@@ -58,12 +58,12 @@ int main() {
 
         world.sync();
 
-        q(world.next_processor()).push(2, 3);
-        q(world.next_processor()).push(123, 1337);
+        q(world.next_processor()).send(2, 3);
+        q(world.next_processor()).send(123, 1337);
 
         auto q2 = bulk::create_queue<int, float>(world);
-        q2(world.next_processor()).push(5, 2.1f);
-        q2(world.next_processor()).push(3, 4.0f);
+        q2(world.next_processor()).send(5, 2.1f);
+        q2(world.next_processor()).send(3, 4.0f);
 
         world.sync();
 
