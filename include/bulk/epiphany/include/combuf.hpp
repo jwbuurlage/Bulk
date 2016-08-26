@@ -13,6 +13,22 @@ constexpr int NPROCS = 16;
 // Since all contents of the structs are 4-byte, we can
 // safely use 4-byte packing without losing speed
 #pragma pack(push, 4)
+
+// Streams, created by the host
+// Currently, there is always only a contiguous part
+// of the stream in external memory
+typedef struct {
+    // Allocated buffer
+    void* buffer;      // points to external memory, epiphany address space
+    uint32_t capacity; // amount of allocated memory
+    // Data currently in the buffer
+    // These two values are ONLY written to by the host
+    int32_t offset;    // offset from the start of the stream
+    int32_t size;      // amount of data currently in the buffer (size <= capacity)
+    // Processor currently owning the stream or -1 if none
+    int32_t pid;
+} stream_descriptor;
+
 typedef struct {
     // Epiphany --> ARM communication
     int8_t syncstate[NPROCS];
@@ -22,6 +38,8 @@ typedef struct {
     // ARM --> Epiphany
     float remotetimer;
     int32_t nprocs;
+    int32_t nstreams;
+    stream_descriptor* streams;
 } combuf;
 #pragma pack(pop)
 
@@ -52,6 +70,8 @@ enum SYNCSTATE : int8_t {
     EREADY = 6,
     ABORT = 7,
     MESSAGE = 8,
+    STREAMREQ = 9,
+    STREAMWRITE = 10,
     COUNT
 };
 

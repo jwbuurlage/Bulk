@@ -31,6 +31,13 @@ CFLAGS    = $(HOST_INCLUDES) $(HOST_LIBS) -std=c99 -O3 -Wall -Wfatal-errors
 CXXFLAGS  = $(HOST_INCLUDES) $(HOST_LIBS) -std=c++14 -O3 -ffast-math -Wall -Wfatal-errors
 E_CFLAGS  = $(E_INCLUDES)    $(E_LIBS) 	  -std=c99 -O3 -fno-strict-aliasing -ffast-math -fno-tree-loop-distribute-patterns -Wall -Wfatal-errors
 E_CXXFLAGS= $(E_INCLUDES)    $(E_LIBS) 	  -std=c++14 -Wall -Os -fno-tree-loop-distribute-patterns -fno-exceptions -fno-rtti -fno-threadsafe-statics -freg-struct-return -fno-default-inline
+TOOL_FLAGS= $(HOST_INCLUDES) $(E_INCLUDES) -std=c++14 -O3 -Wall
+
+HOST_DEPS = $(BULK)/include/bulk/epiphany/lib/libbulk-epiphany-host.a \
+			$(BULK)/include/bulk/epiphany/include/environment_provider.hpp
+
+E_DEPS    = $(BULK)/include/bulk/epiphany/lib/libbulk-epiphany-e.a \
+			$(wildcard $(BULK)/include/bulk/epiphany/include/*.hpp)
 
 ########################################################
 
@@ -51,29 +58,87 @@ all: basic tests
 
 ########################################################
 
-bin/%.elf: %.c
+bin/%.elf: %.c $(E_DEPS)
 	@echo "CC $<"
-	@$(E_PLATFORM_PREFIX)gcc -T ${ELDF} -o $@ $< $(E_CFLAGS)
+	@$(E_PLATFORM_PREFIX)gcc -T $(ELDF) -o $@ $< $(E_CFLAGS)
 
-bin/%.elf: %.cpp
+bin/%.elf: %.cpp $(E_DEPS)
 	@echo "CXX $<"
-	@$(E_PLATFORM_PREFIX)g++ -T ${ELDF} -o $@ $< $(E_CXXFLAGS)
+	@$(E_PLATFORM_PREFIX)g++ -T $(ELDF) -o $@ $< $(E_CXXFLAGS)
 
-bin/%.s: %.c
+bin/%.s: %.c $(E_DEPS)
 	@echo "CC $<"
 	@$(E_PLATFORM_PREFIX)gcc -T $(ELDF) -fverbose-asm -S $< -o $@ $(E_CFLAGS)
 
-bin/%: %.c
-	@echo "CC $< blabla"
+bin/%: %.c $(HOST_DEPS)
+	@echo "CC $<"
 	@$(ARM_PLATFORM_PREFIX)gcc -o $@ $< $(CFLAGS)
 
-bin/%: %.cpp
+bin/%: %.cpp $(HOST_DEPS)
 	@echo "CXX $<"
 	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $< $(CXXFLAGS)
 
-bin/%.o: %.cpp
+#
+# This section uses bulk-compile-tool to compile source files
+# that have kernels written as lambdas
+#
+#
+# Say we want to create main.o from the source main.cpp
+#
+# bulk-compile-tool will generate the following files
+# main.cpp.host.cpp     <-- the host file with lambda's replaced
+# main.cpp.0.kernel.cpp <-- file containing the first lambda
+# main.cpp.1.kernel.cpp <-- file containing the second lambda
+#
+# We have to compile these into
+# main.cpp.host.o
+# main.cpp.0.kernel.elf.o
+# main.cpp.1.kernel.elf.o
+#
+# and then link all of those into main.o
+#
+# To build all of these, we have the following structure
+# main.o             depends on  main.cpp.host.o
+# main.cpp.host.o    depends on  main.cpp.host.cpp
+# main.cpp.host.cpp  depends on  main.cpp
+#
+# Building main.cpp.host.cpp will also build all kernels
+# Building main.o will link in any additional kernels
+#
+# bulk-compile-tool writes a list of kernel cpp files to stdout
+# We first compile
+# main.cpp.0.kernel.cpp  to  main.cpp.0.kernel.elf
+# Then objcopy
+# main.cpp.0.kernel.elf  to  main.cpp.0.kernel.elf.o
+# These last ones are then linked into main.o
+#
+
+bin/%.o: bin/%.cpp.host.o
+	@echo "Linking host object with any kernels"
+	@$(ARM_PLATFORM_PREFIX)ld -r -o $@ $< $(KERNEL_LIST_OBJ)
+	@echo $(KERNEL_LIST_OBJ) | xargs --no-run-if-empty rm
+
+bin/%.cpp.host.o: %.cpp.host.cpp
 	@echo "CXX $<"
 	@$(ARM_PLATFORM_PREFIX)g++ -c -o $@ $< $(CXXFLAGS)
+
+%.cpp.host.cpp: %.cpp $(HOST_DEPS)
+	@echo "bulk-compile-tool $<"
+	$(eval KERNEL_LIST_CPP := $(shell bulk-compile-tool $< -- $(TOOL_FLAGS)))
+	$(eval KERNEL_LIST_OBJ := $(KERNEL_LIST_CPP:%.cpp=%.elf.o))
+	@echo $(KERNEL_LIST_OBJ) | xargs --no-run-if-empty make
+	@echo $(KERNEL_LIST_CPP) | xargs --no-run-if-empty rm
+
+#%.cpp.host.cpp: %.cpp $(HOST_DEPS)
+#	@echo "bulk-compile-tool $<"
+#	bulk-compile-tool $< -- $(TOOL_FLAGS) | sed s/.cpp$$/.elf.o/g | xargs --no-run-if-empty make
+
+%.kernel.elf.o: %.kernel.elf $(E_DEPS)
+	@$(ARM_PLATFORM_PREFIX)objcopy -I binary -O elf32-littlearm -B arm $< $@
+
+%.kernel.elf: %.kernel.cpp $(E_DEPS)
+	@echo "Compiling kernel $<"
+	@$(E_PLATFORM_PREFIX)g++ -T $(ELDF) -o $@ $< $(E_CXXFLAGS)
 
 ########################################################
 
@@ -89,8 +154,8 @@ tests: bin/tests bin/unittests bin/tests/test_kernel1.elf bin/tests/test_kernel2
 bin/tests:
 	@mkdir -p bin/tests
 
-bin/unittests: bin/tests/catch_main.o bin/tests/communication.o
-	@echo "$@"
+bin/unittests: bin/tests/catch_main.o bin/tests/communication.o bin/tests/lambda_kernels.o
+	@echo "CXX $@"
 	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $^ $(HOST_LIBS)
 
 #######################################################

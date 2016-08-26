@@ -1,4 +1,6 @@
 #include <environment_provider.hpp>
+#include <cstdlib>
+#include <cstdio>
 
 // #define __USE_XOPEN2K // already defined in one of the C++ headers
 #include <unistd.h> // For `access` and `readlink`
@@ -8,6 +10,29 @@
 
 namespace bulk {
 namespace epiphany {
+
+void provider::spawn(int processors,
+                     std::pair<unsigned char*, unsigned char*> file_buffer) {
+    // Create temporary file with kernel as contents
+    // Warning: ugly C code ahead
+    char filename[32];
+    strncpy(filename, "/tmp/bulk-XXXXXX", 32);
+    int filedescriptor = mkstemp(filename);
+    if (filedescriptor == -1) {
+        std::cerr << "ERROR: Could not create temporary file for kernel.\n";
+        return;
+    }
+
+    size_t file_size = size_t(file_buffer.second - file_buffer.first);
+    size_t ret = write(filedescriptor, file_buffer.first, file_size);
+    if (ret != file_size) {
+        std::cerr << "ERROR: Could not write to temporary file for kernel.\n";
+    } else {
+        spawn(processors, (const char*)filename);
+    }
+    unlink(filename);
+    close(filedescriptor);
+}
 
 void provider::spawn(int processors, const char* image_name) {
     if (!is_valid()) {
@@ -24,14 +49,20 @@ void provider::spawn(int processors, const char* image_name) {
                   << std::endl;
     }
 
-    e_fullpath_ = e_directory_;
-    e_fullpath_.append(image_name);
+    // First check if the file exists relative to working directory
+    if (access(image_name, R_OK) != -1) {
+        e_fullpath_ = image_name;
+    } else {
+        // Now check if it exits relative to host executable
+        e_fullpath_ = e_directory_;
+        e_fullpath_.append(image_name);
 
-    // Check if the file exists
-    if (access(e_fullpath_.c_str(), R_OK) == -1) {
-        std::cerr << "ERROR: Could not find epiphany executable: "
-                  << e_fullpath_ << std::endl;
-        return;
+        // Check if the file exists
+        if (access(e_fullpath_.c_str(), R_OK) == -1) {
+            std::cerr << "ERROR: Could not find epiphany executable: "
+                      << e_fullpath_ << std::endl;
+            return;
+        }
     }
 
     // Reset core registers to defaults
@@ -47,9 +78,29 @@ void provider::spawn(int processors, const char* image_name) {
         return;
     }
 
-    combuf_->nprocs = nprocs_used_;
+    host_combuf_->nprocs = nprocs_used_;
     for (int i = 0; i < NPROCS; i++)
-        combuf_->syncstate[i] = SYNCSTATE::INIT;
+        host_combuf_->syncstate[i] = SYNCSTATE::INIT;
+
+    // Write stream descriptors
+    stream_descriptor* descriptors = (stream_descriptor*)ext_malloc_(
+        streams.size() * sizeof(stream_descriptor));
+    if (descriptors == 0) {
+        std::cerr
+            << "ERROR: Not enough external memory to write stream descriptors."
+            << std::endl;
+        return;
+    }
+    host_combuf_->nstreams = streams.size();
+    host_combuf_->streams = (stream_descriptor*)host_to_e_pointer_(descriptors);
+    for (size_t i = 0; i < streams.size(); ++i) {
+        streams[i].descriptor = &(descriptors[i]);
+        descriptors[i].buffer = host_to_e_pointer_(streams[i].buffer);
+        descriptors[i].capacity = streams[i].capacity;
+        descriptors[i].offset = 0;
+        descriptors[i].size = 0;
+        descriptors[i].pid = -1;
+    }
 
     // Starting time
     clock_gettime(CLOCK_MONOTONIC, &ts_start_);
@@ -61,10 +112,16 @@ void provider::spawn(int processors, const char* image_name) {
         return;
     }
 
+    env_initialized_ = 3;
+
 #ifdef DEBUG
     int iter = 0;
     std::cerr << "Bulk DEBUG: Epiphany cores started.\n";
 #endif
+
+    // Load streams with data
+    for (auto& s : streams)
+        s.fill_stream();
 
     // Main program loop
     int extmem_corrupted = 0;
@@ -76,7 +133,7 @@ void provider::spawn(int processors, const char* image_name) {
         int counters[SYNCSTATE::COUNT] = {0};
 
         for (int i = 0; i < NPROCS; i++) {
-            SYNCSTATE s = (SYNCSTATE)combuf_->syncstate[i];
+            SYNCSTATE s = (SYNCSTATE)host_combuf_->syncstate[i];
             if (s >= 0 && s < SYNCSTATE::COUNT) {
                 counters[s]++;
             } else {
@@ -88,7 +145,7 @@ void provider::spawn(int processors, const char* image_name) {
             }
 
             if (s == SYNCSTATE::MESSAGE) {
-                std::string msg(combuf_->msgbuf);
+                std::string msg(host_combuf_->msgbuf);
                 // Reset flag to let epiphany core continue
                 set_core_syncstate_(i, SYNCSTATE::CONTINUE);
                 // Print message
@@ -98,6 +155,17 @@ void provider::spawn(int processors, const char* image_name) {
                     printf("$%02d: %s\n", i, msg.c_str());
                     fflush(stdout);
                 }
+            }
+
+            if (s == SYNCSTATE::STREAMREQ) {
+                // TODO
+                std::cerr << "WARNING: Kernel requests stream data but feature "
+                             "is not implemented yet.\n";
+            }
+            if (s == SYNCSTATE::STREAMWRITE) {
+                // TODO
+                std::cerr << "WARNING: Kernel has written data to stream but "
+                             "feature is not implemented yet.\n";
             }
         }
 
@@ -118,7 +186,7 @@ void provider::spawn(int processors, const char* image_name) {
         if (iter % 1000 == 0) {
             std::cerr << "Core bulk states:";
             for (int i = 0; i < nprocs_used_; i++)
-                std::cerr << ' ' << ((int)combuf_->syncstate[i]);
+                std::cerr << ' ' << ((int)host_combuf_->syncstate[i]);
             std::cerr << std::endl;
 
             // Get the `PROGRAM COUNTER` register (instruction pointer)
@@ -146,7 +214,7 @@ void provider::spawn(int processors, const char* image_name) {
 #endif
     }
 
-    env_initialized_ = 3;
+    env_initialized_ = 4;
 }
 
 void provider::initialize_() {
@@ -189,15 +257,19 @@ void provider::initialize_() {
         std::cerr << "ERROR: e_alloc failed.\n";
         return;
     }
-    combuf_ = (combuf*)emem_.base;
+    host_combuf_ = (combuf*)emem_.base;
     malloc_base_ = (void*)(uint32_t(emem_.base) + COMBUF_SIZE);
 
-    malloc_init_();
+    ext_malloc_init_();
 
     env_initialized_ = 2;
 }
 
 void provider::finalize_() {
+    for (auto& s : streams)
+        ext_free_(s.buffer);
+    streams.clear();
+
     if (env_initialized_ >= 2)
         e_free(&emem_);
 
@@ -213,10 +285,10 @@ void provider::finalize_() {
 
 void provider::set_core_syncstate_(int pid, SYNCSTATE state) {
     // First write it to extmem
-    combuf_->syncstate[pid] = SYNCSTATE::CONTINUE;
+    host_combuf_->syncstate[pid] = SYNCSTATE::CONTINUE;
 
     // Then write it to the core itself
-    off_t dst = (off_t)combuf_->syncstate_ptr;
+    off_t dst = (off_t)host_combuf_->syncstate_ptr;
     if (e_write(&dev_, (pid / cols_), (pid % cols_), dst, &state,
                 sizeof(int8_t)) != sizeof(int8_t)) {
         std::cerr << "ERROR: unable to write syncstate to core memory."
@@ -251,7 +323,7 @@ void provider::update_remote_timer_() {
     float time_elapsed = (ts_end_.tv_sec - ts_start_.tv_sec +
                           (ts_end_.tv_nsec - ts_start_.tv_nsec) * 1.0e-9);
 
-    combuf_->remotetimer = time_elapsed;
+    host_combuf_->remotetimer = time_elapsed;
 }
 
 void provider::microsleep_(int microseconds) {
@@ -264,7 +336,7 @@ void provider::microsleep_(int microseconds) {
 
 #include "malloc_implementation.cpp"
 
-void provider::malloc_init_() {
+void provider::ext_malloc_init_() {
     uint32_t size = DYNMEM_SIZE;
     // possibly round up if combuf is not multiple of chunk size
     void* new_base = (void*)chunk_roundup((uint32_t)malloc_base_);
@@ -274,6 +346,14 @@ void provider::malloc_init_() {
         std::cerr << "ERROR: External malloc base is not aligned." << std::endl;
     }
     _init_malloc_state(malloc_base_, size);
+}
+
+void* provider::ext_malloc_(uint32_t size) {
+    return _malloc(malloc_base_, size);
+}
+
+void provider::ext_free_(void* ptr) {
+    return _free(malloc_base_, ptr);
 }
 
 } // namespace epiphany

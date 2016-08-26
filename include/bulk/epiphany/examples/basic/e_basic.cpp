@@ -44,6 +44,28 @@ void example_extmem() {
     bulk::epiphany::free(mem);
 }
 
+void example_stream() {
+    bulk::epiphany::stream stream(s);
+
+    if (stream) {
+        int count = 100;
+        int* buf = new int[count];
+        stream.read(buf, count * sizeof(int), true);
+
+        int sum = 0;
+        for (int i = 0; i < count; i++)
+            sum += buf[i];
+
+        delete[] buf;
+
+        bulk::epiphany::print("Stream sum: %d", sum);
+
+        stream.close();
+    } else {
+        bulk::epiphany::print("Unable to open stream.");
+    }
+}
+
 int main() {
     s = world.processor_id();
     p = world.active_processors();
@@ -56,7 +78,10 @@ int main() {
 
     example_var();
     example_coarray();
+
+    bulk::epiphany::print("Using external memory!");
     example_extmem();
+    example_stream();
 
     world.sync();
 
