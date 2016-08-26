@@ -6,6 +6,8 @@ extern "C" {
 namespace bulk {
 namespace epiphany {
 
+void init_dma_handlers();
+
 EXT_MEM_TEXT world_provider::world_provider() {
     int row = e_group_config.core_row;
     int col = e_group_config.core_col;
@@ -29,7 +31,9 @@ EXT_MEM_TEXT world_provider::world_provider() {
 
     // Send &syncstate to ARM
     if (local_pid_ == 0)
-        combuf->syncstate_ptr = (int8_t*)&syncstate_;
+        combuf_->syncstate_ptr = (int8_t*)&syncstate_;
+
+    init_dma_handlers();
 
     write_syncstate_(SYNCSTATE::RUN);
     sync();
@@ -73,10 +77,10 @@ void world_provider::barrier() {
 void world_provider::barrier_init_() {
     if (local_pid_ == 0) {
         for (int s = 0; s < nprocs_; s++)
-            sync_barrier_tgt_[s] = (volatile int8_t*)transform_address_(
+            sync_barrier_tgt_[s] = (volatile int8_t*)transform_address_local_(
                 (void*)&sync_barrier_[0], s);
     } else {
-        sync_barrier_tgt_[0] = (volatile int8_t*)transform_address_(
+        sync_barrier_tgt_[0] = (volatile int8_t*)transform_address_local_(
             (void*)&sync_barrier_[local_pid_], 0);
     }
 }

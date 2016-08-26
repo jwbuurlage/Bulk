@@ -6,6 +6,7 @@
 #include <bulk/variable_direct.hpp>
 #include <bulk/messages.hpp>
 #include "messages.hpp"
+#include "coarray.hpp"
 #include "world_provider.hpp"
 
 #include "epiphany_internals.hpp"
@@ -27,13 +28,13 @@ class backend {
     using future_type = bulk::future<T, bulk::world<backend>>;
 
     template <typename T>
-    using coarray_type = bulk::coarray<T, bulk::world<backend>>;
+    using coarray_type = bulk::epiphany::coarray<T, bulk::world<backend>>;
 
     template <typename T>
     using array_type = bulk::array<T, bulk::world<backend>>;
 };
 
+extern bulk::world<bulk::epiphany::backend> world;
+
 } // namespace epiphany
 } // namespace bulk
-
-extern bulk::world<bulk::epiphany::backend> world;

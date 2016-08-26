@@ -19,7 +19,7 @@ namespace bulk {
  */
 template <class WorldBackend>
 class world {
-   public:
+  public:
     using Implementation = typename WorldBackend::implementation;
 
     template <typename Tag, typename Content>
@@ -60,7 +60,8 @@ class world {
      */
     int next_processor() const {
         auto next = processor_id() + 1;
-        if (next >= active_processors()) next -= active_processors();
+        if (next >= active_processors())
+            next -= active_processors();
         return next;
     }
 
@@ -71,7 +72,8 @@ class world {
      */
     int prev_processor() const {
         auto prev = processor_id() + active_processors() - 1;
-        if (prev >= active_processors()) prev -= active_processors();
+        if (prev >= active_processors())
+            prev -= active_processors();
         return prev;
     }
 
@@ -95,12 +97,11 @@ class world {
 
     template <typename Tag, typename Content>
     int register_queue_(void** buffer, int* count) {
-        return implementation_.template register_queue_<Tag, Content>(buffer, count);
+        return implementation_.template register_queue_<Tag, Content>(buffer,
+                                                                      count);
     };
 
-    void unregister_queue_(int id) {
-        implementation_.unregister_queue_(id);
-    };
+    void unregister_queue_(int id) { implementation_.unregister_queue_(id); };
 
     /**
      * Retrieve the implementation of the world
@@ -112,7 +113,7 @@ class world {
     Implementation& implementation() { return implementation_; }
     Implementation& provider() { return implementation_; }
 
-   private:
+  private:
     Implementation implementation_;
 };
 
@@ -127,6 +128,20 @@ class world {
 template <typename T, class World>
 typename World::template var_type<T> create_var(World& world) {
     return typename World::template var_type<T>(world);
+}
+
+/**
+ * Constructs a coarray, and registers it with `world`.
+ *
+ * \param world the distributed layer in which the coarray is defined.
+ * \param size the size of the local coarray
+ *
+ * \returns a newly allocated and registered coarray
+ */
+template <typename T, typename World>
+typename World::template coarray_type<T> create_coarray(World& world,
+                                                        int local_size) {
+    return typename World::template coarray_type<T>(world, local_size);
 }
 
 /**
@@ -158,4 +173,4 @@ typename World::template queue_type<Tag, Content> create_queue(World& world) {
     return typename World::template queue_type<Tag, Content>(world);
 }
 
-}  // namespace bulk
+} // namespace bulk
