@@ -1,5 +1,5 @@
 #include <bulk/environment.hpp>
-#include <bulk/epiphany/host.hpp>
+#include <bulk/backends/epiphany/host.hpp>
 #include <catch.hpp>
 
 TEST_CASE("lambda kernels", "[bulk-compile-tool]") {

@@ -1,6 +1,6 @@
 #include <bulk/world.hpp>
 #include <bulk/coarray.hpp>
-#include <bulk/epiphany/epiphany.hpp>
+#include <bulk/backends/epiphany/epiphany.hpp>
 #include <vector>
 
 using bulk::epiphany::world;

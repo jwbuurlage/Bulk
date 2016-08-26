@@ -18,8 +18,8 @@ class backend {
   public:
     using implementation = bulk::epiphany::world_provider;
 
-    template <typename TTag, typename TContent>
-    using message_container_type = message_container<TTag, TContent>;
+    template <typename Tag, typename Content>
+    using queue_type = queue<Tag, Content, bulk::world<backend>>;
 
     template <typename T>
     using var_type = bulk::var_direct<T, bulk::world<backend>>;
