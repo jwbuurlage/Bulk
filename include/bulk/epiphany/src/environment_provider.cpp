@@ -24,8 +24,12 @@ void provider::spawn(int processors,
     }
 
     size_t file_size = size_t(file_buffer.second - file_buffer.first);
-    write(filedescriptor, file_buffer.first, file_size);
-    spawn(processors, (const char*)filename);
+    size_t ret = write(filedescriptor, file_buffer.first, file_size);
+    if (ret != file_size) {
+        std::cerr << "ERROR: Could not write to temporary file for kernel.\n";
+    } else {
+        spawn(processors, (const char*)filename);
+    }
     unlink(filename);
     close(filedescriptor);
 }
