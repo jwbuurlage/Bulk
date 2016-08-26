@@ -1,0 +1,9 @@
+/ufs/buurlage/code/bulk/build/CMakeFiles/edit_cache.dir
+/ufs/buurlage/code/bulk/build/CMakeFiles/rebuild_cache.dir
+/ufs/buurlage/code/bulk/build/CMakeFiles/messaging.dir
+/ufs/buurlage/code/bulk/build/CMakeFiles/dot_product.dir
+/ufs/buurlage/code/bulk/build/CMakeFiles/communication.dir
+/ufs/buurlage/code/bulk/build/CMakeFiles/hello.dir
+/ufs/buurlage/code/bulk/test/build/CMakeFiles/edit_cache.dir
+/ufs/buurlage/code/bulk/test/build/CMakeFiles/rebuild_cache.dir
+/ufs/buurlage/code/bulk/test/build/CMakeFiles/bulk_test.dir

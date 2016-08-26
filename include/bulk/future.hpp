@@ -1,5 +1,4 @@
 #pragma once
-#include "variable_indirect.hpp"
 
 /**
  * \file future.hpp
@@ -59,18 +58,5 @@ class future {
     std::unique_ptr<T> buffer_;
     World& world_;
 };
-
-/**
- * Constructs a future, and registers it with `world`.
- *
- * \param world the distributed layer in which the future is defined.
- * \param size the size of the local future
- *
- * \returns a newly allocated and registered future
- */
-template<typename T, typename World>
-typename World::template future<T> create_future(World& world) {
-      return typename World::template future<T>(world);
-}
 
 } // namespace bulk

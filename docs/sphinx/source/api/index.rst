@@ -27,4 +27,13 @@ Bulk API reference
    :maxdepth: 2
 
    message
+   queue
    send
+
+**Algorithm**:
+
+.. toctree::
+   :maxdepth: 2
+
+   foldl
+   gather_all

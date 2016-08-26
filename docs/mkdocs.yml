@@ -1,6 +1,6 @@
 site_name: Bulk
 
-theme: cinder
+#theme: cinder
 google_analytics: ['UA-59249373-1', 'http://codu.in/bulk/docs']
 repo_url: "https://github.com/jwbuurlage/bulk"
 copyright: "Bulk is licensed under the <a href='https://github.com/jwbuurlage/bulk/blob/master/LICENSE.md'>MIT license</a>"
