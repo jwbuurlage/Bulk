@@ -1,12 +1,11 @@
 #pragma once
 #include <bulk/world.hpp>
 #include <bulk/future.hpp>
-#include <bulk/coarray.hpp>
 #include <bulk/array.hpp>
-#include <bulk/variable_direct.hpp>
 #include <bulk/messages.hpp>
 #include "messages.hpp"
 #include "coarray.hpp"
+#include "variable.hpp"
 #include "world_provider.hpp"
 
 #include "epiphany_internals.hpp"
@@ -22,7 +21,7 @@ class backend {
     using queue_type = queue<Tag, Content, bulk::world<backend>>;
 
     template <typename T>
-    using var_type = bulk::var_direct<T, bulk::world<backend>>;
+    using var_type = bulk::epiphany::var<T, bulk::world<backend>>;
 
     template <typename T>
     using future_type = bulk::future<T, bulk::world<backend>>;

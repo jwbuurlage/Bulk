@@ -1,5 +1,5 @@
 #pragma once
-#include <bulk/world.hpp>
+#include "world_state.hpp"
 
 /**
  * \file variable_direct.hpp
@@ -9,56 +9,56 @@
  */
 
 namespace bulk {
+namespace epiphany {
 
 /**
  * Represents a distributed object with an image for each processor, that is
  * readable and writable from remote processors.
  */
 template <typename T, class World>
-class var_direct {
+class var {
   public:
     /**
      * Initialize and registers the variable with the world
      */
-    var_direct(World& world) : value_(T()), world_(world) {
-        var_id_ = world_.register_location_(&value_, sizeof(T));
+    var(World&) : value_(T()) {
+        var_id_ = state.register_location_(&value_, sizeof(T));
     }
 
 
     /**
      * Deconstructs and deregisters the variable with the world
      */
-    ~var_direct() {
+    ~var() {
         if (var_id_ != -1)
-            world_.unregister_location_(var_id_);
+            state.unregister_location_(var_id_);
     }
 
-    var_direct(var_direct<T, World>& other) = delete;
-    void operator=(var_direct<T, World>& other) = delete;
+    var(var<T, World>& other) = delete;
+    void operator=(var<T, World>& other) = delete;
 
     /**
       * Move constructor: move from one var to a new one
       */
-    var_direct(var_direct<T, World>&& other)
-        : value_(other.value_), var_id_(other.var_id_), world_(other.world_) {
+    var(var<T, World>&& other)
+        : value_(other.value_), var_id_(other.var_id_) {
         // Note that `other` will be deconstructed right away,
         // and since we take over its `var_id_` we have to make sure
         // that `other` does not unregister it by setting it to -1
         other.var_id_ = -1;
-        world_.move_location_(var_id_, &value_);
+        state.move_location_(var_id_, &value_);
     }
 
     /**
      * Move assignment: move from one var to an existing one
      */
-    void operator=(var_direct<T, World>&& other) {
+    void operator=(var<T, World>&& other) {
         if (this != &other) {
             // Note that `other` will be deconstructed right away.
             // Unlike the move constructor above, we already have a `var_id_`
             // so we do NOT take over the `var_id_` of `other`.
             // Therefore we only have to copy its `value_`.
             value_ = other.value_;
-            world_ = other.world_;
         }
     }
 
@@ -82,7 +82,7 @@ class var_direct {
      *
      * \note This is for code like `myvar = 5;`.
      */
-    var_direct<T, World>& operator=(const T& rhs) {
+    var<T, World>& operator=(const T& rhs) {
         value_ = rhs;
         return *this;
     }
@@ -95,7 +95,7 @@ class var_direct {
         // However we want the compiler to optimize so we denote it as `const`
         // so that `for (int i ...) { a(pid)[i]; }` might not call the ()
         // operator every iteration
-        return *((T*)world_.implementation().get_direct_address_(pid, var_id_));
+        return *((T*)state.get_direct_address_(pid, var_id_));
     }
 
     /**
@@ -103,12 +103,15 @@ class var_direct {
      *
      * \returns a reference to the world of the var
      */
-    World& world() { return world_; }
+    World& world() const {
+        extern World world;
+        return world;
+    }
 
   private:
     T value_;
     int var_id_;
-    World& world_;
 };
 
+} // namespace epiphany
 } // namespace bulk

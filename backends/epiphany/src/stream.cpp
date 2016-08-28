@@ -1,5 +1,6 @@
 #include "stream.hpp"
 #include "utility.hpp"
+#include "world_state.hpp"
 
 namespace bulk {
 namespace epiphany {
@@ -17,14 +18,14 @@ void stream::open(int id) {
     }
 
     stream_descriptor* desc = &(combuf_->streams[id]);
-    int mypid = world.processor_id();
+    int mypid = state.processor_id();
 
-    world.implementation().mutex_lock_(MUTEX_STREAM);
+    state.mutex_lock_(MUTEX_STREAM);
     if (desc->pid == -1) {
         desc->pid = mypid;
         mypid = -1;
     }
-    world.implementation().mutex_unlock_(MUTEX_STREAM);
+    state.mutex_unlock_(MUTEX_STREAM);
 
     if (mypid != -1) {
         print(err_stream_in_use_, id);

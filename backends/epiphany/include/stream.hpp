@@ -1,5 +1,5 @@
 #pragma once
-#include "backend.hpp"
+#include "epiphany_internals.hpp"
 #include "dma.hpp"
 
 namespace bulk {

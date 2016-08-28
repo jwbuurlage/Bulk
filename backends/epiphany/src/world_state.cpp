@@ -1,4 +1,4 @@
-#include <world_provider.hpp>
+#include "world_state.hpp"
 extern "C" {
 #include <e-lib.h>
 }
@@ -6,9 +6,12 @@ extern "C" {
 namespace bulk {
 namespace epiphany {
 
+// The global instance of world_state
+world_state state;
+
 void init_dma_handlers();
 
-EXT_MEM_TEXT world_provider::world_provider() {
+EXT_MEM_TEXT world_state::world_state() {
     int row = e_group_config.core_row;
     int col = e_group_config.core_col;
     int cols = e_group_config.group_cols;
@@ -39,11 +42,11 @@ EXT_MEM_TEXT world_provider::world_provider() {
     sync();
 }
 
-world_provider::~world_provider() { write_syncstate_(SYNCSTATE::FINISH); }
+world_state::~world_state() { write_syncstate_(SYNCSTATE::FINISH); }
 
-void world_provider::sync() { barrier(); }
+void world_state::sync() { barrier(); }
 
-void world_provider::barrier() {
+void world_state::barrier() {
     if (local_pid_ == 0) {
         // Flip pass
         // set "my" slot
@@ -74,7 +77,7 @@ void world_provider::barrier() {
     }
 }
 
-void world_provider::barrier_init_() {
+void world_state::barrier_init_() {
     if (local_pid_ == 0) {
         for (int s = 0; s < nprocs_; s++)
             sync_barrier_tgt_[s] = (volatile int8_t*)transform_address_local_(

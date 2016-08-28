@@ -5,7 +5,6 @@
 #include <bulk/future.hpp>
 #include <bulk/coarray.hpp>
 #include <bulk/array.hpp>
-#include <bulk/variable_direct.hpp>
 #include <bulk/messages.hpp>
 
 #include "epiphany_internals.hpp"

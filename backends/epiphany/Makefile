@@ -10,7 +10,17 @@ HOST_SRCS = \
 		environment_provider.cpp
 
 E_HEADERS = \
-		include/world_provider.hpp
+		include/backend.hpp \
+		include/coarray.hpp \
+		include/combuf.hpp \
+		include/dma.hpp \
+		include/epiphany_internals.hpp \
+		include/messages.hpp \
+		include/stream.hpp \
+		include/utility.hpp \
+		include/variable.hpp \
+		include/world_provider.hpp \
+		include/world_state.hpp
 
 E_SRCS = \
 		backend.cpp \
@@ -19,7 +29,7 @@ E_SRCS = \
 		reduce_binary_size.cpp \
 		stream.cpp \
 		utility.cpp \
-		world_provider.cpp
+		world_state.cpp
 
 HOST_INCLUDES = -I./include -I../../include -I${ESDK}/tools/host/include
 E_INCLUDES 	  = -I./include -I../../include
