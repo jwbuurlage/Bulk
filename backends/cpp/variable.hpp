@@ -37,6 +37,10 @@ class var {
      * Deconstructs and deregisters the variable with the world
      */
     ~var() {
+        // It could be that core zero is already deconstructing while
+        // another core is still reading from the variable. Therefore
+        // use a barrier
+        world_.implementation().barrier();
         if (world_.processor_id() == 0 && all_values_ != 0)
             delete[] all_values_;
     }
@@ -52,7 +56,7 @@ class var {
         : self_value_(other.self_value_), all_values_(other.all_values_),
           world_(other.world_) {
         // Note that `other` will be deconstructed right away, so we
-        // must make sure that it does not deallocate
+        // must make sure that it does not deallocate the buffer.
         other.all_values_ = 0;
     }
 

@@ -1,9 +1,10 @@
 #pragma once
+#include "coarray.hpp"
 #include "messages.hpp"
 #include "variable.hpp"
 #include "world_provider.hpp"
+#include <bulk/world.hpp>
 #include <bulk/array.hpp>
-#include <bulk/coarray.hpp>
 #include <bulk/future.hpp>
 
 namespace bulk {
@@ -23,7 +24,7 @@ class backend {
     using future_type = bulk::future<T, bulk::world<backend>>;
 
     template <typename T>
-    using coarray_type = bulk::coarray<T, bulk::world<backend>>;
+    using coarray_type = bulk::cpp::coarray<T, bulk::world<backend>>;
 
     template <typename T>
     using array_type = bulk::array<T, bulk::world<backend>>;
