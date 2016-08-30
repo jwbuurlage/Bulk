@@ -1,5 +1,6 @@
 #pragma once
 #include "messages.hpp"
+#include "variable.hpp"
 #include "world_provider.hpp"
 #include <bulk/array.hpp>
 #include <bulk/coarray.hpp>

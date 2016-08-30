@@ -3,25 +3,21 @@
 #include <mutex>
 #include <condition_variable>
 
-// In the cpp version, the `world` instance is shared amongst all threads
-// Therefore anything that alters the internal state of `world_provider`
-// should use proper mutex mechanisms
+// Mutexes need to be shared, i.e. single instance of the class
+// that is shared amongst threads.
+// There is however a separate `world` object for every thread
+// Therefore we create an extra class `world_state` of which there
+// is only a single instance.
 
 namespace bulk {
 namespace cpp {
 
 // Taken from
 // http://stackoverflow.com/questions/24465533/implementing-boostbarrier-in-c11
-class Barrier {
+class barrier {
   public:
-    //explicit Barrier(std::size_t iCount)
-    //    : mThreshold(iCount), mCount(iCount), mGeneration(0) {}
-
-    void init(std::size_t iCount) {
-        mThreshold = iCount;
-        mCount = iCount;
-        mGeneration = 0;
-    }
+    explicit barrier(std::size_t iCount)
+        : mThreshold(iCount), mCount(iCount), mGeneration(0) {}
 
     void wait() {
         auto lGen = mGeneration;
@@ -43,44 +39,55 @@ class Barrier {
     std::size_t mGeneration;
 };
 
+// single `world_state` instance shared by every thread
+class world_state {
+  public:
+    explicit world_state(int processors) : sync_barrier(processors) {}
+
+    barrier sync_barrier;
+    // Used in var and coarray creation mechanism
+    void* var_pointer_;
+};
+
+// separate `world_provider` instance for every thread
 class world_provider {
   public:
-    // We would like to initialize barriers and so on here,
-    // but because we need `nprocs` it can only be done later
-    // since we can not pass arguments in this constructor
     world_provider() {}
     ~world_provider() {}
 
     int active_processors() const { return nprocs_; }
     int processor_id() const { return pid_; }
 
-    void barrier() {
-        sync_barrier.wait();
-    }
+    void barrier() { state_->sync_barrier.wait(); }
 
-    void sync() {
-        barrier();
-    }
+    void sync() { barrier(); }
 
-    // This should be in the constructor but `world` does not have one
-    // so its done this way. It should only be called ONCE,
-    // so NOT for every thread separately.
-    // environment will:
-    // - construct `world`
-    // - call init_(nprocs) 
-    // - spawn the threads
-    // - something to determine pid??
-    void init_(int nprocs) {
+    void init_(world_state* state, int pid, int nprocs) {
+        state_ = state;
+        pid_ = pid;
         nprocs_ = nprocs;
-        sync_barrier.init(nprocs);
+    }
+
+    // Communication mechanism to communicate single pointers
+    // Used by var and coarray constructors
+    // We could use the variable-id system instead but this seems simpler.
+    template <typename T>
+    void set_pointer_(T* value) {
+        state_->var_pointer_ = value;
+    }
+    template <typename T>
+    T* get_pointer_() {
+        return (T*)(state_->var_pointer_);
     }
 
   private:
-    int pid_ = 0;
-    int nprocs_ = 0;
-    
-    Barrier sync_barrier;
+    // This should be a reference but we can not assign it in the constructor
+    // because `world` does not have a constructor. FIXME: Change this ?
+    world_state* state_;
+    int pid_;
+    int nprocs_;
 };
+
 
 } // namespace cpp
 } // namespace bulk

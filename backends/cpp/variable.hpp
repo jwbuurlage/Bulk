@@ -21,20 +21,23 @@ class var {
     /**
      * Initialize and registers the variable with the world
      */
-    var(World& w) : world(w) {
-        auto pid = world.processor_id();
-        if (pid == 0)
-            all_values_ = new T[world.active_processors()];
-        world.implementation().barrier();
+    var(World& w) : world_(w) {
+        auto pid = world_.processor_id();
+        if (pid == 0) {
+            all_values_ = new T[world_.active_processors()];
+            world_.implementation().set_pointer_(all_values_);
+        }
+        world_.implementation().barrier();
+        all_values_ = world_.implementation().template get_pointer_<T>();
+        world_.implementation().barrier();
         self_value_ = &all_values_[pid];
     }
-
 
     /**
      * Deconstructs and deregisters the variable with the world
      */
     ~var() {
-        if (world.processor_id() == 0 && all_values_ != 0)
+        if (world_.processor_id() == 0 && all_values_ != 0)
             delete[] all_values_;
     }
 
@@ -46,8 +49,8 @@ class var {
       * Move constructor: move from one var to a new one
       */
     var(var<T, World>&& other)
-        : world(other.world), self_value_(other.self_value_),
-          all_values_(other.all_values_) {
+        : self_value_(other.self_value_), all_values_(other.all_values_),
+          world_(other.world_) {
         // Note that `other` will be deconstructed right away, so we
         // must make sure that it does not deallocate
         other.all_values_ = 0;
@@ -107,13 +110,13 @@ class var {
      * \returns a reference to the world of the var
      */
     World& world() const {
-        return world;
+        return world_;
     }
 
   private:
     T* self_value_; // points to all_values_[pid]
     T* all_values_;
-    World& world;
+    World& world_;
 };
 
 } // namespace cpp
