@@ -2,6 +2,8 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <vector>
+#include <functional>
 
 // Mutexes need to be shared, i.e. single instance of the class
 // that is shared amongst threads.
@@ -60,12 +62,32 @@ class world_provider {
 
     void barrier() { state_->sync_barrier.wait(); }
 
-    void sync() { barrier(); }
+    void sync() {
+        barrier();
+        for (auto& op : sync_operations_)
+            op();
+        barrier();
+    }
 
     void init_(world_state* state, int pid, int nprocs) {
         state_ = state;
         pid_ = pid;
         nprocs_ = nprocs;
+    }
+
+    int register_sync_operation_(std::function<void(void)> f) {
+        for (size_t i = 0; i < sync_operations_.size(); ++i) {
+            if (sync_operations_[i] == nullptr) {
+                sync_operations_[i] = f;
+                return i;
+            }
+        }
+        sync_operations_.push_back(f);
+        return sync_operations_.size() - 1;
+    }
+
+    void unregister_sync_operation_(int id) {
+        sync_operations_[id] = nullptr;
     }
 
     // Communication mechanism to communicate single pointers
@@ -86,6 +108,7 @@ class world_provider {
     world_state* state_;
     int pid_;
     int nprocs_;
+    std::vector<std::function<void(void)>> sync_operations_;
 };
 
 

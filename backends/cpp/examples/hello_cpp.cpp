@@ -40,6 +40,37 @@ int main() {
                           << xs[2] << "\n";
             world.sync();
         }
+
+        // queues
+        auto q = bulk::create_queue<int, int>(world);
+        q(world.next_processor()).send(1, 1);
+
+        world.sync();
+
+        // read queue
+        for (auto& msg : q) {
+            std::cout << s << " got sent " << msg.tag << ", " << msg.content << "\n";
+        }
+
+        world.sync();
+
+        q(world.next_processor()).send(2, 3);
+        q(world.next_processor()).send(123, 1337);
+
+        auto q2 = bulk::create_queue<int, float>(world);
+        q2(world.next_processor()).send(5, 2.1f);
+        q2(world.next_processor()).send(3, 4.0f);
+
+        world.sync();
+
+        // read queue
+        for (auto& msg : q) {
+            std::cout << s << " got sent in q " << msg.tag << ", " << msg.content << "\n";
+        }
+
+        for (auto& msg : q2) {
+            std::cout << s << " got sent in q2 " << msg.tag << ", " << msg.content << "\n";
+        }
     });
 
     return 0;

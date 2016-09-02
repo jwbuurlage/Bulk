@@ -25,7 +25,7 @@ class coarray {
             all_values_ = new T[local_size];
             other_values_ = new T*[1];
             other_values_[0] = all_values_;
-            self_value_ = all_values_
+            self_value_ = all_values_;
         } else {
             auto pid = world_.processor_id();
 
