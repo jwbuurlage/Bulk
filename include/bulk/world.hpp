@@ -78,30 +78,17 @@ class world {
     }
 
     /**
-     * Performs a global barrier synchronization of the active processors.
+     * Performs a global barrier synchronization of the active processors
+     * and resolves any outstanding communication. Messages previously
+     * received in queues are cleared for the next superstep.
      */
     void sync() { implementation_.sync(); }
 
-    int register_location_(void* location, size_t size) {
-        return implementation_.register_location_(location, size);
-    }
-    void move_location_(int var_id, void* newlocation) {
-        implementation_.move_location_(var_id, newlocation);
-    }
-    void unregister_location_(void* location) {
-        implementation_.unregister_location_(location);
-    }
-    void unregister_location_(int var_id) {
-        implementation_.unregister_location_(var_id);
-    }
-
-    template <typename Tag, typename Content>
-    int register_queue_(void** buffer, int* count) {
-        return implementation_.template register_queue_<Tag, Content>(buffer,
-                                                                      count);
-    };
-
-    void unregister_queue_(int id) { implementation_.unregister_queue_(id); };
+    /**
+     * Performs a global barrier synchronization of the active processors
+     * without resolving outstanding communication. Queues are not cleared.
+     */
+    void barrier() { implementation_.barrier(); }
 
     /**
      * Retrieve the implementation of the world
