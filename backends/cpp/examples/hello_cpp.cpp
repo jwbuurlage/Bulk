@@ -48,8 +48,13 @@ int main() {
         world.sync();
 
         // read queue
-        for (auto& msg : q) {
-            std::cout << s << " got sent " << msg.tag << ", " << msg.content << "\n";
+        for (int t = 0; t < p; ++t) {
+            if (s == t)
+                for (auto& msg : q) {
+                    std::cout << s << " got sent " << msg.tag << ", "
+                              << msg.content << "\n";
+                }
+            world.implementation().barrier();
         }
 
         world.sync();
@@ -64,12 +69,19 @@ int main() {
         world.sync();
 
         // read queue
-        for (auto& msg : q) {
-            std::cout << s << " got sent in q " << msg.tag << ", " << msg.content << "\n";
-        }
+        for (int t = 0; t < p; ++t) {
+            if (s == t) {
+                for (auto& msg : q) {
+                    std::cout << s << " got sent in q " << msg.tag << ", "
+                              << msg.content << "\n";
+                }
 
-        for (auto& msg : q2) {
-            std::cout << s << " got sent in q2 " << msg.tag << ", " << msg.content << "\n";
+                for (auto& msg : q2) {
+                    std::cout << s << " got sent in q2 " << msg.tag << ", "
+                              << msg.content << "\n";
+                }
+            }
+            world.implementation().barrier();
         }
     });
 

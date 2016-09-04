@@ -37,7 +37,7 @@ class queue {
 
         queuetype* my_queue = &all_values_[pid];
         sync_id_ = world_.implementation().register_sync_operation_(
-            [my_queue]() { my_queue->swap(); });
+            [my_queue]() { my_queue->sync(); });
 
         world_.implementation().barrier();
         self_value_ = &all_values_[pid];
@@ -112,8 +112,9 @@ class queue {
             receiving = &data1;
             sending = &data2;
         }
-        void swap() {
+        void sync() {
             std::swap(sending, receiving);
+            sending->clear();
         }
     };
 
