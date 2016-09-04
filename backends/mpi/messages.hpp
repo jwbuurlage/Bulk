@@ -67,9 +67,10 @@ class queue {
     };
 
     queue(World& world) : world_(world) {
-        id_ = world_.template register_queue_<Tag, Content>(&buffer_, &count_);
+        id_ = world_.implementation().template register_queue_<Tag, Content>(
+            &buffer_, &count_);
     }
-    ~queue() { world_.unregister_queue_(id_); }
+    ~queue() { world_.implementation().unregister_queue_(id_); }
 
     auto operator()(int t) { return sender(*this, t); }
 

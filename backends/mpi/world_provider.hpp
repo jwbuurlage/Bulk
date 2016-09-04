@@ -65,6 +65,10 @@ class world_provider {
     int active_processors() const { return nprocs_; }
     int processor_id() const { return pid_; }
 
+    void barrier() {
+        MPI_Barrier(MPI_COMM_WORLD);
+    }
+
     void sync() {
         // FIXME: what if spawning with fewer processors than exist
         MPI_Barrier(MPI_COMM_WORLD);
