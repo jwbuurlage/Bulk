@@ -122,6 +122,14 @@ class world_provider {
         }
     }
 
+    // FIXME: Change the whole internal_get_ thing
+    template <typename T, class World,
+              template <typename, class> class var_type>
+    void internal_get_(int processor, var_type<T, World>& the_variable,
+                       T& target) {
+        target = the_variable(processor);
+    }
+
     void init_(world_state* state, int pid, int nprocs) {
         state_ = state;
         pid_ = pid;

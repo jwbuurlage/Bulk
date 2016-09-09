@@ -31,6 +31,11 @@ void put(int processor, T value, array<T, World>& the_array, int offset = 0,
         processor, &value, the_array.data(), sizeof(T), offset, count);
 }
 
+// FIXME: bulk::get should be specialized for different backends.
+// It is however not allowed to do partial template specialization
+// for functions. Instead we could try something like the answer in
+// http://stackoverflow.com/questions/5101516/why-function-template-cannot-be-partially-specialized
+
 /**
  * Get a value from a variable held by a (remote) processor
  *
@@ -43,10 +48,9 @@ void put(int processor, T value, array<T, World>& the_array, int offset = 0,
 template <typename T, class World, template <typename, class> class var_type>
 future<T, World> get(int processor, var_type<T, World>& the_variable) {
     future<T, World> result(the_variable.world());
-    the_variable.world().implementation().internal_get_(
-        processor, &the_variable.value(), &result.value(), sizeof(T), 0, 1);
+    the_variable.world().implementation().internal_get_(processor, the_variable,
+                                                        result.value());
     return result;
 }
-
 
 }  // namespace bulk

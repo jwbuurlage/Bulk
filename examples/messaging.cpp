@@ -1,24 +1,18 @@
-#include <iostream>
-
+#include "set_backend.hpp"
 #include <bulk/bulk.hpp>
-#include <bulk/bsp/bsp.hpp>
 
 int main() {
-    auto env = bulk::environment<bulk::bsp::provider>();
+    bulk::environment<provider> env;
 
     env.spawn(env.available_processors(), [](auto world, int s, int p) {
-        for (int t = 0; t < p; ++t) {
-            bulk::send<int, int>(world, t, s, s);
-        }
+        auto q = bulk::create_queue<int, int>(world);
+        for (int t = 0; t < p; ++t)
+            q(t).send(s, s);
 
         world.sync();
 
-        if (s == 0) {
-            for (auto message : bulk::messages<int, int>(world)) {
-                std::cout << message.tag << ", " << message.content
-                          << std::endl;
-            }
-        }
+        for (auto& msg : q)
+            world.log("%d got sent %d, %d\n", s, msg.tag, msg.content);
     });
 
     return 0;
