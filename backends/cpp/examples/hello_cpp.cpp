@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <bulk/backends/cpp/cpp.hpp>
 #include <bulk/bulk.hpp>
 
@@ -24,7 +22,7 @@ int main() {
         b(world.next_processor()) = 5;
         world.sync();
 
-        std::cout << s << " <- " << a.value() << "\n";
+        world.log("%d <- %d\n", s, a.value());
         world.sync();
 
         // coarrays
@@ -34,12 +32,8 @@ int main() {
         xs[1] = s;
         world.sync();
 
-        for (int t = 0; t < p; ++t) {
-            if (s == t)
-                std::cout << s << " <= " << xs[0] << " " << xs[1] << " "
-                          << xs[2] << "\n";
-            world.sync();
-        }
+        // Test if direct logging can produce different output orders
+        world.log_direct("%d <= %d %d %d\n", s, xs[0], xs[1], xs[2]);
 
         // queues
         auto q = bulk::create_queue<int, int>(world);
@@ -48,14 +42,8 @@ int main() {
         world.sync();
 
         // read queue
-        for (int t = 0; t < p; ++t) {
-            if (s == t)
-                for (auto& msg : q) {
-                    std::cout << s << " got sent " << msg.tag << ", "
-                              << msg.content << "\n";
-                }
-            world.implementation().barrier();
-        }
+        for (auto& msg : q)
+            world.log("%d got sent %d, %d\n", s, msg.tag, msg.content);
 
         world.sync();
 
@@ -69,19 +57,11 @@ int main() {
         world.sync();
 
         // read queue
-        for (int t = 0; t < p; ++t) {
-            if (s == t) {
-                for (auto& msg : q) {
-                    std::cout << s << " got sent in q " << msg.tag << ", "
-                              << msg.content << "\n";
-                }
-
-                for (auto& msg : q2) {
-                    std::cout << s << " got sent in q2 " << msg.tag << ", "
-                              << msg.content << "\n";
-                }
-            }
-            world.implementation().barrier();
+        for (auto& msg : q) {
+            world.log("%d got sent in q %d, %d\n", s, msg.tag, msg.content);
+        }
+        for (auto& msg : q2) {
+            world.log("%d got sent in q2 %d, %d\n", s, msg.tag, msg.content);
         }
     });
 

@@ -1,9 +1,13 @@
 #pragma once
-#include <thread>
-#include <mutex>
+#include <algorithm>
 #include <condition_variable>
-#include <vector>
+#include <cstdio>
 #include <functional>
+#include <iostream>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <vector>
 
 // Mutexes need to be shared, i.e. single instance of the class
 // that is shared amongst threads.
@@ -49,6 +53,10 @@ class world_state {
     barrier sync_barrier;
     // Used in var and coarray creation mechanism
     void* var_pointer_;
+
+    std::mutex log_mutex; // mutex for the vector and for sending output
+    std::vector<std::pair<int,std::string>> logs;
+    std::function<void(int, const std::string&)> log_callback;
 };
 
 // separate `world_provider` instance for every thread
@@ -64,9 +72,54 @@ class world_provider {
 
     void sync() {
         barrier();
+        // Perform operations required at each sync like
+        // swapping message queues
         for (auto& op : sync_operations_)
             op();
+
+        // Print any log messages
+        if (pid_ == 0) {
+            auto& logs = state_->logs;
+            std::sort(logs.begin(), logs.end());
+            if (state_->log_callback == nullptr) {
+                for (auto& log : logs)
+                    std::cout << log.second;
+                std::cout << std::flush;
+            } else {
+                for (auto& log : logs)
+                    state_->log_callback(log.first, log.second);
+            }
+            logs.clear();
+        }
         barrier();
+    }
+
+    template <typename... Ts>
+    void log(const char* format, const Ts&... ts) {
+        size_t size = snprintf(0, 0, format, ts...);
+        char* buffer = new char[size + 1];
+        snprintf(buffer, size + 1, format, ts...);
+        {
+            std::lock_guard<std::mutex> lock{state_->log_mutex};
+            state_->logs.push_back(std::make_pair(pid_, std::string(buffer)));
+        }
+        delete[] buffer;
+    }
+
+    template <typename... Ts>
+    void log_direct(const char* format, const Ts&... ts) {
+        size_t size = snprintf(0, 0, format, ts...);
+        char* buffer = new char[size + 1];
+        snprintf(buffer, size + 1, format, ts...);
+        std::string logmessage(buffer);
+        delete[] buffer;
+        {
+            std::lock_guard<std::mutex> lock{state_->log_mutex};
+            if (state_->log_callback == nullptr)
+                std::cout << logmessage << std::flush;
+            else
+                state_->log_callback(pid_, logmessage);
+        }
     }
 
     void init_(world_state* state, int pid, int nprocs) {

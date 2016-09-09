@@ -45,6 +45,25 @@ class environment {
     }
 
     /**
+     * Set a callback that receives output from `world::log` and
+     * `world::log_direct`. If no callback is set, the results will
+     * be printed to standard output.
+     *
+     * The first argument to the callback is the processor id
+     * and the second argument is the logged message.
+     *
+     * The callback must be set before calling `spawn`.
+     *
+     * On multicore systems the callback could be called from a different
+     * thread. It is guaranteed that there will not be two calls to the
+     * callback at the same time, so there is no need for further
+     * synchronization or locking mechanisms.
+     */
+    void set_log_callback(std::function<void(int, const std::string&)> f) {
+        provider_.set_log_callback(f);
+    }
+
+    /**
      * Retrieve the provider of the distributed system
      *
      * \returns the distributed system provider
