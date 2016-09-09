@@ -1,17 +1,11 @@
-#include <iostream>
-
+#include "set_backend.hpp"
 #include <bulk/bulk.hpp>
-#include <bulk/bsp/bsp.hpp>
-#include <bulk/util/log.hpp>
-
 
 int main() {
-    auto env = bulk::environment<bulk::bsp::provider>();
+    bulk::environment<provider> env;
 
     env.spawn(env.available_processors(), [](auto world, int s, int p) {
-        BULK_IN_ORDER(
-            std::cout << "Hello, world " << s << "/" << p << std::endl;
-        )
+        world.log("Hello, world %d/%d\n", s, p);
     });
 
     return 0;

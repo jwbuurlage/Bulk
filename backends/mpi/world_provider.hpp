@@ -298,6 +298,14 @@ class world_provider {
         //        buffer_counts_[id] = nullptr;
     }
 
+    template <typename T, class World,
+              template <typename, class> class var_type>
+    void internal_get_(int processor, var_type<T, World>& the_variable,
+                       T& target) {
+        internal_get_(processor, &the_variable.value(), &target, sizeof(T), 0,
+                      1);
+    }
+
     void internal_get_(int processor, void* variable, void* target, size_t size,
                        int offset, int count) {
         if (processor == pid_) {
