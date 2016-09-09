@@ -80,7 +80,7 @@ class world_provider {
         // Print any log messages
         if (pid_ == 0) {
             auto& logs = state_->logs;
-            std::sort(logs.begin(), logs.end());
+            std::stable_sort(logs.begin(), logs.end());
             if (state_->log_callback == nullptr) {
                 for (auto& log : logs)
                     std::cout << log.second;

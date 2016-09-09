@@ -37,7 +37,7 @@ class provider {
 
         // Print leftover log messages
         auto& logs = state.logs;
-        std::sort(logs.begin(), logs.end());
+        std::stable_sort(logs.begin(), logs.end());
         if (state.log_callback == nullptr) {
             for (auto& log : logs)
                 std::cout << log.second;
