@@ -81,14 +81,54 @@ class world {
      * Performs a global barrier synchronization of the active processors
      * and resolves any outstanding communication. Messages previously
      * received in queues are cleared for the next superstep.
+     * The function must be called by all processors.
+     * When some processors call `sync` while others call `barrier`
+     * at the same time, behaviour is undefined.
      */
     void sync() { implementation_.sync(); }
 
     /**
      * Performs a global barrier synchronization of the active processors
      * without resolving outstanding communication. Queues are not cleared.
+     * The function must be called by all processors.
+     * When some processors call `sync` while others call `barrier`
+     * at the same time, behaviour is undefined.
      */
     void barrier() { implementation_.barrier(); }
+
+    /**
+     * Print output for debugging, shown at the next synchronization.
+     *
+     * The syntax is printf style.
+     *
+     * The logs are sorted by processor id before being printed at the next
+     * call to `sync`.
+     *
+     * At the next call to `sync`, the logs of all processors are sent
+     * to the `environment` and by default printed to standard output.
+     * Instead one can use `environment::set_log_callback` to intercept
+     * these log messages.
+     */
+    template <typename... Ts>
+    void log(const char* format, const Ts&... ts) {
+        implementation_.log(format, ts...);
+    }
+
+    /**
+     * Print output for debugging, guaranteed to be shown before the function
+     * returns.
+     *
+     * The syntax is printf style.
+     *
+     * The log message is sent to the `environment` and by default
+     * printed to standard output.
+     * Instead one can use `environment::set_log_callback` to intercept
+     * these log messages.
+     */
+    template <typename... Ts>
+    void log_direct(const char* format, const Ts&... ts) {
+        implementation_.log_direct(format, ts...);
+    }
 
     /**
      * Retrieve the implementation of the world
