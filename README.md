@@ -6,8 +6,10 @@ Bulk is an alternative interface for writing parallel programs in C++ in bulk-sy
 Examples
 --------
 
+See below for instructions on how to build the examples.
+
 ```cpp
-auto env = bulk::environment<bulk::bsp::provider>();
+bulk::environment<bulk::cpp::provider> env;
 env.spawn(env.available_processors(), [](auto world, int s, int p) {
     // 1. Hello world!
     world.log("Hello, world %d/%d\n", s, p);
@@ -38,6 +40,20 @@ env.spawn(env.available_processors(), [](auto world, int s, int p) {
 });
 
 ```
+
+Building
+--------
+
+The examples in the `examples` directory work for every backend. To build them, do the following. `cpp` can be replaced by the desired backend like `mpi` or `epiphany`.
+
+    cd backends/cpp/build
+    cmake .
+    make
+
+The examples will be compiled in the `bin` directory of the backend:
+
+    cd backends/cpp/bin
+    ./hello
 
 Authors
 -------

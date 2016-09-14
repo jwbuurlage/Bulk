@@ -25,7 +25,7 @@ int main() {
         // reduce to find global dot product
         auto alpha = bulk::foldl(result, [](int& lhs, int rhs) { lhs += rhs; });
 
-        world.log("%d: alpha = %d\n", s, alpha);
+        world.log("%d/%d: alpha = %d\n", s, p, alpha);
     });
 
     return 0;
