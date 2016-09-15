@@ -50,6 +50,10 @@ void example_stream() {
     if (stream) {
         int count = 100;
         int* buf = new int[count];
+
+        for (int i = 0; i < count; ++i)
+            buf[i] = -1;
+
         int read = stream.read(buf, count * sizeof(int), true);
         count = read / sizeof(int);
 
@@ -87,6 +91,8 @@ int main() {
 
     bulk::epiphany::print("Using external memory!");
     example_extmem();
+
+    world.sync();
     example_stream();
 
     world.sync();

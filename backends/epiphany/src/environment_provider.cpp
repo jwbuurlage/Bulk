@@ -98,7 +98,7 @@ void provider::spawn(int processors, const char* image_name) {
         descriptors[i].buffer = host_to_e_pointer_(streams[i].buffer);
         descriptors[i].capacity = streams[i].capacity;
         descriptors[i].offset = 0;
-        descriptors[i].size = 0;
+        descriptors[i].filled_size = 0;
         descriptors[i].pid = -1;
     }
 
@@ -122,6 +122,8 @@ void provider::spawn(int processors, const char* image_name) {
     // Load streams with data
     for (auto& s : streams)
         s.fill_stream();
+
+    std::cerr << "DEBUG: filled " << streams.size() << " streams." << std::endl;
 
     // Main program loop
     int extmem_corrupted = 0;
@@ -181,7 +183,7 @@ void provider::spawn(int processors, const char* image_name) {
             // and set proper environment state
             e_reset_system();
             finalize_();
-            break;
+            return;
         }
         if (counters[SYNCSTATE::FINISH] == nprocs_used_)
             break;
@@ -217,6 +219,14 @@ void provider::spawn(int processors, const char* image_name) {
         ++iter;
 #endif
     }
+
+    // Note that this point is not reached when a core calls abort()
+
+    std::cerr << "DEBUG: flusing " << streams.size() << " streams." << std::endl;
+
+    // Flush extmem stream data back to host
+    for (auto& s : streams)
+        s.flush_stream();
 
     env_initialized_ = 4;
 }

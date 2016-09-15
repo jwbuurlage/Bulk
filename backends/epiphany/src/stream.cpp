@@ -45,7 +45,7 @@ void stream::open(int id) {
     buffer = desc->buffer;
     capacity = desc->capacity;
     offset = desc->offset;
-    size = desc->size;
+    filled_size = desc->filled_size;
 
     // Set local values
     stream_id = id;

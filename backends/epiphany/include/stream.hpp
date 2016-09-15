@@ -49,7 +49,7 @@ class stream {
                 cursor = buffer;
             }
         } else {
-            size_t remaining = (unsigned)buffer + size - (unsigned)cursor;
+            size_t remaining = (unsigned)buffer + filled_size - (unsigned)cursor;
             if ((unsigned)delta_bytes > remaining) {
                 // TODO: host request
                 delta_bytes = remaining;
@@ -64,12 +64,16 @@ class stream {
         // [buffer, buffer + capacity[
         // corresponds to the stream part
         // [offset, offset + capacity[
-        // Now we request to go to `offset_`
+        // Now we request the cursor to go to `offset_`
+        // First check if that lies within the current loaded stream part
         if ((int)offset_ < offset || offset_ > offset + capacity) {
             // TODO: host seek request
-            offset = capacity;
+            cursor = buffer;
+        } else {
+            // buffer corresponds to offset
+            // buffer + offset_ - offset corresponds to offset_
+            cursor = (void*)((unsigned)buffer + offset_ - offset);
         }
-        cursor = (void*)((unsigned)buffer + offset);
     }
 
     /**
@@ -136,7 +140,7 @@ class stream {
     /**
      * Read data from a stream to a local buffer.
      *
-     * @param buffer Buffer that receives the data. Must hold at least size.
+     * @param dst_buf Buffer that receives the data. Must hold at least size.
      * @param wait_for_completion If true this function blocks untill
      * the data is completely read from the stream.
      * @return Number of bytes read. Zero at end of stream, negative on error.
@@ -145,16 +149,18 @@ class stream {
      *
      * @remarks Memory is transferred using the `DMA1` engine.
      */
-    int read(void* buffer, size_t size, bool wait_for_completion) {
-        size_t remaining = (unsigned)buffer + size - (unsigned)cursor;
+    int read(void* dst_buf, size_t size, bool wait_for_completion) {
+        size_t remaining = (unsigned)buffer + filled_size - (unsigned)cursor;
         if (remaining == 0) {
-            // TODO: read from host request
+            // TODO: blocking host request
             return 0;
         }
-        if (size > remaining)
+        if (size > remaining) {
+            // TODO: read remaining but also async host request
             size = remaining;
+        }
         wait();
-        dma.push(buffer, cursor, size, 1);
+        dma.push(dst_buf, cursor, size, 1);
         cursor = (void*)((unsigned)cursor + size);
         if (wait_for_completion)
             wait();
@@ -163,10 +169,11 @@ class stream {
 
   private:
     // These are also part of `stream_descriptor`
+    // Explanation is in combuf.hpp at `stream_descriptor`
     void* buffer;
     uint32_t capacity;
     int32_t offset;
-    int32_t size;
+    int32_t filled_size;
     // Only local
     __attribute__((aligned(8))) dma_task dma;
     int stream_id;

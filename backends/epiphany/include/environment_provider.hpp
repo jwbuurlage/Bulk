@@ -24,7 +24,10 @@ class provider {
   public:
     class stream {
       public:
+        // Fill buffer in extmem with data from host
         void fill_stream() {
+            std::cerr << "DEBUG: streamfill this = " << this << std::endl;
+            std::cerr << "DEBUG: streamfill write = " << write.target_type().name() << std::endl;
             // TODO
             int ret = read(buffer, descriptor->offset, capacity);
             if (ret > capacity) {
@@ -34,14 +37,22 @@ class provider {
                     << "ERROR: Invalid return value at stream callback.\n";
             } else if (ret == -1) {
                 // Stream finished
-                descriptor->size = -1;
+                descriptor->filled_size = -1;
             } else if (ret == 0) {
                 // No data available right now, but might be later
-                descriptor->size = 0;
+                descriptor->filled_size = 0;
             } else {
                 // Data has been copied to buffer, usable by Epiphany
-                descriptor->size = ret;
+                descriptor->filled_size = ret;
             }
+        }
+
+        // Flush extmem buffer to host
+        void flush_stream() {
+            // TODO
+            std::cerr << "DEBUG: streamflush this = " << this << std::endl;
+            std::cerr << "DEBUG: offset,capacity " << descriptor->offset << ',' << capacity << std::endl;
+            write(buffer, descriptor->offset, capacity);
         }
 
         // Allocated buffer
@@ -230,8 +241,12 @@ class provider {
                 ::memcpy(dst, (void*)(unsigned(data) + offset), size_requested);
                 return size_requested;
             },
-            [data, data_size, stream_id](const void* buf, uint32_t offset,
+            [data, data_size, stream_id, this](const void* buf, uint32_t offset,
                                          uint32_t bytes_written) {
+            // wtf this whole lambda thing gets corrupted
+            // i.e. the stream_id and 'this' of the lambda get overwritten
+            std::cerr << "DEBUG: streamwrite. e(buf), offset, bytes: " << host_to_e_pointer_((void*)buf) << ',' << offset << ',' << bytes_written << std::endl;
+            std::cerr << "DEBUG: streamwrite. data_size, stream_id: " << data_size << ',' << stream_id << std::endl;
                 // Kernel has written data
                 if (offset + bytes_written > data_size) {
                     std::cerr

@@ -23,8 +23,8 @@ typedef struct {
     uint32_t capacity; // amount of allocated memory
     // Data currently in the buffer
     // These two values are ONLY written to by the host
-    int32_t offset;    // offset from the start of the stream
-    int32_t size;      // amount of data currently in the buffer (size <= capacity)
+    int32_t offset;      // offset from the start of the stream
+    int32_t filled_size; // amount of data currently in the buffer (<= capacity)
     // Processor currently owning the stream or -1 if none
     int32_t pid;
 } stream_descriptor;
