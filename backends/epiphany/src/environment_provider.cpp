@@ -177,6 +177,10 @@ void provider::spawn(int processors, const char* image_name) {
 
         if (counters[SYNCSTATE::ABORT]) {
             std::cout << "(BSP) ERROR: spmd program aborted." << std::endl;
+            // Abort all cores because they are in an unusable state
+            // and set proper environment state
+            e_reset_system();
+            finalize_();
             break;
         }
         if (counters[SYNCSTATE::FINISH] == nprocs_used_)

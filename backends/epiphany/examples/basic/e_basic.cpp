@@ -50,7 +50,8 @@ void example_stream() {
     if (stream) {
         int count = 100;
         int* buf = new int[count];
-        stream.read(buf, count * sizeof(int), true);
+        int read = stream.read(buf, count * sizeof(int), true);
+        count = read / sizeof(int);
 
         int sum = 0;
         for (int i = 0; i < count; i++)
@@ -58,7 +59,12 @@ void example_stream() {
 
         delete[] buf;
 
-        bulk::epiphany::print("Stream sum: %d", sum);
+        bulk::epiphany::print("Stream sum of %d elements: %d", count, sum);
+
+        // Go to start
+        stream.seek_abs(0);
+        // Write the sum to the start of the stream
+        stream.write(&sum, sizeof(int), false);
 
         stream.close();
     } else {

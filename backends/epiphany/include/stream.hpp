@@ -20,6 +20,8 @@ class stream {
     stream(stream&&) = delete;
     void operator=(stream&&) = delete;
 
+    // Open a stream. If a different stream was open, close it
+    // If the same stream was open, dont do anything.
     void open(int id);
 
     void close() {

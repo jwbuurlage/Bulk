@@ -28,6 +28,12 @@ class world_state {
     /// Barrier that not resolve outstanding communication like sync.
     void barrier();
 
+    void abort() {
+        write_syncstate_(SYNCSTATE::ABORT);
+        for (;;)
+            barrier();
+    }
+
     var_id_t register_location_(void* location, size_t size) {
         var_id_t id = VAR_INVALID;
         for (var_id_t i = 0; i < MAX_VARS; ++i) {

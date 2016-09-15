@@ -169,7 +169,7 @@ tests: bin/tests bin/unittests bin/tests/test_kernel1.elf bin/tests/test_kernel2
 bin/tests:
 	@mkdir -p bin/tests
 
-bin/unittests: bin/tests/catch_main.o bin/tests/communication.o bin/tests/lambda_kernels.o
+bin/unittests: bin/tests/catch_main.o bin/tests/communication.o bin/tests/lambda_kernels.o bin/tests/streaming.o
 	@echo "CXX $@"
 	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $^ $(HOST_LIBS)
 

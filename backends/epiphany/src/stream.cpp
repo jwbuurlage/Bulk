@@ -16,6 +16,13 @@ void stream::open(int id) {
         print(err_stream_id_, id);
         return;
     }
+    // Check if the stream was already open
+    if (stream_id != -1) {
+        // The requested stream was open so dont do anything
+        if (id == stream_id)
+            return;
+        close();
+    }
 
     stream_descriptor* desc = &(combuf_->streams[id]);
     int mypid = state.processor_id();
