@@ -54,7 +54,7 @@ endif
 
 ########################################################
 
-all: basic benchmark tests
+all: basic benchmark cannon tests
 
 ########################################################
 
@@ -146,6 +146,14 @@ basic: bin/basic bin/basic/host_basic bin/basic/e_basic.elf
 
 bin/basic:
 	@mkdir -p bin/basic
+
+########################################################
+
+cannon: bin/cannon bin/cannon/host_cannon bin/cannon/e_cannon.elf
+
+bin/cannon:
+	@mkdir -p bin/cannon
+
 
 ########################################################
 
