@@ -25,6 +25,7 @@ E_HEADERS = \
 E_SRCS = \
 		backend.cpp \
 		dma.cpp \
+		get_raw_time.s \
 		malloc.cpp \
 		reduce_binary_size.cpp \
 		stream.cpp \
@@ -69,11 +70,12 @@ debug: host e
 
 ########################################################
 
-E_OBJS    = $(E_SRCS:%.c=build/e/%.o) $(E_SRCS:%.cpp=build/e/%.o)
+E_OBJS    = $(E_SRCS:%.c=build/e/%.o) $(E_SRCS:%.cpp=build/e/%.o) $(E_SRCS:%.s=build/e/%.o)
 HOST_OBJS = $(HOST_SRCS:%.c=build/host/%.o) $(HOST_SRCS:%.cpp=build/host/%.o)
 
 vpath %.c src
 vpath %.cpp src
+vpath %.s src
 
 build/host/%.o: %.c $(HOST_HEADERS)
 	@echo "CC $<"
@@ -90,6 +92,10 @@ build/e/%.o: %.c $(E_HEADERS)
 build/e/%.o: %.cpp $(E_HEADERS)
 	@echo "CXX $<"
 	@$(E_PLATFORM_PREFIX)g++ $(E_CXXFLAGS) -c $< -o $@
+
+build/e/%.o: %.s $(E_HEADERS)
+	@echo "CC $<"
+	@$(E_PLATFORM_PREFIX)gcc $(E_CFLAGS) -c $< -o $@
 
 lib/$(HOST_LIBNAME): $(HOST_OBJS)
 	@$(ARM_PLATFORM_PREFIX)ar rs $@ $^ 

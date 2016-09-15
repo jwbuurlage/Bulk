@@ -1,5 +1,9 @@
 #pragma once
 
+// Function written in assembly
+// Returns the number of clockcycles since the previous call
+extern "C" unsigned int get_raw_time();
+
 namespace bulk {
 namespace epiphany {
 

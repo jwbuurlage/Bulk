@@ -54,7 +54,7 @@ endif
 
 ########################################################
 
-all: basic tests
+all: basic benchmark tests
 
 ########################################################
 
@@ -146,6 +146,13 @@ basic: bin/basic bin/basic/host_basic bin/basic/e_basic.elf
 
 bin/basic:
 	@mkdir -p bin/basic
+
+########################################################
+
+benchmark: bin/benchmark bin/benchmark/host_benchmark bin/benchmark/e_benchmark.elf
+
+bin/benchmark:
+	@mkdir -p bin/benchmark
 
 #######################################################
 
