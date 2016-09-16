@@ -9,7 +9,7 @@ const char err_stream_id_[] EXT_MEM_RO =
     "BULK ERROR: stream with id %d does not exist";
 
 const char err_stream_in_use_[] EXT_MEM_RO =
-    "BULK ERROR: stream with id %d was in use by another processor";
+    "BULK ERROR: stream with id %d is in use";
 
 void stream::open(int id) {
     if (id < 0 || id > combuf_->nstreams) {

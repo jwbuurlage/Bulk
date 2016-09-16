@@ -81,6 +81,7 @@ int main() {
     bulk::epiphany::stream stream_b(3 * s + 1);
     bulk::epiphany::stream stream_c(3 * s + 2);
 
+    // Check if the streams are open
     auto so_far_so_good = bulk::create_var<int>(world);
     so_far_so_good = 1;
     world.sync();
@@ -126,8 +127,8 @@ int main() {
 
             // Obtain A, B
             // Last bool is `wait_for_completion`
-            stream_a.read(a_data[0], CORE_BLOCK_SIZE, true);
-            stream_b.read(b_data[0], CORE_BLOCK_SIZE, true);
+            stream_a.read(a_data[0], CORE_BLOCK_BYTES, true);
+            stream_b.read(b_data[0], CORE_BLOCK_BYTES, true);
 
             int cur = 0;        // computation
             int cur_buffer = 1; // data transfer

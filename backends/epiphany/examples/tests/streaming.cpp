@@ -44,6 +44,11 @@ TEST_CASE("streaming", "[bulk-streaming]") {
         world.abort();                                                         \
     }
 
+                if (s == 0)
+                    world.log("Testing opening same stream twice. This should "
+                              "output errors.");
+                world.sync();
+
                 // Test both constructors
                 // Test opening same stream twice
                 // Test opening an open stream
@@ -68,6 +73,8 @@ TEST_CASE("streaming", "[bulk-streaming]") {
                 // Test read sync
                 // Test write sync
                 // Test communication back to host
+                // Test size larger than extmem capacity
+                // - subtest: write a littlebit, then seek, then write again
 
                 constexpr int streamcount = 100;
                 int* buf = new int[streamcount];

@@ -103,6 +103,7 @@ int main(int argc, char** argv) {
             }
         }
     }
+
     for (int i = 0; i < N * N; i++) {
         env.provider().create_stream(&stream_A[i][0], matrix_bytes / (N * N),
                                      matrix_bytes / (N * N));
@@ -148,13 +149,23 @@ int main(int argc, char** argv) {
         }
     }
 
+    if (matrix_size <= 32) {
+        printf("Result:\n");
+        for (int i = 0; i < matrix_size; ++i) {
+            for (int j = 0; j < matrix_size; ++j)
+                printf("%3.2f ", C[i * matrix_size + j]);
+            printf("\n");
+        }
+        printf("\n");
+    }
+
     printf("Result: C[n - 1, n - 1] = %.2f\n", C[matrix_size * matrix_size - 1]);
 
     float correct = 0.0f;
     for (int i = 0; i < matrix_size; i++)
         correct += A[(matrix_size - 1) * matrix_size + i] *
                    B[i * matrix_size + (matrix_size - 1)];
-    printf("Correct result: %.2f\n", correct);
+    printf("Correct last element: %.2f\n", correct);
 
     return 0;
 }

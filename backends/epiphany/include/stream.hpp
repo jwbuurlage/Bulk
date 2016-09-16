@@ -1,6 +1,7 @@
 #pragma once
 #include "epiphany_internals.hpp"
 #include "dma.hpp"
+#include "world_state.hpp"
 
 namespace bulk {
 namespace epiphany {
@@ -46,12 +47,25 @@ class stream {
             cursor = (void*)((unsigned)cursor + delta_bytes);
             if (cursor < buffer) {
                 // TODO: host request
+                // First write/flush old data then request new data ?
+                state.write_syncstate_(SYNCSTATE::STREAMREQ);
+                while (state.syncstate_ != SYNCSTATE::CONTINUE) {
+                };
+                state.write_syncstate_(SYNCSTATE::RUN);
+
                 cursor = buffer;
             }
         } else {
-            size_t remaining = (unsigned)buffer + filled_size - (unsigned)cursor;
+            size_t remaining =
+                (unsigned)buffer + filled_size - (unsigned)cursor;
             if ((unsigned)delta_bytes > remaining) {
                 // TODO: host request
+                // First write/flush old data then request new data ?
+                state.write_syncstate_(SYNCSTATE::STREAMREQ);
+                while (state.syncstate_ != SYNCSTATE::CONTINUE) {
+                };
+                state.write_syncstate_(SYNCSTATE::RUN);
+
                 delta_bytes = remaining;
             }
             cursor = (void*)((unsigned)cursor + delta_bytes);
@@ -68,6 +82,12 @@ class stream {
         // First check if that lies within the current loaded stream part
         if ((int)offset_ < offset || offset_ > offset + capacity) {
             // TODO: host seek request
+            // First write/flush old data then request new data ?
+            state.write_syncstate_(SYNCSTATE::STREAMREQ);
+            while (state.syncstate_ != SYNCSTATE::CONTINUE) {
+            };
+            state.write_syncstate_(SYNCSTATE::RUN);
+
             cursor = buffer;
         } else {
             // buffer corresponds to offset
@@ -121,17 +141,31 @@ class stream {
     int write(void* data, size_t size, bool wait_for_completion) {
         size_t remaining = (unsigned)buffer + capacity - (unsigned)cursor;
         if (size > remaining) {
-            // TODO: write to host request
+            // TODO: a blocking write to host
+            state.write_syncstate_(SYNCSTATE::STREAMWRITE);
+            while (state.syncstate_ != SYNCSTATE::CONTINUE) {
+            };
+            state.write_syncstate_(SYNCSTATE::RUN);
             return -1;
         }
         // Wait for any previous transfer to finish (either down or up)
         wait();
         // Round size up to a multiple of 8
         // If this is not done, integer access to the headers will crash
-        size = ((size + 8 - 1) / 8) * 8;
+        // TODO: we dont do this anymore since there are no interleaved
+        // headers in the stream. However the docs should very clearly
+        // state that if the size is not a multiple of 8 then its very slow
+        // size = ((size + 8 - 1) / 8) * 8;
+
         // Write the data (async)
         dma.push(cursor, data, size, 1);
         cursor = (void*)((unsigned)cursor + size);
+
+        // TODO:
+        // Send async host write request.
+        // Reason: if you dont do it right now and the kernel does `seek`
+        // to another part of the stream, the written data is lost
+
         if (wait_for_completion)
             wait();
         return size;
@@ -141,6 +175,7 @@ class stream {
      * Read data from a stream to a local buffer.
      *
      * @param dst_buf Buffer that receives the data. Must hold at least size.
+     * @param size Size of the buffer.
      * @param wait_for_completion If true this function blocks untill
      * the data is completely read from the stream.
      * @return Number of bytes read. Zero at end of stream, negative on error.
@@ -153,10 +188,18 @@ class stream {
         size_t remaining = (unsigned)buffer + filled_size - (unsigned)cursor;
         if (remaining == 0) {
             // TODO: blocking host request
+            state.write_syncstate_(SYNCSTATE::STREAMREQ);
+            while (state.syncstate_ != SYNCSTATE::CONTINUE) {
+            };
+            state.write_syncstate_(SYNCSTATE::RUN);
             return 0;
         }
         if (size > remaining) {
             // TODO: read remaining but also async host request
+            state.write_syncstate_(SYNCSTATE::STREAMREQ);
+            while (state.syncstate_ != SYNCSTATE::CONTINUE) {
+            };
+            state.write_syncstate_(SYNCSTATE::RUN);
             size = remaining;
         }
         wait();

@@ -122,6 +122,7 @@ class world_state {
         syncstate_ = state;                    // local variable
         combuf_->syncstate[local_pid_] = state; // being polled by ARM
     }
+    friend class stream;
 
     // This is our own version of e_barrier_init which is shorter
     void barrier_init_();

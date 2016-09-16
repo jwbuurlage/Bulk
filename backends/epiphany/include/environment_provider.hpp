@@ -26,8 +26,6 @@ class provider {
       public:
         // Fill buffer in extmem with data from host
         void fill_stream() {
-            std::cerr << "DEBUG: streamfill this = " << this << std::endl;
-            std::cerr << "DEBUG: streamfill write = " << write.target_type().name() << std::endl;
             // TODO
             int ret = read(buffer, descriptor->offset, capacity);
             if (ret > capacity) {
@@ -37,9 +35,12 @@ class provider {
                     << "ERROR: Invalid return value at stream callback.\n";
             } else if (ret == -1) {
                 // Stream finished
+                std::cerr << "WARNING: Untested feature 'stream finished'.\n";
                 descriptor->filled_size = -1;
             } else if (ret == 0) {
                 // No data available right now, but might be later
+                std::cerr << "WARNING: Untested feature: no data written to "
+                             "stream by host.\n";
                 descriptor->filled_size = 0;
             } else {
                 // Data has been copied to buffer, usable by Epiphany
@@ -50,15 +51,14 @@ class provider {
         // Flush extmem buffer to host
         void flush_stream() {
             // TODO
-            std::cerr << "DEBUG: streamflush this = " << this << std::endl;
-            std::cerr << "DEBUG: offset,capacity " << descriptor->offset << ',' << capacity << std::endl;
-            write(buffer, descriptor->offset, capacity);
+            write(buffer, descriptor->offset, requested_capacity);
         }
 
         // Allocated buffer
         void* buffer; // points to external memory, host address space
         int capacity; // amount of allocated external memory
-        // Pointer to descriptor, accessible by Epiphany
+        int requested_capacity; // can differ because rounding up to 8-multiple
+        // Pointer to descriptor in extmem (accessible by Epiphany)
         stream_descriptor* descriptor;
 
         /**
@@ -193,20 +193,21 @@ class provider {
                          "to the stream.\n";
             return false;
         }
-        capacity = ((capacity + 7) / 8) * 8; // round up
-        void* buffer = ext_malloc_(capacity);
+        uint32_t rounded_capacity = ((capacity + 7) / 8) * 8; // round up
+        void* buffer = ext_malloc_(rounded_capacity);
         if (buffer == 0) {
             std::cerr << "ERROR: Stream capacity " << capacity
                       << " does not fit in external memory.\n";
             return false;
         }
-        stream s;
+        streams.push_back(stream());
+        stream& s = streams.back();
         s.buffer = buffer;
-        s.capacity = capacity;
+        s.capacity = rounded_capacity;
+        s.requested_capacity = capacity;
         s.descriptor = 0;
         s.read = read;
         s.write = write;
-        streams.push_back(s);
         // TODO: start requesting data?
         return true;
     }
@@ -241,21 +242,19 @@ class provider {
                 ::memcpy(dst, (void*)(unsigned(data) + offset), size_requested);
                 return size_requested;
             },
-            [data, data_size, stream_id, this](const void* buf, uint32_t offset,
+            [data, data_size, stream_id](const void* buf, uint32_t offset,
                                          uint32_t bytes_written) {
-            // wtf this whole lambda thing gets corrupted
-            // i.e. the stream_id and 'this' of the lambda get overwritten
-            std::cerr << "DEBUG: streamwrite. e(buf), offset, bytes: " << host_to_e_pointer_((void*)buf) << ',' << offset << ',' << bytes_written << std::endl;
-            std::cerr << "DEBUG: streamwrite. data_size, stream_id: " << data_size << ',' << stream_id << std::endl;
                 // Kernel has written data
                 if (offset + bytes_written > data_size) {
                     std::cerr
                         << "WARNING: Kernel is writing out of bounds on stream "
                         << stream_id << '\n';
-                } else {
-                    ::memcpy((void*)(unsigned(&data) + offset), buf,
-                             bytes_written);
+                    if (offset > data_size)
+                        return;
+                    // Still write the part that fits
+                    bytes_written = data_size - offset;
                 }
+                ::memcpy((void*)(unsigned(data) + offset), buf, bytes_written);
                 return;
             },
             capacity);
