@@ -80,8 +80,10 @@ TEST_CASE("streaming", "[bulk-streaming]") {
                 int* buf = new int[streamcount];
                 BULK_ASSERT(buf);
 
-                s2.read(buf, streamcount * sizeof(int), false);
+                int bytes_read = s2.read(buf, streamcount * sizeof(int), false);
                 s2.close();
+
+                BULK_ASSERT(bytes_read == streamcount * sizeof(int));
 
                 for (int i = 0; i < streamcount; ++i)
                     buf[i] += s;
@@ -93,7 +95,7 @@ TEST_CASE("streaming", "[bulk-streaming]") {
                 delete[] buf;
             });
 
-        CHECK(success_count == env.available_processors() * 4);
+        CHECK(success_count == env.available_processors() * 5);
 
         int buffer_fails = 0;
         for (int i = 0; i < env.available_processors(); ++i)
