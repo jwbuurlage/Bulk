@@ -24,6 +24,7 @@ class provider {
   public:
     class stream {
       public:
+        // Fill buffer in extmem with data from host
         void fill_stream() {
             // TODO
             int ret = read(buffer, descriptor->offset, capacity);
@@ -34,20 +35,30 @@ class provider {
                     << "ERROR: Invalid return value at stream callback.\n";
             } else if (ret == -1) {
                 // Stream finished
-                descriptor->size = -1;
+                std::cerr << "WARNING: Untested feature 'stream finished'.\n";
+                descriptor->filled_size = -1;
             } else if (ret == 0) {
                 // No data available right now, but might be later
-                descriptor->size = 0;
+                std::cerr << "WARNING: Untested feature: no data written to "
+                             "stream by host.\n";
+                descriptor->filled_size = 0;
             } else {
                 // Data has been copied to buffer, usable by Epiphany
-                descriptor->size = ret;
+                descriptor->filled_size = ret;
             }
+        }
+
+        // Flush extmem buffer to host
+        void flush_stream() {
+            // TODO
+            write(buffer, descriptor->offset, requested_capacity);
         }
 
         // Allocated buffer
         void* buffer; // points to external memory, host address space
         int capacity; // amount of allocated external memory
-        // Pointer to descriptor, accessible by Epiphany
+        int requested_capacity; // can differ because rounding up to 8-multiple
+        // Pointer to descriptor in extmem (accessible by Epiphany)
         stream_descriptor* descriptor;
 
         /**
@@ -182,20 +193,21 @@ class provider {
                          "to the stream.\n";
             return false;
         }
-        capacity = ((capacity + 7) / 8) * 8; // round up
-        void* buffer = ext_malloc_(capacity);
+        uint32_t rounded_capacity = ((capacity + 7) / 8) * 8; // round up
+        void* buffer = ext_malloc_(rounded_capacity);
         if (buffer == 0) {
             std::cerr << "ERROR: Stream capacity " << capacity
                       << " does not fit in external memory.\n";
             return false;
         }
-        stream s;
+        streams.push_back(stream());
+        stream& s = streams.back();
         s.buffer = buffer;
-        s.capacity = capacity;
+        s.capacity = rounded_capacity;
+        s.requested_capacity = capacity;
         s.descriptor = 0;
         s.read = read;
         s.write = write;
-        streams.push_back(s);
         // TODO: start requesting data?
         return true;
     }
@@ -237,10 +249,12 @@ class provider {
                     std::cerr
                         << "WARNING: Kernel is writing out of bounds on stream "
                         << stream_id << '\n';
-                } else {
-                    ::memcpy((void*)(unsigned(&data) + offset), buf,
-                             bytes_written);
+                    if (offset > data_size)
+                        return;
+                    // Still write the part that fits
+                    bytes_written = data_size - offset;
                 }
+                ::memcpy((void*)(unsigned(data) + offset), buf, bytes_written);
                 return;
             },
             capacity);

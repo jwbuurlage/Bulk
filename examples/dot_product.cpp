@@ -1,14 +1,10 @@
-#include <iostream>
+#include <bulk/bulk.hpp>
+#include "set_backend.hpp"
 #include <numeric>
 #include <vector>
 
-#include <bulk/bulk.hpp>
-#include <bulk/bsp/bsp.hpp>
-#include <bulk/util/log.hpp>
-
-
 int main() {
-    auto env = bulk::environment<bulk::bsp::provider>();
+    bulk::environment<provider> env;
 
     env.spawn(env.available_processors(), [](auto world, int s, int p) {
         // block distribution
@@ -29,7 +25,7 @@ int main() {
         // reduce to find global dot product
         auto alpha = bulk::foldl(result, [](int& lhs, int rhs) { lhs += rhs; });
 
-        BULK_LOG_VAR(alpha);
+        world.log("%d/%d: alpha = %d\n", s, p, alpha);
     });
 
     return 0;

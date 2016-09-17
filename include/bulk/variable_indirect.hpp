@@ -21,9 +21,9 @@ class future;
  */
 template <typename T, class World>
 class var_indirect {
-   public:
+  public:
     class image {
-       public:
+      public:
         using var_type = var_indirect<T, World>;
         image(var_type& var, int t) : var_(var), t_(t) {}
 
@@ -32,16 +32,14 @@ class var_indirect {
          *
          * \param value the new value of the image
          */
-        void operator=(T value) {
-            bulk::put(t_, value, var_);
-        }
+        void operator=(T value) { bulk::put(t_, value, var_); }
 
         /**
          * Obtain a future to the remote image value.
          */
         auto get() { return bulk::get(t_, var_); }
 
-       private:
+      private:
         var_type& var_;
         int t_;
     };
@@ -53,14 +51,15 @@ class var_indirect {
      */
     var_indirect(World& world) : world_(world) {
         value_ = std::make_unique<T>();
-        world_.register_location_(value_.get(), sizeof(T));
+        world_.implementation().register_location_(value_.get(), sizeof(T));
     }
 
     /**
      * Deconstructs and deregisters the variable with the world
      */
     ~var_indirect() {
-        if (value_.get()) world_.unregister_location_(value_.get());
+        if (value_.get())
+            world_.implementation().unregister_location_(value_.get());
     }
 
     var_indirect(var_indirect<T, World>& other) = delete;
@@ -85,7 +84,7 @@ class var_indirect {
      */
     void operator=(var_indirect<T, World>&& other) {
         if (value_.get()) {
-            world_.unregister_location_(value_.get());
+            world_.implementation().unregister_location_(value_.get());
         }
         value_ = std::move(other.value_);
     }
@@ -122,9 +121,9 @@ class var_indirect {
      */
     World& world() { return world_; }
 
-   private:
+  private:
     std::unique_ptr<T> value_;
     World& world_;
 };
 
-}  // namespace bulk
+} // namespace bulk

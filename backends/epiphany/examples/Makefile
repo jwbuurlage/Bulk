@@ -14,14 +14,14 @@ E_INCLUDES 	  = -I${BULK}/include
 HOST_LIBS = \
 	 -L /usr/arm-linux-gnueabihf/lib \
 	 -L${ESDK}/tools/host/lib \
-	 -L${BULK}/include/bulk/epiphany/lib \
+	 -L${BULK}/backends/epiphany/lib \
 	 -lbulk-epiphany-host \
 	 -le-hal \
 	 -le-loader
 
 E_LIBS = \
 	 -L${ESDK}/tools/host/lib \
-	 -L${BULK}/include/bulk/epiphany/lib \
+	 -L${BULK}/backends/epiphany/lib \
 	 -lbulk-epiphany-e \
 	 -le-lib
 
@@ -33,11 +33,11 @@ E_CFLAGS  = $(E_INCLUDES)    $(E_LIBS) 	  -std=c99 -O3 -fno-strict-aliasing -ffa
 E_CXXFLAGS= $(E_INCLUDES)    $(E_LIBS) 	  -std=c++14 -Wall -Os -fno-tree-loop-distribute-patterns -fno-exceptions -fno-rtti -fno-threadsafe-statics -freg-struct-return -fno-default-inline
 TOOL_FLAGS= $(HOST_INCLUDES) $(E_INCLUDES) -std=c++14 -O3 -Wall
 
-HOST_DEPS = $(BULK)/include/bulk/epiphany/lib/libbulk-epiphany-host.a \
-			$(BULK)/include/bulk/epiphany/include/environment_provider.hpp
+HOST_DEPS = $(BULK)/backends/epiphany/lib/libbulk-epiphany-host.a \
+			$(BULK)/backends/epiphany/include/environment_provider.hpp
 
-E_DEPS    = $(BULK)/include/bulk/epiphany/lib/libbulk-epiphany-e.a \
-			$(wildcard $(BULK)/include/bulk/epiphany/include/*.hpp)
+E_DEPS    = $(BULK)/backends/epiphany/lib/libbulk-epiphany-e.a \
+			$(wildcard $(BULK)/backends/epiphany/include/*.hpp)
 
 ########################################################
 
@@ -54,7 +54,7 @@ endif
 
 ########################################################
 
-all: basic tests
+all: basic benchmark cannon tests
 
 ########################################################
 
@@ -147,6 +147,21 @@ basic: bin/basic bin/basic/host_basic bin/basic/e_basic.elf
 bin/basic:
 	@mkdir -p bin/basic
 
+########################################################
+
+cannon: bin/cannon bin/cannon/host_cannon bin/cannon/e_cannon.elf
+
+bin/cannon:
+	@mkdir -p bin/cannon
+
+
+########################################################
+
+benchmark: bin/benchmark bin/benchmark/host_benchmark bin/benchmark/e_benchmark.elf
+
+bin/benchmark:
+	@mkdir -p bin/benchmark
+
 #######################################################
 
 tests: bin/tests bin/unittests bin/tests/test_kernel1.elf bin/tests/test_kernel2.elf bin/tests/test_kernel3.elf
@@ -154,7 +169,7 @@ tests: bin/tests bin/unittests bin/tests/test_kernel1.elf bin/tests/test_kernel2
 bin/tests:
 	@mkdir -p bin/tests
 
-bin/unittests: bin/tests/catch_main.o bin/tests/communication.o bin/tests/lambda_kernels.o
+bin/unittests: bin/tests/catch_main.o bin/tests/communication.o bin/tests/lambda_kernels.o bin/tests/streaming.o bin/tests/dma.o
 	@echo "CXX $@"
 	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $^ $(HOST_LIBS)
 

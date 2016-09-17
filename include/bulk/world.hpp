@@ -78,30 +78,51 @@ class world {
     }
 
     /**
-     * Performs a global barrier synchronization of the active processors.
+     * Performs a global barrier synchronization of the active processors
+     * and resolves any outstanding communication. Messages previously
+     * received in queues are cleared for the next superstep.
+     * The function must be called by all processors.
+     * When some processors call `sync` while others call `barrier`
+     * at the same time, behaviour is undefined.
      */
     void sync() { implementation_.sync(); }
 
-    int register_location_(void* location, size_t size) {
-        return implementation_.register_location_(location, size);
-    }
-    void move_location_(int var_id, void* newlocation) {
-        implementation_.move_location_(var_id, newlocation);
-    }
-    void unregister_location_(void* location) {
-        implementation_.unregister_location_(location);
-    }
-    void unregister_location_(int var_id) {
-        implementation_.unregister_location_(var_id);
+    /**
+     * Performs a global barrier synchronization of the active processors
+     * without resolving outstanding communication. Queues are not cleared.
+     * The function must be called by all processors.
+     * When some processors call `sync` while others call `barrier`
+     * at the same time, behaviour is undefined.
+     */
+    void barrier() { implementation_.barrier(); }
+
+    /**
+     * Print output for debugging, shown at the next synchronization.
+     *
+     * The syntax is printf style.
+     *
+     * The logs are sorted by processor id before being printed at the next
+     * call to `sync`.
+     *
+     * At the next call to `sync`, the logs of all processors are sent
+     * to the `environment` and by default printed to standard output.
+     * Instead one can use `environment::set_log_callback` to intercept
+     * these log messages.
+     */
+    template <typename... Ts>
+    void log(const char* format, const Ts&... ts) {
+        implementation_.log(format, ts...);
     }
 
-    template <typename Tag, typename Content>
-    int register_queue_(void** buffer, int* count) {
-        return implementation_.template register_queue_<Tag, Content>(buffer,
-                                                                      count);
-    };
-
-    void unregister_queue_(int id) { implementation_.unregister_queue_(id); };
+    /**
+     * Terminates the spmd program on all processors.
+     *
+     * This is not the normal way to exit a bulk program
+     * and indicates an error has occurred.
+     * If any processor calls abort, all processors will stop
+     * and `bulk::environment::spawn` will throw an exception.
+     */
+    void abort() { implementation_.abort(); }
 
     /**
      * Retrieve the implementation of the world

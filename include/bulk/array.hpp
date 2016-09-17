@@ -26,7 +26,7 @@ class array {
      */
     array(World& world, int size) : world_(world), size_(size) {
         data_ = new T[size];
-        world_.register_location_(data_, sizeof(T) * size);
+        world_.implementation().register_location_(data_, sizeof(T) * size);
     }
 
     /**
@@ -34,7 +34,7 @@ class array {
      */
     ~array() {
         if (data_ != nullptr) {
-            world_.unregister_location_(data_);
+            world_.implementation().unregister_location_(data_);
             delete[] data_;
         }
     }

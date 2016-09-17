@@ -1,5 +1,5 @@
 #pragma once
-#include "epiphany_internals.hpp"
+#include "world_state.hpp"
 
 /**
  * \file coarray.hpp
@@ -19,10 +19,9 @@ class coarray {
      * \param local_size the number of elements in the local array
      */
     coarray(World&, int local_size) {
-        extern World world;
         size_ = local_size;
         data_ = new T[size_];
-        var_id_ = world.register_location_(data_, sizeof(T) * size_);
+        var_id_ = state.register_location_(data_, sizeof(T) * size_);
     }
 
     /**
@@ -32,10 +31,9 @@ class coarray {
      * \param default_value the initial value of each local element
      */
     coarray(World&, int local_size, const T& default_value) {
-        extern World world;
         size_ = local_size;
         data_ = new T[size_];
-        var_id_ = world.register_location_(data_, sizeof(T) * size_);
+        var_id_ = state.register_location_(data_, sizeof(T) * size_);
         for (int i = 0; i < size_; i++)
             data_[i] = default_value;
     }
@@ -44,9 +42,8 @@ class coarray {
      * Deconstructs and deregisters the variable with the world
      */
     ~coarray() {
-        extern World world;
         if (var_id_ != VAR_INVALID)
-            world.unregister_location_(var_id_);
+            state.unregister_location_(var_id_);
         if (data_)
             delete[] data_;
     }
@@ -106,8 +103,7 @@ class coarray {
     const T& operator[](int i) const { return data_[i]; }
 
     T* operator()(int pid) const {
-        extern World world;
-        return (T*)(world.implementation().get_direct_address_(pid, var_id_));
+        return (T*)(state.get_direct_address_(pid, var_id_));
     }
 
     /**

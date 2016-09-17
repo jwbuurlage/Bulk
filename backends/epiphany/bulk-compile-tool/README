@@ -1,0 +1,10 @@
+
+Dependencies on parallella Ubuntu
+
+    clang llvm libclang-dev libedit-dev
+
+Dependencies on arch linux
+
+    clang llvm
+
+Add the `bin` directory to your $PATH

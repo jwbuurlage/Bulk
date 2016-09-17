@@ -1,4 +1,4 @@
-#include "backend.hpp"
+#include "world_state.hpp"
 #include <cstdio>
 #include <cstdarg>
 
@@ -38,7 +38,7 @@ void memcpy(void* dest, const void* source, unsigned int nbytes) {
 
 void EXT_MEM_TEXT print(const char* format, ...) {
     // Lock mutex
-    world.implementation().mutex_lock_(MUTEX_PRINT);
+    state.mutex_lock_(MUTEX_PRINT);
 
     // Write the message to a buffer
     char buf[128];
@@ -51,13 +51,18 @@ void EXT_MEM_TEXT print(const char* format, ...) {
     bulk::epiphany::memcpy(&combuf_->msgbuf[0], buf, sizeof(combuf_->msgbuf));
 
     // Wait for message to be written
-    world.implementation().write_syncstate_(SYNCSTATE::MESSAGE);
-    while (world.implementation().syncstate_ != SYNCSTATE::CONTINUE) {
+    state.write_syncstate_(SYNCSTATE::MESSAGE);
+    while (state.syncstate_ != SYNCSTATE::CONTINUE) {
     };
-    world.implementation().write_syncstate_(SYNCSTATE::RUN);
+    state.write_syncstate_(SYNCSTATE::RUN);
 
     // Unlock mutex
-    world.implementation().mutex_unlock_(MUTEX_PRINT);
+    state.mutex_unlock_(MUTEX_PRINT);
 }
+
+float host_time() {
+    return combuf_->remotetimer;
+}
+
 }
 }

@@ -1,6 +1,6 @@
 #include <bulk/world.hpp>
 #include <bulk/coarray.hpp>
-#include <bulk/epiphany/epiphany.hpp>
+#include <bulk/backends/epiphany/epiphany.hpp>
 #include <vector>
 
 using bulk::epiphany::world;
@@ -50,7 +50,12 @@ void example_stream() {
     if (stream) {
         int count = 100;
         int* buf = new int[count];
-        stream.read(buf, count * sizeof(int), true);
+
+        for (int i = 0; i < count; ++i)
+            buf[i] = -1;
+
+        int read = stream.read(buf, count * sizeof(int), true);
+        count = read / sizeof(int);
 
         int sum = 0;
         for (int i = 0; i < count; i++)
@@ -58,7 +63,12 @@ void example_stream() {
 
         delete[] buf;
 
-        bulk::epiphany::print("Stream sum: %d", sum);
+        bulk::epiphany::print("Stream sum of %d elements: %d", count, sum);
+
+        // Go to start
+        stream.seek_abs(0);
+        // Write the sum to the start of the stream
+        stream.write(&sum, sizeof(int), false);
 
         stream.close();
     } else {
@@ -81,6 +91,8 @@ int main() {
 
     bulk::epiphany::print("Using external memory!");
     example_extmem();
+
+    world.sync();
     example_stream();
 
     world.sync();

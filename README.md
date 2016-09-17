@@ -6,40 +6,54 @@ Bulk is an alternative interface for writing parallel programs in C++ in bulk-sy
 Examples
 --------
 
+See below for instructions on how to build the examples.
+
 ```cpp
-auto env = bulk::environment<bulk::bsp::provider>();
+bulk::environment<bulk::cpp::provider> env;
 env.spawn(env.available_processors(), [](auto world, int s, int p) {
     // 1. Hello world!
-    BULK_IN_ORDER(
-        std::cout << "Hello, world " << s << "/" << p << std::endl;
-    )
+    world.log("Hello, world %d/%d\n", s, p);
 
     // 2. Communication
     auto a = world.create_var<int>();
 
-    world.put(world.next_processor(), s, a);
+    a(world.next_processor()) = s;
     world.sync();
 
-    // ... a.value() is now updated
+    // ... the local a is now updated
 
-    auto b = world.get<int>(world.next_processor(), a);
+    auto b = a(world.next_processor()).get();
     world.sync();
 
     // ... b.value() is now available
 
     // 3. Message passing
-    for (int t = 0; t < p; ++t) {
-        world.send<int, int>(t, s, s);
-    }
+    auto q = bulk::create_queue<int, int>(world);
+    for (int t = 0; t < p; ++t)
+        q(t).send(s, s); // send (s,s) to processor t
 
     world.sync();
 
-    for (auto message : world.messages<int, int>()) {
-        std::cout << message.tag << ", " << message.content << std::endl;
-    }
+    // Messages are now available in q
+    for (auto& msg : q)
+        world.log("%d got sent %d, %d\n", s, msg.tag, msg.content);
 });
 
 ```
+
+Building
+--------
+
+The examples in the `examples` directory work for every backend. To build them, do the following. `cpp` can be replaced by the desired backend like `mpi` or `epiphany`.
+
+    cd backends/cpp/build
+    cmake .
+    make
+
+The examples will be compiled in the `bin` directory of the backend:
+
+    cd backends/cpp/bin
+    ./hello
 
 Authors
 -------
