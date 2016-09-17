@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     for (int i = 0; i < env.available_processors(); i++) {
         std::cout << "Result from processor " << i << ":\n";
         for (int j = 0; j < count; j++)
-            std::cout << j << ' ';
+            std::cout << data[i][j] << ' ';
         std::cout << '\n';
     }
 

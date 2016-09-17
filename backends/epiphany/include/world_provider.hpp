@@ -1,8 +1,9 @@
 #pragma once
-#include <cstdint>
-#include <cstddef>
 #include "epiphany_internals.hpp"
+#include "utility.hpp"
 #include "world_state.hpp"
+#include <cstddef>
+#include <cstdint>
 
 namespace bulk {
 namespace epiphany {
@@ -19,6 +20,13 @@ class world_provider {
 
     /// Barrier that not resolve outstanding communication like sync.
     void barrier() { state.barrier(); }
+
+    template <typename... Ts>
+    void log(const char* format, const Ts&... ts) {
+        print(format, ts...);
+    }
+
+    void abort() { state.abort(); }
 
     var_id_t register_location_(void* location, size_t size) {
         return state.register_location_(location, size);

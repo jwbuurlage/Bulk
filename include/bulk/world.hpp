@@ -115,20 +115,14 @@ class world {
     }
 
     /**
-     * Print output for debugging, guaranteed to be shown before the function
-     * returns.
+     * Terminates the spmd program on all processors.
      *
-     * The syntax is printf style.
-     *
-     * The log message is sent to the `environment` and by default
-     * printed to standard output.
-     * Instead one can use `environment::set_log_callback` to intercept
-     * these log messages.
+     * This is not the normal way to exit a bulk program
+     * and indicates an error has occurred.
+     * If any processor calls abort, all processors will stop
+     * and `bulk::environment::spawn` will throw an exception.
      */
-    template <typename... Ts>
-    void log_direct(const char* format, const Ts&... ts) {
-        implementation_.log_direct(format, ts...);
-    }
+    void abort() { implementation_.abort(); }
 
     /**
      * Retrieve the implementation of the world

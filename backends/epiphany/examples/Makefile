@@ -54,7 +54,7 @@ endif
 
 ########################################################
 
-all: basic tests
+all: basic benchmark cannon tests
 
 ########################################################
 
@@ -147,6 +147,21 @@ basic: bin/basic bin/basic/host_basic bin/basic/e_basic.elf
 bin/basic:
 	@mkdir -p bin/basic
 
+########################################################
+
+cannon: bin/cannon bin/cannon/host_cannon bin/cannon/e_cannon.elf
+
+bin/cannon:
+	@mkdir -p bin/cannon
+
+
+########################################################
+
+benchmark: bin/benchmark bin/benchmark/host_benchmark bin/benchmark/e_benchmark.elf
+
+bin/benchmark:
+	@mkdir -p bin/benchmark
+
 #######################################################
 
 tests: bin/tests bin/unittests bin/tests/test_kernel1.elf bin/tests/test_kernel2.elf bin/tests/test_kernel3.elf
@@ -154,7 +169,7 @@ tests: bin/tests bin/unittests bin/tests/test_kernel1.elf bin/tests/test_kernel2
 bin/tests:
 	@mkdir -p bin/tests
 
-bin/unittests: bin/tests/catch_main.o bin/tests/communication.o bin/tests/lambda_kernels.o
+bin/unittests: bin/tests/catch_main.o bin/tests/communication.o bin/tests/lambda_kernels.o bin/tests/streaming.o bin/tests/dma.o
 	@echo "CXX $@"
 	@$(ARM_PLATFORM_PREFIX)g++ -o $@ $^ $(HOST_LIBS)
 

@@ -59,5 +59,10 @@ void EXT_MEM_TEXT print(const char* format, ...) {
     // Unlock mutex
     state.mutex_unlock_(MUTEX_PRINT);
 }
+
+float host_time() {
+    return combuf_->remotetimer;
+}
+
 }
 }

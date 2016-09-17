@@ -98,9 +98,20 @@ void provider::spawn(int processors, const char* image_name) {
         descriptors[i].buffer = host_to_e_pointer_(streams[i].buffer);
         descriptors[i].capacity = streams[i].capacity;
         descriptors[i].offset = 0;
-        descriptors[i].size = 0;
+        descriptors[i].filled_size = 0;
         descriptors[i].pid = -1;
     }
+
+    // Load streams with data
+    // TODO
+    // Note that we have to do this before launching the kernels
+    // because the kernels will try to open them and the descriptors
+    // have to contain a valid `filled_size` at that point.
+    // OR: we only do `fill_stream` when the kernel requested it?
+    // Note that we can not fill it while a kernel has it open
+    // because of race conditions on the stream descriptor.
+    for (auto& s : streams)
+        s.fill_stream();
 
     // Starting time
     clock_gettime(CLOCK_MONOTONIC, &ts_start_);
@@ -118,10 +129,6 @@ void provider::spawn(int processors, const char* image_name) {
     int iter = 0;
     std::cerr << "Bulk DEBUG: Epiphany cores started.\n";
 #endif
-
-    // Load streams with data
-    for (auto& s : streams)
-        s.fill_stream();
 
     // Main program loop
     int extmem_corrupted = 0;
@@ -159,13 +166,17 @@ void provider::spawn(int processors, const char* image_name) {
 
             if (s == SYNCSTATE::STREAMREQ) {
                 // TODO
-                std::cerr << "WARNING: Kernel requests stream data but feature "
-                             "is not implemented yet.\n";
+                std::cerr << "WARNING: Core " << i << " requests stream data "
+                                                      "but feature is not "
+                                                      "implemented yet.\n";
+                set_core_syncstate_(i, SYNCSTATE::CONTINUE);
             }
             if (s == SYNCSTATE::STREAMWRITE) {
                 // TODO
-                std::cerr << "WARNING: Kernel has written data to stream but "
-                             "feature is not implemented yet.\n";
+                std::cerr << "WARNING: Core " << i << " has written data to "
+                                                      "stream but feature is "
+                                                      "not implemented yet.\n";
+                set_core_syncstate_(i, SYNCSTATE::CONTINUE);
             }
         }
 
@@ -177,7 +188,11 @@ void provider::spawn(int processors, const char* image_name) {
 
         if (counters[SYNCSTATE::ABORT]) {
             std::cout << "(BSP) ERROR: spmd program aborted." << std::endl;
-            break;
+            // Abort all cores because they are in an unusable state
+            // and set proper environment state
+            e_reset_system();
+            finalize_();
+            return;
         }
         if (counters[SYNCSTATE::FINISH] == nprocs_used_)
             break;
@@ -213,6 +228,12 @@ void provider::spawn(int processors, const char* image_name) {
         ++iter;
 #endif
     }
+
+    // Note that this point is not reached when a core calls abort()
+
+    // Flush extmem stream data back to host
+    for (auto& s : streams)
+        s.flush_stream();
 
     env_initialized_ = 4;
 }
