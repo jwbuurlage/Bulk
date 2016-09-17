@@ -70,7 +70,7 @@ T foldl(var_type<T, World>& x, Func f, T start_value = 0) {
  * other processor.
  */
 template <typename T, typename World>
-coarray<T, World> gather_all(World& world, T value) {
+auto gather_all(World& world, T value) {
     auto xs = create_coarray<T>(world, world.active_processors());
 
     for (int t = 0; t < world.active_processors(); ++t) {
