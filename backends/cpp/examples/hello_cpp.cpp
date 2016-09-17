@@ -33,7 +33,7 @@ int main() {
         world.sync();
 
         // Test if direct logging can produce different output orders
-        world.log_direct("%d <= %d %d %d\n", s, xs[0], xs[1], xs[2]);
+        //world.log_direct("%d <= %d %d %d\n", s, xs[0], xs[1], xs[2]);
 
         // queues
         auto q = bulk::create_queue<int, int>(world);
