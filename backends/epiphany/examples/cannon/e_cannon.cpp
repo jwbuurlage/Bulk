@@ -139,9 +139,9 @@ int main() {
                 if (i != N - 1) {
                     // Transfer blocks
                     dma_task_a.push(neighbor_a_data[cur_buffer], a_data[cur],
-                                    CORE_BLOCK_SIZE, 1);
+                                    CORE_BLOCK_BYTES, 0);
                     dma_task_b.push(neighbor_b_data[cur_buffer], b_data[cur],
-                                    CORE_BLOCK_SIZE, 1);
+                                    CORE_BLOCK_BYTES, 0);
                 }
 
                 // Perform C += A * B
@@ -174,7 +174,7 @@ int main() {
         float time3 = time2 - time1;
         int time4 = (int)time3;
         int time5 = (int)(1000.0f * (time3 - (float)time4));
-        print("%d.%d", time4, time5);
+        print("%d.%03d", time4, time5);
     }
 
     // Clean up

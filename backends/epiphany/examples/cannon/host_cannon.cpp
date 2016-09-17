@@ -7,6 +7,23 @@
 
 using std::vector;
 
+void print_matrix(float* matrix, int size) {
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j)
+            printf("%5.1f ", matrix[i * size + j]);
+        printf("\n");
+    }
+}
+
+// To check the result C
+// Assumes C is set to zero
+void matrix_multiply_add(float* A, float* B, float* C, int size) {
+    for (int i = 0; i < size; i++)
+        for (int j = 0; j < size; j++)
+            for (int k = 0; k < size; k++)
+                C[i * size + j] += A[i * size + k] * B[k * size + j];
+}
+
 int main(int argc, char** argv) {
     bulk::environment<bulk::epiphany::provider> env;
     if (!env.provider().is_valid())
@@ -40,7 +57,7 @@ int main(int argc, char** argv) {
     // Fill matrices
     for (int i = 0; i < matrix_size; i++) {
         for (int j = 0; j < matrix_size; j++) {
-            A[i * matrix_size + j] = (float)i;
+            A[i * matrix_size + j] = (float)(i + j);
             B[i * matrix_size + j] = (float)j;
             C[i * matrix_size + j] = 0.0f;
         }
@@ -104,6 +121,20 @@ int main(int argc, char** argv) {
         }
     }
 
+    // Debug
+    if (matrix_size <= 32) {
+        printf("Matrix A:\n");
+        print_matrix(&A[0], matrix_size);
+        printf("\n");
+        printf("Correct matrix C:\n");
+        matrix_multiply_add(&A[0], &B[0], &C[0], matrix_size);
+        print_matrix(&C[0], matrix_size);
+        // Set to zero again
+        for (int i = 0; i < matrix_size * matrix_size; ++i)
+            C[i] = 0.0f;
+        printf("\n\n");
+    }
+
     for (int i = 0; i < N * N; i++) {
         env.provider().create_stream(&stream_A[i][0], matrix_bytes / (N * N),
                                      matrix_bytes / (N * N));
@@ -151,21 +182,17 @@ int main(int argc, char** argv) {
 
     if (matrix_size <= 32) {
         printf("Result:\n");
-        for (int i = 0; i < matrix_size; ++i) {
-            for (int j = 0; j < matrix_size; ++j)
-                printf("%3.2f ", C[i * matrix_size + j]);
-            printf("\n");
-        }
+        print_matrix(&C[0], matrix_size);
         printf("\n");
     }
 
-    printf("Result: C[n - 1, n - 1] = %.2f\n", C[matrix_size * matrix_size - 1]);
+    printf("Result: C[n - 1, n - 1] = %.1f\n", C[matrix_size * matrix_size - 1]);
 
     float correct = 0.0f;
     for (int i = 0; i < matrix_size; i++)
         correct += A[(matrix_size - 1) * matrix_size + i] *
                    B[i * matrix_size + (matrix_size - 1)];
-    printf("Correct last element: %.2f\n", correct);
+    printf("Correct last element: %.1f\n", correct);
 
     return 0;
 }
