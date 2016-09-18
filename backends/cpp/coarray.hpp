@@ -43,7 +43,7 @@ class coarray {
                 // Compute total size
                 int total_size = 0;
                 for (int i = 0; i < world_.active_processors(); i++)
-                    total_size += x(i);
+                    total_size += x.get_ref(i);
 
                 all_values_ = new T[total_size];
                 other_values_ = new T*[world_.active_processors()];
@@ -52,7 +52,7 @@ class coarray {
                 int total = 0;
                 for (int i = 0; i < world_.active_processors(); i++) {
                     other_values_[i] = &all_values_[total];
-                    total += x(i);
+                    total += x.get_ref(i);
                 }
 
                 // Give the buffers to other cores
@@ -61,8 +61,8 @@ class coarray {
             }
             world_.sync();
             // All cores save the pointer
-            all_values_ = buffer(0);
-            other_values_ = (T**)buffer(1);
+            all_values_ = buffer.get_ref(0);
+            other_values_ = (T**)buffer.get_ref(1);
             self_value_ = other_values_[pid];
         }
     }

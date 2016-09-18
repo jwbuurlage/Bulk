@@ -22,27 +22,27 @@ namespace cpp {
 // http://stackoverflow.com/questions/24465533/implementing-boostbarrier-in-c11
 class barrier {
   public:
-    explicit barrier(std::size_t iCount)
-        : mThreshold(iCount), mCount(iCount), mGeneration(0) {}
+    explicit barrier(std::size_t count)
+        : threshold_(count), count_(count), generation_(0) {}
 
     void wait() {
-        auto lGen = mGeneration;
-        std::unique_lock<std::mutex> lLock{mMutex};
-        if (!--mCount) {
-            mGeneration++;
-            mCount = mThreshold;
-            mCond.notify_all();
+        auto gen = generation_;
+        std::unique_lock<std::mutex> lock{mutex_};
+        if (!--count_) {
+            generation_++;
+            count_ = threshold_;
+            cond_.notify_all();
         } else {
-            mCond.wait(lLock, [this, lGen] { return lGen != mGeneration; });
+            cond_.wait(lock, [this, gen] { return gen != generation_; });
         }
     }
 
   private:
-    std::mutex mMutex;
-    std::condition_variable mCond;
-    std::size_t mThreshold;
-    std::size_t mCount;
-    std::size_t mGeneration;
+    std::mutex mutex_;
+    std::condition_variable cond_;
+    std::size_t threshold_;
+    std::size_t count_;
+    std::size_t generation_;
 };
 
 // single `world_state` instance shared by every thread
@@ -127,7 +127,14 @@ class world_provider {
               template <typename, class> class var_type>
     void internal_get_(int processor, var_type<T, World>& the_variable,
                        T& target) {
-        target = the_variable(processor);
+        target = the_variable.get_ref(processor);
+    }
+
+    template <typename T, class World,
+              template <typename, class> class var_type>
+    void internal_put_(int processor, T value,
+                       var_type<T, World>& the_variable) {
+        the_variable.get_ref(processor) = value;
     }
 
     void init_(world_state* state, int pid, int nprocs) {

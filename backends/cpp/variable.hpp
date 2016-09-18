@@ -1,5 +1,8 @@
 #pragma once
+
 #include <utility>
+
+#include "bulk/communication.hpp"
 
 /**
  * \file variable_direct.hpp
@@ -18,6 +21,33 @@ namespace cpp {
 template <typename T, class World>
 class var {
   public:
+    class image {
+      public:
+        using var_type = var<T, World>;
+        image(var_type& variable, int t) : var_(variable), t_(t) {}
+
+        /**
+         * Assign a value to a remote image
+         *
+         * \param value the new value of the image
+         */
+        void operator=(T value) {
+            // normally we use bulk::put here, but because the cpp backend does
+            // not conform to the shared internals we need to do it
+            // differently..
+            var_.get_ref(t_) = value;
+        }
+
+        /**
+         * Obtain a future to the remote image value.
+         */
+        auto get() { return bulk::get(t_, var_); }
+
+      private:
+        var_type& var_;
+        int t_;
+    };
+
     /**
      * Initialize and registers the variable with the world
      */
@@ -104,8 +134,8 @@ class var {
     /**
      * Get a reference to a remove copy of the variable.
      */
-    T& operator()(int pid) const {
-        return all_values_[pid];
+    image operator()(int t) {
+        return image(*this, t);
     }
 
     /**
@@ -115,6 +145,12 @@ class var {
      */
     World& world() const {
         return world_;
+    }
+
+    // I do not like this, but without internal_put and internal_get, image and
+    // coarray require this
+    T& get_ref(int t) {
+        return all_values_[t];
     }
 
   private:
