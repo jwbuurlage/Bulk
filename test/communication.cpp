@@ -1,8 +1,6 @@
-#include <bulk/backends/mpi/mpi.hpp>
 #include <bulk/bulk.hpp>
-//#include <bulk/util/log.hpp>
-
-#include "bulk_mpi_test_common.hpp"
+#include "bulk_test_common.hpp"
+#include "set_backend.hpp"
 
 extern bulk::environment<provider> env;
 
@@ -176,7 +174,7 @@ void test_communication() {
 
         BULK_SECTION("Single message passing") {
             auto q = bulk::create_queue<int, int>(world);
-            q(world.next_processor()).push(123, 1337);
+            q(world.next_processor()).send(123, 1337);
             world.sync();
             for (auto msg : q) {
                 BULK_CHECK_ONCE(msg.tag == 123 && msg.content == 1337,
@@ -189,7 +187,7 @@ void test_communication() {
 
             auto q = bulk::create_queue<int, int>(world);
             for (size_t i = 0; i < contents.size(); ++i) {
-                q(world.next_processor()).push(s, contents[i]);
+                q(world.next_processor()).send(s, contents[i]);
             }
 
             world.sync();
@@ -210,10 +208,10 @@ void test_communication() {
             auto q2 = bulk::create_queue<int, float>(world);
 
             for (size_t i = 0; i < contents.size(); ++i) {
-                q(world.next_processor()).push(s, contents[i]);
+                q(world.next_processor()).send(s, contents[i]);
             }
             for (size_t i = 0; i < contents2.size(); ++i) {
-                q2(world.next_processor()).push(s, contents2[i]);
+                q2(world.next_processor()).send(s, contents2[i]);
             }
 
             world.sync();

@@ -7,11 +7,29 @@ include_directories(
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wfatal-errors -Wextra -g -O3")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../../../bin)
 
 find_package(MPI QUIET)
 
 if(MPI_CXX_FOUND)
+    add_definitions(-DBACKEND_MPI)
+    set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
+    set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+    include_directories(${MPI_INCLUDE_PATH})
+
+    set(TEST_DIR "../../../test")
+
+    set(
+        TEST_SOURCES
+        "${TEST_DIR}/communication.cpp"
+        "${TEST_DIR}/initialization.cpp"
+        "${TEST_DIR}/test_main.cpp"
+    )
+
+    add_executable(mpi_test ${TEST_SOURCES})
+    target_link_libraries(mpi_test ${MPI_LIBRARIES})
+
+    # Examples specific for mpi backend
     set(
         EXAMPLE_DIR
         "../examples/"
@@ -21,10 +39,6 @@ if(MPI_CXX_FOUND)
         EXAMPLE_SOURCES
         "hello_mpi.cpp"
         )
-
-    set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
-    set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
-    include_directories(${MPI_INCLUDE_PATH})
 
     foreach(source_file ${EXAMPLE_SOURCES})
         string(REPLACE ".cpp" "" source_name ${source_file})

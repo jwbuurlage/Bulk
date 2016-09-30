@@ -38,5 +38,3 @@ extern int total, success;
     if (world.processor_id() == 0) { \
         std::cout << body << "\n";   \
     }
-
-using provider = bulk::mpi::provider;

@@ -26,9 +26,24 @@ set(
 
 foreach(source_file ${EXAMPLE_SOURCES})
     string(REPLACE ".cpp" "" source_name ${source_file})
-    add_executable(${source_name} ${EXAMPLE_DIR}${source_file})
-    target_link_libraries( ${source_name} )
+    add_executable(cpp_${source_name} ${EXAMPLE_DIR}${source_file})
+    target_link_libraries(cpp_${source_name} )
 endforeach(source_file)
+
+# Bulk tests that work for any backend
+
+
+set(TEST_DIR "../../../test")
+
+set(
+    TEST_SOURCES
+    "${TEST_DIR}/communication.cpp"
+    "${TEST_DIR}/initialization.cpp"
+    "${TEST_DIR}/test_main.cpp"
+    )
+
+add_executable(cpp_test ${TEST_SOURCES})
+target_link_libraries(cpp_test)
 
 # Examples specific for cpp backend
 

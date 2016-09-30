@@ -1,7 +1,6 @@
-#include <bulk/backends/mpi/mpi.hpp>
 #include <bulk/bulk.hpp>
-
-#include "bulk_mpi_test_common.hpp"
+#include "bulk_test_common.hpp"
+#include "set_backend.hpp"
 
 int total = 0;
 int success = 0;
