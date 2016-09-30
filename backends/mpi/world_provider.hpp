@@ -223,6 +223,14 @@ class world_provider {
         MPI_Barrier(MPI_COMM_WORLD);
     }
 
+    template <typename T, class World,
+              template <typename, class> class var_type>
+    void internal_put_(int processor, T value,
+                       var_type<T, World>& the_variable) {
+        internal_put_(processor, &value, &the_variable.value(), sizeof(T), 0,
+                      1);
+    }
+
     void internal_put_(int processor, void* value, void* variable, size_t size,
                        int offset, int count) {
         /* FIXME: we really dont want to do it like this:

@@ -21,11 +21,11 @@ namespace bulk {
 template <typename T, typename var_type>
 void put(int processor, T value, var_type& the_variable) {
     the_variable.world().implementation().internal_put_(
-        processor, &value, &the_variable.value(), sizeof(T), 0, 1);
+        processor, value, the_variable);
 }
 
-template <typename T, typename World>
-void put(int processor, T value, array<T, World>& the_array, int offset = 0,
+template <typename T, typename array_type>
+void put(int processor, T value, array_type& the_array, int offset,
          int count = 1) {
     the_array.world().implementation().internal_put_(
         processor, &value, the_array.data(), sizeof(T), offset, count);

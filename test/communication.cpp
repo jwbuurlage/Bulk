@@ -135,6 +135,8 @@ void test_communication() {
             auto x = bulk::create_var<int>(world);
             x.value() = s;
 
+            world.sync();
+
             std::vector<bulk::future<int, decltype(world)>> ys;
             for (int i = 0; i < size; ++i) {
                 ys.push_back(bulk::get(world.next_processor(), x));
