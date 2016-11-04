@@ -12,11 +12,11 @@ int main() {
 
         world.log("%d/%d <- %d\n", s, p, a.value());
 
-        auto b = a(world.next_processor());
+        auto b = a(world.next_processor()).get();
 
         world.sync();
 
-        world.log("%d/%d -> %d\n", s, p, b);
+        world.log("%d/%d -> %d\n", s, p, b.value());
     });
 
     return 0;

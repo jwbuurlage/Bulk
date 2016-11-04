@@ -15,4 +15,8 @@
 #include <bulk/environment.hpp>
 #include <bulk/future.hpp>
 #include <bulk/messages.hpp>
+#include <bulk/partitioning.hpp>
+#include <bulk/partitioned_array.hpp>
 #include <bulk/world.hpp>
+
+#include <bulk/util/binary_tree.hpp>

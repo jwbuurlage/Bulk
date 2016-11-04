@@ -22,6 +22,7 @@ set(
     "dot_product.cpp"
     "hello.cpp"
     "messaging.cpp"
+    "partitioning.cpp"
     )
 
 foreach(source_file ${EXAMPLE_SOURCES})
@@ -39,6 +40,7 @@ set(
     TEST_SOURCES
     "${TEST_DIR}/communication.cpp"
     "${TEST_DIR}/initialization.cpp"
+    "${TEST_DIR}/partitioning.cpp"
     "${TEST_DIR}/test_main.cpp"
     )
 
