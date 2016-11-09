@@ -164,6 +164,12 @@ void test_communication() {
 
             BULK_CHECK_ONCE(zs[3] == 2,
                             "writing to local coarray gives wrong result");
+
+            auto a = zs(2)[1].get();
+            world.sync();
+
+            BULK_CHECK_ONCE(a.value() == 1,
+                            "getting from coarray gives wrong result");
         }
 
         BULK_SECTION("Coarray iteration") {

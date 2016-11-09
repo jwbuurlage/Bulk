@@ -10,7 +10,6 @@
 #include "array.hpp"
 #include "communication.hpp"
 
-
 namespace bulk {
 
 /**
@@ -34,19 +33,19 @@ namespace bulk {
  */
 template <typename T, class World>
 class coarray {
-  public:
+   public:
     class writer {
-      public:
+       public:
         /**
          * Assign a value to a remote image element.
          *
          * \param value the new value of the element
          */
-        void operator=(T value) {
-            bulk::put<T>(t_, value, parent_.data(), i_, 1);
-        }
+        void operator=(T value) { parent_.put(t_, i_, value); }
 
-      private:
+        auto get() { return parent_.get(t_, i_); }
+
+       private:
         friend coarray<T, World>;
 
         writer(World& world, coarray<T, World>& parent, int t, int i)
@@ -59,7 +58,7 @@ class coarray {
     };
 
     class image {
-      public:
+       public:
         image(World& world, coarray<T, World>& parent, int t)
             : world_(world), parent_(parent), t_(t) {}
 
@@ -72,7 +71,7 @@ class coarray {
          */
         writer operator[](int i) { return writer(world_, parent_, t_, i); }
 
-      private:
+       private:
         World& world_;
         coarray<T, World>& parent_;
         int t_;
@@ -84,7 +83,8 @@ class coarray {
      * \param world the distributed layer in which the array is defined.
      * \param local_size the size of the local array
      */
-    coarray(World& world, int local_size) : world_(world), data_(world_, local_size) {}
+    coarray(World& world, int local_size)
+        : world_(world), data_(world_, local_size) {}
 
     /**
      * Initialize and registers the coarray with the world
@@ -107,9 +107,7 @@ class coarray {
      *
      * \returns the coarray image with index t
      */
-    image operator()(int t) {
-        return image(world_, *this, t);
-    }
+    image operator()(int t) { return image(world_, *this, t); }
 
     /**
      * Access the `i`th element of the local coarray image
@@ -139,7 +137,17 @@ class coarray {
      */
     T* end() { return data_.end(); }
 
-  private:
+    /**
+     * Put the value `value` into element `idx` on processor `t`.
+     */
+    void put(int t, int idx, T value) { bulk::put<T>(t, value, data_, idx, 1); }
+
+    /**
+     * Obtain a future to the value of element `idx` on processor `t`.
+     */
+    auto get(int t, int idx) { return bulk::get<T>(t, data_, idx, 1); }
+
+   private:
     friend image;
     friend writer;
 
@@ -149,4 +157,4 @@ class coarray {
     array<T, World>& data() { return data_; }
 };
 
-} // namespace bulk
+}  // namespace bulk
