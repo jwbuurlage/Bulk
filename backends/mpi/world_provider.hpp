@@ -1,6 +1,8 @@
 #pragma once
 
 #include <type_traits>
+#include <cstdio>
+#include <sstream>
 
 #include <mpi.h>
 #include <boost/bimap.hpp>
@@ -359,6 +361,13 @@ class world_provider {
     }
 
     std::string name() { return std::string(name_); }
+
+    template <typename... Ts>
+    void log(std::string format, Ts... ts) {
+        std::stringstream ss;
+        ss << "$" << processor_id() << ": ";
+        printf((ss.str() + format).c_str(), ts...);
+    }
 
    private:
     size_t tag_size_ = 0;

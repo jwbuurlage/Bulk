@@ -17,12 +17,34 @@ if(MPI_CXX_FOUND)
     set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
     include_directories(${MPI_INCLUDE_PATH})
 
+    set(
+        EXAMPLE_DIR
+        "../../../examples/"
+        )
+
+    set(
+        EXAMPLE_SOURCES
+        "communication.cpp"
+        "dot_product.cpp"
+        "hello.cpp"
+        "messaging.cpp"
+        "partitioning.cpp"
+        "distributed_image.cpp"
+        )
+
+    foreach(source_file ${EXAMPLE_SOURCES})
+        string(REPLACE ".cpp" "" source_name ${source_file})
+        add_executable(mpi_${source_name} ${EXAMPLE_DIR}${source_file})
+        target_link_libraries(mpi_${source_name} ${MPI_LIBRARIES})
+    endforeach(source_file)
+
     set(TEST_DIR "../../../test")
 
     set(
         TEST_SOURCES
         "${TEST_DIR}/communication.cpp"
         "${TEST_DIR}/initialization.cpp"
+        "${TEST_DIR}/partitioning.cpp"
         "${TEST_DIR}/test_main.cpp"
     )
 

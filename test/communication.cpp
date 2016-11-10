@@ -14,7 +14,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK_ONCE(a.value() == ((s + p - 1) % p),
-                            "wrong value after putting");
+                            "receive correct value after putting");
         }
 
         BULK_SECTION("Sugarized put") {
@@ -25,7 +25,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK_ONCE(a.value() == ((s + p - 1) % p),
-                            "wrong value after sugarized putting");
+                            "receive correct value after sugarized putting");
         }
 
         BULK_SECTION("Put to self") {
@@ -35,7 +35,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK_ONCE(a.value() == s,
-                            "wrong value after putting to self");
+                            "receive correct value after putting to self");
         }
 
         BULK_SECTION("Get from self") {
@@ -45,7 +45,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK_ONCE(b.value() == s,
-                            "wrong value after putting to self");
+                            "receive correct value after getting from self");
         }
 
         BULK_SECTION("Put non-int") {
@@ -56,7 +56,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK_ONCE(a.value() == 1.0f,
-                            "wrong value after putting float");
+                            "receive correct value after putting float");
         }
 
         BULK_SECTION("Put multiple") {
@@ -74,9 +74,9 @@ void test_communication() {
             world.sync();
 
             for (int i = 0; i < size; ++i) {
-                BULK_CHECK_ONCE(
-                    xs[i].value() == ((s + p - 1) % p) + i,
-                    "wrong value after multiple puts to array of variables");
+                BULK_CHECK_ONCE(xs[i].value() == ((s + p - 1) % p) + i,
+                                "receive correct value after multiple puts to "
+                                "array of variables");
             }
         }
 
@@ -102,8 +102,9 @@ void test_communication() {
 
             world.sync();
 
-            BULK_CHECK_ONCE(a.value() == p - 1,
-                            "wrong value after heterogeneous puts and getting");
+            BULK_CHECK_ONCE(
+                a.value() == p - 1,
+                "receive correct value after heterogeneous puts and getting");
         }
 
         BULK_SECTION("Get") {
@@ -115,7 +116,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK_ONCE(c.value() == world.next_processor(),
-                            "wrong value after getting");
+                            "receive correct value after getting");
         }
 
         BULK_SECTION("Sugarized get") {
@@ -127,7 +128,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK_ONCE(c.value() == world.next_processor(),
-                            "wrong value after sugarized getting");
+                            "receive correct value after sugarized getting");
         }
 
         BULK_SECTION("Get multiple") {
@@ -146,7 +147,7 @@ void test_communication() {
 
             for (auto& y : ys) {
                 BULK_CHECK_ONCE(y.value() == world.next_processor(),
-                                "wrong value after getting multiple");
+                                "receive correct value after getting multiple");
             }
         }
 
@@ -158,19 +159,25 @@ void test_communication() {
 
             BULK_CHECK_ONCE(
                 zs[1] == world.prev_processor(),
-                "putting to remote coarray image gives wrong result");
+                "putting to remote coarray image gives correct result");
 
             zs[3] = 2;
 
             BULK_CHECK_ONCE(zs[3] == 2,
-                            "writing to local coarray gives wrong result");
+                            "writing to local coarray gives correct result");
+
+            auto a = zs(2)[1].get();
+            world.sync();
+
+            BULK_CHECK_ONCE(a.value() == 1,
+                            "getting from coarray gives correct result");
         }
 
         BULK_SECTION("Coarray iteration") {
             auto xs = bulk::gather_all(world, s);
             int t = 0;
             for (auto x : xs) {
-                BULK_CHECK_ONCE(x == t++, "gather operation failed");
+                BULK_CHECK_ONCE(x == t++, "gather operation succeeded");
             }
         }
 
@@ -180,7 +187,7 @@ void test_communication() {
             world.sync();
             for (auto msg : q) {
                 BULK_CHECK_ONCE(msg.tag == 123 && msg.content == 1337,
-                                "message passing failed");
+                                "message passed succesfully");
             }
         }
 
@@ -198,7 +205,7 @@ void test_communication() {
             for (auto msg : q) {
                 BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
                                     msg.content == contents[k++],
-                                "multiple message passing failed");
+                                "multiple messages passed succesfully");
             }
         }
 
@@ -222,16 +229,15 @@ void test_communication() {
             for (auto msg : q) {
                 BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
                                     msg.content == contents[k++],
-                                "failed to receive correct result on q");
+                                "received correct result on q");
             }
 
             int l = 0;
             for (auto msg : q2) {
                 BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
                                     msg.content == contents2[l++],
-                                "failed to receive correct result on q2");
+                                "received correct result on q2");
             }
         }
-
     });
 }

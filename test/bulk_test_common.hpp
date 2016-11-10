@@ -8,10 +8,10 @@ extern int total, success;
     if (world.processor_id() == 0) {                           \
         ++total;                                               \
         if (!(body)) {                                         \
-            std::cout << "  FAILED: " << error << "\n";        \
+            std::cout << "  FAILED: *did not* " << error << "\n";        \
         } else {                                               \
             ++success;                                         \
-            std::cout << "  SUCCESS: *not* " << error << "\n"; \
+            std::cout << "  SUCCESS: " << error << "\n"; \
         }                                                      \
     }
 

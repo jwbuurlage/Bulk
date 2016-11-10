@@ -20,8 +20,8 @@ namespace bulk {
  */
 template <typename T, typename var_type>
 void put(int processor, T value, var_type& the_variable) {
-    the_variable.world().implementation().internal_put_(
-        processor, value, the_variable);
+    the_variable.world().implementation().internal_put_(processor, value,
+                                                        the_variable);
 }
 
 template <typename T, typename array_type>
@@ -47,9 +47,20 @@ void put(int processor, T value, array_type& the_array, int offset,
  */
 template <typename T, class World, template <typename, class> class var_type>
 future<T, World> get(int processor, var_type<T, World>& the_variable) {
+    // FIXME: can we rely on RVO?
     future<T, World> result(the_variable.world());
     the_variable.world().implementation().internal_get_(processor, the_variable,
                                                         result.value());
+    return result;
+}
+
+template <typename T, class World, template <typename, class> class array_type>
+future<T, World> get(int processor, array_type<T, World>& the_array,
+                     int offset, int count = 1) {
+    // FIXME: can we rely on RVO?
+    future<T, World> result(the_array.world());
+    the_array.world().implementation().internal_get_(
+        processor, the_array.data(), &result.value(), sizeof(T), offset, count);
     return result;
 }
 
