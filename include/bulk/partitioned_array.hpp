@@ -75,6 +75,15 @@ class partitioned_array {
         return data_[flatten<D>(part_.local_extent(multi_id_), {index...})];
     }
 
+    /// ditto
+    template <typename... Ts, typename = check_dim<D, Ts...>>
+    const T& local(Ts... index) const {
+        return data_[flatten<D>(part_.local_extent(multi_id_), {index...})];
+    }
+
+    /** Obtain a reference to the world. */
+    auto world() const { return world_ ; }
+
    private:
     std::array<int, D> multi_id_;
 
