@@ -1,8 +1,8 @@
 #pragma once
 
 #include <array>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 #include "util/binary_tree.hpp"
 
@@ -198,6 +198,21 @@ class block_partitioning : public partitioning<DataDim, GridDim> {
 
     // obtain the block size in each dimension
     std::array<int, GridDim> block_size() const { return block_size_; }
+
+    /** Obtain the origin of the block of processor `t`. */
+    std::array<int, DataDim> origin(std::array<int, DataDim> multi_index) {
+        std::array<int, DataDim> result;
+        for (int d = 0; d < DataDim; ++d) {
+            result[d] = block_size_[d] * multi_index[d];
+        }
+        return result;
+    }
+
+    /** Obtain the origin of the block of processor `t`. */
+    std::array<int, DataDim> origin(int t) {
+        auto multi_index = unflatten<DataDim>(this->grid_, t);
+        return origin(multi_index);
+    }
 
    private:
     std::array<int, GridDim> block_size_;

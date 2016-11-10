@@ -42,6 +42,12 @@ void test_partitioning() {
                             "compute correctly the block extent");
             BULK_CHECK_ONCE(part.local_index({3, 12})[1] == 2,
                             "compute correctly the block index");
+            BULK_CHECK_ONCE(part.origin(0)[0] == 0,
+                            "compute correctly the block origin (0)");
+            BULK_CHECK_ONCE(part.origin(1)[0] == 10,
+                            "compute correctly the block origin (1)");
+            BULK_CHECK_ONCE(part.origin(2)[1] == 10,
+                            "compute correctly the block origin (2)");
         }
 
         BULK_SECTION("Binary-split-partitioning") {
