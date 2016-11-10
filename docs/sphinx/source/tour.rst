@@ -94,4 +94,29 @@ Algorithmic skeletons
 
 Here we first compute the local inner product, and finally use the higher-level function :code:`bulk::foldl` to find the global result.
 
+Another example is finding a maximum element over all processors, here max is the maximum value found locally:
+
+.. code-block:: cpp
+
+    auto maxs = bulk::gather_all(world, max);
+    max = *std::max_element(maxs.begin(), maxs.end());
+
+Compare this to the way this is done using e.g. BSPlib:
+
+.. code-block:: cpp
+
+    int* global_max = malloc(sizeof(int) * bsp_nprocs());
+    bsp_push_reg(global_max, sizeof(int) * bsp_nprocs());
+
+    for (int t = 0; t < p; ++t) {
+        bsp_put(t, &max, global_max, bsp_pid(), sizeof(int));
+    }
+    bsp_sync();
+
+    for (int t = 0; t < p; ++t) {
+        if (max < global_max[t]) {
+            max = global_max[t];
+        }
+    }
+
 .. _Co-array Fortran: https://en.wikipedia.org/wiki/Coarray_Fortran
