@@ -60,6 +60,12 @@ class partitioning {
     virtual std::array<int, DataDim> local_index(
         std::array<int, DataDim> xs) = 0;
 
+    /** Obtain the origin of the block of processor `t`. */
+    virtual std::array<int, DataDim> origin(int t) const {
+        (void)t;
+        return std::array<int, DataDim>();
+    }
+
     /** The total number of elements along each axis on the processor index with
      * `idxs...` */
     virtual std::array<int, DataDim> local_extent(
@@ -200,18 +206,13 @@ class block_partitioning : public partitioning<DataDim, GridDim> {
     std::array<int, GridDim> block_size() const { return block_size_; }
 
     /** Obtain the origin of the block of processor `t`. */
-    std::array<int, DataDim> origin(std::array<int, DataDim> multi_index) {
+    std::array<int, DataDim> origin(int t) const override {
+        auto multi_index = unflatten<GridDim>(this->grid_, t);
         std::array<int, DataDim> result;
         for (int d = 0; d < DataDim; ++d) {
             result[d] = block_size_[d] * multi_index[d];
         }
         return result;
-    }
-
-    /** Obtain the origin of the block of processor `t`. */
-    std::array<int, DataDim> origin(int t) {
-        auto multi_index = unflatten<DataDim>(this->grid_, t);
-        return origin(multi_index);
     }
 
    private:
@@ -308,7 +309,7 @@ class binary_partitioning : public partitioning<DataDim, 1> {
         return {proc};
     }
 
-    std::array<int, DataDim> origin(int t) const { return origins_[t]; }
+    std::array<int, DataDim> origin(int t) const override { return origins_[t]; }
 
    private:
     binary_tree<split> splits_;

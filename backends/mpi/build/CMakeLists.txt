@@ -29,7 +29,6 @@ if(MPI_CXX_FOUND)
         "hello.cpp"
         "messaging.cpp"
         "partitioning.cpp"
-        "distributed_image.cpp"
         )
 
     foreach(source_file ${EXAMPLE_SOURCES})
