@@ -42,7 +42,7 @@ std::array<int, D> unflatten(std::array<int, D> volume, int flattened) {
  */
 template <int DataDim, int GridDim = DataDim>
 class partitioning {
-   public:
+  public:
     partitioning(std::array<int, GridDim> grid,
                  std::array<int, DataDim> data_size)
         : grid_{grid}, size_(data_size) {}
@@ -57,8 +57,8 @@ class partitioning {
     virtual std::array<int, GridDim> owner(std::array<int, DataDim> xs) = 0;
 
     /** Compute the owner of a element using its global indices */
-    virtual std::array<int, DataDim> local_index(
-        std::array<int, DataDim> xs) = 0;
+    virtual std::array<int, DataDim>
+    local_index(std::array<int, DataDim> xs) = 0;
 
     /** Obtain the origin of the block of processor `t`. */
     virtual std::array<int, DataDim> origin(int t) const {
@@ -68,8 +68,8 @@ class partitioning {
 
     /** The total number of elements along each axis on the processor index with
      * `idxs...` */
-    virtual std::array<int, DataDim> local_extent(
-        std::array<int, GridDim> idxs) = 0;
+    virtual std::array<int, DataDim>
+    local_extent(std::array<int, GridDim> idxs) = 0;
 
     /** The total number of elements on the t-th processor */
     int local_element_count(int t) {
@@ -81,7 +81,7 @@ class partitioning {
         return count;
     }
 
-   protected:
+  protected:
     std::array<int, GridDim> grid_;
     std::array<int, DataDim> size_;
 };
@@ -98,7 +98,7 @@ class partitioning {
  */
 template <int DataDim, int GridDim = DataDim>
 class cyclic_partitioning : public partitioning<DataDim, GridDim> {
-   public:
+  public:
     /**
      * Constructs a cyclic partitioning in nD.
      *
@@ -114,8 +114,8 @@ class cyclic_partitioning : public partitioning<DataDim, GridDim> {
     }
 
     /** Compute the local indices of a element using its global indices */
-    std::array<int, DataDim> local_index(
-        std::array<int, DataDim> index) override final {
+    std::array<int, DataDim>
+    local_index(std::array<int, DataDim> index) override final {
         for (int d = 0; d < GridDim; ++d) {
             index[d] = index[d] / this->grid_[d];
         }
@@ -124,15 +124,15 @@ class cyclic_partitioning : public partitioning<DataDim, GridDim> {
 
     /** The total number of elements along each axis on the processor index with
      * `idxs...` */
-    std::array<int, DataDim> local_extent(
-        std::array<int, GridDim> idxs) override final {
+    std::array<int, DataDim>
+    local_extent(std::array<int, GridDim> idxs) override final {
         std::array<int, DataDim> size;
-        for (int dim = 0; dim < DataDim; ++dim) {
+        for (int dim = 0; dim < GridDim; ++dim) {
             size[dim] = (this->size_[dim] + this->grid_[dim] - idxs[dim] - 1) /
                         this->grid_[dim];
         }
         for (int dim = GridDim; dim < DataDim; ++dim) {
-            size[dim] *= this->size_[dim];
+            size[dim] = this->size_[dim];
         }
         return size;
     }
@@ -151,7 +151,7 @@ class cyclic_partitioning : public partitioning<DataDim, GridDim> {
  */
 template <int DataDim, int GridDim = DataDim>
 class block_partitioning : public partitioning<DataDim, GridDim> {
-   public:
+  public:
     /**
      * Constructs a block partitioning in nD.
      *
@@ -167,28 +167,32 @@ class block_partitioning : public partitioning<DataDim, GridDim> {
         for (int d = 0; d < GridDim; ++d) {
             block_size_[d] = ((data_size[d] - 1) / grid[d]) + 1;
         }
+        for (int d = GridDim; d < DataDim; ++d) {
+            block_size_[d] = data_size[d];
+        }
     }
 
     /** Compute the local indices of a element using its global indices */
-    std::array<int, DataDim> local_index(
-        std::array<int, DataDim> index) override final {
-        for (int d = 0; d < GridDim; ++d) {
+    std::array<int, DataDim>
+    local_index(std::array<int, DataDim> index) override final {
+        for (int d = 0; d < DataDim; ++d) {
             index[d] = index[d] % block_size_[d];
         }
+
         return index;
     }
 
     /** The total number of elements along each axis on the processor index with
      * `idxs...` */
-    std::array<int, DataDim> local_extent(
-        std::array<int, GridDim> idxs) override final {
+    std::array<int, DataDim>
+    local_extent(std::array<int, GridDim> idxs) override final {
         std::array<int, DataDim> size;
         for (int dim = 0; dim < GridDim; ++dim) {
             size[dim] = (this->size_[dim] + this->grid_[dim] - idxs[dim] - 1) /
                         this->grid_[dim];
         }
         for (int dim = GridDim; dim < DataDim; ++dim) {
-            size[dim] *= this->size_[dim];
+            size[dim] = this->size_[dim];
         }
         return size;
     }
@@ -209,13 +213,13 @@ class block_partitioning : public partitioning<DataDim, GridDim> {
     std::array<int, DataDim> origin(int t) const override {
         auto multi_index = unflatten<GridDim>(this->grid_, t);
         std::array<int, DataDim> result;
-        for (int d = 0; d < DataDim; ++d) {
+        for (int d = 0; d < GridDim; ++d) {
             result[d] = block_size_[d] * multi_index[d];
         }
         return result;
     }
 
-   private:
+  private:
     std::array<int, GridDim> block_size_;
 };
 
@@ -235,7 +239,7 @@ class block_partitioning : public partitioning<DataDim, GridDim> {
  */
 template <int DataDim>
 class binary_partitioning : public partitioning<DataDim, 1> {
-   public:
+  public:
     /**
      * Constructs a cyclic partitioning in nD.
      *
@@ -275,8 +279,8 @@ class binary_partitioning : public partitioning<DataDim, 1> {
     }
 
     /** Compute the local indices of a element using its global indices */
-    std::array<int, DataDim> local_index(
-        std::array<int, DataDim> index) override final {
+    std::array<int, DataDim>
+    local_index(std::array<int, DataDim> index) override final {
         auto t = owner(index)[0];
         for (int d = 0; d < DataDim; ++d) {
             index[d] -= origins_[t][d];
@@ -286,8 +290,8 @@ class binary_partitioning : public partitioning<DataDim, 1> {
 
     /** The total number of elements along each axis on the processor index with
      * `idxs...` */
-    std::array<int, DataDim> local_extent(
-        std::array<int, 1> idxs) override final {
+    std::array<int, DataDim>
+    local_extent(std::array<int, 1> idxs) override final {
         return extents_[idxs[0]];
     }
 
@@ -309,12 +313,14 @@ class binary_partitioning : public partitioning<DataDim, 1> {
         return {proc};
     }
 
-    std::array<int, DataDim> origin(int t) const override { return origins_[t]; }
+    std::array<int, DataDim> origin(int t) const override {
+        return origins_[t];
+    }
 
-   private:
+  private:
     binary_tree<split> splits_;
     std::vector<std::array<int, DataDim>> origins_;
     std::vector<std::array<int, DataDim>> extents_;
 };
 
-}  // namespace bulk
+} // namespace bulk

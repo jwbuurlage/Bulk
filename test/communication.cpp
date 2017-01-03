@@ -191,6 +191,34 @@ void test_communication() {
             }
         }
 
+        BULK_SECTION("Message to self") {
+            auto q = bulk::create_queue<int, int>(world);
+            q(world.processor_id()).send(123, 1337);
+            world.sync();
+            int tag = 0;
+            int content = 0;
+            for (auto msg : q) {
+                tag = msg.tag;
+                content = msg.content;
+            }
+            BULK_CHECK_ONCE(tag == 123 && content == 1337,
+                            "message passed succesfully");
+        }
+
+        BULK_SECTION("Multiple messages to self") {
+            auto q = bulk::create_queue<int, int>(world);
+            q(world.processor_id()).send(123, 1337);
+            world.sync();
+            int tag = 0;
+            int content = 0;
+            for (auto msg : q) {
+                tag = msg.tag;
+                content = msg.content;
+            }
+            BULK_CHECK_ONCE(tag == 123 && content == 1337,
+                            "message passed succesfully");
+        }
+
         BULK_SECTION("Multiple message passing") {
             std::vector<int> contents = {1337, 12345, 1230519, 5, 8};
 

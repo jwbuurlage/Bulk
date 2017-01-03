@@ -1,8 +1,8 @@
 #pragma once
 
-#include <type_traits>
 #include <cstdio>
 #include <sstream>
+#include <type_traits>
 
 #include <mpi.h>
 #include <boost/bimap.hpp>
@@ -67,9 +67,7 @@ class world_provider {
     int active_processors() const { return nprocs_; }
     int processor_id() const { return pid_; }
 
-    void barrier() {
-        MPI_Barrier(MPI_COMM_WORLD);
-    }
+    void barrier() { MPI_Barrier(MPI_COMM_WORLD); }
 
     void sync() {
         // FIXME: what if spawning with fewer processors than exist
@@ -160,20 +158,23 @@ class world_provider {
         // probe for incoming messages for each queue
         for (int q = 0; q < queue_count_; ++q) {
             // optionally resize queue buffer
-            size_t incoming_size = remote_sends_[q] * message_sizes_[q];
+            size_t incoming_size =
+                (remote_sends_[q] + self_messages_[q].size()) *
+                message_sizes_[q];
             if (!queue_buffers_[q] || queue_buffer_sizes_[q] < incoming_size) {
                 if (queue_buffers_[q]) free(queue_buffers_[q]);
                 queue_buffers_[q] = malloc(incoming_size);
                 queue_buffer_sizes_[q] = incoming_size;
                 *queue_buffer_references_[q] = queue_buffers_[q];
             }
-            *buffer_counts_[q] = remote_sends_[q];
+            *buffer_counts_[q] = remote_sends_[q] + self_messages_[q].size();
 
             for (int message = 0; message < remote_sends_[q]; ++message) {
                 MPI_Status status = {};
-                MPI_Probe(MPI_ANY_SOURCE,
-                          static_cast<receive_type>(receive_category::message) + q,
-                          MPI_COMM_WORLD, &status);
+                MPI_Probe(
+                    MPI_ANY_SOURCE,
+                    static_cast<receive_type>(receive_category::message) + q,
+                    MPI_COMM_WORLD, &status);
 
                 MPI_Recv(
                     (char*)queue_buffers_[q] + message_sizes_[q] * message,
@@ -182,6 +183,15 @@ class world_provider {
                     MPI_COMM_WORLD, &status);
             }
 
+            size_t offset = remote_sends_[q] * message_sizes_[q];
+            for (int k = 0; k < self_messages_[q].size(); ++k) {
+                memcpy(
+                    (char*)queue_buffers_[q] + offset + k * message_sizes_[q],
+                    self_messages_[q][k], message_sizes_[q]);
+                free(self_messages_[q][k]);
+            }
+
+            self_messages_[q].clear();
             remote_sends_[q] = 0;
         }
 
@@ -271,6 +281,12 @@ class world_provider {
         memcpy((char*)variable + size * offset, value, count * size);
     }
 
+    void send_to_self_(int queue_id, void* message) {
+        // FIXME: if we decide to strictly do buffering communication only, then
+        // this is illegal
+        self_messages_[queue_id].push_back(message);
+    }
+
     void get_from_self_(void* variable, void* target, size_t size, int offset,
                         int count) {
         // FIXME: if we decide to strictly do buffering communication only, then
@@ -299,6 +315,7 @@ class world_provider {
         queue_buffer_sizes_.push_back(0);
 
         message_sizes_.push_back(sizeof(message<Tag, Content>));
+        self_messages_.push_back({});
 
         return queue_count_++;
     }
@@ -341,6 +358,10 @@ class world_provider {
     template <typename Tag, typename Content>
     void internal_send_(int queue_id, int processor, Tag tag, Content content) {
         if (processor == pid_) {
+            auto msg = malloc(sizeof(message<Tag, Content>));
+            message<Tag, Content> x{tag, content};
+            memcpy(msg, &x, sizeof(x));
+            send_to_self_(queue_id, msg);
             return;
         }
 
@@ -399,6 +420,7 @@ class world_provider {
 
     std::vector<void*> queue_buffers_;
     std::vector<size_t> queue_buffer_sizes_;
+    std::vector<std::vector<void*>> self_messages_;
 };
 
 }  // namespace mpi
