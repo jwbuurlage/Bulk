@@ -191,6 +191,34 @@ void test_communication() {
             }
         }
 
+        BULK_SECTION("Message to self") {
+            bulk::queue<int, int> q(world);
+            q(world.processor_id()).send(123, 1337);
+            world.sync();
+            int tag = 0;
+            int content = 0;
+            for (auto msg : q) {
+                tag = msg.tag;
+                content = msg.content;
+            }
+            BULK_CHECK_ONCE(tag == 123 && content == 1337,
+                            "message passed succesfully");
+        }
+
+        BULK_SECTION("Multiple messages to self") {
+            bulk::queue<int, int> q(world);
+            q(world.processor_id()).send(123, 1337);
+            world.sync();
+            int tag = 0;
+            int content = 0;
+            for (auto msg : q) {
+                tag = msg.tag;
+                content = msg.content;
+            }
+            BULK_CHECK_ONCE(tag == 123 && content == 1337,
+                            "message passed succesfully");
+        }
+
         BULK_SECTION("Multiple message passing") {
             std::vector<int> contents = {1337, 12345, 1230519, 5, 8};
 
@@ -202,6 +230,7 @@ void test_communication() {
             world.sync();
 
             int k = 0;
+            BULK_CHECK_ONCE(!q.empty(), "multiple messages arrived");
             for (auto msg : q) {
                 BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
                                     msg.content == contents[k++],
@@ -226,6 +255,7 @@ void test_communication() {
             world.sync();
 
             int k = 0;
+            BULK_CHECK_ONCE(!q.empty() && !q2.empty(), "queues are non-empty");
             for (auto& msg : q) {
                 BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
                                     msg.content == contents[k++],

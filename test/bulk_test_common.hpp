@@ -30,7 +30,7 @@ extern int total, success;
     env.spawn(env.available_processors(), [](auto& world, int, int) { \
         if (world.processor_id() == 0) {                             \
             world.log("-------------");                              \
-            world.log("%d test of %d failed.", total - success, total);    \
+            world.log("%d test(s) of %d failed.", total - success, total);    \
         }                                                            \
     })
 

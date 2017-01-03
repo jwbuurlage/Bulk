@@ -130,15 +130,15 @@ class world {
     virtual int register_location_(void* location) = 0;
     virtual void unregister_location_(int id) = 0;
 
-    virtual void put_(int processor, const void* value, int size,
+    virtual void put_(int processor, const void* value, std::size_t size,
                       int var_id) = 0;
     // Size is per element
-    virtual void put_(int processor, const void* values, int size, int var_id,
+    virtual void put_(int processor, const void* values, std::size_t size, int var_id,
                       int offset, int count) = 0;
 
-    virtual void get_(int processor, int var_id, int size, void* target) = 0;
+    virtual void get_(int processor, int var_id, std::size_t size, void* target) = 0;
     // Size is per element
-    virtual void get_(int processor, int var_id, int size, void* target,
+    virtual void get_(int processor, int var_id, std::size_t size, void* target,
                       int offset, int count) = 0;
 
     virtual int register_queue_(class queue_base* q) = 0;
@@ -146,7 +146,7 @@ class world {
 
     // data consists of both tag and content. size is total size.
     virtual void send_(int processor, int queue_id, const void* data,
-                       int size) = 0;
+                       std::size_t size) = 0;
 
     virtual void log_(std::string message) = 0;
 

@@ -17,7 +17,7 @@ namespace bulk {
  */
 template <typename T>
 class array {
-  public:
+   public:
     /**
      * Constructs an array, and registers it with `world`.
      *
@@ -89,11 +89,11 @@ class array {
         return result;
     }
 
-  private:
+   private:
     bulk::world& world_;
     T* data_;
     int size_;
     int id_;
 };
 
-} // namespace bulk
+}  // namespace bulk

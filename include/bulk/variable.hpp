@@ -1,14 +1,14 @@
 #pragma once
 
-#include <bulk/world.hpp>
 #include <bulk/future.hpp>
+#include <bulk/world.hpp>
 #include <memory>
 
 /**
- * \file variable_indirect.hpp
+ * \file variable.hpp
  *
  * This header defines a distributed variable, which has a value on each
- * processor. This is a version for systems with no shared memory address space.
+ * processor.
  */
 
 namespace bulk {
@@ -22,9 +22,9 @@ class future;
  */
 template <typename T>
 class var {
-  public:
+   public:
     class image {
-      public:
+       public:
         image(var<T>& v, int t) : var_(v), t_(t) {}
 
         /**
@@ -42,7 +42,7 @@ class var {
          */
         future<T> get() const { return var_.impl_->get(t_); }
 
-      private:
+       private:
         var<T>& var_;
         int t_;
     };
@@ -53,8 +53,8 @@ class var {
      * Initialize and registers the variable with the world
      */
     var(bulk::world& world) {
-        //TODO: Here we should ask world to create the appropriate
-        //subclass of var_impl
+        // TODO: Here we should ask world to create the appropriate
+        // subclass of var_impl
         impl_ = std::make_unique<var_impl>(world);
         world.barrier();
     }
@@ -66,7 +66,13 @@ class var {
         // It could be that some core is already unregistering while
         // another core is still reading from the variable. Therefore
         // use a barrier before var_impl unregisters
-        impl_->world_.barrier();
+
+        // FIXME we really do not want this on distributed, for obvious
+        // performance reasons
+        // FIXME: what if the variable has moved, do we delay moving until next
+        // superstep?
+
+        if (impl_) impl_->world_.barrier();
     }
 
     // A variable can not be copied
@@ -89,7 +95,6 @@ class var {
      * \returns a `var::image` object to the image with index `t`.
      */
     image operator()(int t) { return image(*this, t); };
-
 
     /**
      * Implicitly get the value held by the local image of the var
@@ -123,13 +128,13 @@ class var {
      */
     bulk::world& world() { return impl_->world_; }
 
-  private:
+   private:
     // Default implementation is a value, world and id.
     // Backends can subclass bulk::var<T>::var_impl to add more.
     // Backends can overload var_impl::put and var_impl::get.
     class var_impl {
-      public:
-        var_impl(bulk::world& world) : world_(world) {
+       public:
+        var_impl(bulk::world& world) : world_(world), value_{} {
             id_ = world.register_location_(&value_);
         }
         virtual ~var_impl() { world_.unregister_location_(id_); }
@@ -149,8 +154,8 @@ class var {
             return result;
         }
 
-        T value_;
         bulk::world& world_;
+        T value_;
         int id_;
     };
     std::unique_ptr<var_impl> impl_;
@@ -158,4 +163,4 @@ class var {
     friend class image;
 };
 
-} // namespace bulk
+}  // namespace bulk

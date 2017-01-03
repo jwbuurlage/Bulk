@@ -32,6 +32,8 @@ class queue_base {
     // These are called by world during a sync
     // It resizes an internal buffer and returns a pointer to it
     virtual void* get_buffer_(int size_in_bytes) = 0;
+
+    virtual void unsafe_push_back(void* msg) = 0;
 };
 
 /**
@@ -94,6 +96,8 @@ class queue {
      */
     auto operator()(int t) { return sender(*this, t); }
 
+    bool empty() { return impl_->data_.empty(); }
+
     /**
      * Obtain an iterator to the begin of the local queue
      */
@@ -136,6 +140,10 @@ class queue {
          void* get_buffer_(int size_in_bytes) override {
              data_.resize(size_in_bytes / sizeof(message<Tag, Content>));
              return &data_[0];
+         }
+
+         void unsafe_push_back(void* msg) override {
+             data_.push_back(*static_cast<message<Tag, Content>*>(msg));
          }
 
          std::vector<message<Tag, Content>> data_;
