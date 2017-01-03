@@ -1,1 +1,0 @@
-/usr/lib64/ccache/c++    -std=c++14 -Wall -Wfatal-errors -Wextra -g -O3   CMakeFiles/dot_product.dir/ufs/buurlage/code/bulk/examples/dot_product.cpp.o  -o /ufs/buurlage/code/bulk/bin/dot_product  -L/ufs/buurlage/code/bulk/build/../ext/multicore-bsp/lib -rdynamic -lpthread -lmcbsp-compat1.2.0 -Wl,-rpath,/ufs/buurlage/code/bulk/build/../ext/multicore-bsp/lib 
