@@ -12,20 +12,19 @@
 
 namespace bulk {
 
-template <typename T, class World>
+template <typename T>
 class future;
 
 /**
  * Represents a distributed object with an image for each processor, that is
  * readable and writable from remote processors.
  */
-template <typename T, class World>
-class var_indirect {
+template <typename T>
+class var {
   public:
     class image {
       public:
-        using var_type = var_indirect<T, World>;
-        image(var_type& var, int t) : var_(var), t_(t) {}
+        image(var<T>& v, int t) : var_(v), t_(t) {}
 
         /**
          * Assign a value to a remote image
@@ -40,7 +39,7 @@ class var_indirect {
         auto get() { return bulk::get(t_, var_); }
 
       private:
-        var_type& var_;
+        var<T>& var_;
         int t_;
     };
 
@@ -49,45 +48,48 @@ class var_indirect {
     /**
      * Initialize and registers the variable with the world
      */
-    var_indirect(World& world) : world_(world) {
+    var(bulk::world& world) : world_(world) {
         value_ = std::make_unique<T>();
-        world_.implementation().register_location_(value_.get(), sizeof(T));
+        id_ = world_.register_location_(value_.get());
     }
 
     /**
      * Deconstructs and deregisters the variable with the world
      */
-    ~var_indirect() {
+    ~var() {
         if (value_.get())
-            world_.implementation().unregister_location_(value_.get());
+            world_.implementation().unregister_location_(id_);
     }
 
-    var_indirect(var_indirect<T, World>& other) = delete;
-    void operator=(var_indirect<T, World>& other) = delete;
+    var(var<T>& other) = delete;
+    void operator=(var<T>& other) = delete;
 
     /**
       * Move from one var to another
       */
-    var_indirect(var_indirect<T, World>&& other) : world_(other.world_) {
+    var(var<T>&& other) : world_(other.world_) {
         *this = std::move(other);
+    }
+
+    /**
+     * Move from one var to another
+     */
+    void operator=(var<T>&& other) {
+        if (value_.get())
+            world_.implementation().unregister_location_(id_);
+        // Since other no longer has a value_ after a move it will not unregister
+        // id_ so we can simply copy it and it will remain valid
+        value_ = std::move(other.value_);
+        id_ = other.id_;
     }
 
     /**
      * Obtain a image object to a remote image, added for syntactic sugar
      *
-     * \returns a `var_indirect::image` object to the image with index `t`.
+     * \returns a `var::image` object to the image with index `t`.
      */
     image operator()(int t) { return image(*this, t); };
 
-    /**
-     * Move from one var to another
-     */
-    void operator=(var_indirect<T, World>&& other) {
-        if (value_.get()) {
-            world_.implementation().unregister_location_(value_.get());
-        }
-        value_ = std::move(other.value_);
-    }
 
     /**
      * Implicitly get the value held by the local image of the var
@@ -102,7 +104,7 @@ class var_indirect {
      *
      * \note This is for code like `myvar = 5;`.
      */
-    var_indirect<T, World>& operator=(const T& rhs) {
+    var<T>& operator=(const T& rhs) {
         *value_.get() = rhs;
         return *this;
     }
@@ -119,11 +121,14 @@ class var_indirect {
      *
      * \returns a reference to the world of the var
      */
-    World& world() { return world_; }
+    bulk::world& world() { return world_; }
 
+    // FIXME: should not be a public function but it is used by bulk::put
+    int id() const { return id_; }
   private:
     std::unique_ptr<T> value_;
-    World& world_;
+    bulk::world& world_;
+    int id_;
 };
 
 } // namespace bulk

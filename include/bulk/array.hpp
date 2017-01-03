@@ -12,10 +12,8 @@ namespace bulk {
  * A distributed variable representing an array on each processor.
  *
  * This object is the default implementation of a distributed _array_.
- * Specialized arrays can be provided by providers, but will always behave like
- * this array.
  */
-template <typename T, class World>
+template <typename T>
 class array {
   public:
     /**
@@ -24,9 +22,9 @@ class array {
      * \param world the distributed layer in which the array is defined.
      * \param size the size of the local array
      */
-    array(World& world, int size) : world_(world), size_(size) {
+    array(bulk::world& world, int size) : world_(world), size_(size) {
         data_ = new T[size];
-        world_.implementation().register_location_(data_, sizeof(T) * size);
+        id_ = world_.register_location_(data_);
     }
 
     /**
@@ -34,7 +32,7 @@ class array {
      */
     ~array() {
         if (data_ != nullptr) {
-            world_.implementation().unregister_location_(data_);
+            world_.unregister_location_(id_);
             delete[] data_;
         }
     }
@@ -58,7 +56,7 @@ class array {
      *
      * \returns a reference to the world of the array
      */
-    World& world() { return world_; }
+    bulk::world& world() { return world_; }
 
     /**
      * Get an iterator to the beginning of the local image of the array.
@@ -74,23 +72,12 @@ class array {
      */
     T* end() { return data_ + size_; }
 
+    int id() const { return id_; }
   private:
-    World& world_;
+    bulk::world& world_;
     T* data_;
     int size_;
+    int id_;
 };
-
-/**
- * Constructs an array, and registers it with `world`.
- *
- * \param world the distributed layer in which the array is defined.
- * \param size the size of the local array
- *
- * \returns a newly allocated and registered array
- */
-template<typename T, typename World>
-typename World::template array_type<T> create_array(World& world, int size) {
-      return array<T, World>(world, size);
-}
 
 } // namespace bulk

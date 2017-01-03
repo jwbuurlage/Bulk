@@ -2,7 +2,7 @@
 #include <bulk/bulk.hpp>
 
 int main() {
-    auto env = bulk::environment<bulk::cpp::provider>();
+    bulk::cpp::environment env;
 
     env.spawn(env.available_processors(), [](auto world, int s, int p) {
         // hello world

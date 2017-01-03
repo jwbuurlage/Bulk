@@ -59,18 +59,19 @@ class world_state {
     std::function<void(int, const std::string&)> log_callback;
 };
 
-// separate `world_provider` instance for every thread
-class world_provider {
+// separate `world` instance for every thread
+class world : public bulk::world {
   public:
-    world_provider() {}
-    ~world_provider() {}
+    world(world_state* state, int pid, int nprocs)
+        : state_(state), pid_(pid), nprocs_(nprocs) {}
+    ~world() {}
 
-    int active_processors() const { return nprocs_; }
-    int processor_id() const { return pid_; }
+    int active_processors() const override final { return nprocs_; }
+    int processor_id() const override final { return pid_; }
 
-    void barrier() { state_->sync_barrier.wait(); }
+    void barrier() override final { state_->sync_barrier.wait(); }
 
-    void sync() {
+    void sync() override final {
         barrier();
         // Perform operations required at each sync like
         // swapping message queues
@@ -94,16 +95,9 @@ class world_provider {
         barrier();
     }
 
-    template <typename... Ts>
-    void log(const char* format, const Ts&... ts) {
-        size_t size = snprintf(0, 0, format, ts...);
-        char* buffer = new char[size + 1];
-        snprintf(buffer, size + 1, format, ts...);
-        {
-            std::lock_guard<std::mutex> lock{state_->log_mutex};
-            state_->logs.push_back(std::make_pair(pid_, std::string(buffer)));
-        }
-        delete[] buffer;
+    void log_(std::string message) {
+        std::lock_guard<std::mutex> lock{state_->log_mutex};
+        state_->logs.push_back(std::make_pair(pid_, message));
     }
 
     template <typename... Ts>

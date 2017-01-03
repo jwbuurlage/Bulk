@@ -9,6 +9,7 @@
 
 #include "future.hpp"
 #include "world.hpp"
+#include "variable.hpp"
 
 namespace bulk {
 
@@ -17,18 +18,16 @@ namespace bulk {
  *
  * \param processor the id of a remote processor holding the variable
  * \param value the new value of the variable
+ * \param v the variable to put the value into
  */
-template <typename T, typename var_type>
-void put(int processor, T value, var_type& the_variable) {
-    the_variable.world().implementation().internal_put_(processor, value,
-                                                        the_variable);
+template <typename T>
+void put(int processor, T value, var<T>& v) {
+    v.world().put_(processor, &value, sizeof(T), v.id());
 }
 
-template <typename T, typename array_type>
-void put(int processor, T value, array_type& the_array, int offset,
-         int count = 1) {
-    the_array.world().implementation().internal_put_(
-        processor, &value, the_array.data(), sizeof(T), offset, count);
+template <typename T>
+void put(int processor, T* values, array<T>& a, int offset, int count = 1) {
+    a.world().put_(processor, values, sizeof(T), a.id(), offset, count);
 }
 
 // FIXME: bulk::get should be specialized for different backends.
@@ -45,22 +44,18 @@ void put(int processor, T value, array_type& the_array, int offset,
  * \returns a `future` object that will contain the current remote value,
  * starting from the next superstep.
  */
-template <typename T, class World, template <typename, class> class var_type>
-future<T, World> get(int processor, var_type<T, World>& the_variable) {
-    // FIXME: can we rely on RVO?
-    future<T, World> result(the_variable.world());
-    the_variable.world().implementation().internal_get_(processor, the_variable,
-                                                        result.value());
+template <typename T>
+future<T> get(int processor, var<T>& v) {
+    future<T> result(v.world());
+    v.world().get_(processor, v.id(), sizeof(T), result.value());
     return result;
 }
 
-template <typename T, class World, template <typename, class> class array_type>
-future<T, World> get(int processor, array_type<T, World>& the_array,
-                     int offset, int count = 1) {
-    // FIXME: can we rely on RVO?
-    future<T, World> result(the_array.world());
-    the_array.world().implementation().internal_get_(
-        processor, the_array.data(), &result.value(), sizeof(T), offset, count);
+template <typename T>
+future<T> get(int processor, array<T>& a, int offset, int count = 1) {
+    future<T> result(a.world());
+    a.world().get_(processor, a.id(), sizeof(T), &result.value(), offset,
+                   count);
     return result;
 }
 

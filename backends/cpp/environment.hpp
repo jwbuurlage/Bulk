@@ -8,14 +8,14 @@
 namespace bulk {
 namespace cpp {
 
-class provider {
+class environment : public bulk::environment {
   public:
-    provider() {}
+    environment() {}
 
-    ~provider() {}
+    ~environment() {}
 
     void spawn(int processors,
-               std::function<void(bulk::world<backend>, int, int)> spmd) {
+                        std::function<void(bulk::world&, int, int)> spmd) override final {
         // Thread objects
         std::vector<std::thread> threads;
 
@@ -24,11 +24,11 @@ class provider {
         state.log_callback = log_callback;
 
         // Create the threads and thereby start them
+        std::vector<bulk::cpp::world> ws;
+        ws.reserve(processors);
         for (int i = 0; i < processors; i++) {
-            bulk::world<backend> world;
-            world.implementation().init_(&state, i, processors);
-            // copy or move world object into thread
-            threads.push_back(std::thread(spmd, world, i, processors));
+            ws.push_back(bulk::cpp::world(&state, i, processors));
+            threads.push_back(std::thread(spmd, ws.back(), processors));
         }
 
         // Wait for the threads to finish
@@ -49,11 +49,11 @@ class provider {
         logs.clear();
     }
 
-    int available_processors() const {
+    int available_processors() const override final {
         return std::thread::hardware_concurrency();
     }
 
-    void set_log_callback(std::function<void(int, const std::string&)> f) {
+    void set_log_callback(std::function<void(int, const std::string&)> f) override final {
         log_callback = f;
     }
 

@@ -31,7 +31,7 @@ namespace bulk {
  *     xs[3] = 2;
  * \endcode
  */
-template <typename T, class World>
+template <typename T>
 class coarray {
    public:
     class writer {
@@ -46,20 +46,20 @@ class coarray {
         auto get() { return parent_.get(t_, i_); }
 
        private:
-        friend coarray<T, World>;
+        friend coarray<T>;
 
-        writer(World& world, coarray<T, World>& parent, int t, int i)
+        writer(bulk::world& world, coarray<T>& parent, int t, int i)
             : world_(world), parent_(parent), t_(t), i_(i) {}
 
-        World& world_;
-        coarray<T, World>& parent_;
+        bulk::world& world_;
+        coarray<T>& parent_;
         int t_;
         int i_;
     };
 
     class image {
        public:
-        image(World& world, coarray<T, World>& parent, int t)
+        image(bulk::world& world, coarray<T>& parent, int t)
             : world_(world), parent_(parent), t_(t) {}
 
         /**
@@ -72,8 +72,8 @@ class coarray {
         writer operator[](int i) { return writer(world_, parent_, t_, i); }
 
        private:
-        World& world_;
-        coarray<T, World>& parent_;
+        bulk::world& world_;
+        coarray<T>& parent_;
         int t_;
     };
 
@@ -83,7 +83,7 @@ class coarray {
      * \param world the distributed layer in which the array is defined.
      * \param local_size the size of the local array
      */
-    coarray(World& world, int local_size)
+    coarray(bulk::world& world, int local_size)
         : world_(world), data_(world_, local_size) {}
 
     /**
@@ -93,7 +93,7 @@ class coarray {
      * \param local_size the size of the local array
      * \param default_value the initial value of each local element
      */
-    coarray(World& world, int local_size, T default_value)
+    coarray(bulk::world& world, int local_size, T default_value)
         : world_(world), data_(world_, local_size) {
         for (int i = 0; i < local_size; ++i) {
             data_[i] = default_value;
@@ -121,7 +121,7 @@ class coarray {
      * Retrieve the world to which this coarray is registed.
      * \returns a reference to the world of the coarray
      */
-    World& world() { return world_; }
+    bulk::world& world() { return world_; }
 
     /**
      * Get an iterator to the beginning of the local image of the co-array.
@@ -140,7 +140,7 @@ class coarray {
     /**
      * Put the value `value` into element `idx` on processor `t`.
      */
-    void put(int t, int idx, T value) { bulk::put<T>(t, value, data_, idx, 1); }
+    void put(int t, int idx, T value) { bulk::put<T>(t, &value, data_, idx, 1); }
 
     /**
      * Obtain a future to the value of element `idx` on processor `t`.
@@ -151,10 +151,10 @@ class coarray {
     friend image;
     friend writer;
 
-    World& world_;
-    array<T, World> data_;
+    bulk::world& world_;
+    array<T> data_;
 
-    array<T, World>& data() { return data_; }
+    array<T>& data() { return data_; }
 };
 
 }  // namespace bulk
