@@ -1,6 +1,1 @@
-[submodule "catch"]
-	path = ext/catch
-	url = https://www.github.com/philsquared/catch.git
-[submodule "mcbsp"]
-	path = ext/multicore-bsp
-	url = http://git.codu.in/jwbuurlage/multicore-bsp
+
