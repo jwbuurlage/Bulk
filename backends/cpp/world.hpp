@@ -8,6 +8,8 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <limits>
+#include <cstring>
 #include <bulk/world.hpp>
 
 // Mutexes need to be shared, i.e. single instance of the class
@@ -49,11 +51,16 @@ class barrier {
 // single `world_state` instance shared by every thread
 class world_state {
   public:
-    explicit world_state(int processors) : sync_barrier(processors) {}
+    explicit world_state(int processors) : sync_barrier(processors) {
+        locations_.reserve(20 * processors);
+    }
 
     barrier sync_barrier;
     // Used in var and coarray creation mechanism
     void* var_pointer_;
+
+    std::mutex location_mutex;
+    std::vector<void*> locations_;
 
     std::mutex log_mutex; // mutex for the vector and for sending output
     std::vector<std::pair<int,std::string>> logs;
@@ -130,27 +137,6 @@ class world : public bulk::world {
         return;
     }
 
-    // FIXME: Change the whole internal_get_ thing
-    template <typename T, class World,
-              template <typename, class> class var_type>
-    void internal_get_(int processor, var_type<T, World>& the_variable,
-                       T& target) {
-        target = the_variable.get_ref(processor);
-    }
-
-    template <typename T, class World,
-              template <typename, class> class var_type>
-    void internal_put_(int processor, T value,
-                       var_type<T, World>& the_variable) {
-        the_variable.get_ref(processor) = value;
-    }
-
-    void init_(world_state* state, int pid, int nprocs) {
-        state_ = state;
-        pid_ = pid;
-        nprocs_ = nprocs;
-    }
-
     int register_sync_operation_(std::function<void(void)> f) {
         for (size_t i = 0; i < sync_operations_.size(); ++i) {
             if (sync_operations_[i] == nullptr) {
@@ -179,25 +165,49 @@ class world : public bulk::world {
     }
 
   protected:
-    // TODO
-    int register_location_(void* location) override final { return 0; }
-    void unregister_location_(int id) override final { return; }
+    int register_location_(void* location) override final {
+        std::lock_guard<std::mutex> lock{state_->location_mutex};
+        auto& locs = state_->locations_;
+        for (unsigned int i = 0; i < locs.size(); i += nprocs_) {
+            if (locs[i + pid_] == 0) {
+                locs[i + pid_] = location;
+                return (int)i;
+            }
+        }
+        int id = locs.size();
+        // There was no slot yet. In that case, this thread is the first
+        // to reach this point, so we have to allocate `nprocs_` extra slots
+        locs.insert(locs.end(), nprocs_, 0);
+        locs[id + pid_] = location;
+        return id;
+    }
+
+    void unregister_location_(int id) override final {
+        // No mutex needed because each thread sets a different value to zero
+        // and other than that, the vector is not modified
+        state_->locations_[id + pid_] = 0;
+    }
 
     void put_(int processor, void* value, int size, int var_id) override final {
+        memcpy(state_->locations_[var_id + processor], value, size);
         return;
     }
+
     // Size is per element
     void put_(int processor, void* values, int size, int var_id, int offset,
               int count) override final {
+        // TODO
         return;
     }
     void get_(int processor, int var_id, int size,
               void* target) override final {
+        memcpy(target, state_->locations_[var_id + processor], size);
         return;
     }
     // Size is per element
     void get_(int processor, int var_id, int size, void* target, int offset,
               int count) override final {
+        // TODO
         return;
     }
 

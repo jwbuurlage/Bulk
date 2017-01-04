@@ -58,16 +58,22 @@ class var {
     var(bulk::world& world) : world_(world) {
         value_ = std::make_unique<T>();
         id_ = world_.register_location_(value_.get());
+        world_.barrier();
     }
 
     /**
      * Deconstructs and deregisters the variable with the world
      */
     ~var() {
+        // It could be that some core is already unregistering while
+        // another core is still reading from the variable. Therefore
+        // use a barrier
+        world_.barrier();
         if (value_.get())
             world_.unregister_location_(id_);
     }
 
+    // A variable can not be copied
     var(var<T>& other) = delete;
     void operator=(var<T>& other) = delete;
 
@@ -75,7 +81,10 @@ class var {
       * Move from one var to another
       */
     var(var<T>&& other) : world_(other.world_) {
-        *this = std::move(other);
+        // Since other no longer has a value_ after a move it will not unregister
+        // id_ so we can simply copy it and it will remain valid
+        value_ = std::move(other.value_);
+        id_ = other.id_;
     }
 
     /**
