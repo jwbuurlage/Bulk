@@ -7,9 +7,10 @@
  * distributed variables.
  */
 
-#include "future.hpp"
 #include "world.hpp"
+#include "future.hpp"
 #include "variable.hpp"
+#include "messages.hpp"
 
 namespace bulk {
 
@@ -22,7 +23,7 @@ namespace bulk {
  */
 template <typename T>
 void put(int processor, T value, var<T>& v) {
-    v.world().put_(processor, &value, sizeof(T), v.id());
+    v(processor) = value;
 }
 
 template <typename T>
@@ -46,9 +47,7 @@ void put(int processor, T* values, array<T>& a, int offset, int count = 1) {
  */
 template <typename T>
 future<T> get(int processor, var<T>& v) {
-    future<T> result(v.world());
-    v.world().get_(processor, v.id(), sizeof(T), result.value());
-    return result;
+    return v(processor).get();
 }
 
 template <typename T>
@@ -57,6 +56,20 @@ future<T> get(int processor, array<T>& a, int offset, int count = 1) {
     a.world().get_(processor, a.id(), sizeof(T), &result.value(), offset,
                    count);
     return result;
+}
+
+
+/**
+ * Sends a message to a remote processor
+ *
+ * \param processor the id of the remote processor receiving the message
+ * \param tag a tag to attach to the message
+ * \param content the content (payload) of the message
+ */
+template <typename Tag, typename Content>
+void send(queue<Tag, Content>& q, int processor, Tag tag, Content content) {
+    //FIXME: convert to void* data
+    //q.world().internal_send_<Tag, Content>(queue_id, processor, tag, content);
 }
 
 }  // namespace bulk

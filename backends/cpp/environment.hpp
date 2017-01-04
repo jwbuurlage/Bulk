@@ -1,5 +1,6 @@
 #pragma once
-#include "backend.hpp"
+#include "world.hpp"
+#include <bulk/environment.hpp>
 #include <algorithm>
 #include <iostream>
 #include <thread>
@@ -27,8 +28,8 @@ class environment : public bulk::environment {
         std::vector<bulk::cpp::world> ws;
         ws.reserve(processors);
         for (int i = 0; i < processors; i++) {
-            ws.push_back(bulk::cpp::world(&state, i, processors));
-            threads.push_back(std::thread(spmd, ws.back(), processors));
+            ws.emplace_back(&state, i, processors);
+            threads.push_back(std::thread(spmd, std::ref(ws.back()), i, processors));
         }
 
         // Wait for the threads to finish

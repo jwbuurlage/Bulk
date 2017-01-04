@@ -24,7 +24,6 @@ namespace bulk {
  * should be called in the same step on each processor.
  *
  * \tparam T the type of the value held by \c x.
- * \tparam World the world to which \c x is registered.
  * \tparam Func the binary function to apply to the images of \c x.
  *
  * \param x the variable to fold over
@@ -34,13 +33,16 @@ namespace bulk {
  *              \f[ f(f(f(f(x(0), x(1)), x(2)), ...), x(p-1)). \f]
  *          which is computed at each core.
  */
-template <typename T, typename World, template<typename,class> class var_type, typename Func>
-T foldl(var_type<T, World>& x, Func f, T start_value = 0) {
+template <typename T, typename Func>
+T foldl(var<T>& x, Func f, T start_value = 0) {
     auto& world = x.world();
     T result = start_value;
 
+    // FIXME: This should be done with puts instead of gets,
+    // which are faster on almost every platform
+
     // allocate space to store each remote value locally
-    std::vector<bulk::future<T, World>> images;
+    std::vector<bulk::future<T>> images;
     for (int t = 0; t < world.active_processors(); ++t) {
         // obtain the remote values
         images.push_back(bulk::get<T>(t, x));
@@ -69,9 +71,9 @@ T foldl(var_type<T, World>& x, Func f, T start_value = 0) {
  * \returns a co-array containing on each processor the argument given by each
  * other processor.
  */
-template <typename T, typename World>
-auto gather_all(World& world, T value) {
-    auto xs = create_coarray<T>(world, world.active_processors());
+template <typename T>
+bulk::coarray<T> gather_all(bulk::world& world, T value) {
+    bulk::coarray<T> xs(world, world.active_processors());
 
     for (int t = 0; t < world.active_processors(); ++t) {
         xs(t)[world.processor_id()] = value;

@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 /**
  * \file world.hpp
@@ -13,6 +14,13 @@ namespace bulk {
  */
 class world {
   public:
+    world(){};
+    virtual ~world(){};
+
+    // No copies
+    world(world& other) = delete;
+    void operator=(world& other) = delete;
+
     /**
      * Retrieve the total number of active processors in a spmd section
      *
@@ -102,8 +110,9 @@ class world {
      */
     virtual void abort() = 0;
 
-  protected:
-    virtual void log_(std::string message) = 0;
+    //
+    // Internal functions
+    //
 
     // Returns the id of the registered location
     virtual int register_location_(void* location) = 0;
@@ -118,6 +127,9 @@ class world {
     // Size is per element
     virtual void get_(int processor, int var_id, int size, void* target,
                       int offset, int count) = 0;
+  protected:
+    virtual void log_(std::string message) = 0;
+
 };
 
 } // namespace bulk

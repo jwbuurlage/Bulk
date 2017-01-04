@@ -8,6 +8,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <bulk/world.hpp>
 
 // Mutexes need to be shared, i.e. single instance of the class
 // that is shared amongst threads.
@@ -66,6 +67,14 @@ class world : public bulk::world {
         : state_(state), pid_(pid), nprocs_(nprocs) {}
     ~world() {}
 
+    // Needs a move for environment::spawn to work
+    world(world&& other) {
+        state_ = other.state_;
+        pid_ = other.pid_;
+        nprocs_ = other.nprocs_;
+        sync_operations_ = std::move(other.sync_operations_);
+    }
+
     int active_processors() const override final { return nprocs_; }
     int processor_id() const override final { return pid_; }
 
@@ -95,7 +104,7 @@ class world : public bulk::world {
         barrier();
     }
 
-    void log_(std::string message) {
+    void log_(std::string message) override final {
         std::lock_guard<std::mutex> lock{state_->log_mutex};
         state_->logs.push_back(std::make_pair(pid_, message));
     }
@@ -114,6 +123,11 @@ class world : public bulk::world {
             else
                 state_->log_callback(pid_, logmessage);
         }
+    }
+
+    void abort() override final {
+        //TODO
+        return;
     }
 
     // FIXME: Change the whole internal_get_ thing
@@ -162,6 +176,29 @@ class world : public bulk::world {
     template <typename T>
     T* get_pointer_() {
         return (T*)(state_->var_pointer_);
+    }
+
+  protected:
+    // TODO
+    int register_location_(void* location) override final { return 0; }
+    void unregister_location_(int id) override final { return; }
+
+    void put_(int processor, void* value, int size, int var_id) override final {
+        return;
+    }
+    // Size is per element
+    void put_(int processor, void* values, int size, int var_id, int offset,
+              int count) override final {
+        return;
+    }
+    void get_(int processor, int var_id, int size,
+              void* target) override final {
+        return;
+    }
+    // Size is per element
+    void get_(int processor, int var_id, int size, void* target, int offset,
+              int count) override final {
+        return;
     }
 
   private:

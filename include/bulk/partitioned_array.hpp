@@ -49,11 +49,11 @@ using check_dim =
  * TODO: think about template argument storage class (coarray by default)
  * TODO: this about specializing for 'rectangular partitionings'
  */
-template <typename T, int D, typename World>
+template <typename T, int D>
 class partitioned_array {
    public:
     /** Construct a partitioned array from a given partitioning. */
-    partitioned_array(World& world, partitioning<D, D>& part)
+    partitioned_array(bulk::world& world, partitioning<D, D>& part)
         : world_(world),
           part_(part),
           data_(world, part_.local_element_count(world.processor_id())) {
@@ -88,13 +88,13 @@ class partitioned_array {
     std::array<int, D> multi_id_;
 
     // world in which this array resides
-    World& world_;
+    bulk::world& world_;
 
     // underlying partitioning
     partitioning<D, D>& part_;
 
     // linear storage
-    bulk::coarray<T, World> data_;
+    bulk::coarray<T> data_;
 };
 
 }  // namespace bulk

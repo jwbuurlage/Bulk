@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bulk/world.hpp>
+#include <bulk/future.hpp>
 #include <memory>
 
 /**
@@ -31,12 +32,18 @@ class var {
          *
          * \param value the new value of the image
          */
-        void operator=(T value) { bulk::put(t_, value, var_); }
+        void operator=(T value) {
+            var_.world().put_(t_, &value, sizeof(T), var_.id());
+        }
 
         /**
          * Obtain a future to the remote image value.
          */
-        auto get() { return bulk::get(t_, var_); }
+        future<T> get() {
+            future<T> result(var_.world());
+            var_.world().get_(t_, var_.id(), sizeof(T), result.value());
+            return result;
+        }
 
       private:
         var<T>& var_;
@@ -58,7 +65,7 @@ class var {
      */
     ~var() {
         if (value_.get())
-            world_.implementation().unregister_location_(id_);
+            world_.unregister_location_(id_);
     }
 
     var(var<T>& other) = delete;
@@ -76,7 +83,7 @@ class var {
      */
     void operator=(var<T>&& other) {
         if (value_.get())
-            world_.implementation().unregister_location_(id_);
+            world_.unregister_location_(id_);
         // Since other no longer has a value_ after a move it will not unregister
         // id_ so we can simply copy it and it will remain valid
         value_ = std::move(other.value_);
@@ -123,7 +130,7 @@ class var {
      */
     bulk::world& world() { return world_; }
 
-    // FIXME: should not be a public function but it is used by bulk::put
+    // TODO: Make this private and make `image` a friend?
     int id() const { return id_; }
   private:
     std::unique_ptr<T> value_;
