@@ -4,12 +4,12 @@
 #include "bulk_test_common.hpp"
 #include "set_backend.hpp"
 
-extern bulk::environment<provider> env;
+extern environment env;
 
 void test_partitioning() {
-    env.spawn(env.available_processors(), [](auto world, int s, int p) {
+    env.spawn(env.available_processors(), [](auto& world, int s, int p) {
         auto N = (int)sqrt(p);
-        assert(N * N == p);
+        BULK_REQUIRE(N * N == p);
 
         BULK_SECTION("Cyclic partitioning to 1D") {
             auto part =
@@ -84,7 +84,7 @@ void test_partitioning() {
         BULK_SECTION("Partitioned array") {
             auto part = bulk::cyclic_partitioning<2>({N, N}, {200, 200});
             auto xs =
-                bulk::partitioned_array<int, 2, decltype(world)>(world, part);
+                bulk::partitioned_array<int, 2>(world, part);
 
             xs.local(0, 0) = s;
             xs.local(1, 1) = s + 1;

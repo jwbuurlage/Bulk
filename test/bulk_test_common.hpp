@@ -22,11 +22,12 @@ extern int total, success;
     if (world.processor_id() == 0) { \
         if (!(body)) {                                  \
             world.log("  ASSERTION FAILED: %s", #body); \
+            world.abort();                              \
         }                                               \
     }
 
 #define BULK_FINALIZE_TESTS(env)                                     \
-    env.spawn(env.available_processors(), [](auto world, int, int) { \
+    env.spawn(env.available_processors(), [](auto& world, int, int) { \
         if (world.processor_id() == 0) {                             \
             world.log("-------------");                              \
             world.log("%d test of %d failed.", total - success, total);    \

@@ -1,8 +1,5 @@
 #pragma once
 
-// FIXME: The queue system has been changed. This class is 'old' code.
-// The new system can be found in mpi/messages.hpp or cpp/messages.hpp
-
 /**
  * \file messages.hpp
  *
@@ -32,49 +29,72 @@ template <typename Tag, typename Content>
 class queue {
    public:
     /**
-     * A basic iterator used for iterating through the messages.
-     */
-    class message_iterator {};
-
-    /**
      * This helper class adds syntactic sugar to the message passing interface
      * In particular it allows the programmer to write
      *
      *     q(pid).send(tag, content);
      */
     class sender {
-        /**
-         * Add a message to a (remote) queue
-         *
-         * \param tag the tag to attach to the message
-         * \param content the content of the message
-         */
-        void send(Tag tag, Content content);
+       public:
+        void send(Tag tag, Content content) { q_.send_(t_, tag, content); }
 
        private:
-        sender(queue& q, int t);
+        friend queue;
+
+        sender(queue& q, int t) : q_(q), t_(t) {}
+
+        queue& q_;
+        int t_;
     };
 
     /**
      * Construct a message queue and register it with world
      */
-    queue(bulk::world& world) : world_(world) {}
-    ~queue();
+    queue(bulk::world& world) : world_(world) {
+        // TODO
+    }
+    ~queue() {
+        // TODO
+    }
+
+    // No copies
+    queue(queue<Tag, Content>& other) = delete;
+    void operator=(queue<Tag, Content>& other) = delete;
+
+    /**
+      * Move constructor: move from one queue to a new one
+      */
+    queue(queue<Tag, Content>&& other) {
+        // TODO
+    }
+
+    /**
+     * Move assignment: move from one queue to an existing one
+     */
+    void operator=(queue<Tag, Content>&& other) {
+        // TODO
+    }
 
     /**
      * Obtain a sender object to a remote queue
      */
-    auto operator()(int t);
+    auto operator()(int t) { return sender(*this, t); }
 
     /**
      * Obtain an iterator to the begin of the local queue
      */
-    message_iterator begin();
+    auto begin() {
+        // TODO
+        return (message<Tag,Content>*)(nullptr);
+    }
 
     /**
      * Obtain an iterator to the end of the local queue
      */
-    message_iterator end();
+    auto end() {
+        // TODO
+        return (message<Tag,Content>*)(nullptr);
+    }
 
     /**
      * Retrieve the world to which this var is registed.
@@ -84,6 +104,12 @@ class queue {
     bulk::world& world() { return world_; }
    private:
     bulk::world& world_;
+
+    friend sender;
+
+    void send_(int t, Tag tag, Content content) {
+        // TODO
+    }
 };
 
 }  // namespace bulk

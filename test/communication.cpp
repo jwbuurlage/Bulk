@@ -5,7 +5,7 @@
 extern environment env;
 
 void test_communication() {
-    env.spawn(env.available_processors(), [](auto world, int s, int p) {
+    env.spawn(env.available_processors(), [](auto& world, int s, int p) {
         BULK_SECTION("Put") {
             // test `put` to single variable
             bulk::var<int> a(world);
