@@ -55,10 +55,9 @@ class var {
     /**
      * Initialize and registers the variable with the world
      */
-    var(bulk::world& world) : world_(world) {
-        value_ = std::make_unique<T>();
-        id_ = world_.register_location_(value_.get());
-        world_.barrier();
+    var(bulk::world& world) {
+        impl_ = std::make_unique<var_impl>(world);
+        world.barrier();
     }
 
     /**
@@ -67,10 +66,8 @@ class var {
     ~var() {
         // It could be that some core is already unregistering while
         // another core is still reading from the variable. Therefore
-        // use a barrier
-        world_.barrier();
-        if (value_.get())
-            world_.unregister_location_(id_);
+        // use a barrier before var_impl unregisters
+        impl_->world.barrier();
     }
 
     // A variable can not be copied
@@ -80,24 +77,12 @@ class var {
     /**
       * Move from one var to another
       */
-    var(var<T>&& other) : world_(other.world_) {
-        // Since other no longer has a value_ after a move it will not unregister
-        // id_ so we can simply copy it and it will remain valid
-        value_ = std::move(other.value_);
-        id_ = other.id_;
-    }
+    var(var<T>&& other) { impl_ = std::move(other.impl_); }
 
     /**
      * Move from one var to another
      */
-    void operator=(var<T>&& other) {
-        if (value_.get())
-            world_.unregister_location_(id_);
-        // Since other no longer has a value_ after a move it will not unregister
-        // id_ so we can simply copy it and it will remain valid
-        value_ = std::move(other.value_);
-        id_ = other.id_;
-    }
+    void operator=(var<T>&& other) { impl_ = std::move(other.impl_); }
 
     /**
      * Obtain a image object to a remote image, added for syntactic sugar
@@ -112,8 +97,8 @@ class var {
      *
      * \note This is for code like `myint = myvar + 5;`.
      */
-    operator T&() { return *value_.get(); }
-    operator const T&() const { return *value_.get(); }
+    operator T&() { return impl_->value; }
+    operator const T&() const { return impl_->value; }
 
     /**
      * Write to the local image
@@ -121,7 +106,7 @@ class var {
      * \note This is for code like `myvar = 5;`.
      */
     var<T>& operator=(const T& rhs) {
-        *value_.get() = rhs;
+        impl_->value = rhs;
         return *this;
     }
 
@@ -130,21 +115,38 @@ class var {
      *
      * \returns a reference to the value held by the local image
      */
-    T& value() { return *value_.get(); }
+    T& value() { return impl_->value; }
 
     /**
      * Retrieve the world to which this var is registed.
      *
      * \returns a reference to the world of the var
      */
-    bulk::world& world() { return world_; }
+    bulk::world& world() { return impl_->world; }
 
     // TODO: Make this private and make `image` a friend?
-    int id() const { return id_; }
+    int id() const { return impl_->id; }
   private:
-    std::unique_ptr<T> value_;
-    bulk::world& world_;
-    int id_;
+    // Default implementation is a value, world and id.
+    // Backends can subclass bulk::var<T>::var_impl to add more
+    class var_impl {
+      public:
+        var_impl(bulk::world& world_) : world(world_) {
+            id = world.register_location_(&value);
+        }
+        virtual ~var_impl() { world.unregister_location_(id); }
+
+        // No copies or moves
+        var_impl(var_impl& other) = delete;
+        var_impl(var_impl&& other) = delete;
+        void operator=(var_impl& other) = delete;
+        void operator=(var_impl&& other) = delete;
+
+        T value;
+        bulk::world& world;
+        int id;
+    };
+    std::unique_ptr<var_impl> impl_;
 };
 
 } // namespace bulk
