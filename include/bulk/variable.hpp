@@ -32,18 +32,15 @@ class var {
          *
          * \param value the new value of the image
          */
-        void operator=(T value) {
-            var_.world().put_(t_, &value, sizeof(T), var_.id());
+        var<T>& operator=(const T& value) {
+            var_.impl_->put(t_, value);
+            return var_;
         }
 
         /**
          * Obtain a future to the remote image value.
          */
-        future<T> get() {
-            future<T> result(var_.world());
-            var_.world().get_(t_, var_.id(), sizeof(T), result.value());
-            return result;
-        }
+        future<T> get() const { return var_.impl_->get(t_); }
 
       private:
         var<T>& var_;
@@ -56,6 +53,8 @@ class var {
      * Initialize and registers the variable with the world
      */
     var(bulk::world& world) {
+        //TODO: Here we should ask world to create the appropriate
+        //subclass of var_impl
         impl_ = std::make_unique<var_impl>(world);
         world.barrier();
     }
@@ -67,7 +66,7 @@ class var {
         // It could be that some core is already unregistering while
         // another core is still reading from the variable. Therefore
         // use a barrier before var_impl unregisters
-        impl_->world.barrier();
+        impl_->world_.barrier();
     }
 
     // A variable can not be copied
@@ -97,8 +96,8 @@ class var {
      *
      * \note This is for code like `myint = myvar + 5;`.
      */
-    operator T&() { return impl_->value; }
-    operator const T&() const { return impl_->value; }
+    operator T&() { return impl_->value_; }
+    operator const T&() const { return impl_->value_; }
 
     /**
      * Write to the local image
@@ -106,7 +105,7 @@ class var {
      * \note This is for code like `myvar = 5;`.
      */
     var<T>& operator=(const T& rhs) {
-        impl_->value = rhs;
+        impl_->value_ = rhs;
         return *this;
     }
 
@@ -115,26 +114,25 @@ class var {
      *
      * \returns a reference to the value held by the local image
      */
-    T& value() { return impl_->value; }
+    T& value() { return impl_->value_; }
 
     /**
      * Retrieve the world to which this var is registed.
      *
      * \returns a reference to the world of the var
      */
-    bulk::world& world() { return impl_->world; }
+    bulk::world& world() { return impl_->world_; }
 
-    // TODO: Make this private and make `image` a friend?
-    int id() const { return impl_->id; }
   private:
     // Default implementation is a value, world and id.
-    // Backends can subclass bulk::var<T>::var_impl to add more
+    // Backends can subclass bulk::var<T>::var_impl to add more.
+    // Backends can overload var_impl::put and var_impl::get.
     class var_impl {
       public:
-        var_impl(bulk::world& world_) : world(world_) {
-            id = world.register_location_(&value);
+        var_impl(bulk::world& world) : world_(world) {
+            id_ = world.register_location_(&value_);
         }
-        virtual ~var_impl() { world.unregister_location_(id); }
+        virtual ~var_impl() { world_.unregister_location_(id_); }
 
         // No copies or moves
         var_impl(var_impl& other) = delete;
@@ -142,11 +140,22 @@ class var {
         void operator=(var_impl& other) = delete;
         void operator=(var_impl&& other) = delete;
 
-        T value;
-        bulk::world& world;
-        int id;
+        virtual void put(int processor, const T& source) {
+            world_.put_(processor, &source, sizeof(T), id_);
+        }
+        virtual future<T> get(int processor) const {
+            future<T> result(world_);
+            world_.get_(processor, id_, sizeof(T), &result.value());
+            return result;
+        }
+
+        T value_;
+        bulk::world& world_;
+        int id_;
     };
     std::unique_ptr<var_impl> impl_;
+
+    friend class image;
 };
 
 } // namespace bulk

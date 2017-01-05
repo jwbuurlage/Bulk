@@ -188,14 +188,15 @@ class world : public bulk::world {
         state_->locations_[id + pid_] = 0;
     }
 
-    void put_(int processor, void* value, int size, int var_id) override final {
+    void put_(int processor, const void* value, int size,
+              int var_id) override final {
         memcpy(state_->locations_[var_id + processor], value, size);
         return;
     }
 
     // Size is per element
-    void put_(int processor, void* values, int size, int var_id, int offset,
-              int count) override final {
+    void put_(int processor, const void* values, int size, int var_id,
+              int offset, int count) override final {
         // TODO
         return;
     }

@@ -118,9 +118,10 @@ class world {
     virtual int register_location_(void* location) = 0;
     virtual void unregister_location_(int id) = 0;
 
-    virtual void put_(int processor, void* value, int size, int var_id) = 0;
+    virtual void put_(int processor, const void* value, int size,
+                      int var_id) = 0;
     // Size is per element
-    virtual void put_(int processor, void* values, int size, int var_id,
+    virtual void put_(int processor, const void* values, int size, int var_id,
                       int offset, int count) = 0;
 
     virtual void get_(int processor, int var_id, int size, void* target) = 0;
