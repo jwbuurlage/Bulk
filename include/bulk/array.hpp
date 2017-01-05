@@ -1,5 +1,7 @@
 #pragma once
 
+#include "future.hpp"
+
 /**
  * \file array.hpp
  *
@@ -72,7 +74,21 @@ class array {
      */
     T* end() { return data_ + size_; }
 
-    int id() const { return id_; }
+    /**
+     * Put values to another processor
+     *
+     */
+    void put(int processor, T* values, int offset, int count = 1) {
+        world_.put_(processor, values, sizeof(T), id_, offset, count);
+    }
+
+    future<T> get(int processor, int offset, int count = 1) {
+        // TODO future with count other than 1
+        future<T> result(world_);
+        world_.get_(processor, id_, sizeof(T), &result.value(), offset, 1);
+        return result;
+    }
+
   private:
     bulk::world& world_;
     T* data_;

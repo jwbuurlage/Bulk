@@ -110,9 +110,21 @@ class world {
      */
     virtual void abort() = 0;
 
+  protected:
     //
     // Internal functions
     //
+    template <typename T>
+    friend class var;
+
+    template <typename T>
+    friend class array;
+
+    template <typename T>
+    friend class coarray;
+
+    template <typename Tag, typename Content>
+    friend class queue;
 
     // Returns the id of the registered location
     virtual int register_location_(void* location) = 0;
@@ -128,7 +140,14 @@ class world {
     // Size is per element
     virtual void get_(int processor, int var_id, int size, void* target,
                       int offset, int count) = 0;
-  protected:
+
+    virtual int register_queue_(class queue_base* q) = 0;
+    virtual void unregister_queue_(int id) = 0;
+
+    // data consists of both tag and content. size is total size.
+    virtual void send_(int processor, int queue_id, const void* data,
+                       int size) = 0;
+
     virtual void log_(std::string message) = 0;
 
 };

@@ -1,5 +1,9 @@
 #pragma once
 
+#include <bulk/world.hpp>
+#include <memory>
+#include <vector>
+
 /**
  * \file messages.hpp
  *
@@ -19,6 +23,17 @@ struct message {
     Content content;
 };
 
+// queue::impl subclasses queue_base
+class queue_base {
+  public:
+    queue_base(){};
+    virtual ~queue_base(){};
+
+    // These are called by world during a sync
+    // It resizes an internal buffer and returns a pointer to it
+    virtual void* get_buffer_(int size_in_bytes) = 0;
+};
+
 /**
  * The queue inferface is used for sending and receiving messages.
  *
@@ -36,7 +51,9 @@ class queue {
      */
     class sender {
        public:
-        void send(Tag tag, Content content) { q_.send_(t_, tag, content); }
+         void send(Tag tag, Content content) {
+             q_.impl_->send_(t_, tag, content);
+         }
 
        private:
         friend queue;
@@ -50,12 +67,11 @@ class queue {
     /**
      * Construct a message queue and register it with world
      */
-    queue(bulk::world& world) : world_(world) {
-        // TODO
+    queue(bulk::world& world) {
+        impl_ = std::make_unique<impl>(world);
+        world.barrier();
     }
-    ~queue() {
-        // TODO
-    }
+    ~queue() { impl_->world_.barrier(); }
 
     // No copies
     queue(queue<Tag, Content>& other) = delete;
@@ -64,15 +80,13 @@ class queue {
     /**
       * Move constructor: move from one queue to a new one
       */
-    queue(queue<Tag, Content>&& other) {
-        // TODO
-    }
+    queue(queue<Tag, Content>&& other) { impl_ = std::move(other.impl_); }
 
     /**
      * Move assignment: move from one queue to an existing one
      */
     void operator=(queue<Tag, Content>&& other) {
-        // TODO
+        impl_ = std::move(other.impl_);
     }
 
     /**
@@ -84,32 +98,53 @@ class queue {
      * Obtain an iterator to the begin of the local queue
      */
     auto begin() {
-        // TODO
-        return (message<Tag,Content>*)(nullptr);
+        return impl_->data_.begin();
     }
 
     /**
      * Obtain an iterator to the end of the local queue
      */
     auto end() {
-        // TODO
-        return (message<Tag,Content>*)(nullptr);
+        return impl_->data_.end();
     }
 
     /**
-     * Retrieve the world to which this var is registed.
+     * Retrieve the world to which this queue is registed.
      *
-     * \returns a reference to the world of the var
+     * \returns a reference to the world of the queue
      */
-    bulk::world& world() { return world_; }
+    bulk::world& world() { return impl_->world_; }
    private:
-    bulk::world& world_;
+     class impl : public queue_base {
+       public:
+         impl(bulk::world& world) : world_(world) {
+             id_ = world.register_queue_(this);
+         }
+         ~impl() { world_.unregister_queue_(id_); }
 
-    friend sender;
+         // No copies or moves
+         impl(impl& other) = delete;
+         impl(impl&& other) = delete;
+         void operator=(impl& other) = delete;
+         void operator=(impl&& other) = delete;
 
-    void send_(int t, Tag tag, Content content) {
-        // TODO
-    }
+         void send_(int t, Tag tag, Content content) {
+             message<Tag, Content> m{tag, content};
+             world_.send_(t, id_, &m, sizeof(m));
+         }
+
+         void* get_buffer_(int size_in_bytes) override {
+             data_.resize(size_in_bytes / sizeof(message<Tag, Content>));
+             return &data_[0];
+         }
+
+         std::vector<message<Tag, Content>> data_;
+         bulk::world& world_;
+         int id_;
+     };
+     std::unique_ptr<impl> impl_;
+
+     friend sender;
 };
 
 }  // namespace bulk

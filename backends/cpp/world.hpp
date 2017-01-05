@@ -212,6 +212,22 @@ class world : public bulk::world {
         return;
     }
 
+    int register_queue_(class queue_base* q) override final {
+        // TODO
+        return 0;
+    }
+
+    void unregister_queue_(int id) override final {
+        // TODO
+        return;
+    }
+
+    void send_(int processor, int queue_id, const void* data,
+               int size) override final {
+        // TODO
+        return;
+    }
+
   private:
     // This should be a reference but we can not assign it in the constructor
     // because `world` does not have a constructor. FIXME: Change this ?

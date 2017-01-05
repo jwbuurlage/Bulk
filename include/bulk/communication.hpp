@@ -10,7 +10,6 @@
 #include "world.hpp"
 #include "future.hpp"
 #include "variable.hpp"
-#include "messages.hpp"
 
 namespace bulk {
 
@@ -28,7 +27,7 @@ void put(int processor, T value, var<T>& v) {
 
 template <typename T>
 void put(int processor, T* values, array<T>& a, int offset, int count = 1) {
-    a.world().put_(processor, values, sizeof(T), a.id(), offset, count);
+    a.put(processor, values, offset, count);
 }
 
 // FIXME: bulk::get should be specialized for different backends.
@@ -52,24 +51,7 @@ future<T> get(int processor, var<T>& v) {
 
 template <typename T>
 future<T> get(int processor, array<T>& a, int offset, int count = 1) {
-    future<T> result(a.world());
-    a.world().get_(processor, a.id(), sizeof(T), &result.value(), offset,
-                   count);
-    return result;
-}
-
-
-/**
- * Sends a message to a remote processor
- *
- * \param processor the id of the remote processor receiving the message
- * \param tag a tag to attach to the message
- * \param content the content (payload) of the message
- */
-template <typename Tag, typename Content>
-void send(queue<Tag, Content>& q, int processor, Tag tag, Content content) {
-    //FIXME: convert to void* data
-    //q.world().internal_send_<Tag, Content>(queue_id, processor, tag, content);
+    return a.get(processor, offset, count);
 }
 
 }  // namespace bulk
