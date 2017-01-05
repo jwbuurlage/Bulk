@@ -2,7 +2,7 @@
 #include "bulk_test_common.hpp"
 #include "set_backend.hpp"
 
-extern bulk::environment<provider> env;
+extern environment env;
 
 void test_initialization() {
     env.spawn(env.available_processors(), [](auto world, int s, int p) {
@@ -13,15 +13,15 @@ void test_initialization() {
                             "correct number of processors");
 
             // we can create a variable
-            auto x = bulk::create_var<int>(world);
+            bulk::var<int> x(world);
             x = 5;
             BULK_CHECK_ONCE(x.value() == 5, "write to variable");
 
             // we can create multiple variables in one step
-            auto y = bulk::create_var<int>(world);
+            bulk::var<int> y(world);
 
             // we can reassign variables
-            x = bulk::create_var<int>(world);
+            x = bulk::var<int>(world);
             BULK_CHECK_ONCE(x.value() == 0, "reassign variable");
         }
     });
