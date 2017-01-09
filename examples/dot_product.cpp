@@ -4,9 +4,9 @@
 #include <vector>
 
 int main() {
-    bulk::environment<provider> env;
+    environment env;
 
-    env.spawn(env.available_processors(), [](auto world, int s, int p) {
+    env.spawn(env.available_processors(), [](bulk::world& world, int s, int p) {
         // block distribution
         int size = 10;
         std::vector<int> xs(size);
@@ -15,7 +15,7 @@ int main() {
         std::iota(ys.begin(), ys.end(), s * size);
 
         // compute local dot product
-        auto result = bulk::create_var<int>(world);
+        bulk::var<int> result(world);
         for (int i = 0; i < size; ++i) {
             result.value() += xs[i] * ys[i];
         }

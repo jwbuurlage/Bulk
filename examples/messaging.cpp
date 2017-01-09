@@ -2,10 +2,10 @@
 #include <bulk/bulk.hpp>
 
 int main() {
-    bulk::environment<provider> env;
+    environment env;
 
-    env.spawn(env.available_processors(), [](auto world, int s, int p) {
-        auto q = bulk::create_queue<int, int>(world);
+    env.spawn(env.available_processors(), [](bulk::world& world, int s, int p) {
+        bulk::queue<int, int> q(world);
         for (int t = 0; t < p; ++t)
             q(t).send(s, s);
 

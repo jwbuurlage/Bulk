@@ -2,13 +2,13 @@
 #include "bulk_test_common.hpp"
 #include "set_backend.hpp"
 
-extern bulk::environment<provider> env;
+extern environment env;
 
 void test_communication() {
-    env.spawn(env.available_processors(), [](auto world, int s, int p) {
+    env.spawn(env.available_processors(), [](auto& world, int s, int p) {
         BULK_SECTION("Put") {
             // test `put` to single variable
-            auto a = bulk::create_var<int>(world);
+            bulk::var<int> a(world);
 
             bulk::put(world.next_processor(), s, a);
             world.sync();
@@ -19,7 +19,7 @@ void test_communication() {
 
         BULK_SECTION("Sugarized put") {
             // test `put` to single variable
-            auto a = bulk::create_var<int>(world);
+            bulk::var<int> a(world);
 
             a(world.next_processor()) = s;
             world.sync();
@@ -29,7 +29,7 @@ void test_communication() {
         }
 
         BULK_SECTION("Put to self") {
-            auto a = bulk::create_var<int>(world);
+            bulk::var<int> a(world);
 
             bulk::put(s, s, a);
             world.sync();
@@ -39,7 +39,7 @@ void test_communication() {
         }
 
         BULK_SECTION("Get from self") {
-            auto a = bulk::create_var<int>(world);
+            bulk::var<int> a(world);
             a = s;
             auto b = bulk::get(s, a);
             world.sync();
@@ -50,7 +50,7 @@ void test_communication() {
 
         BULK_SECTION("Put non-int") {
             // test `put` float to single variable
-            auto a = bulk::create_var<float>(world);
+            bulk::var<float> a(world);
 
             bulk::put(world.next_processor(), 1.0f, a);
             world.sync();
@@ -63,9 +63,9 @@ void test_communication() {
             int size = 5;
 
             // test `put` to multiple variables
-            std::vector<decltype(bulk::create_var<int>(world))> xs;
+            std::vector<bulk::var<int>> xs;
             for (int i = 0; i < size; ++i)
-                xs.push_back(bulk::create_var<int>(world));
+                xs.emplace_back(world);
 
             for (int i = 0; i < size; ++i) {
                 bulk::put(world.next_processor(), s + i, xs[i]);
@@ -84,9 +84,9 @@ void test_communication() {
             int size = 5;
 
             // test `put` to multiple variables
-            std::vector<decltype(bulk::create_var<int>(world))> xs;
+            std::vector<bulk::var<int>> xs;
             for (int i = 0; i < size; ++i)
-                xs.push_back(bulk::create_var<int>(world));
+                xs.emplace_back(world);
 
             if (s == 0)
                 for (int i = 1; i < p; ++i) {
@@ -97,7 +97,7 @@ void test_communication() {
 
             world.sync();
 
-            auto a = bulk::create_future<int>(world);
+            bulk::future<int> a(world);
             if (s == 0) a = bulk::get(p - 1, xs[size - 1]);
 
             world.sync();
@@ -108,7 +108,7 @@ void test_communication() {
         }
 
         BULK_SECTION("Get") {
-            auto b = bulk::create_var<int>(world);
+            bulk::var<int> b(world);
             b.value() = s;
             world.sync();
 
@@ -120,7 +120,7 @@ void test_communication() {
         }
 
         BULK_SECTION("Sugarized get") {
-            auto b = bulk::create_var<int>(world);
+            bulk::var<int> b(world);
             b.value() = s;
             world.sync();
 
@@ -133,12 +133,12 @@ void test_communication() {
 
         BULK_SECTION("Get multiple") {
             int size = 5;
-            auto x = bulk::create_var<int>(world);
+            bulk::var<int> x(world);
             x.value() = s;
 
             world.sync();
 
-            std::vector<bulk::future<int, decltype(world)>> ys;
+            std::vector<bulk::future<int>> ys;
             for (int i = 0; i < size; ++i) {
                 ys.push_back(bulk::get(world.next_processor(), x));
             }
@@ -152,7 +152,7 @@ void test_communication() {
         }
 
         BULK_SECTION("Coarray") {
-            auto zs = bulk::create_coarray<int>(world, 10);
+            bulk::coarray<int> zs(world, 10);
             zs(world.next_processor())[1] = s;
 
             world.sync();
@@ -182,17 +182,18 @@ void test_communication() {
         }
 
         BULK_SECTION("Single message passing") {
-            auto q = bulk::create_queue<int, int>(world);
+            bulk::queue<int, int> q(world);
             q(world.next_processor()).send(123, 1337);
             world.sync();
-            for (auto msg : q) {
+            for (auto& msg : q) {
                 BULK_CHECK_ONCE(msg.tag == 123 && msg.content == 1337,
                                 "message passed succesfully");
             }
         }
 
         BULK_SECTION("Message to self") {
-            auto q = bulk::create_queue<int, int>(world);
+            bulk::queue<int, int> q(world);
+
             q(world.processor_id()).send(123, 1337);
             world.sync();
             int tag = 0;
@@ -206,7 +207,8 @@ void test_communication() {
         }
 
         BULK_SECTION("Multiple messages to self") {
-            auto q = bulk::create_queue<int, int>(world);
+            auto q = bulk::queue<int, int>(world);
+
             q(world.processor_id()).send(123, 1337);
             world.sync();
             int tag = 0;
@@ -222,7 +224,7 @@ void test_communication() {
         BULK_SECTION("Multiple message passing") {
             std::vector<int> contents = {1337, 12345, 1230519, 5, 8};
 
-            auto q = bulk::create_queue<int, int>(world);
+            bulk::queue<int, int> q(world);
             for (size_t i = 0; i < contents.size(); ++i) {
                 q(world.next_processor()).send(s, contents[i]);
             }
@@ -230,6 +232,7 @@ void test_communication() {
             world.sync();
 
             int k = 0;
+            BULK_CHECK_ONCE(!q.empty(), "multiple messages arrived");
             for (auto msg : q) {
                 BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
                                     msg.content == contents[k++],
@@ -241,8 +244,8 @@ void test_communication() {
             std::vector<int> contents = {1337, 12345, 1230519, 5, 8};
             std::vector<float> contents2 = {1.0f, 2.0f, 3.0f, 4.0f};
 
-            auto q = bulk::create_queue<int, int>(world);
-            auto q2 = bulk::create_queue<int, float>(world);
+            bulk::queue<int, int> q(world);
+            bulk::queue<int, float> q2(world);
 
             for (size_t i = 0; i < contents.size(); ++i) {
                 q(world.next_processor()).send(s, contents[i]);
@@ -254,14 +257,15 @@ void test_communication() {
             world.sync();
 
             int k = 0;
-            for (auto msg : q) {
+            BULK_CHECK_ONCE(!q.empty() && !q2.empty(), "queues are non-empty");
+            for (auto& msg : q) {
                 BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
                                     msg.content == contents[k++],
                                 "received correct result on q");
             }
 
             int l = 0;
-            for (auto msg : q2) {
+            for (auto& msg : q2) {
                 BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
                                     msg.content == contents2[l++],
                                 "received correct result on q2");

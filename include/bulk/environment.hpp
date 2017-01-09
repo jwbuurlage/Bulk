@@ -8,20 +8,15 @@
  */
 
 #include <functional>
-#include <memory>
-#include <vector>
-
 
 namespace bulk {
 
-template <class WorldProvider>
 class world;
 
 /**
  * This object encodes the parallel environment of this layer, and
  * provides information on the system.
  */
-template <class Provider>
 class environment {
   public:
     /**
@@ -30,19 +25,15 @@ class environment {
      * \param processors the number of processors to run on
      * \param spmd the spmd function that gets run on each (virtual) processor
      */
-    template <typename Func>
-    void spawn(int processors, Func spmd) {
-        provider_.spawn(processors, spmd);
-    }
+    virtual void spawn(int processors,
+                        std::function<void(bulk::world&, int, int)> spmd) = 0;
 
     /**
      * Retrieve the total number of processors available on the system
      *
      * \returns the number of available processors
     */
-    int available_processors() const {
-        return provider_.available_processors();
-    }
+    virtual int available_processors() const = 0;
 
     /**
      * Set a callback that receives output from `world::log` and
@@ -59,19 +50,7 @@ class environment {
      * callback at the same time, so there is no need for further
      * synchronization or locking mechanisms.
      */
-    void set_log_callback(std::function<void(int, const std::string&)> f) {
-        provider_.set_log_callback(f);
-    }
-
-    /**
-     * Retrieve the provider of the distributed system
-     *
-     * \returns the distributed system provider
-    */
-    Provider& provider() { return provider_; }
-
-  private:
-    Provider provider_;
+    virtual void set_log_callback(std::function<void(int, const std::string&)> f) = 0;
 };
 
 } // namespace bulk

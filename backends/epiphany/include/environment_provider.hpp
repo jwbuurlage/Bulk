@@ -20,7 +20,7 @@ extern "C" {
 namespace bulk {
 namespace epiphany {
 
-class provider {
+class environment : public bulk::environment {
   public:
     class stream {
       public:
@@ -100,11 +100,11 @@ class provider {
         std::function<void(const void*, uint32_t, uint32_t)> write;
     };
 
-    provider() {
+    environment() {
         env_initialized_ = 0;
         initialize_();
     }
-    ~provider() { finalize_(); }
+    ~environment() { finalize_(); }
 
     /// Check if the hub is properly initialized and ready to run
     /// an Epiphany program
@@ -124,7 +124,7 @@ class provider {
     // Note that spawn is never implemented since the library is never compiled
     // with clang so the linking stage is never reached.
     void spawn(int processors,
-               std::function<void(bulk::world<backend>&, int, int)> f);
+               std::function<void(bulk::world&, int, int)> f);
 #else
     // When not compiling with the tool, there should be an error
     // when the user tries to use the function, but NO error when the
@@ -146,9 +146,9 @@ class provider {
                std::pair<unsigned char*, unsigned char*> file_start_end);
 #endif
 
-    int available_processors() const { return nprocs_available_; }
+    int available_processors() const override final { return nprocs_available_; }
 
-    void set_log_callback(std::function<void(int, const std::string&)> f) {
+    void set_log_callback(std::function<void(int, const std::string&)> f) override final {
         log_callback_ = f;
     }
 
@@ -160,7 +160,7 @@ class provider {
      * @param capacity Size of external memory buffer
      * @return true if stream was succesfully created
      *
-     * See class `environment_provider::stream` for description of callbacks.
+     * See class `environment::stream` for description of callbacks.
      *
      * Capacity must be nonzero and will be rounded up to the nearest multiple
      * of 8.

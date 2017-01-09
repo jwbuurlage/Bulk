@@ -4,13 +4,11 @@
 #include "set_backend.hpp"
 
 int main() {
-    bulk::environment<provider> env;
+    environment env;
 
-    env.spawn(env.available_processors(), [](auto world, int s, int p) {
+    env.spawn(env.available_processors(), [](bulk::world& world, int s, int p) {
         auto part = bulk::cyclic_partitioning<2>({2, 2}, {200, 200});
-        auto xs =
-            bulk::partitioned_array<int, 2, decltype(world)>(
-                world, part);
+        auto xs = bulk::partitioned_array<int, 2>(world, part);
 
         xs.local(0, 0) = s;
         xs.local(1, 1) = s + 1;
