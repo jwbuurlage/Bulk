@@ -8,13 +8,18 @@ namespace bulk {
 template <int D, int G = D>
 class block_partitioning : public rectangular_partitioning<D, G> {
    public:
+    using rectangular_partitioning<D, G>::local_size;
+    using rectangular_partitioning<D, G>::origin;
+    using rectangular_partitioning<D, G>::local_to_global;
+
     /**
      * Constructs a block partitioning in nD.
      *
      * `grid`: the number of processors in each dimension
      * `data_size`: the global number of processors along each axis
      */
-    block_partitioning(bulk::world& world, index_type<D> data_size, index_type<G> grid)
+    block_partitioning(bulk::world& world, index_type<D> data_size,
+                       index_type<G> grid)
         : rectangular_partitioning<D, G>(world, data_size, grid) {
         static_assert(G <= D,
                       "Dimensionality of the data should be larger or equal to "
@@ -41,7 +46,8 @@ class block_partitioning : public rectangular_partitioning<D, G> {
     index_type<D> local_size(index_type<G> idxs) override final {
         index_type<D> size;
         for (int dim = 0; dim < G; ++dim) {
-            size[dim] = (this->global_size_[dim] + this->grid_size_[dim] - idxs[dim] - 1) /
+            size[dim] = (this->global_size_[dim] + this->grid_size_[dim] -
+                         idxs[dim] - 1) /
                         this->grid_size_[dim];
         }
         for (int dim = G; dim < D; ++dim) {

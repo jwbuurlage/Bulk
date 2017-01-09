@@ -55,6 +55,8 @@ class partitioning {
 template <int D, int G>
 class multi_partitioning : public partitioning<D> {
    public:
+    using partitioning<D>::local_size;
+
     multi_partitioning(bulk::world& world, index_type<D> global_size,
                        index_type<G> grid_size)
         : partitioning<D>(world, global_size), grid_size_(grid_size) {}
@@ -64,7 +66,6 @@ class multi_partitioning : public partitioning<D> {
     index_type<D> local_size(int processor) override {
         return local_size(unflatten<G>(grid_size_, processor));
     };
-    int local_count(int processor) { return 0; }
 
     /** Get the multi-dimensional owner of a global index. */
     virtual index_type<G> grid_owner(index_type<D> xs) = 0;
@@ -89,6 +90,8 @@ class multi_partitioning : public partitioning<D> {
 template <int D, int G>
 class rectangular_partitioning : public multi_partitioning<D, G> {
    public:
+    using multi_partitioning<D, G>::local_to_global;
+
     rectangular_partitioning(bulk::world& world, index_type<D> global_size,
                              index_type<G> grid_size)
         : multi_partitioning<D, G>(world, global_size, grid_size) {}

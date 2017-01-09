@@ -15,6 +15,9 @@ namespace bulk {
 template <int D, int G = D>
 class cyclic_partitioning : public multi_partitioning<D, G> {
    public:
+    using multi_partitioning<D, G>::local_size;
+    using multi_partitioning<D, G>::local_to_global;
+
     /**
      * Constructs a cyclic partitioning in nD.
      *
@@ -49,7 +52,8 @@ class cyclic_partitioning : public multi_partitioning<D, G> {
     index_type<D> local_size(index_type<G> idxs) override final {
         index_type<D> size;
         for (int dim = 0; dim < G; ++dim) {
-            size[dim] = (this->global_size_[dim] + this->grid_size_[dim] - idxs[dim] - 1) /
+            size[dim] = (this->global_size_[dim] + this->grid_size_[dim] -
+                         idxs[dim] - 1) /
                         this->grid_size_[dim];
         }
         for (int dim = G; dim < D; ++dim) {

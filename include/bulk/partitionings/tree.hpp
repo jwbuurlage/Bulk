@@ -19,6 +19,10 @@ namespace bulk {
 template <int D>
 class tree_partitioning : public rectangular_partitioning<D, 1> {
    public:
+    using rectangular_partitioning<D, 1>::local_size;
+    using rectangular_partitioning<D, 1>::origin;
+    using rectangular_partitioning<D, 1>::local_to_global;
+
     /**
      * Constructs a cyclic partitioning in nD.
      *
@@ -27,7 +31,8 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
      */
     tree_partitioning(bulk::world& world, index_type<D> data_size, int procs,
                       binary_tree<split>&& splits)
-        : rectangular_partitioning<D, 1>(world, data_size, {procs}), splits_(std::move(splits)) {
+        : rectangular_partitioning<D, 1>(world, data_size, {procs}),
+          splits_(std::move(splits)) {
         // resize extents and origins
         origins_.resize(procs);
         extents_.resize(procs);
