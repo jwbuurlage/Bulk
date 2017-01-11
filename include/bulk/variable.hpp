@@ -60,6 +60,12 @@ class var {
     }
 
     /**
+     * Initialize and registers the variable with the world, and sets its value
+     * to `value`.
+     */
+    var(bulk::world& world, T value) : var(world) { *this = value; }
+
+    /**
      * Deconstructs and deregisters the variable with the world
      */
     ~var() {

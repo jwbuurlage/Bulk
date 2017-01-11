@@ -8,7 +8,9 @@ void test_communication() {
     env.spawn(env.available_processors(), [](auto& world, int s, int p) {
         BULK_SECTION("Put") {
             // test `put` to single variable
-            bulk::var<int> a(world);
+            bulk::var<int> a(world, 3);
+
+            BULK_CHECK_ONCE(a.value() == 3, "correct initial value for variable");
 
             bulk::put(world.next_processor(), s, a);
             world.sync();
