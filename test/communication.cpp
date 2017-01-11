@@ -64,8 +64,7 @@ void test_communication() {
 
             // test `put` to multiple variables
             std::vector<bulk::var<int>> xs;
-            for (int i = 0; i < size; ++i)
-                xs.emplace_back(world);
+            for (int i = 0; i < size; ++i) xs.emplace_back(world);
 
             for (int i = 0; i < size; ++i) {
                 bulk::put(world.next_processor(), s + i, xs[i]);
@@ -85,8 +84,7 @@ void test_communication() {
 
             // test `put` to multiple variables
             std::vector<bulk::var<int>> xs;
-            for (int i = 0; i < size; ++i)
-                xs.emplace_back(world);
+            for (int i = 0; i < size; ++i) xs.emplace_back(world);
 
             if (s == 0)
                 for (int i = 1; i < p; ++i) {
@@ -153,6 +151,12 @@ void test_communication() {
 
         BULK_SECTION("Coarray") {
             bulk::coarray<int> zs(world, 10);
+
+            BULK_CHECK_ONCE(zs.size() == 10,
+                            "can obtain the size of a coarray");
+            BULK_CHECK_ONCE(zs.empty() == false,
+                            "can check for emptyness");
+
             zs(world.next_processor())[1] = s;
 
             world.sync();

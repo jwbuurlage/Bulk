@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 #include "future.hpp"
 
 /**
@@ -24,7 +26,7 @@ class array {
      * \param world the distributed layer in which the array is defined.
      * \param size the size of the local array
      */
-    array(bulk::world& world, int size) : world_(world), size_(size) {
+    array(bulk::world& world, std::size_t size) : world_(world), size_(size) {
         data_ = new T[size];
         id_ = world_.register_location_(data_);
     }
@@ -89,10 +91,14 @@ class array {
         return result;
     }
 
+    std::size_t size() const {
+        return size_;
+    }
+
    private:
     bulk::world& world_;
     T* data_;
-    int size_;
+    std::size_t size_;
     int id_;
 };
 

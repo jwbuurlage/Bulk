@@ -4,8 +4,10 @@
  * \file coarray.hpp
  *
  * This header provides an implementation of a coarray, which is syntactically
- * similar to the co-arrays defined in Co-array Fortran.
+ * similar to the coarrays defined in Co-array Fortran.
  */
+
+#include <cstddef>
 
 #include "array.hpp"
 #include "communication.hpp"
@@ -17,7 +19,7 @@ namespace bulk {
  * of Co-Array Fortran.
  *
  * Co-arrays provide a convenient way to share data across processors. Instead
- * of manually sending and receiving data elements, co-arrays model distributed
+ * of manually sending and receiving data elements, coarrays model distributed
  * data as a 2-dimensional array, where the first dimension is over the
  * processors, and the second dimension is over local 1-dimensional array
  * indices.
@@ -124,14 +126,14 @@ class coarray {
     bulk::world& world() { return world_; }
 
     /**
-     * Get an iterator to the beginning of the local image of the co-array.
+     * Get an iterator to the beginning of the local image of the coarray.
      *
      * \returns a pointer to the first element of the local data.
      */
     T* begin() { return data_.begin(); }
 
     /**
-     * Get an iterator to the end of the local image of the co-array.
+     * Get an iterator to the end of the local image of the coarray.
      *
      * \returns a pointer beyond the last element of the local data.
      */
@@ -140,12 +142,24 @@ class coarray {
     /**
      * Put the value `value` into element `idx` on processor `t`.
      */
-    void put(int t, int idx, T value) { bulk::put<T>(t, &value, data_, idx, 1); }
+    void put(int t, int idx, T value) {
+        bulk::put<T>(t, &value, data_, idx, 1);
+    }
 
     /**
      * Obtain a future to the value of element `idx` on processor `t`.
      */
     auto get(int t, int idx) { return bulk::get<T>(t, data_, idx, 1); }
+
+    /**
+     * Obtain the size of the coarray.
+     */
+    std::size_t size() const { return data_.size(); }
+
+    /**
+     * See if the coarray is empty.
+     */
+    bool empty() const { return size() == 0; }
 
    private:
     friend image;
