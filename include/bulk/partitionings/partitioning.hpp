@@ -34,7 +34,7 @@ class partitioning {
 
     /** the total count of elements on a processor */
     int local_count(int processor) {
-        auto size = local_size();
+        auto size = local_size(processor);
         return std::accumulate(size.begin(), size.end(), 1,
                                std::multiplies<int>());
     }
@@ -98,11 +98,11 @@ class rectangular_partitioning : public multi_partitioning<D, G> {
 
     /** Support origin queries by flattened, or multi-index */
     virtual index_type<D> origin(index_type<G> processor) const {
-        origin(flatten<G>(this->grid_size_, processor));
+        return origin(flatten<G>(this->grid_size_, processor));
     }
 
     virtual index_type<D> origin(int processor) const {
-        origin(unflatten<G>(this->grid_size_, processor));
+        return origin(unflatten<G>(this->grid_size_, processor));
     }
 
     virtual index_type<D> local_to_global(index_type<D> xs,

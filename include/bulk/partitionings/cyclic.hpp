@@ -43,8 +43,11 @@ class cyclic_partitioning : public multi_partitioning<D, G> {
     /** Local to global */
     index_type<D> local_to_global(index_type<D> xs,
                                   index_type<G> processor) override final {
-        // FIXME implement
-        return index_type<D>{};
+        auto result = xs;
+        for (int d = 0; d < G; ++d) {
+            result[d] = result[d] * this->grid_size_[d] + processor[d];
+        }
+        return result;
     }
 
     /** The total number of elements along each axis on the processor index with

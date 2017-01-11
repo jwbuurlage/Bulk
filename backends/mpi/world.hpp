@@ -156,7 +156,7 @@ class world : public bulk::world {
         put_buffers_[processor] << var_id;
         std::size_t total_offset = offset * size;
         put_buffers_[processor] << total_offset;
-        put_buffers_[processor] << size;
+        put_buffers_[processor] << (std::size_t)(size * count);
         put_buffers_[processor].push(size, values);
     }
 
@@ -176,7 +176,7 @@ class world : public bulk::world {
         get_request_buffers_[processor] << var_id;
         std::size_t total_offset = offset * size;
         get_request_buffers_[processor] << total_offset;
-        get_request_buffers_[processor] << size;
+        get_request_buffers_[processor] << (std::size_t)(size * count);
         get_request_buffers_[processor] << target;
         get_request_buffers_[processor] << processor_id_;
     }

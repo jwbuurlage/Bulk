@@ -33,6 +33,8 @@ void test_partitioning() {
                             "compute correctly the cyclic size");
             BULK_CHECK_ONCE(part.global_to_local({4, 3})[0] == 4 / N,
                             "compute correctly the cyclic local index");
+            BULK_CHECK_ONCE(part.local_to_global({1, 1}, {s % N, s / N})[0] == N,
+                            "compute correctly the cyclic global index");
         }
 
         BULK_SECTION("Block partitioning") {

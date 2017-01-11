@@ -86,6 +86,11 @@ class array {
 
     future<T> get(int processor, int offset, int count = 1) {
         // TODO future with count other than 1
+        if (count != 1) {
+            world_.log("Getting with count other than 1 is not yet supported\n");
+            count = 1;
+        }
+
         future<T> result(world_);
         world_.get_(processor, id_, sizeof(T), &result.value(), offset, 1);
         return result;

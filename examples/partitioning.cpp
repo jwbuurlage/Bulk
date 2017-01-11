@@ -6,7 +6,7 @@
 int main() {
     environment env;
 
-    env.spawn(env.available_processors(), [](bulk::world& world, int s, int p) {
+    env.spawn(env.available_processors(), [](bulk::world& world, int s, int) {
         auto part = bulk::cyclic_partitioning<2>(world, {200, 200}, {2, 2});
         auto xs = bulk::partitioned_array<int, 2, 2>(world, part);
 

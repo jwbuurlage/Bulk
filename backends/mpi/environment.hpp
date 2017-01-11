@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include <mpi.h>
 #include <bulk/environment.hpp>
 
@@ -20,6 +22,11 @@ class environment : public bulk::environment {
 
     void spawn(int processors, std::function<void(bulk::world&, int, int)> spmd)
         override final {
+        if (processors < available_processors()) {
+            std::cout << "Running with fewer processors than available is not "
+                         "yet implemented in MPI.\n";
+            return;
+        }
         bulk::mpi::world world;
         spmd(world, world.processor_id(), world.active_processors());
     }
