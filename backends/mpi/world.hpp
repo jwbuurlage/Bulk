@@ -5,8 +5,8 @@
 #include <vector>
 
 #include <mpi.h>
-#include <bulk/world.hpp>
 #include <bulk/messages.hpp>
+#include <bulk/world.hpp>
 
 #include "memory_buffer.hpp"
 
@@ -75,6 +75,8 @@ class world : public bulk::world {
     int processor_id() const override final { return processor_id_; }
 
     void sync() override final {
+        clear_messages_();
+
         int remote_puts = 0;
         int remote_get_requests = 0;
         int remote_get_responses = 0;
@@ -355,6 +357,12 @@ class world : public bulk::world {
             reader.update(size);
         }
         buf.clear();
+    }
+
+    void clear_messages_() {
+        for (auto& q : queues_) {
+            q.second->clear_();
+        }
     }
 
     char name_[MPI_MAX_PROCESSOR_NAME];

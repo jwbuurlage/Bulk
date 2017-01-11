@@ -154,8 +154,7 @@ void test_communication() {
 
             BULK_CHECK_ONCE(zs.size() == 10,
                             "can obtain the size of a coarray");
-            BULK_CHECK_ONCE(zs.empty() == false,
-                            "can check for emptyness");
+            BULK_CHECK_ONCE(zs.empty() == false, "can check for emptyness");
 
             zs(world.next_processor())[1] = s;
 
@@ -269,11 +268,22 @@ void test_communication() {
             }
 
             int l = 0;
+            BULK_CHECK_ONCE(q.size() == contents.size(),
+                            "first queue correct number of messages");
+
+            BULK_CHECK_ONCE(q2.size() == contents2.size(),
+                            "second queue correct number of messages");
+
             for (auto& msg : q2) {
                 BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
                                     msg.content == contents2[l++],
                                 "received correct result on q2");
             }
+
+            world.sync();
+
+            BULK_CHECK_ONCE(q.empty(), "first queue gets emptied");
+            BULK_CHECK_ONCE(q2.empty(), "second queue gets emptied");
         }
     });
 }

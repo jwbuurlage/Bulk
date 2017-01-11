@@ -1,8 +1,10 @@
 #pragma once
 
-#include <bulk/world.hpp>
+#include <cstddef>
 #include <memory>
 #include <vector>
+
+#include "world.hpp"
 
 /**
  * \file messages.hpp
@@ -25,13 +27,14 @@ struct message {
 
 // queue::impl subclasses queue_base
 class queue_base {
-  public:
+   public:
     queue_base(){};
     virtual ~queue_base(){};
 
     // These are called by world during a sync
     // It resizes an internal buffer and returns a pointer to it
     virtual void* get_buffer_(int size_in_bytes) = 0;
+    virtual void clear_() = 0;
 
     virtual void unsafe_push_back(void* msg) = 0;
 };
@@ -53,9 +56,9 @@ class queue {
      */
     class sender {
        public:
-         void send(Tag tag, Content content) {
-             q_.impl_->send_(t_, tag, content);
-         }
+        void send(Tag tag, Content content) {
+            q_.impl_->send_(t_, tag, content);
+        }
 
        private:
         friend queue;
@@ -96,21 +99,25 @@ class queue {
      */
     auto operator()(int t) { return sender(*this, t); }
 
-    bool empty() { return impl_->data_.empty(); }
-
     /**
      * Obtain an iterator to the begin of the local queue
      */
-    auto begin() {
-        return impl_->data_.begin();
-    }
+    auto begin() { return impl_->data_.begin(); }
 
     /**
      * Obtain an iterator to the end of the local queue
      */
-    auto end() {
-        return impl_->data_.end();
-    }
+    auto end() { return impl_->data_.end(); }
+
+    /**
+     * Obtain the number of messages in the queue.
+     */
+    std::size_t size() { return impl_->data_.size(); }
+
+    /**
+     * See if the queue is empy.
+     */
+    bool empty() { return impl_->data_.empty(); }
 
     /**
      * Retrieve the world to which this queue is registed.
@@ -118,41 +125,46 @@ class queue {
      * \returns a reference to the world of the queue
      */
     bulk::world& world() { return impl_->world_; }
+
    private:
-     class impl : public queue_base {
+    class impl : public queue_base {
        public:
-         impl(bulk::world& world) : world_(world) {
-             id_ = world.register_queue_(this);
-         }
-         ~impl() { world_.unregister_queue_(id_); }
+        impl(bulk::world& world) : world_(world) {
+            id_ = world.register_queue_(this);
+        }
+        ~impl() { world_.unregister_queue_(id_); }
 
-         // No copies or moves
-         impl(impl& other) = delete;
-         impl(impl&& other) = delete;
-         void operator=(impl& other) = delete;
-         void operator=(impl&& other) = delete;
+        // No copies or moves
+        impl(impl& other) = delete;
+        impl(impl&& other) = delete;
+        void operator=(impl& other) = delete;
+        void operator=(impl&& other) = delete;
 
-         void send_(int t, Tag tag, Content content) {
-             message<Tag, Content> m{tag, content};
-             world_.send_(t, id_, &m, sizeof(m));
-         }
+        void send_(int t, Tag tag, Content content) {
+            message<Tag, Content> m{tag, content};
+            world_.send_(t, id_, &m, sizeof(m));
+        }
 
-         void* get_buffer_(int size_in_bytes) override {
-             data_.resize(size_in_bytes / sizeof(message<Tag, Content>));
-             return &data_[0];
-         }
+        void* get_buffer_(int size_in_bytes) override {
+            data_.resize(size_in_bytes / sizeof(message<Tag, Content>));
+            return &data_[0];
+        }
 
-         void unsafe_push_back(void* msg) override {
-             data_.push_back(*static_cast<message<Tag, Content>*>(msg));
-         }
+        void unsafe_push_back(void* msg) override {
+            data_.push_back(*static_cast<message<Tag, Content>*>(msg));
+        }
 
-         std::vector<message<Tag, Content>> data_;
-         bulk::world& world_;
-         int id_;
-     };
-     std::unique_ptr<impl> impl_;
+        void clear_() override {
+            data_.clear();
+        }
 
-     friend sender;
+        std::vector<message<Tag, Content>> data_;
+        bulk::world& world_;
+        int id_;
+    };
+    std::unique_ptr<impl> impl_;
+
+    friend sender;
 };
 
 }  // namespace bulk
