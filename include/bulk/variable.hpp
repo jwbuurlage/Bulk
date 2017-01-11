@@ -52,6 +52,8 @@ class var {
     /**
      * Initialize and registers the variable with the world
      */
+    template <
+        typename = std::enable_if_t<std::is_trivially_constructible<T>::value>>
     var(bulk::world& world) {
         // TODO: Here we should ask world to create the appropriate
         // subclass of var_impl

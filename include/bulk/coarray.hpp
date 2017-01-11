@@ -85,6 +85,8 @@ class coarray {
      * \param world the distributed layer in which the array is defined.
      * \param local_size the size of the local array
      */
+    template <
+        typename = std::enable_if_t<std::is_trivially_constructible<T>::value>>
     coarray(bulk::world& world, int local_size)
         : world_(world), data_(world_, local_size) {}
 
