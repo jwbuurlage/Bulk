@@ -33,7 +33,6 @@ endforeach(source_file)
 
 # Bulk tests that work for any backend
 
-
 set(TEST_DIR "../../../test")
 
 set(
