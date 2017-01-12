@@ -1,15 +1,18 @@
 #pragma once
+
 #include <algorithm>
 #include <condition_variable>
+#include <cstddef>
 #include <cstdio>
+#include <cstring>
 #include <functional>
 #include <iostream>
+#include <limits>
 #include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
-#include <limits>
-#include <cstring>
+
 #include <bulk/world.hpp>
 
 // Mutexes need to be shared, i.e. single instance of the class
@@ -24,7 +27,7 @@ namespace cpp {
 // Taken from
 // http://stackoverflow.com/questions/24465533/implementing-boostbarrier-in-c11
 class barrier {
-  public:
+   public:
     explicit barrier(std::size_t count)
         : threshold_(count), count_(count), generation_(0) {}
 
@@ -40,7 +43,7 @@ class barrier {
         }
     }
 
-  private:
+   private:
     std::mutex mutex_;
     std::condition_variable cond_;
     std::size_t threshold_;
@@ -50,7 +53,7 @@ class barrier {
 
 // single `world_state` instance shared by every thread
 class world_state {
-  public:
+   public:
     explicit world_state(int processors) : sync_barrier(processors) {
         locations_.reserve(20 * processors);
     }
@@ -62,14 +65,14 @@ class world_state {
     std::mutex location_mutex;
     std::vector<void*> locations_;
 
-    std::mutex log_mutex; // mutex for the vector and for sending output
-    std::vector<std::pair<int,std::string>> logs;
+    std::mutex log_mutex;  // mutex for the vector and for sending output
+    std::vector<std::pair<int, std::string>> logs;
     std::function<void(int, const std::string&)> log_callback;
 };
 
 // separate `world` instance for every thread
 class world : public bulk::world {
-  public:
+   public:
     world(world_state* state, int pid, int nprocs)
         : state_(state), pid_(pid), nprocs_(nprocs) {}
     ~world() {}
@@ -91,16 +94,14 @@ class world : public bulk::world {
         barrier();
         // Perform operations required at each sync like
         // swapping message queues
-        for (auto& op : sync_operations_)
-            op();
+        for (auto& op : sync_operations_) op();
 
         // Print any log messages
         if (pid_ == 0) {
             auto& logs = state_->logs;
             std::stable_sort(logs.begin(), logs.end());
             if (state_->log_callback == nullptr) {
-                for (auto& log : logs)
-                    std::cout << log.second;
+                for (auto& log : logs) std::cout << log.second;
                 std::cout << std::flush;
             } else {
                 for (auto& log : logs)
@@ -133,7 +134,7 @@ class world : public bulk::world {
     }
 
     void abort() override final {
-        //TODO
+        // TODO
         return;
     }
 
@@ -148,9 +149,7 @@ class world : public bulk::world {
         return sync_operations_.size() - 1;
     }
 
-    void unregister_sync_operation_(int id) {
-        sync_operations_[id] = nullptr;
-    }
+    void unregister_sync_operation_(int id) { sync_operations_[id] = nullptr; }
 
     // Communication mechanism to communicate single pointers
     // Used by var and coarray constructors
@@ -164,7 +163,7 @@ class world : public bulk::world {
         return (T*)(state_->var_pointer_);
     }
 
-  protected:
+   protected:
     int register_location_(void* location) override final {
         std::lock_guard<std::mutex> lock{state_->location_mutex};
         auto& locs = state_->locations_;
@@ -188,26 +187,26 @@ class world : public bulk::world {
         state_->locations_[id + pid_] = 0;
     }
 
-    void put_(int processor, const void* value, int size,
+    void put_(int processor, const void* value, std::size_t size,
               int var_id) override final {
         memcpy(state_->locations_[var_id + processor], value, size);
         return;
     }
 
     // Size is per element
-    void put_(int processor, const void* values, int size, int var_id,
-              int offset, int count) override final {
+    void put_(int processor, const void* values, std::size_t size, int var_id,
+              std::size_t offset, int count) override final {
         // TODO
         return;
     }
-    void get_(int processor, int var_id, int size,
+    void get_(int processor, int var_id, std::size_t size,
               void* target) override final {
         memcpy(target, state_->locations_[var_id + processor], size);
         return;
     }
     // Size is per element
-    void get_(int processor, int var_id, int size, void* target, int offset,
-              int count) override final {
+    void get_(int processor, int var_id, std::size_t size, void* target,
+              std::size_t offset, int count) override final {
         // TODO
         return;
     }
@@ -223,12 +222,12 @@ class world : public bulk::world {
     }
 
     void send_(int processor, int queue_id, const void* data,
-               int size) override final {
+               std::size_t size) override final {
         // TODO
         return;
     }
 
-  private:
+   private:
     // This should be a reference but we can not assign it in the constructor
     // because `world` does not have a constructor. FIXME: Change this ?
     world_state* state_;
@@ -237,6 +236,5 @@ class world : public bulk::world {
     std::vector<std::function<void(void)>> sync_operations_;
 };
 
-
-} // namespace cpp
-} // namespace bulk
+}  // namespace cpp
+}  // namespace bulk
