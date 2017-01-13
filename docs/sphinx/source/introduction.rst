@@ -13,52 +13,9 @@ The |project_name| project aims to provide the performance and fine-grain tunabi
 Why |project_name|
 --------
 
-.. image:: https://imgs.xkcd.com/comics/standards.png
-    :align: center
+|project_name| is a general purpose library for distributed computing, which does not put any restrinctions on the programs that can be expressed using the library. At the same time, it enables the use of common programming abstractions, by supporting and encouraging the use of modern C++ idioms, such as the use of anonymous functions, smart pointers, range based for loops and portable threading support.
 
 Structure of this documentation
 -------------------------------
 
-Bulk provides a modern bulk-synchronous parallel API which is `documented in detail here <api/index.html>`_. In this documentation we will first give a tour of Bulk, and subsequently a detailed introduction is given to each component of |project_name|.
-
-Related projects
-----------------
-
-This is an incomplete list of alternative libraries for parallel computing.
-
-General parallel libraries:
-
-- MPI
-- OpenMP
-
-BSP specific:
-
-- BSPonMPI
-- Multicore-BSP
-- Apache Hama
-
-Libraries based on algorithmic skeletons:
-
-- Muesli - the Muenster skeleton library
-- SkePU 2
-
-GPU libraries:
-
-- OpenCL
-- CUDA
-- Vulkan (compute)
-- Thrust
-- SYCL
-
-Big Data:
-
-- Apache Hadoop
-- Apache Spark
-- Apache Giraph
-- TensorFlow
-
-A number of alternative libraries for Parallella exist:
-
-- Epiphany BSP
-- COPRTHR-2 with MPI support
-- Epiphany Erlang
+|project_name| provides a modern bulk-synchronous parallel API which is `documented in detail here <api/index.html>`_. In this documentation we will first give a tour of Bulk, and subsequently a detailed introduction is given to each component of |project_name|.

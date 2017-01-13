@@ -17,15 +17,15 @@ We start out with the obligatory Hello World! in Bulk |project_name|, and subseq
     #include <bulk/backends/mpi/mpi.hpp>
 
     int main() {
-        auto env = bulk::environment<bulk::mpi::provider>();
-        env.spawn(env.available_processors(), [](auto world, int s, int p) {
+        auto env = bulk::mpi::environment;
+        env.spawn(env.available_processors(), [](auto& world, int s, int p) {
             std::cout << "Hello, world " << s << "/" << p << std::endl;
         }
     }
 
 On lines `1` and `2` we include the |project_name| library, and the backend of our choosing (in our case MPI). On line `5`, we initialize an **environment**, which sets up the parallel or distributed system.
 
-On line `6`, we spawn the **SPMD** section of our program within the environment. The first argument denotes the number of processors that we want to run the section on, while the second argument provides a function-like object (here a C++ lambda function) that is executed on the requested number of processors. This function obtains a **World** object, which it can use to communicate with other processors, for programmer convenience its identifier :code:`s` and the total number of processes that are spawned :code:`p` are passed as well. These can alternatively be obtained from world using :code:`world.processor_id()` and :code:`world.active_processors()` respectively.
+On line `6`, we spawn the **SPMD** section of our program within the environment. The first argument denotes the number of processors that we want to run the section on, while the second argument provides a function-like object (here a C++ lambda function) that is executed on the requested number of processors. This function obtains a **bulk::world** object, which it can use to communicate with other processors, for programmer convenience its identifier :code:`s` and the total number of processes that are spawned :code:`p` are passed as well. These can alternatively be obtained from world using :code:`world.processor_id()` and :code:`world.active_processors()` respectively.
 
 Communication between processors
 --------------------------------
@@ -34,7 +34,7 @@ Next, we look at some basic forms of communication between processors. The main 
 
 .. code-block:: cpp
 
-    auto x = bulk::create_var<T>(world);
+    auto x = bulk::var<T>(world);
 
 Here, :code:`T` is the type of the variable, for example an :code:`int`. Values can be assigned to the (local) variable:
 
@@ -68,10 +68,10 @@ Co-arrays are a convenient way to store, and manipulate distributed data. We pro
 
 .. code-block:: cpp
 
-    auto xs = bulk::create_coarray<int>(world, s);
+    auto xs = bulk::coarray<int>(world, s);
     xs(3)[2] = 1;
 
-Here, we create a co-array of varying local  size (each processor holds :code:`s` many elements). Next we write the value :code:`1` to the element with local index :code:`2` on processor with index :code:`3`.
+Here, we create a co-array of varying local size (each processor holds :code:`s` many elements). Next we write the value :code:`1` to the element with local index :code:`2` on processor with index :code:`3`.
 
 Algorithmic skeletons
 ---------------------
@@ -80,11 +80,11 @@ Algorithmic skeletons
 
 .. code-block:: cpp
 
-    auto xs = bulk::create_coarray<int>(world, s);
-    auto ys = bulk::create_coarray<int>(world, s);
+    auto xs = bulk::coarray<int>(world, s);
+    auto ys = bulk::coarray<int>(world, s);
 
     // fill xs and ys with data
-    auto result = bulk::create_var<int>(world);
+    auto result = bulk::var<int>(world);
     for (int i = 0; i < s; ++i) {
         result.value() += xs[i] * ys[i];
     }

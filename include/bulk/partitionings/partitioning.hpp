@@ -14,7 +14,7 @@ namespace bulk {
 template <int D>
 using index_type = std::array<int, D>;
 
-/** Base class for partitionings over a 1D processor grid */
+/** Base class for partitionings over a 1D processor grid. */
 template <int D>
 class partitioning {
    public:

@@ -5,7 +5,7 @@ Another way to communicate between processors is by using message queues. These 
 
 .. code-block:: cpp
 
-    auto queue = bulk::create_queue<int, float>(world);
+    auto queue = bulk::queue<int, float>(world);
 
 This will create a queue that stores message with *integer* tags, and *float* content. For example, a message can correspond to a component of a vector of floats. To put a message into a remote queue, we use :code:`queue(pid).send`:
 
@@ -31,12 +31,12 @@ It is perfectly legal, and even encouraged, to make a seperate queue for differe
 
 .. code-block:: cpp
 
-    auto q = bulk::create_queue<int, int>(world);
+    auto q = bulk::queue<int, int>(world);
     q(world.next_processor()).send(1, 1);
     q(world.next_processor()).send(2, 3);
     q(world.next_processor()).send(123, 1337);
 
-    auto q2 = bulk::create_queue<int, float>(world);
+    auto q2 = bulk::queue<int, float>(world);
     q2(world.next_processor()).send(5, 2.1f);
     q2(world.next_processor()).send(3, 4.0f);
 

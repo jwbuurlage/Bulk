@@ -4,7 +4,7 @@ Environment and worlds
 Parallel environments
 ---------------------
 
-A |project_name| program runs in some parallel environment. For example, this environment could be an MPI cluster, a many-core co-processor, or simply threads on a multi-core computer. This environment is accessed within the program through a `bulk::environment <api/environment.html>`_ object. This object takes as a template argument a *provider*, which is an implementation of the lower-level communication that reflect the actual environment. For example, to setup a |project_name| environment on an MPI cluster, we would write:
+A |project_name| program runs in some parallel environment. For example, this environment could be an MPI cluster, a many-core co-processor, or simply threads on a multi-core computer. This environment is accessed within the program through a `bulk::environment <api/environment.html>`_ object. This object is specialized for each *backend*, which is an implementation of the lower-level communication that reflect the actual environment. For example, to setup a |project_name| environment on an MPI cluster, we would write:
 
 .. code-block:: cpp
 
@@ -12,7 +12,7 @@ A |project_name| program runs in some parallel environment. For example, this en
     #include <bulk/backends/mpi/mpi.hpp>
 
     int main() {
-        auto env = bulk::environment<bulk::mpi::provider>();
+        bulk::mpi::environment env;
     }
 
 For a list of default providers, consult the *backends* section of this documentation.
@@ -31,7 +31,7 @@ This function will run on each processor, and should take three arguments. The f
 
 .. code-block:: cpp
 
-    env.spawn(env.available_processors(), [](auto world, int s, int p) {
+    env.spawn(env.available_processors(), [](auto& world, int s, int p) {
         std::cout << "Hello, world " << s << "/" << p << std::endl;
     }
 
@@ -81,14 +81,14 @@ It is possible to nest environments. For example, each MPI node could have a mul
 
     int main() {
         // initialize the outer MPI layer
-        auto mpi_env = bulk::environment<bulk::mpi::provider>();
+        bulk::mpi::environment mpi_env;
 
-        mpi_env.spawn(mpi_env.available_processors(), [](auto world, int t, int q) {
+        mpi_env.spawn(mpi_env.available_processors(), [](auto& mpi_world, int t, int q) {
             // initialize the inner Epiphany layer
-            auto epi_env = bulk::environment<bulk::epiphany::provider>();
+            bulk::epiphany::environment epi_env;
 
             // on each MPI node, we run a parallel program on the Epiphany co-processor
-            epi_env.spawn(epi_env.available_processors(), [](auto world, int s, int p) {
+            epi_env.spawn(epi_env.available_processors(), [](auto& world, int s, int p) {
                 std::cout << "Hello, world " << s << "/" << p << std::endl;
             }
         }

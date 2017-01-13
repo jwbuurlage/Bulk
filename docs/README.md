@@ -6,7 +6,6 @@ The Bulk docs are built using mkdocs. Mkdocs can be installed using
 
 we need to install the Cinder theme
 
-
     pip install mkdocs-cinder
 
 afterwards run
