@@ -7,7 +7,6 @@ include_directories(
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wfatal-errors -Wextra -Werror -g -O3")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../../../bin)
 
 find_package(MPI QUIET)
 
@@ -31,10 +30,13 @@ if(MPI_CXX_FOUND)
         "partitioning.cpp"
         )
 
+    add_custom_target(mpi)
+
     foreach(source_file ${EXAMPLE_SOURCES})
         string(REPLACE ".cpp" "" source_name ${source_file})
         add_executable(mpi_${source_name} ${EXAMPLE_DIR}${source_file})
         target_link_libraries(mpi_${source_name} ${MPI_LIBRARIES})
+        add_dependencies(mpi mpi_${source_name})
     endforeach(source_file)
 
     set(TEST_DIR "../../../test")
@@ -49,6 +51,7 @@ if(MPI_CXX_FOUND)
 
     add_executable(mpi_test ${TEST_SOURCES})
     target_link_libraries(mpi_test ${MPI_LIBRARIES})
+    add_dependencies(mpi mpi_test)
 
     # Examples specific for mpi backend
     set(
@@ -65,6 +68,7 @@ if(MPI_CXX_FOUND)
         string(REPLACE ".cpp" "" source_name ${source_file})
         add_executable(${source_name} ${EXAMPLE_DIR}${source_file})
         target_link_libraries(${source_name} ${MPI_LIBRARIES})
+        add_dependencies(mpi ${source_name})
     endforeach(source_file)
 
 else(MPI_CXX_FOUND)
