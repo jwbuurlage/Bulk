@@ -22,6 +22,8 @@ class partitioning {
     partitioning(bulk::world& world, index_type<D> global_size)
         : world_(world), global_size_(global_size) {}
 
+    virtual ~partitioning() = default;
+
     /** Get the local and global sizes. */
     index_type<D> global_size() const { return global_size_; }
     int global_count() { return 0; }
@@ -60,6 +62,8 @@ class multi_partitioning : public partitioning<D> {
     multi_partitioning(bulk::world& world, index_type<D> global_size,
                        index_type<G> grid_size)
         : partitioning<D>(world, global_size), grid_size_(grid_size) {}
+
+    virtual ~multi_partitioning() = default;
 
     /** Get the local and global sizes. */
     virtual index_type<D> local_size(index_type<G> processor) = 0;
