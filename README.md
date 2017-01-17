@@ -49,16 +49,15 @@ Bulk supports a number of different *backends*, allowing the programs to run in 
 - `mpi` for distributed environments using MPI
 - `epiphany` for programs compiled for the [Parallella](http://www.parallella.org) development board
 
-The examples in the `examples` directory work for every backend. To build them, do the following. `cpp` can be replaced by the desired backend like `mpi` or `epiphany`.
+The examples in the `examples` directory work for every backend. To build them, do the following. The backends (e.g. `cpp`, `mpi`) are built optionally, just remove or add the option if you do not require them.
 
-    cd backends/cpp/build
+    cd build
     cmake .
-    make
+    make cpp mpi
 
-The examples will be compiled in the `bin` directory, prepended with the backend name:
+The examples will be compiled in the `bin/{backend}` directory, prepended with the backend name, i.e. to run the `hello` example with the `cpp` backend:
 
-    cd bin
-    ./cpp_hello
+    ./bin/cpp/cpp_hello
 
 Authors
 -------
