@@ -29,9 +29,9 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
      * `grid`: the number of processors in each dimension
      * `data_size`: the global number of processors along each axis
      */
-    tree_partitioning(bulk::world& world, index_type<D> data_size, int procs,
+    tree_partitioning(index_type<D> data_size, int procs,
                       binary_tree<split>&& splits)
-        : rectangular_partitioning<D, 1>(world, data_size, {procs}),
+        : rectangular_partitioning<D, 1>(data_size, {procs}),
           splits_(std::move(splits)) {
         // resize extents and origins
         origins_.resize(procs);

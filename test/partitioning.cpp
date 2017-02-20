@@ -12,8 +12,8 @@ void test_partitioning() {
         BULK_REQUIRE(N * N == p);
 
         BULK_SECTION("Cyclic partitioning to 1D") {
-            auto part = bulk::cyclic_partitioning<2, 1>(
-                world, {5 * p * N, 5 * p * N}, {p});
+            auto part =
+                bulk::cyclic_partitioning<2, 1>({5 * p * N, 5 * p * N}, {p});
             BULK_CHECK_ONCE(part.owner({p + 2, 3}) == 2,
                             "compute correctly the cyclic from 2 -> 1 dim");
             BULK_CHECK_ONCE(part.local_size({s})[0] == 5 * N,
@@ -25,8 +25,8 @@ void test_partitioning() {
         }
 
         BULK_SECTION("Cyclic partitioning") {
-            auto part = bulk::cyclic_partitioning<2, 2>(world, {10 * N, 10 * N},
-                                                        {N, N});
+            auto part =
+                bulk::cyclic_partitioning<2, 2>({10 * N, 10 * N}, {N, N});
             BULK_CHECK_ONCE(part.grid_owner({4, 3})[0] == 4 % N,
                             "compute correctly the cyclic owner");
             BULK_CHECK_ONCE(part.local_size({s % N, s / N})[0] == 10,
@@ -40,7 +40,7 @@ void test_partitioning() {
 
         BULK_SECTION("Block partitioning") {
             auto part =
-                bulk::block_partitioning<2, 2>(world, {10 * N, 10 * N}, {N, N});
+                bulk::block_partitioning<2, 2>({10 * N, 10 * N}, {N, N});
             BULK_CHECK_ONCE(part.grid_owner({2 * 10 + 3, 3})[0] == 2,
                             "compute correctly the block owner");
             BULK_CHECK_ONCE(part.local_size({s % N, s / N})[0] == 10,
@@ -57,8 +57,8 @@ void test_partitioning() {
 
         BULK_SECTION("Block partitioning custom axes") {
             // construct a block partitioning only in the 2nd axis
-            auto part = bulk::block_partitioning<2, 1>(world, {10 * p, 10 * p},
-                                                       {p}, {1});
+            auto part =
+                bulk::block_partitioning<2, 1>({10 * p, 10 * p}, {p}, {1});
 
             BULK_CHECK_ONCE(part.owner({0, 13}) == 1,
                             "compute correctly the block owner");
@@ -88,7 +88,7 @@ void test_partitioning() {
             tree.add(root, dir::right, bulk::split{1, 5});
 
             auto part =
-                bulk::tree_partitioning<2>(world, {10, 10}, 4, std::move(tree));
+                bulk::tree_partitioning<2>({10, 10}, 4, std::move(tree));
 
             BULK_CHECK_ONCE((part.local_size({0}) == std::array<int, 2>{5, 5}),
                             "extent of bspart are correct");
@@ -112,7 +112,7 @@ void test_partitioning() {
         }
 
         BULK_SECTION("Partitioned array") {
-            auto part = bulk::cyclic_partitioning<2>(world, {200, 200}, {N, N});
+            auto part = bulk::cyclic_partitioning<2>({200, 200}, {N, N});
             auto xs = bulk::partitioned_array<int, 2, 2>(world, part);
 
             xs.local({0, 0}) = s;

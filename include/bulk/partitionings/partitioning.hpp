@@ -19,8 +19,8 @@ template <int D>
 class partitioning {
    public:
     /** Construct a partitioning for a global size. */
-    partitioning(bulk::world& world, index_type<D> global_size)
-        : world_(world), global_size_(global_size) {}
+    partitioning(index_type<D> global_size)
+        : global_size_(global_size) {}
 
     virtual ~partitioning() = default;
 
@@ -30,9 +30,6 @@ class partitioning {
 
     /** of an arbitrary processor */
     virtual index_type<D> local_size(int processor) = 0;
-
-    /** of the local processor */
-    index_type<D> local_size() { return local_size(world_.processor_id()); }
 
     /** the total count of elements on a processor */
     int local_count(int processor) {
@@ -49,7 +46,6 @@ class partitioning {
     virtual index_type<D> local_to_global(index_type<D> xs, int processor) = 0;
 
    protected:
-    bulk::world& world_;
     index_type<D> global_size_;
 };
 
@@ -59,9 +55,9 @@ class multi_partitioning : public partitioning<D> {
    public:
     using partitioning<D>::local_size;
 
-    multi_partitioning(bulk::world& world, index_type<D> global_size,
+    multi_partitioning(index_type<D> global_size,
                        index_type<G> grid_size)
-        : partitioning<D>(world, global_size), grid_size_(grid_size) {}
+        : partitioning<D>(global_size), grid_size_(grid_size) {}
 
     virtual ~multi_partitioning() = default;
 
@@ -96,9 +92,9 @@ class rectangular_partitioning : public multi_partitioning<D, G> {
    public:
     using multi_partitioning<D, G>::local_to_global;
 
-    rectangular_partitioning(bulk::world& world, index_type<D> global_size,
+    rectangular_partitioning(index_type<D> global_size,
                              index_type<G> grid_size)
-        : multi_partitioning<D, G>(world, global_size, grid_size) {}
+        : multi_partitioning<D, G>(global_size, grid_size) {}
 
     /** Support origin queries by flattened, or multi-index */
     virtual index_type<D> origin(index_type<G> processor) const {

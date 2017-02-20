@@ -21,9 +21,8 @@ class cyclic_partitioning : public multi_partitioning<D, G> {
      * `grid`: the number of processors in each dimension
      * `data_size`: the global number of processors along each axis
      */
-    cyclic_partitioning(bulk::world& world, index_type<D> data_size,
-                        index_type<G> grid)
-        : multi_partitioning<D, G>(world, data_size, grid) {
+    cyclic_partitioning(index_type<D> data_size, index_type<G> grid)
+        : multi_partitioning<D, G>(data_size, grid) {
         static_assert(G <= D,
                       "Dimensionality of the data should be larger or equal to "
                       "that of the processor grid.");
