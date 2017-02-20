@@ -1,40 +1,36 @@
 #pragma once
 
-#include <iostream>
-
 extern int total, success;
 
 #define BULK_CHECK_ONCE(body, error)                           \
     if (world.processor_id() == 0) {                           \
         ++total;                                               \
         if (!(body)) {                                         \
-            std::cout << "  FAILED: *did not* " << error << "\n";        \
+            world.log("  FAILED: *did not* %s", error);        \
         } else {                                               \
             ++success;                                         \
-            std::cout << "  SUCCESS: " << error << "\n"; \
+            world.log("  SUCCESS: %s", error);                 \
         }                                                      \
     }
 
 #define BULK_SECTION(name)                        \
     if (world.processor_id() == 0) {              \
-        std::cout << "SECTION: " << name << "\n"; \
+        world.log("SECTION: %s", name);           \
     }
 
 #define BULK_REQUIRE(body)           \
     if (world.processor_id() == 0) { \
-        assert(body);                \
+        if (!(body)) {                                  \
+            world.log("  ASSERTION FAILED: %s", #body); \
+            world.abort();                              \
+        }                                               \
     }
 
 #define BULK_FINALIZE_TESTS(env)                                     \
-    env.spawn(env.available_processors(), [](auto world, int, int) { \
+    env.spawn(env.available_processors(), [](auto& world, int, int) { \
         if (world.processor_id() == 0) {                             \
-            std::cout << "-------------\n";                          \
-            std::cout << total - success << " tests of " << total    \
-                      << " failed.\n";                               \
+            world.log("-------------");                              \
+            world.log("%d test(s) of %d failed.", total - success, total);    \
         }                                                            \
     })
 
-#define BULK_MESSAGE(body)           \
-    if (world.processor_id() == 0) { \
-        std::cout << body << "\n";   \
-    }

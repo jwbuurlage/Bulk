@@ -8,7 +8,6 @@ Bulk API reference
 
    environment
    world
-   provider
 
 **Variables**:
 
@@ -37,3 +36,15 @@ Bulk API reference
 
    foldl
    gather_all
+
+**Partitioning**:
+
+.. toctree::
+   :maxdepth: 2
+
+   partitioning
+   multi_partitioning
+   rectangular_partitioning
+   block_partitioning
+   cyclic_partitioning
+   tree_partitioning

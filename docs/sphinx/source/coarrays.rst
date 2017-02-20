@@ -5,7 +5,7 @@ Co-arrays are a convenient way to store, and manipulate distributed arrays. Thes
 
 .. code-block:: cpp
 
-    auto xs = bulk::create_coarray<int>(world, 5);
+    auto xs = bulk::coarray<int>(world, 5);
 
 Here, we create a co-array with local size equal to *5*. The total number of elements in the co-array is therefore :code:`5 * p`. We use a constant size here, but this is not required as the local size is allowed to vary over the processors. Co-arrays provide syntactic sugar to make manipulating distributed arrays as easy as possible. For example, we can write:
 

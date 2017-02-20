@@ -9,7 +9,7 @@ extern void test_initialization();
 extern void test_communication();
 extern void test_partitioning();
 
-bulk::environment<provider> env = {};
+environment env;
 
 int main() {
     test_initialization();

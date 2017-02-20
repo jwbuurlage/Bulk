@@ -29,16 +29,11 @@
 
 #include <array>
 
-#include "partitioning.hpp"
 #include "coarray.hpp"
 #include "future.hpp"
-#include "util/meta_helpers.hpp"
+#include "partitionings/partitioning.hpp"
 
 namespace bulk {
-
-template <int D, typename... Ts>
-using check_dim =
-    typename std::enable_if<count_of_type<D, int, Ts...>::value>::type;
 
 /**
  * A partitioned array is a distributed array with an associated partitioning.
@@ -49,52 +44,50 @@ using check_dim =
  * TODO: think about template argument storage class (coarray by default)
  * TODO: this about specializing for 'rectangular partitionings'
  */
-template <typename T, int D, typename World>
+template <typename T, int D, int G>
 class partitioned_array {
    public:
     /** Construct a partitioned array from a given partitioning. */
-    partitioned_array(World& world, partitioning<D, D>& part)
+    partitioned_array(bulk::world& world, multi_partitioning<D, G>& part)
         : world_(world),
-          part_(part),
-          data_(world, part_.local_element_count(world.processor_id())) {
-        multi_id_ = unflatten<D>(part_.grid(), world.processor_id());
+          partitioning_(part),
+          data_(world,
+                partitioning_.local_count(world.processor_id())) {
+        multi_id_ = unflatten<D>(partitioning_.grid(), world.processor_id());
     }
 
     /** Obtain an image to a (possibly remote) element using a global index. */
-    template <typename... Ts, typename = check_dim<D, Ts...>>
-    auto global(Ts... index) {
-        auto owner = part_.owner({index...});
-        auto idx = flatten<D>(part_.local_extent(owner),
-                              part_.local_index({index...}));
-        return data_(flatten<D>(part_.grid(), part_.owner({index...})))[idx];
+    auto global(index_type<D> index) {
+        auto owner = partitioning_.owner(index);
+        auto local_idx = partitioning_.global_to_local(index);
+        return data_(
+            owner)[flatten<D>(partitioning_.local_size(owner), local_idx)];
     }
 
     /** Obtain an element using its local index. */
-    template <typename... Ts, typename = check_dim<D, Ts...>>
-    T& local(Ts... index) {
-        return data_[flatten<D>(part_.local_extent(multi_id_), {index...})];
+    T& local(index_type<D> index) {
+        return data_[flatten<D>(partitioning_.local_size(multi_id_), index)];
     }
 
     /// ditto
-    template <typename... Ts, typename = check_dim<D, Ts...>>
-    const T& local(Ts... index) const {
-        return data_[flatten<D>(part_.local_extent(multi_id_), {index...})];
+    const T& local(index_type<D> index) const {
+        return data_[flatten<D>(partitioning_.local_size(multi_id_), index)];
     }
 
     /** Obtain a reference to the world. */
-    auto world() const { return world_ ; }
+    auto world() const { return world_; }
 
    private:
     std::array<int, D> multi_id_;
 
     // world in which this array resides
-    World& world_;
+    bulk::world& world_;
 
     // underlying partitioning
-    partitioning<D, D>& part_;
+    multi_partitioning<D, G>& partitioning_;
 
     // linear storage
-    bulk::coarray<T, World> data_;
+    bulk::coarray<T> data_;
 };
 
 }  // namespace bulk

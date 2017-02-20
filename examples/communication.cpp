@@ -2,10 +2,10 @@
 #include "set_backend.hpp"
 
 int main() {
-    bulk::environment<provider> env;
+    environment env;
 
-    env.spawn(env.available_processors(), [](auto world, int s, int p) {
-        auto a = bulk::create_var<int>(world);
+    env.spawn(env.available_processors(), [](bulk::world& world, int s, int p) {
+        bulk::var<int> a(world);
 
         a(world.next_processor()) = s;
         world.sync();

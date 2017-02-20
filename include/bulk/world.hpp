@@ -1,57 +1,41 @@
 #pragma once
 
+#include <cstddef>
+#include <string>
+
 /**
  * \file world.hpp
  *
  * This objects encodes the world of a processor and its place within it.
  */
 
-#include "messages.hpp"
-
-#include <functional>
-#include <memory>
-#include <vector>
-
 namespace bulk {
 
 /**
  * This objects encodes the world of a processor and its place within it.
  */
-template <class WorldBackend>
 class world {
   public:
-    using Implementation = typename WorldBackend::implementation;
+    world(){};
+    virtual ~world(){};
 
-    template <typename Tag, typename Content>
-    using queue_type = typename WorldBackend::template queue_type<Tag, Content>;
-
-    template <typename T>
-    using var_type = typename WorldBackend::template var_type<T>;
-
-    template <typename T>
-    using future_type = typename WorldBackend::template future_type<T>;
-
-    template <typename T>
-    using coarray_type = typename WorldBackend::template coarray_type<T>;
-
-    template <typename T>
-    using array_type = typename WorldBackend::template array_type<T>;
+    // No copies
+    world(world& other) = delete;
+    void operator=(world& other) = delete;
 
     /**
      * Retrieve the total number of active processors in a spmd section
      *
      * \returns the number of active processors
      */
-    int active_processors() const {
-        return implementation_.active_processors();
-    }
+    virtual int active_processors() const = 0;
 
     /**
      * Retrieve the local processor id
      *
      * \returns an integer containing the id of the local processor
      */
-    int processor_id() const { return implementation_.processor_id(); }
+    virtual int processor_id() const = 0;
 
     /**
      * Retrieve the id of the next logical processor
@@ -85,7 +69,7 @@ class world {
      * When some processors call `sync` while others call `barrier`
      * at the same time, behaviour is undefined.
      */
-    void sync() { implementation_.sync(); }
+    virtual void sync() = 0;
 
     /**
      * Performs a global barrier synchronization of the active processors
@@ -94,7 +78,7 @@ class world {
      * When some processors call `sync` while others call `barrier`
      * at the same time, behaviour is undefined.
      */
-    void barrier() { implementation_.barrier(); }
+    virtual void barrier() = 0;
 
     /**
      * Print output for debugging, shown at the next synchronization.
@@ -111,7 +95,11 @@ class world {
      */
     template <typename... Ts>
     void log(const char* format, const Ts&... ts) {
-        implementation_.log(format, ts...);
+        size_t size = snprintf(0, 0, format, ts...);
+        char* buffer = new char[size + 1];
+        snprintf(buffer, size + 1, format, ts...);
+        log_(std::string(buffer));
+        delete[] buffer;
     }
 
     /**
@@ -122,76 +110,48 @@ class world {
      * If any processor calls abort, all processors will stop
      * and `bulk::environment::spawn` will throw an exception.
      */
-    void abort() { implementation_.abort(); }
+    virtual void abort() = 0;
 
-    /**
-     * Retrieve the implementation of the world
-     *
-     * \returns the distributed system implementation
-     *
-     */
-    // FIXME: make a choice for the name
-    Implementation& implementation() { return implementation_; }
-    Implementation& provider() { return implementation_; }
+  protected:
+    //
+    // Internal functions
+    //
+    template <typename T>
+    friend class var;
 
-  private:
-    Implementation implementation_;
+    template <typename T>
+    friend class array;
+
+    template <typename T>
+    friend class coarray;
+
+    template <typename Tag, typename Content>
+    friend class queue;
+
+    // Returns the id of the registered location
+    virtual int register_location_(void* location) = 0;
+    virtual void unregister_location_(int id) = 0;
+
+    virtual void put_(int processor, const void* value, std::size_t size,
+                      int var_id) = 0;
+    // Size is per element
+    virtual void put_(int processor, const void* values, std::size_t size, int var_id,
+                      std::size_t offset, int count) = 0;
+
+    virtual void get_(int processor, int var_id, std::size_t size, void* target) = 0;
+    // Size is per element
+    virtual void get_(int processor, int var_id, std::size_t size, void* target,
+                      std::size_t offset, int count) = 0;
+
+    virtual int register_queue_(class queue_base* q) = 0;
+    virtual void unregister_queue_(int id) = 0;
+
+    // data consists of both tag and content. size is total size.
+    virtual void send_(int processor, int queue_id, const void* data,
+                       std::size_t size) = 0;
+
+    virtual void log_(std::string message) = 0;
+
 };
-
-/**
- * Constructs a variable that is registered with `world`.
- *
- * \tparam T the type of the variable
- * \param world the distributed layer in which the variable is defined.
- *
- * \returns a newly constructed and registered variable
- */
-template <typename T, class World>
-typename World::template var_type<T> create_var(World& world) {
-    return typename World::template var_type<T>(world);
-}
-
-/**
- * Constructs a coarray, and registers it with `world`.
- *
- * \param world the distributed layer in which the coarray is defined.
- * \param size the size of the local coarray
- *
- * \returns a newly allocated and registered coarray
- */
-template <typename T, typename World>
-typename World::template coarray_type<T> create_coarray(World& world,
-                                                        int local_size) {
-    return typename World::template coarray_type<T>(world, local_size);
-}
-
-/**
- * Constructs a future, and registers it with `world`.
- *
- * \tparam T the type of the variable
- *
- * \param world the distributed layer in which the future is defined.
- *
- * \returns a newly constructed and registered future
- */
-template <typename T, typename World>
-typename World::template future_type<T> create_future(World& world) {
-    return typename World::template future_type<T>(world);
-}
-
-/**
- * Constructs a message queue, and registers it with `world`.
- *
- * \tparam Tag the tag type of the queue
- * \tparam Conent the content type of the queue
- *
- * \param world the distributed layer in which the queue is defined.
- *
- * \returns a newly constructed and registered queue
- */
-template <typename Tag, typename Content, typename World>
-typename World::template queue_type<Tag, Content> create_queue(World& world) {
-    return typename World::template queue_type<Tag, Content>(world);
-}
 
 } // namespace bulk

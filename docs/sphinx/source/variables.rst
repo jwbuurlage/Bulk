@@ -5,19 +5,9 @@ Now that we are able to set up the environment, and gained some familiarity with
 
 .. code-block:: cpp
 
-    auto x = bulk::create_var<int>(world);
+    auto x = bulk::var<int>(world);
 
 Here we create a distributed variable that holds an integer. A distributed variable exists on every processor, but can have different values on different processors. These different local 'copies' are referred to as *images* of the variable. The variable lives within the *world* of the current SPMD section, and we explicitely write this by passing the world object as a parameter to the variable creation function.
-
-
-.. note::
-    As a technical note, we mention that the :code:`create_var` and related functions, are available purely as convenience methods. The type of the variable depends on the backend, and can be very complicated. The create function helps the user to prevent writing:
-
-    .. code-block:: cpp
-
-        typename decltype(world)::var_type<int> x(world);
-
-    Instead, it deduces the correct type itself.
 
 While :code:`x` refers to the *local image* of a variable, it is identified with images on remote processors by the order in which variables are constructed (which is possible because of the SPMD nature of Bulk programs). This allows us to *write to* and *read from* remote images of a variable by simply passing :code:`x` to communication functions.
 

@@ -11,6 +11,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../../../bin)
 
 # Bulk examples that work for any backend
 
+add_custom_target(cpp)
+
 set(
     EXAMPLE_DIR
     "../../../examples/"
@@ -29,10 +31,10 @@ foreach(source_file ${EXAMPLE_SOURCES})
     string(REPLACE ".cpp" "" source_name ${source_file})
     add_executable(cpp_${source_name} ${EXAMPLE_DIR}${source_file})
     target_link_libraries(cpp_${source_name} )
+    add_dependencies(cpp cpp_${source_name})
 endforeach(source_file)
 
 # Bulk tests that work for any backend
-
 
 set(TEST_DIR "../../../test")
 
@@ -46,6 +48,7 @@ set(
 
 add_executable(cpp_test ${TEST_SOURCES})
 target_link_libraries(cpp_test)
+add_dependencies(cpp cpp_test)
 
 # Examples specific for cpp backend
 
@@ -63,4 +66,5 @@ foreach(source_file ${EXAMPLE_SOURCES})
     string(REPLACE ".cpp" "" source_name ${source_file})
     add_executable(${source_name} ${EXAMPLE_DIR}${source_file})
     target_link_libraries( ${source_name} )
+    add_dependencies(cpp ${source_name})
 endforeach(source_file)

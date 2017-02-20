@@ -1,5 +1,9 @@
 #pragma once
 
+#include <cstddef>
+
+#include "future.hpp"
+
 /**
  * \file array.hpp
  *
@@ -12,21 +16,19 @@ namespace bulk {
  * A distributed variable representing an array on each processor.
  *
  * This object is the default implementation of a distributed _array_.
- * Specialized arrays can be provided by providers, but will always behave like
- * this array.
  */
-template <typename T, class World>
+template <typename T>
 class array {
-  public:
+   public:
     /**
      * Constructs an array, and registers it with `world`.
      *
      * \param world the distributed layer in which the array is defined.
      * \param size the size of the local array
      */
-    array(World& world, int size) : world_(world), size_(size) {
+    array(bulk::world& world, std::size_t size) : world_(world), size_(size) {
         data_ = new T[size];
-        world_.implementation().register_location_(data_, sizeof(T) * size);
+        id_ = world_.register_location_(data_);
     }
 
     /**
@@ -34,7 +36,7 @@ class array {
      */
     ~array() {
         if (data_ != nullptr) {
-            world_.implementation().unregister_location_(data_);
+            world_.unregister_location_(id_);
             delete[] data_;
         }
     }
@@ -58,7 +60,7 @@ class array {
      *
      * \returns a reference to the world of the array
      */
-    World& world() { return world_; }
+    bulk::world& world() { return world_; }
 
     /**
      * Get an iterator to the beginning of the local image of the array.
@@ -74,23 +76,35 @@ class array {
      */
     T* end() { return data_ + size_; }
 
-  private:
-    World& world_;
+    /**
+     * Put values to another processor
+     *
+     */
+    void put(int processor, T* values, int offset, int count = 1) {
+        world_.put_(processor, values, sizeof(T), id_, offset, count);
+    }
+
+    future<T> get(int processor, int offset, int count = 1) {
+        // TODO future with count other than 1
+        if (count != 1) {
+            world_.log("Getting with count other than 1 is not yet supported\n");
+            count = 1;
+        }
+
+        future<T> result(world_);
+        world_.get_(processor, id_, sizeof(T), &result.value(), offset, 1);
+        return result;
+    }
+
+    std::size_t size() const {
+        return size_;
+    }
+
+   private:
+    bulk::world& world_;
     T* data_;
-    int size_;
+    std::size_t size_;
+    int id_;
 };
 
-/**
- * Constructs an array, and registers it with `world`.
- *
- * \param world the distributed layer in which the array is defined.
- * \param size the size of the local array
- *
- * \returns a newly allocated and registered array
- */
-template<typename T, typename World>
-typename World::template array_type<T> create_array(World& world, int size) {
-      return array<T, World>(world, size);
-}
-
-} // namespace bulk
+}  // namespace bulk
