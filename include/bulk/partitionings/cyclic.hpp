@@ -3,15 +3,12 @@
 namespace bulk {
 
 /**
- * This cyclic partitioning is an initial draft of what will eventually part of
- * a bigger class of partitionings.
- *
- * In particular, block distributions are nearly identical, except for indexing
- * functions being slightly different, make common base class for this.
- *
- * Future challenges include how to coalesce lookups for distributed owner/index
- * tables.
+ * A cyclic partitioning distributes the indices of a D-dimension space over the
+ * first G axes, where G is the dimensionality of the processor grid.
  */
+
+// TODO:  Future challenges include how to coalesce lookups for distributed
+// owner/index tables.
 template <int D, int G = D>
 class cyclic_partitioning : public multi_partitioning<D, G> {
    public:

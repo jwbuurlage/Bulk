@@ -33,8 +33,9 @@ void test_partitioning() {
                             "compute correctly the cyclic size");
             BULK_CHECK_ONCE(part.global_to_local({4, 3})[0] == 4 / N,
                             "compute correctly the cyclic local index");
-            BULK_CHECK_ONCE(part.local_to_global({1, 1}, {s % N, s / N})[0] == N,
-                            "compute correctly the cyclic global index");
+            BULK_CHECK_ONCE(
+                part.local_to_global({1, 1}, {s % N, s / N})[0] == N,
+                "compute correctly the cyclic global index");
         }
 
         BULK_SECTION("Block partitioning") {
@@ -52,6 +53,31 @@ void test_partitioning() {
                             "compute correctly the block origin (1)");
             BULK_CHECK_ONCE(part.origin(2)[1] == 10,
                             "compute correctly the block origin (2)");
+        }
+
+        BULK_SECTION("Block partitioning custom axes") {
+            // construct a block partitioning only in the 2nd axis
+            auto part = bulk::block_partitioning<2, 1>(world, {10 * p, 10 * p},
+                                                       {p}, {1});
+
+            BULK_CHECK_ONCE(part.owner({0, 13}) == 1,
+                            "compute correctly the block owner");
+            BULK_CHECK_ONCE(part.local_size(1)[0] == 10 * p,
+                            "compute correctly the block size [0]");
+            BULK_CHECK_ONCE(part.local_size(1)[1] == 10,
+                            "compute correctly the block size [1]");
+            BULK_CHECK_ONCE(part.global_to_local({3, 12})[1] == 2,
+                            "compute correctly the block index");
+            BULK_CHECK_ONCE(part.origin(0)[1] == 0,
+                            "compute correctly the block origin (0)[1]");
+            BULK_CHECK_ONCE(part.origin(1)[1] == 10,
+                            "compute correctly the block origin (1)[1]");
+            BULK_CHECK_ONCE(part.origin(2)[1] == 20,
+                            "compute correctly the block origin (2)[1]");
+            BULK_CHECK_ONCE(part.origin(0)[0] == 0,
+                            "compute correctly the block origin (0)[0]");
+            BULK_CHECK_ONCE(part.origin(1)[0] == 0,
+                            "compute correctly the block origin (1)[0]");
         }
 
         BULK_SECTION("Binary-split-partitioning") {

@@ -20,15 +20,27 @@ class block_partitioning : public rectangular_partitioning<D, G> {
      */
     block_partitioning(bulk::world& world, index_type<D> data_size,
                        index_type<G> grid)
-        : rectangular_partitioning<D, G>(world, data_size, grid) {
+        : block_partitioning(world, data_size, grid, iota_()) {}
+
+    /**
+     * Constructs a block partitioning in nD.
+     *
+     * `grid`: the number of processors in each dimension
+     * `data_size`: the global number of processors along each axis
+     * `axes`: an array of size `G` that indicates the axes over which to
+     * partition
+     */
+    block_partitioning(bulk::world& world, index_type<D> data_size,
+                       index_type<G> grid, index_type<G> axes)
+        : rectangular_partitioning<D, G>(world, data_size, grid), axes_(axes) {
         static_assert(G <= D,
                       "Dimensionality of the data should be larger or equal to "
                       "that of the processor grid.");
-        for (int d = 0; d < G; ++d) {
+        block_size_ = data_size;
+
+        for (int i = 0; i < G; ++i) {
+            int d = axes_[i];
             block_size_[d] = ((data_size[d] - 1) / grid[d]) + 1;
-        }
-        for (int d = G; d < D; ++d) {
-            block_size_[d] = data_size[d];
         }
     }
 
@@ -44,42 +56,52 @@ class block_partitioning : public rectangular_partitioning<D, G> {
     /** The total number of elements along each axis on the processor index with
      * `idxs...` */
     index_type<D> local_size(index_type<G> idxs) override final {
-        index_type<D> size;
-        for (int dim = 0; dim < G; ++dim) {
-            size[dim] = (this->global_size_[dim] + this->grid_size_[dim] -
+        index_type<D> size = this->global_size_;
+        for (int i = 0; i < G; ++i) {
+            auto dim = axes_[i];
+
+            size[dim] = (this->global_size_[dim] + this->grid_size_[i] -
                          idxs[dim] - 1) /
-                        this->grid_size_[dim];
-        }
-        for (int dim = G; dim < D; ++dim) {
-            size[dim] = this->global_size_[dim];
+                        this->grid_size_[i];
         }
         return size;
     }
 
     /** Block in first 'G' dimensions. */
     index_type<G> grid_owner(index_type<D> xs) override final {
-        index_type<G> result;
-        for (int d = 0; d < G; ++d) {
-            result[d] = xs[d] / block_size_[d];
+        index_type<G> result = {};
+        for (int i = 0; i < G; ++i) {
+            auto d = axes_[i];
+            result[i] = xs[d] / block_size_[d];
         }
         return result;
     }
 
-    // obtain the block size in each dimension
-    index_type<G> block_size() const { return block_size_; }
+    /** Obtain the block size in each dimension. */
+    index_type<D> block_size() const { return block_size_; }
 
     /** Obtain the origin of the block of processor `t`. */
     index_type<D> origin(int t) const override {
         auto multi_index = unflatten<G>(this->grid_size_, t);
         index_type<D> result;
-        for (int d = 0; d < G; ++d) {
+        for (int i = 0; i < G; ++i) {
+            auto d = axes_[i];
             result[d] = block_size_[d] * multi_index[d];
         }
         return result;
     }
 
    private:
-    index_type<G> block_size_;
+    index_type<D> block_size_;
+    index_type<G> axes_;
+
+    static index_type<G> iota_() {
+        index_type<G> result;
+        for (int i = 0; i < G; ++i) {
+            result[i] = i;
+        }
+        return result;
+    }
 };
 
 }  // namespace bulk
