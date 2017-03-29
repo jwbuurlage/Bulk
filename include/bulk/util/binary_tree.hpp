@@ -26,7 +26,7 @@ struct binary_tree {
         T value;
     };
 
-    node* add(node* parent, dir direction, T value) {
+    node* add(const node* parent, dir direction, T value) {
         if (parent != nullptr) {
             if (direction == dir::left) {
                 parent->left = std::make_unique<node>(value);

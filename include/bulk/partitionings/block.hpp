@@ -83,7 +83,7 @@ class block_partitioning : public rectangular_partitioning<D, G> {
     /** Obtain the origin of the block of processor `t`. */
     index_type<D> origin(int t) const override {
         auto multi_index = unflatten<G>(this->grid_size_, t);
-        index_type<D> result;
+        index_type<D> result = {};
         for (int i = 0; i < G; ++i) {
             auto d = axes_[i];
             result[d] = block_size_[d] * multi_index[d];
@@ -96,7 +96,7 @@ class block_partitioning : public rectangular_partitioning<D, G> {
     index_type<G> axes_;
 
     static index_type<G> iota_() {
-        index_type<G> result;
+        index_type<G> result = {};
         for (int i = 0; i < G; ++i) {
             result[i] = i;
         }
