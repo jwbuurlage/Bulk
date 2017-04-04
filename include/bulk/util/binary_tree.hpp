@@ -21,12 +21,23 @@ struct binary_tree {
     struct node {
         node(T value_) : value(value_) {}
 
+        int size() {
+            int result = 1;
+            if (left) {
+                result += left->size();
+            }
+            if (right) {
+                result += right->size();
+            }
+            return result;
+        }
+
         std::unique_ptr<node> left = nullptr;
         std::unique_ptr<node> right = nullptr;
         T value;
     };
 
-    node* add(const node* parent, dir direction, T value) {
+    node* add(node* parent, dir direction, T value) {
         if (parent != nullptr) {
             if (direction == dir::left) {
                 parent->left = std::make_unique<node>(value);
@@ -39,6 +50,13 @@ struct binary_tree {
             root = std::make_unique<node>(value);
             return root.get();
         }
+    }
+
+    int size() {
+        if (root) {
+            return root->size();
+        }
+        return 0;
     }
 
     std::unique_ptr<node> root;
