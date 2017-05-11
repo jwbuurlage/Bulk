@@ -39,6 +39,11 @@ if(MPI_CXX_FOUND)
         add_dependencies(mpi mpi_${source_name})
     endforeach(source_file)
 
+    # Benchmark executable
+    add_executable(mpi_benchmark "../../../benchmark/benchmark.cpp")
+    target_link_libraries(mpi_benchmark ${MPI_LIBRARIES})
+    add_dependencies(mpi mpi_benchmark)
+
     set(TEST_DIR "../../../test")
 
     set(
