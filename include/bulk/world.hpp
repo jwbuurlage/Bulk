@@ -134,12 +134,12 @@ class world {
 
     virtual void put_(int processor, const void* value, std::size_t size,
                       int var_id) = 0;
-    // Size is per element
+    // size is per element
     virtual void put_(int processor, const void* values, std::size_t size, int var_id,
                       std::size_t offset, int count) = 0;
 
     virtual void get_(int processor, int var_id, std::size_t size, void* target) = 0;
-    // Size is per element
+    // size is per element
     virtual void get_(int processor, int var_id, std::size_t size, void* target,
                       std::size_t offset, int count) = 0;
 
@@ -151,7 +151,6 @@ class world {
                        std::size_t size) = 0;
 
     virtual void log_(std::string message) = 0;
-
 };
 
 } // namespace bulk
