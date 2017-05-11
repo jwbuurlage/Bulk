@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <cstddef>
 
 #include "future.hpp"
@@ -77,11 +78,23 @@ class array {
     T* end() { return data_ + size_; }
 
     /**
-     * Put values to another processor
-     *
+     * Put raw values to another processor
      */
     void put(int processor, T* values, int offset, int count = 1) {
         world_.put_(processor, values, sizeof(T), id_, offset, count);
+    }
+
+    /**
+     * Put iterated values to another processor
+     */
+    template <typename FwdIterator>
+    void put(int processor, FwdIterator first, FwdIterator last, int offset = 0) {
+        std::vector<T> values;
+        for (; first != last; ++first) {
+            values.push_back(*first);
+        }
+        world_.put_(processor, values.data(), sizeof(T), id_, offset,
+                    values.size());
     }
 
     future<T> get(int processor, int offset, int count = 1) {

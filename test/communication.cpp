@@ -151,6 +151,18 @@ void test_communication() {
             }
         }
 
+        BULK_SECTION("Put array") {
+            std::vector<int> test(10);
+            std::iota(test.begin(), test.end(), 1);
+
+            bulk::coarray<int> xs(world, 10, 5);
+            xs.put(world.next_processor(), test.begin(), test.end());
+            world.sync();
+
+            BULK_CHECK_ONCE(xs[5] == 6, "can put iterator range");
+        }
+
+
         BULK_SECTION("Coarray") {
             bulk::coarray<int> zs(world, 10);
 
