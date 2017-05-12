@@ -149,6 +149,14 @@ class coarray {
     }
 
     /**
+     * Put data defined by an iterator pair in a remote image.
+     */
+    template <typename FwdIterator>
+    void put(int processor, FwdIterator first, FwdIterator last, int offset = 0) {
+        data_.put(processor, first, last, offset);
+    }
+
+    /**
      * Obtain a future to the value of element `idx` on processor `t`.
      */
     auto get(int t, int idx) { return bulk::get<T>(t, data_, idx, 1); }

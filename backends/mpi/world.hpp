@@ -1,12 +1,13 @@
 #pragma once
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 
-#include <mpi.h>
 #include <bulk/messages.hpp>
 #include <bulk/world.hpp>
+#include <mpi.h>
 
 #include "memory_buffer.hpp"
 
@@ -51,7 +52,7 @@ enum class get_t : int { request_single, request_multiple };
 // code reuse and modularity here
 
 class world : public bulk::world {
-   public:
+  public:
     world() : bulk::world() {
         MPI_Comm_size(MPI_COMM_WORLD, &active_processors_);
         MPI_Comm_rank(MPI_COMM_WORLD, &processor_id_);
@@ -133,7 +134,7 @@ class world : public bulk::world {
 
     void abort() override final {}
 
-   protected:
+  protected:
     // Returns the id of the registered location
     int register_location_(void* location) override final {
         locations_[next_index_] = location;
@@ -142,25 +143,26 @@ class world : public bulk::world {
 
     void unregister_location_(int id) override final { locations_.erase(id); }
 
-    void put_(int processor, const void* value, std::size_t size,
+    void put_(int processor, const void* value, size_t size,
               int var_id) override final {
         put_buffers_[processor] << put_t::single;
         put_buffers_[processor] << var_id;
         put_buffers_[processor] << size;
         put_buffers_[processor].push(size, value);
     }
+
     // Size is per element
-    void put_(int processor, const void* values, std::size_t size, int var_id,
-              std::size_t offset, int count) override final {
+    void put_(int processor, const void* values, size_t size, int var_id,
+              size_t offset, int count) override final {
         put_buffers_[processor] << put_t::multiple;
         put_buffers_[processor] << var_id;
-        std::size_t total_offset = offset * size;
+        size_t total_offset = offset * size;
         put_buffers_[processor] << total_offset;
-        put_buffers_[processor] << (std::size_t)(size * count);
-        put_buffers_[processor].push(size, values);
+        put_buffers_[processor] << (size_t)(size * count);
+        put_buffers_[processor].push(size * count, values);
     }
 
-    void get_(int processor, int var_id, std::size_t size,
+    void get_(int processor, int var_id, size_t size,
               void* target) override final {
         get_request_buffers_[processor] << get_t::request_single;
         get_request_buffers_[processor] << var_id;
@@ -170,13 +172,13 @@ class world : public bulk::world {
     }
 
     // Size is per element
-    void get_(int processor, int var_id, std::size_t size, void* target,
-              std::size_t offset, int count) override final {
+    void get_(int processor, int var_id, size_t size, void* target,
+              size_t offset, int count) override final {
         get_request_buffers_[processor] << get_t::request_multiple;
         get_request_buffers_[processor] << var_id;
-        std::size_t total_offset = offset * size;
+        size_t total_offset = offset * size;
         get_request_buffers_[processor] << total_offset;
-        get_request_buffers_[processor] << (std::size_t)(size * count);
+        get_request_buffers_[processor] << (size_t)(size * count);
         get_request_buffers_[processor] << target;
         get_request_buffers_[processor] << processor_id_;
     }
@@ -190,7 +192,7 @@ class world : public bulk::world {
 
     // data consists of both tag and content. size is total size.
     void send_(int processor, int queue_id, const void* data,
-               std::size_t size) override {
+               size_t size) override {
         message_buffers_[processor] << queue_id;
         message_buffers_[processor] << size;
         message_buffers_[processor].push(size, data);
@@ -200,7 +202,7 @@ class world : public bulk::world {
         printf("$%i (%s): %s\n", processor_id_, name_, message.c_str());
     }
 
-   private:
+  private:
     bool send_buffer_(memory_buffer& buf, message_t tag, int processor) {
         // start sending put buffers
         if (buf.size() > 0) {
@@ -245,36 +247,36 @@ class world : public bulk::world {
         auto reader = buf.reader();
         while (!reader.empty()) {
             int var_id = 0;
-            std::size_t offset = 0;
-            std::size_t size = 0;
+            size_t offset = 0;
+            size_t size = 0;
 
             put_t put_type;
             reader >> put_type;
 
             switch (put_type) {
-                case put_t::single: {
-                    reader >> var_id;
-                    reader >> size;
-                    reader.copy(size, locations_.at(var_id));
-                    break;
-                }
+            case put_t::single: {
+                reader >> var_id;
+                reader >> size;
+                reader.copy(size, locations_.at(var_id));
+                break;
+            }
 
-                case put_t::multiple: {
-                    reader >> var_id;
-                    reader >> offset;
-                    reader >> size;
+            case put_t::multiple: {
+                reader >> var_id;
+                reader >> offset;
+                reader >> size;
 
-                    auto write_location = (char*)locations_.at(var_id) + offset;
-                    reader.copy(size, write_location);
+                auto write_location = (char*)locations_.at(var_id) + offset;
+                reader.copy(size, write_location);
 
-                    break;
-                }
+                break;
+            }
 
-                default: {
-                    log("ERROR: Unknown type of put message");
-                    abort();
-                    break;
-                }
+            default: {
+                log("ERROR: Unknown type of put message");
+                abort();
+                break;
+            }
             }
         }
         buf.clear();
@@ -286,47 +288,47 @@ class world : public bulk::world {
             int var_id = 0;
             void* target = 0;
             int processor = 0;
-            std::size_t offset = 0;
-            std::size_t size = 0;
+            size_t offset = 0;
+            size_t size = 0;
 
             get_t get_type;
             reader >> get_type;
 
             switch (get_type) {
-                case get_t::request_single: {
-                    reader >> var_id;
-                    reader >> size;
-                    reader >> target;
-                    reader >> processor;
+            case get_t::request_single: {
+                reader >> var_id;
+                reader >> size;
+                reader >> target;
+                reader >> processor;
 
-                    get_response_buffers_[processor] << target;
-                    get_response_buffers_[processor] << size;
-                    get_response_buffers_[processor].push(
-                        size, locations_.at(var_id));
+                get_response_buffers_[processor] << target;
+                get_response_buffers_[processor] << size;
+                get_response_buffers_[processor].push(size,
+                                                      locations_.at(var_id));
 
-                    break;
-                }
+                break;
+            }
 
-                case get_t::request_multiple: {
-                    reader >> var_id;
-                    reader >> offset;
-                    reader >> size;
-                    reader >> target;
-                    reader >> processor;
+            case get_t::request_multiple: {
+                reader >> var_id;
+                reader >> offset;
+                reader >> size;
+                reader >> target;
+                reader >> processor;
 
-                    get_response_buffers_[processor] << target;
-                    get_response_buffers_[processor] << size;
-                    get_response_buffers_[processor].push(
-                        size, (char*)locations_.at(var_id) + offset);
+                get_response_buffers_[processor] << target;
+                get_response_buffers_[processor] << size;
+                get_response_buffers_[processor].push(
+                    size, (char*)locations_.at(var_id) + offset);
 
-                    break;
-                }
+                break;
+            }
 
-                default: {
-                    log("ERROR: Unknown type of get message");
-                    abort();
-                    break;
-                }
+            default: {
+                log("ERROR: Unknown type of get message");
+                abort();
+                break;
+            }
             }
         }
         buf.clear();
@@ -338,7 +340,7 @@ class world : public bulk::world {
         auto reader = buf.reader();
         while (!reader.empty()) {
             void* target = 0;
-            std::size_t size = 0;
+            size_t size = 0;
             reader >> target;
             reader >> size;
             reader.copy(size, target);
@@ -349,7 +351,7 @@ class world : public bulk::world {
     void process_messages_(memory_buffer& buf) {
         auto reader = buf.reader();
         int queue_id;
-        std::size_t size;
+        size_t size;
         while (!reader.empty()) {
             reader >> queue_id;
             reader >> size;
@@ -390,5 +392,5 @@ class world : public bulk::world {
     memory_buffer message_buffer_;
 };
 
-}  // namespace mpi
-}  // namespace bulk
+} // namespace mpi
+} // namespace bulk
