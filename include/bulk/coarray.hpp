@@ -120,6 +120,7 @@ class coarray {
      * \returns reference to the i-th element of the local image
      */
     T& operator[](int i) { return data_[i]; }
+    const T& operator[](int i) const { return data_[i]; }
 
     /**
      * Retrieve the world to which this coarray is registed.

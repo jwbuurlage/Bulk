@@ -55,6 +55,7 @@ class array {
      * \returns a reference to element \c i in the local array
      */
     T& operator[](int i) { return data_[i]; }
+    const T& operator[](int i) const { return data_[i]; }
 
     /**
      * Retrieve the world to which this array is registed.
