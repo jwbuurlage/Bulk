@@ -1,10 +1,11 @@
-#include <bulk/bulk.hpp>
+#include "bulk/bulk.hpp"
+
 #include "set_backend.hpp"
 
 int main() {
     environment env;
     env.spawn(env.available_processors(), [](auto& world, int s, int p) {
-        world.log("Hello, world %d/%d\n", s, p);
+        world.log("Hello, world %d/%d", s, p);
 
         auto a = bulk::var<int>(world);
         a(world.next_processor()) = s;
@@ -30,7 +31,7 @@ int main() {
 
         // Messages are now available in q
         for (auto& msg : q) {
-            world.log("%d got sent %d, %f\n", s, msg.tag, msg.content);
+            world.log("%d got sent %d, %f", s, msg.tag, msg.content);
         }
     });
 

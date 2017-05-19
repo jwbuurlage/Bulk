@@ -1,5 +1,6 @@
+#include "bulk/bulk.hpp"
+
 #include "set_backend.hpp"
-#include <bulk/bulk.hpp>
 
 int main() {
     environment env;
@@ -12,7 +13,7 @@ int main() {
         world.sync();
 
         for (auto& msg : q)
-            world.log("%d got sent %d, %d\n", s, msg.tag, msg.content);
+            world.log("%d got sent %d, %d", s, msg.tag, msg.content);
     });
 
     return 0;

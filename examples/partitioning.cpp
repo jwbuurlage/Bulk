@@ -1,6 +1,5 @@
-#include <iostream>
+#include "bulk/bulk.hpp"
 
-#include <bulk/bulk.hpp>
 #include "set_backend.hpp"
 
 int main() {
@@ -16,10 +15,8 @@ int main() {
         auto glob = xs.global({1, 1}).get();
         world.sync();
 
-        if (s == 0) {
-            std::cout << glob.value() << "\n";
-            std::cout << xs.local({1, 1}) << "\n";
-        }
+        world.log("%i", glob.value());
+        world.log("%i", xs.local({1, 1}));
     });
 
     return 0;
