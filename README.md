@@ -51,8 +51,9 @@ Bulk supports a number of different *backends*, allowing the programs to run in 
 
 The examples in the `examples` directory work for every backend. To build them, do the following. The backends (e.g. `cpp`, `mpi`) are built optionally, just remove or add the option if you do not require them.
 
+    mkdir build
     cd build
-    cmake .
+    cmake ..
     make cpp mpi
 
 The examples will be compiled in the `bin/{backend}` directory, prepended with the backend name, i.e. to run the `hello` example with the `cpp` backend:
