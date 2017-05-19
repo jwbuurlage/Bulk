@@ -7,25 +7,11 @@ include_directories(
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wfatal-errors -Wextra -g -O3 -pthread")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../../../bin)
-
-# Bulk examples that work for any backend
 
 add_custom_target(cpp)
+add_definitions(-DBACKEND_CPP)
 
-set(
-    EXAMPLE_DIR
-    "../../../examples/"
-    )
-
-set(
-    EXAMPLE_SOURCES
-    "communication.cpp"
-    "dot_product.cpp"
-    "hello.cpp"
-    "messaging.cpp"
-    "partitioning.cpp"
-    )
+# Bulk examples that work for any backend
 
 foreach(source_file ${EXAMPLE_SOURCES})
     string(REPLACE ".cpp" "" source_name ${source_file})
@@ -36,16 +22,6 @@ endforeach(source_file)
 
 # Bulk tests that work for any backend
 
-set(TEST_DIR "../../../test")
-
-set(
-    TEST_SOURCES
-    "${TEST_DIR}/communication.cpp"
-    "${TEST_DIR}/initialization.cpp"
-    "${TEST_DIR}/partitioning.cpp"
-    "${TEST_DIR}/test_main.cpp"
-    )
-
 add_executable(cpp_test ${TEST_SOURCES})
 target_link_libraries(cpp_test)
 add_dependencies(cpp cpp_test)
@@ -53,18 +29,18 @@ add_dependencies(cpp cpp_test)
 # Examples specific for cpp backend
 
 set(
-    EXAMPLE_DIR
+    CPP_EXAMPLE_DIR
     "../examples/"
     )
 
 set(
-    EXAMPLE_SOURCES
+    CPP_EXAMPLE_SOURCES
     "hello_cpp.cpp"
     )
 
-foreach(source_file ${EXAMPLE_SOURCES})
+foreach(source_file ${CPP_EXAMPLE_SOURCES})
     string(REPLACE ".cpp" "" source_name ${source_file})
-    add_executable(${source_name} ${EXAMPLE_DIR}${source_file})
+    add_executable(${source_name} ${CPP_EXAMPLE_DIR}${source_file})
     target_link_libraries( ${source_name} )
     add_dependencies(cpp ${source_name})
 endforeach(source_file)
