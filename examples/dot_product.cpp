@@ -1,7 +1,9 @@
-#include <bulk/bulk.hpp>
-#include "set_backend.hpp"
 #include <numeric>
 #include <vector>
+
+#include "bulk/bulk.hpp"
+
+#include "set_backend.hpp"
 
 int main() {
     environment env;
@@ -25,7 +27,7 @@ int main() {
         // reduce to find global dot product
         auto alpha = bulk::foldl(result, [](int& lhs, int rhs) { lhs += rhs; });
 
-        world.log("%d/%d: alpha = %d\n", s, p, alpha);
+        world.log("%d/%d: alpha = %d", s, p, alpha);
     });
 
     return 0;
