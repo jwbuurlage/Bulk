@@ -10,15 +10,16 @@ int main() {
 
     env.spawn(env.available_processors(), [](bulk::world& world, int s, int p) {
         // block distribution
-        int size = 10;
-        std::vector<int> xs(size);
-        std::vector<int> ys(size);
-        std::iota(xs.begin(), xs.end(), s * size);
-        std::iota(ys.begin(), ys.end(), s * size);
+        int size = 1000;
+        int local_size = size / p;
+        std::vector<int> xs(local_size);
+        std::vector<int> ys(local_size);
+        std::iota(xs.begin(), xs.end(), s * local_size);
+        std::iota(ys.begin(), ys.end(), s * local_size);
 
         // compute local dot product
         bulk::var<int> result(world);
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < local_size; ++i) {
             result.value() += xs[i] * ys[i];
         }
 
