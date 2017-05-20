@@ -13,15 +13,15 @@ double flop_rate(bulk::world& world) {
     using clock = high_resolution_clock;
 
     unsigned int r_size = 1 << 23;
-    std::vector<int> xs(r_size);
+    std::vector<float> xs(r_size);
     std::iota(xs.begin(), xs.end(), 0);
-    std::vector<int> ys = xs;
-    std::vector<int> zs = xs;
+    std::vector<float> ys = xs;
+    std::vector<float> zs = xs;
 
     auto begin_time = clock::now();
 
-    auto alpha = 1.0 / 3.0;
-    auto beta = 4.0 / 9.0;
+    auto alpha = 1.0f / 3.0f;
+    auto beta = 4.0f / 9.0f;
     for (auto i = 0u; i < r_size; ++i) {
         zs[i] = zs[i] + alpha * xs[i] - beta * ys[i];
     }

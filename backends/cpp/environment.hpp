@@ -16,7 +16,7 @@ class environment : public bulk::environment {
     ~environment() {}
 
     void spawn(int processors,
-                        std::function<void(bulk::world&, int, int)> spmd) override final {
+                        std::function<void(bulk::world&, int, int)> spmd) override {
         // Thread objects
         std::vector<std::thread> threads;
 
@@ -50,17 +50,17 @@ class environment : public bulk::environment {
         logs.clear();
     }
 
-    int available_processors() const override final {
+    int available_processors() const override {
         return std::thread::hardware_concurrency();
     }
 
-    void set_log_callback(std::function<void(int, const std::string&)> f) override final {
+    void set_log_callback(std::function<void(int, const std::string&)> f) override {
         log_callback = f;
     }
 
-  private:
+  protected:
     std::function<void(int, const std::string&)> log_callback;
 };
 
-} // namespace mpi
+} // namespace cpp
 } // namespace bulk

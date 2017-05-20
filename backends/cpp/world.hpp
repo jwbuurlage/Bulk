@@ -85,12 +85,12 @@ class world : public bulk::world {
         sync_operations_ = std::move(other.sync_operations_);
     }
 
-    int active_processors() const override final { return nprocs_; }
-    int processor_id() const override final { return pid_; }
+    int active_processors() const override { return nprocs_; }
+    int processor_id() const override { return pid_; }
 
-    void barrier() override final { state_->sync_barrier.wait(); }
+    void barrier() override { state_->sync_barrier.wait(); }
 
-    void sync() override final {
+    void sync() override {
         barrier();
         // Perform operations required at each sync like
         // swapping message queues
@@ -112,7 +112,7 @@ class world : public bulk::world {
         barrier();
     }
 
-    void log_(std::string message) override final {
+    void log_(std::string message) override {
         std::lock_guard<std::mutex> lock{state_->log_mutex};
         state_->logs.push_back(std::make_pair(pid_, message));
     }
@@ -133,7 +133,7 @@ class world : public bulk::world {
         }
     }
 
-    void abort() override final {
+    void abort() override {
         // TODO
         return;
     }
@@ -164,7 +164,7 @@ class world : public bulk::world {
     }
 
    protected:
-    int register_location_(void* location) override final {
+    int register_location_(void* location) override {
         int id = -1;
         {
             // The lock is not for accessing [i + pid]
@@ -191,14 +191,14 @@ class world : public bulk::world {
         return id;
     }
 
-    void unregister_location_(int id) override final {
+    void unregister_location_(int id) override {
         // No mutex needed because each thread sets a different value to zero
         // and other than that, the vector is not modified
         state_->locations_[id + pid_] = 0;
     }
 
     void put_(int processor, const void* value, std::size_t size,
-              int var_id) override final {
+              int var_id) override {
         memcpy(state_->locations_[var_id + processor], value, size);
         return;
     }
@@ -206,38 +206,38 @@ class world : public bulk::world {
     // Offset and count are number of elements
     // Size is size per element
     void put_(int processor, const void* values, std::size_t size, int var_id,
-              std::size_t offset, int count) override final {
+              std::size_t offset, int count) override {
         memcpy((char*)state_->locations_[var_id + processor] + size * offset, values,
                size * count);
         return;
     }
     void get_(int processor, int var_id, std::size_t size,
-              void* target) override final {
+              void* target) override {
         memcpy(target, state_->locations_[var_id + processor], size);
         return;
     }
     // Size is per element
     void get_(int processor, int var_id, std::size_t size, void* target,
-              std::size_t offset, int count) override final {
+              std::size_t offset, int count) override {
         memcpy(target, (char*)state_->locations_[var_id + processor] + size * offset,
                size * count);
         return;
     }
 
-    int register_queue_(class queue_base* q) override final {
+    int register_queue_(class queue_base* q) override {
         (void)q;
         // TODO
         return 0;
     }
 
-    void unregister_queue_(int id) override final {
+    void unregister_queue_(int id) override {
         (void)id;
         // TODO
         return;
     }
 
     void send_(int processor, int queue_id, const void* data,
-               std::size_t size) override final {
+               std::size_t size) override {
         (void)processor;
         (void)queue_id;
         (void)data;

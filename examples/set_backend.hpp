@@ -12,6 +12,11 @@ using environment = bulk::mpi::environment;
 #include <bulk/backends/epiphany/host.hpp>
 using environment = bulk::epiphany::environment;
 
+#elif defined BACKEND_XEONPHI
+
+#include <bulk/backends/xeonphi/xeonphi.hpp>
+using environment = bulk::xeonphi::environment;
+
 #else
 
 #include <bulk/backends/cpp/cpp.hpp>
