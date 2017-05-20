@@ -40,7 +40,7 @@ class block_partitioning : public rectangular_partitioning<D, G> {
 
         for (int i = 0; i < G; ++i) {
             int d = axes_[i];
-            block_size_[d] = ((data_size[d] - 1) / grid[d]) + 1;
+            block_size_[d] = ((data_size[d] - 1) / grid[i]) + 1;
         }
     }
 
