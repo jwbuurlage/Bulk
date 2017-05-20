@@ -43,6 +43,7 @@ set(
 set(
     CPP_EXAMPLE_SOURCES
     "hello_cpp.cpp"
+    "densematrix_sharedmemory.cpp"
     )
 
 foreach(source_file ${CPP_EXAMPLE_SOURCES})
