@@ -39,10 +39,12 @@ int main() {
     environment env;
 
     env.spawn(env.available_processors(), [](bulk::world& world, int s, int p) {
+        assert(p > 0);
+
         using clock = high_resolution_clock;
 
         // about 400 MB
-        unsigned int size = 100'000'000u;
+        unsigned int size = 1'000'000u;
 
         std::vector<int> dummy_data(size);
         std::iota(dummy_data.begin(), dummy_data.end(), 0);
@@ -51,34 +53,36 @@ int main() {
 
         bulk::coarray<int> target(world, size);
 
-        std::vector<size_t> test_sizes = {
-            1'000u,   2'000u,   4'000u,     8'000u,      16'000u,     32'000u,
-            128'000u, 512'000u, 1'000'000u, 10'000'000u, 100'000'000u};
+        std::vector<size_t> test_sizes = {1'000u, 2'000u,  4'000u,
+                                          8'000u, 16'000u, 32'000u};
         std::vector<double> test_results;
 
         for (auto test_size : test_sizes) {
-            auto begin_time = clock::now();
+            double total = 0.0f;
+            for (auto t = world.next_processor(); t != s; ++t, t %= p) {
+                auto begin_time = clock::now();
 
-            target.put(world.next_processor(), dummy_data.begin(),
-                       dummy_data.begin() + test_size);
-            world.sync();
+                target.put(t, dummy_data.begin(),
+                           dummy_data.begin() + test_size);
+                world.sync();
 
-            auto end_time = clock::now();
+                auto end_time = clock::now();
 
-            auto total_ms =
-                duration<double, std::milli>(end_time - begin_time).count();
+                auto total_ms =
+                    duration<double, std::milli>(end_time - begin_time).count();
 
-            test_results.push_back(total_ms);
+                total += total_ms;
+            }
+
+            test_results.push_back(total / (p - 1));
         }
 
         auto parameters = bulk::fit(test_sizes, test_results);
         if (parameters) {
-            if (s == 0) {
-                printf(
-                    "> p = %i\n> r = %f GLOPS\n> l = %f FLOPs\n> g = %f FLOPs\n",
-                    p, r / 1e9, parameters.value().first * (r / 1000.0),
-                    parameters.value().second * (r / 1000.0));
-            }
+            world.log("> p = %i\n> r = %f GLOPS\n> l = %f FLOPs\n> g = %f "
+                      "FLOPs",
+                      p, r / 1e9, parameters.value().first * (r / 1000.0),
+                      parameters.value().second * (r / 1000.0));
         }
     });
 
