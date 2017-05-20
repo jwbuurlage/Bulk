@@ -16,7 +16,8 @@ extern int total, success;
 #define BULK_SECTION(name)                        \
     if (world.processor_id() == 0) {              \
         world.log("SECTION: %s", name);           \
-    }
+    }                                             \
+    world.sync();
 
 #define BULK_REQUIRE(body)           \
     if (world.processor_id() == 0) { \

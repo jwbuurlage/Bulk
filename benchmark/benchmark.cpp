@@ -38,7 +38,7 @@ double flop_rate(bulk::world& world) {
 int main() {
     environment env;
 
-    env.spawn(env.available_processors(), [](bulk::world& world, int s, int p) {
+    env.spawn(env.available_processors(), [](bulk::world& world, int, int p) {
         assert(p > 0);
 
         using clock = high_resolution_clock;
@@ -59,7 +59,10 @@ int main() {
 
         for (auto test_size : test_sizes) {
             double total = 0.0f;
-            for (auto t = world.next_processor(); t != s; ++t, t %= p) {
+            int sample_size = p > 8 ? 8 : p;
+            for (auto k = 0; k < sample_size; ++k) {
+                auto t = (world.next_processor() + p / sample_size) % p;
+
                 auto begin_time = clock::now();
 
                 target.put(t, dummy_data.begin(),
@@ -74,7 +77,7 @@ int main() {
                 total += total_ms;
             }
 
-            test_results.push_back(total / (p - 1));
+            test_results.push_back(total / sample_size);
         }
 
         auto parameters = bulk::fit(test_sizes, test_results);

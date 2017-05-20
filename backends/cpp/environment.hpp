@@ -41,7 +41,7 @@ class environment : public bulk::environment {
         std::stable_sort(logs.begin(), logs.end());
         if (state.log_callback == nullptr) {
             for (auto& log : logs)
-                std::cout << log.second;
+                std::cout << log.second << '\n';
             std::cout << std::flush;
         } else {
             for (auto& log : logs)

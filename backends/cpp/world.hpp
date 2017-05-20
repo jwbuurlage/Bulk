@@ -101,7 +101,7 @@ class world : public bulk::world {
             auto& logs = state_->logs;
             std::stable_sort(logs.begin(), logs.end());
             if (state_->log_callback == nullptr) {
-                for (auto& log : logs) std::cout << log.second;
+                for (auto& log : logs) std::cout << log.second << '\n';
                 std::cout << std::flush;
             } else {
                 for (auto& log : logs)
@@ -127,7 +127,7 @@ class world : public bulk::world {
         {
             std::lock_guard<std::mutex> lock{state_->log_mutex};
             if (state_->log_callback == nullptr)
-                std::cout << logmessage << std::flush;
+                std::cout << logmessage << '\n' << std::flush;
             else
                 state_->log_callback(pid_, logmessage);
         }
@@ -165,19 +165,29 @@ class world : public bulk::world {
 
    protected:
     int register_location_(void* location) override final {
-        std::lock_guard<std::mutex> lock{state_->location_mutex};
-        auto& locs = state_->locations_;
-        for (unsigned int i = 0; i < locs.size(); i += nprocs_) {
-            if (locs[i + pid_] == 0) {
-                locs[i + pid_] = location;
-                return (int)i;
+        int id = -1;
+        {
+            // The lock is not for accessing [i + pid]
+            // but for the resizing that might happen
+            std::lock_guard<std::mutex> lock{state_->location_mutex};
+            auto& locs = state_->locations_;
+            for (auto i = 0u; i < locs.size(); i += nprocs_) {
+                if (locs[i + pid_] == 0) {
+                    locs[i + pid_] = location;
+                    id = i;
+                    break;
+                }
+            }
+            if (id == -1) {
+                id = locs.size();
+                // There was no slot yet. In that case, this thread is the first
+                // to reach this point, so we have to allocate `nprocs_` extra
+                // slots
+                locs.insert(locs.end(), nprocs_, 0);
+                locs[id + pid_] = location;
             }
         }
-        int id = locs.size();
-        // There was no slot yet. In that case, this thread is the first
-        // to reach this point, so we have to allocate `nprocs_` extra slots
-        locs.insert(locs.end(), nprocs_, 0);
-        locs[id + pid_] = location;
+        barrier();
         return id;
     }
 
@@ -193,10 +203,12 @@ class world : public bulk::world {
         return;
     }
 
-    // Size is per element
+    // Offset and count are number of elements
+    // Size is size per element
     void put_(int processor, const void* values, std::size_t size, int var_id,
               std::size_t offset, int count) override final {
-        // TODO
+        memcpy((char*)state_->locations_[var_id + processor] + size * offset, values,
+               size * count);
         return;
     }
     void get_(int processor, int var_id, std::size_t size,
@@ -207,22 +219,29 @@ class world : public bulk::world {
     // Size is per element
     void get_(int processor, int var_id, std::size_t size, void* target,
               std::size_t offset, int count) override final {
-        // TODO
+        memcpy(target, (char*)state_->locations_[var_id + processor] + size * offset,
+               size * count);
         return;
     }
 
     int register_queue_(class queue_base* q) override final {
+        (void)q;
         // TODO
         return 0;
     }
 
     void unregister_queue_(int id) override final {
+        (void)id;
         // TODO
         return;
     }
 
     void send_(int processor, int queue_id, const void* data,
                std::size_t size) override final {
+        (void)processor;
+        (void)queue_id;
+        (void)data;
+        (void)size;
         // TODO
         return;
     }

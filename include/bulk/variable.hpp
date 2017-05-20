@@ -57,8 +57,8 @@ class var {
     var(bulk::world& world) {
         // TODO: Here we should ask world to create the appropriate
         // subclass of var_impl
+        // var_impl constructor can include a barrier in certain backends
         impl_ = std::make_unique<var_impl>(world);
-        world.barrier();
     }
 
     /**
@@ -143,6 +143,7 @@ class var {
     class var_impl {
        public:
         var_impl(bulk::world& world) : world_(world), value_{} {
+            // register_location_ can include a barrier in certain backends
             id_ = world.register_location_(&value_);
         }
         virtual ~var_impl() { world_.unregister_location_(id_); }
