@@ -225,17 +225,23 @@ class world : public bulk::world {
     }
 
     int register_queue_(class queue_base* q) override final {
+        (void)q;
         // TODO
         return 0;
     }
 
     void unregister_queue_(int id) override final {
+        (void)id;
         // TODO
         return;
     }
 
     void send_(int processor, int queue_id, const void* data,
                std::size_t size) override final {
+        (void)processor;
+        (void)queue_id;
+        (void)data;
+        (void)size;
         // TODO
         return;
     }
