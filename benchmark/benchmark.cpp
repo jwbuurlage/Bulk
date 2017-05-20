@@ -12,7 +12,7 @@ using namespace std::chrono;
 double flop_rate(bulk::world& world) {
     using clock = high_resolution_clock;
 
-    unsigned int r_size = 10000000;
+    unsigned int r_size = 1 << 23;
     std::vector<int> xs(r_size);
     std::iota(xs.begin(), xs.end(), 0);
     std::vector<int> ys = xs;
@@ -91,11 +91,21 @@ int main() {
             auto ls = bulk::gather_all(world, l);
 
             if (s == 0) {
+                std::vector<double> durations;
+                for (int i = 0; i < 100; ++i) {
+                    auto a = clock::now();
+                    auto b = clock::now();
+                    durations.push_back(
+                        duration<double, std::milli>(b - a).count() *
+                        (r / 1000.0));
+                }
+
+                auto avg_r = bulk::average(rs.begin(), rs.end());
                 world.log("> p = %i\n> r = %f GLOPS\n> l = %f FLOPs\n> g = %f "
-                          "FLOPs",
-                          p, bulk::average(rs.begin(), rs.end()),
-                          bulk::average(gs.begin(), gs.end()),
-                          bulk::average(ls.begin(), ls.end()));
+                          "FLOPs\n> total = %f GLOPS\n> dt = %f FLOPs",
+                          p, avg_r, bulk::average(gs.begin(), gs.end()),
+                          bulk::average(ls.begin(), ls.end()), avg_r * p,
+                          bulk::average(durations.begin(), durations.end()));
             }
         }
     });
