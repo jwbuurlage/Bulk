@@ -12,7 +12,7 @@ using namespace std::chrono;
 double flop_rate(bulk::world& world) {
     using clock = high_resolution_clock;
 
-    unsigned int r_size = 1000;
+    unsigned int r_size = 10000000;
     std::vector<int> xs(r_size);
     std::iota(xs.begin(), xs.end(), 0);
     std::vector<int> ys = xs;
@@ -38,12 +38,12 @@ double flop_rate(bulk::world& world) {
 int main() {
     environment env;
 
-    env.spawn(env.available_processors(), [](bulk::world& world, int, int p) {
+    env.spawn(env.available_processors(), [](bulk::world& world, int s, int p) {
         assert(p > 0);
 
         using clock = high_resolution_clock;
 
-        // about 400 MB
+        // about 4 MB
         unsigned int size = 1'000'000u;
 
         std::vector<int> dummy_data(size);
@@ -53,8 +53,10 @@ int main() {
 
         bulk::coarray<int> target(world, size);
 
-        std::vector<size_t> test_sizes = {1'000u, 2'000u,  4'000u,
-                                          8'000u, 16'000u, 32'000u};
+        std::vector<size_t> test_sizes = {
+            1'000u,   2'000u,   4'000u,    8'000u,   16'000u,
+            32'000u,  64'000u,  100'000u,  128'000u, 200'000u,
+            256'000u, 512'000u, 1'000'000u};
         std::vector<double> test_results;
 
         for (auto test_size : test_sizes) {
@@ -82,10 +84,19 @@ int main() {
 
         auto parameters = bulk::fit(test_sizes, test_results);
         if (parameters) {
-            world.log("> p = %i\n> r = %f GLOPS\n> l = %f FLOPs\n> g = %f "
-                      "FLOPs",
-                      p, r / 1e9, parameters.value().first * (r / 1000.0),
-                      parameters.value().second * (r / 1000.0));
+            auto g = parameters.value().first * (r / 1000.0);
+            auto l = parameters.value().second * (r / 1000.0);
+            auto rs = bulk::gather_all(world, r / 1e9);
+            auto gs = bulk::gather_all(world, g);
+            auto ls = bulk::gather_all(world, l);
+
+            if (s == 0) {
+                world.log("> p = %i\n> r = %f GLOPS\n> l = %f FLOPs\n> g = %f "
+                          "FLOPs",
+                          p, bulk::average(rs.begin(), rs.end()),
+                          bulk::average(gs.begin(), gs.end()),
+                          bulk::average(ls.begin(), ls.end()));
+            }
         }
     });
 
