@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(bulk_examples)
+set(BACKEND_NAME cpp)
+project(bulk_${BACKEND_NAME})
+
+add_custom_target(${BACKEND_NAME})
+add_definitions(-DBACKEND_CPP)
 
 include_directories(
     "../../../include"
@@ -8,29 +12,26 @@ include_directories(
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wfatal-errors -Wextra -g -O3 -pthread")
 
-add_custom_target(cpp)
-add_definitions(-DBACKEND_CPP)
-
 # Bulk examples that work for any backend
 
 foreach(source_file ${EXAMPLE_SOURCES})
     string(REPLACE ".cpp" "" source_name ${source_file})
-    add_executable(cpp_${source_name} ${EXAMPLE_DIR}${source_file})
-    target_link_libraries(cpp_${source_name} )
-    add_dependencies(cpp cpp_${source_name})
+    add_executable(${BACKEND_NAME}_${source_name} ${EXAMPLE_DIR}${source_file})
+    target_link_libraries(${BACKEND_NAME}_${source_name} )
+    add_dependencies(${BACKEND_NAME} ${BACKEND_NAME}_${source_name})
 endforeach(source_file)
 
 # Benchmark executable
 
-add_executable(cpp_benchmark "../../../benchmark/benchmark.cpp")
-target_link_libraries(cpp_benchmark)
-add_dependencies(cpp cpp_benchmark)
+add_executable(${BACKEND_NAME}_benchmark "../../../benchmark/benchmark.cpp")
+target_link_libraries(${BACKEND_NAME}_benchmark)
+add_dependencies(${BACKEND_NAME} ${BACKEND_NAME}_benchmark)
 
 # Bulk tests that work for any backend
 
-add_executable(cpp_test ${TEST_SOURCES})
-target_link_libraries(cpp_test)
-add_dependencies(cpp cpp_test)
+add_executable(${BACKEND_NAME}_unittests ${TEST_SOURCES})
+target_link_libraries(${BACKEND_NAME}_unittests)
+add_dependencies(${BACKEND_NAME} ${BACKEND_NAME}_unittests)
 
 # Examples specific for cpp backend
 
@@ -46,7 +47,7 @@ set(
 
 foreach(source_file ${CPP_EXAMPLE_SOURCES})
     string(REPLACE ".cpp" "" source_name ${source_file})
-    add_executable(${source_name} ${CPP_EXAMPLE_DIR}${source_file})
-    target_link_libraries( ${source_name} )
-    add_dependencies(cpp ${source_name})
+    add_executable(${BACKEND_NAME}_${source_name} ${CPP_EXAMPLE_DIR}${source_file})
+    target_link_libraries( ${BACKEND_NAME}_${source_name} )
+    add_dependencies(${BACKEND_NAME} ${BACKEND_NAME}_${source_name})
 endforeach(source_file)
