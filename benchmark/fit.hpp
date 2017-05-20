@@ -39,12 +39,8 @@ std::optional<std::pair<double, double>> fit(const std::vector<size_t>& xs,
         return std::optional<std::pair<double, double>>();
     }
 
-    auto sum = [](const auto& zs) {
-        return std::accumulate(zs.begin(), zs.end(), 0);
-    };
-
-    auto avg_x = sum(xs) / (double)xs.size();
-    auto avg_y = sum(ys) / (double)ys.size();
+    auto avg_x = std::accumulate(xs.begin(), xs.end(), 0u) / (double)xs.size();
+    auto avg_y = std::accumulate(ys.begin(), ys.end(), 0.0) / (double)ys.size();
     auto points = zip(xs, ys);
 
     auto num = std::accumulate(

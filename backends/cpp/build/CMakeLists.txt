@@ -20,6 +20,12 @@ foreach(source_file ${EXAMPLE_SOURCES})
     add_dependencies(cpp cpp_${source_name})
 endforeach(source_file)
 
+# Benchmark executable
+
+add_executable(cpp_benchmark "../../../benchmark/benchmark.cpp")
+target_link_libraries(cpp_benchmark)
+add_dependencies(cpp cpp_benchmark)
+
 # Bulk tests that work for any backend
 
 add_executable(cpp_test ${TEST_SOURCES})
