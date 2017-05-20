@@ -14,6 +14,7 @@
 #include <vector>
 
 #include <bulk/world.hpp>
+#include <bulk/messages.hpp>
 
 // Mutexes need to be shared, i.e. single instance of the class
 // that is shared amongst threads.
@@ -49,6 +50,16 @@ class barrier {
     std::size_t threshold_;
     std::size_t count_;
     std::size_t generation_;
+};
+
+struct queue_helper {
+    queue_helper() {}
+    ~queue_helper() {}
+
+    class queue_base* base;
+    int sync_id;
+    std::vector<char> receiveBuffer;
+    std::mutex mutex; // sending mutex
 };
 
 // single `world_state` instance shared by every thread
@@ -197,9 +208,13 @@ class world : public bulk::world {
         state_->locations_[id + pid_] = 0;
     }
 
+    void* get_location_(int id, int pid) const {
+        return state_->locations_[id + pid];
+    }
+
     void put_(int processor, const void* value, std::size_t size,
               int var_id) override {
-        memcpy(state_->locations_[var_id + processor], value, size);
+        memcpy(get_location_(var_id, processor), value, size);
         return;
     }
 
@@ -207,52 +222,66 @@ class world : public bulk::world {
     // Size is size per element
     void put_(int processor, const void* values, std::size_t size, int var_id,
               std::size_t offset, int count) override {
-        memcpy((char*)state_->locations_[var_id + processor] + size * offset, values,
+        memcpy((char*)get_location_(var_id, processor) + size * offset, values,
                size * count);
         return;
     }
     void get_(int processor, int var_id, std::size_t size,
               void* target) override {
-        memcpy(target, state_->locations_[var_id + processor], size);
+        memcpy(target, get_location_(var_id, processor), size);
         return;
     }
     // Size is per element
     void get_(int processor, int var_id, std::size_t size, void* target,
               std::size_t offset, int count) override {
-        memcpy(target, (char*)state_->locations_[var_id + processor] + size * offset,
+        memcpy(target, (char*)get_location_(var_id, processor) + size * offset,
                size * count);
         return;
     }
 
     int register_queue_(class queue_base* q) override {
-        (void)q;
-        // TODO
-        return 0;
+        queue_helper* helper = new queue_helper;
+        helper->base = q;
+
+        helper->sync_id = register_sync_operation_([helper]() {
+            auto size = helper->receiveBuffer.size();
+            void* dest = helper->base->get_buffer_(size);
+            memcpy(dest, helper->receiveBuffer.data(), size);
+            helper->receiveBuffer.clear();
+        });
+
+        return register_location_(helper);
+    }
+
+    queue_helper* get_queue_(int id, int pid) const {
+        return (queue_helper*)get_location_(id, pid);
     }
 
     void unregister_queue_(int id) override {
-        (void)id;
-        // TODO
+        queue_helper* helper = get_queue_(id, pid_);
+        unregister_sync_operation_(helper->sync_id);
+        delete helper;
+        unregister_location_(id);
         return;
     }
 
     void send_(int processor, int queue_id, const void* data,
                std::size_t size) override {
-        (void)processor;
-        (void)queue_id;
-        (void)data;
-        (void)size;
-        // TODO
+        auto q = get_queue_(queue_id, processor);
+        std::lock_guard<std::mutex> lock{q->mutex};
+        auto& vec = q->receiveBuffer;
+        vec.insert(vec.end(), (const char*)data, (const char*)data + size);
         return;
     }
 
-   private:
+  private:
     // This should be a reference but we can not assign it in the constructor
     // because `world` does not have a constructor. FIXME: Change this ?
     world_state* state_;
     int pid_;
     int nprocs_;
     std::vector<std::function<void(void)>> sync_operations_;
+
 };
 
 }  // namespace cpp

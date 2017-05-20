@@ -26,6 +26,10 @@ struct message {
 };
 
 // queue::impl subclasses queue_base
+// The reason that this is seperate is:
+// queue::impl has template Tag,Content
+// whereas we need to access this object
+// in a virtual function in `world`.
 class queue_base {
    public:
     queue_base(){};
@@ -71,12 +75,10 @@ class queue {
 
     /**
      * Construct a message queue and register it with world
+     * The world implementation can choose to perform a barrier sync
      */
-    queue(bulk::world& world) {
-        impl_ = std::make_unique<impl>(world);
-        world.barrier();
-    }
-    ~queue() { impl_->world_.barrier(); }
+    queue(bulk::world& world) { impl_ = std::make_unique<impl>(world); }
+    ~queue() {}
 
     // No copies
     queue(queue<Tag, Content>& other) = delete;
