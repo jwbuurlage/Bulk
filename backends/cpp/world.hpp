@@ -103,14 +103,22 @@ class world : public bulk::world {
 
     void sync() override {
         barrier();
+
         // Perform operations required at each sync like
         // swapping message queues
-        for (auto& op : sync_operations_) op();
+        for (auto& op : sync_operations_) {
+            if (op)
+                op();
+        }
 
         // Print any log messages
         if (pid_ == 0) {
             auto& logs = state_->logs;
-            std::stable_sort(logs.begin(), logs.end());
+            // Sort on pid
+            // Leave message order intact
+            std::stable_sort(logs.begin(), logs.end(), [](auto& m1, auto& m2) {
+                return m1.first < m2.first;
+            });
             if (state_->log_callback == nullptr) {
                 for (auto& log : logs) std::cout << log.second << '\n';
                 std::cout << std::flush;
@@ -244,6 +252,7 @@ class world : public bulk::world {
         helper->base = q;
 
         helper->sync_id = register_sync_operation_([helper]() {
+            // If size is 0 then get_buffer_ will clear the queue automatically
             auto size = helper->receiveBuffer.size();
             void* dest = helper->base->get_buffer_(size);
             memcpy(dest, helper->receiveBuffer.data(), size);
