@@ -38,8 +38,9 @@ double flop_rate(bulk::world& world) {
 int main() {
     environment env;
 
-    env.spawn(env.available_processors(), [](bulk::world& world, int s, int p) {
-        assert(p > 0);
+    env.spawn(env.available_processors(), [](bulk::world& world) {
+        int s = world.processor_id();
+        int p = world.active_processors();
 
         using clock = high_resolution_clock;
 

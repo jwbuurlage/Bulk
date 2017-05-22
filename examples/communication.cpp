@@ -5,7 +5,10 @@
 int main() {
     environment env;
 
-    env.spawn(env.available_processors(), [](bulk::world& world, int s, int p) {
+    env.spawn(env.available_processors(), [](bulk::world& world) {
+        int s = world.processor_id();
+        int p = world.active_processors();
+
         bulk::var<int> a(world);
 
         a(world.next_processor()) = s;

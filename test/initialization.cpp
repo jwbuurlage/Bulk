@@ -5,7 +5,11 @@
 extern environment env;
 
 void test_initialization() {
-    env.spawn(env.available_processors(), [](auto& world, int s, int p) {
+    env.spawn(env.available_processors(), [](auto& world) {
+        int s = world.processor_id();
+        int p = world.active_processors();
+
+
         BULK_SECTION("Init") {
             BULK_CHECK_ONCE(s == world.processor_id(),
                             "correct processor id");

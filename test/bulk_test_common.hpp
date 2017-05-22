@@ -28,7 +28,7 @@ extern int total, success;
     }
 
 #define BULK_FINALIZE_TESTS(env)                                     \
-    env.spawn(env.available_processors(), [](auto& world, int, int) { \
+    env.spawn(env.available_processors(), [](auto& world) { \
         if (world.processor_id() == 0) {                             \
             world.log("-------------");                              \
             world.log("%d test(s) of %d failed.", total - success, total);    \

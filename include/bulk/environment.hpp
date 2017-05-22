@@ -28,7 +28,7 @@ class environment {
      * \param spmd the spmd function that gets run on each (virtual) processor
      */
     virtual void spawn(int processors,
-                       std::function<void(bulk::world&, int, int)> spmd) = 0;
+                       std::function<void(bulk::world&)> spmd) = 0;
 
     /**
      * Retrieve the total number of processors available on the system

@@ -16,7 +16,7 @@ class environment : public bulk::environment {
     ~environment() {}
 
     void spawn(int processors,
-                        std::function<void(bulk::world&, int, int)> spmd) override {
+                        std::function<void(bulk::world&)> spmd) override {
         // Thread objects
         std::vector<std::thread> threads;
 
@@ -29,7 +29,7 @@ class environment : public bulk::environment {
         ws.reserve(processors);
         for (int i = 0; i < processors; i++) {
             ws.emplace_back(&state, i, processors);
-            threads.push_back(std::thread(spmd, std::ref(ws.back()), i, processors));
+            threads.push_back(std::thread(spmd, std::ref(ws.back())));
         }
 
         // Wait for the threads to finish

@@ -4,7 +4,11 @@
 
 int main() {
     environment env;
-    env.spawn(env.available_processors(), [](auto& world, int s, int p) {
+
+    env.spawn(env.available_processors(), [](bulk::world& world) {
+        int s = world.processor_id();
+        int p = world.active_processors();
+
         world.log("Hello, world %d/%d", s, p);
 
         auto a = bulk::var<int>(world);
@@ -25,7 +29,7 @@ int main() {
         // content type
         auto q = bulk::queue<int, float>(world);
         for (int t = 0; t < p; ++t) {
-            q(t).send(s, 3.1415f);  // send (s, pi) to processor t
+            q(t).send(s, 3.1415f); // send (s, pi) to processor t
         }
         world.sync();
 

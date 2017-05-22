@@ -20,7 +20,7 @@ class environment : public bulk::environment {
     environment() { MPI_Init(nullptr, nullptr); }
     ~environment() { MPI_Finalize(); }
 
-    void spawn(int processors, std::function<void(bulk::world&, int, int)> spmd)
+    void spawn(int processors, std::function<void(bulk::world&)> spmd)
         override final {
         if (processors < available_processors()) {
             std::cout << "Running with fewer processors than available is not "
@@ -28,7 +28,7 @@ class environment : public bulk::environment {
             return;
         }
         bulk::mpi::world world;
-        spmd(world, world.processor_id(), world.active_processors());
+        spmd(world);
     }
 
     int available_processors() const override final {

@@ -44,7 +44,10 @@ int main() {
 
     using clock = high_resolution_clock;
     auto spawn_begin = clock::now();
-    env.spawn(env.available_processors(), [&times_ms](bulk::world& world, int s, int p) {
+    env.spawn(env.available_processors(), [&times_ms](bulk::world& world) {
+        int s = world.processor_id();
+        int p = world.active_processors();
+
         int N = (int)std::sqrt(p);
         if (N * N != p) {
             world.log("Invalid number of processors (not a square).");
