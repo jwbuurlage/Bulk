@@ -1,7 +1,7 @@
 #pragma once
 #include "world.hpp"
-#include <bulk/environment.hpp>
 #include <algorithm>
+#include <bulk/environment.hpp>
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -16,7 +16,7 @@ class environment : public bulk::environment {
     ~environment() {}
 
     void spawn(int processors,
-                        std::function<void(bulk::world&)> spmd) override {
+               std::function<void(bulk::world&)> spmd) override {
         // Thread objects
         std::vector<std::thread> threads;
 
@@ -37,8 +37,11 @@ class environment : public bulk::environment {
             t.join();
 
         // Print leftover log messages
+        // TODO: don't duplicate this code -- JW
         auto& logs = state.logs;
-        std::stable_sort(logs.begin(), logs.end());
+        std::stable_sort(logs.begin(), logs.end(), [](auto& m1, auto& m2) {
+            return m1.first < m2.first;
+        });
         if (state.log_callback == nullptr) {
             for (auto& log : logs)
                 std::cout << log.second << '\n';
@@ -54,7 +57,8 @@ class environment : public bulk::environment {
         return std::thread::hardware_concurrency();
     }
 
-    void set_log_callback(std::function<void(int, const std::string&)> f) override {
+    void
+    set_log_callback(std::function<void(int, const std::string&)> f) override {
         log_callback = f;
     }
 

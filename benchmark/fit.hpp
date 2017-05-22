@@ -9,6 +9,7 @@ using optional = experimental::optional<T>;
 }
 
 namespace bulk {
+namespace util {
 
 template <typename Iterable>
 auto average(Iterable& iter) {
@@ -61,4 +62,5 @@ std::optional<std::pair<double, double>> fit(const std::vector<size_t>& xs,
     return std::optional<std::pair<double, double>>({l, g});
 }
 
-}
+} // namespace util
+} // namespace bulk

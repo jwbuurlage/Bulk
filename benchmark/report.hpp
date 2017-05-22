@@ -12,7 +12,9 @@ namespace util {
 
 class table {
   public:
-    table(std::string title) : title_(title) { column(""); }
+    table(std::string title, std::string entry_title = "") : title_(title) {
+        column(entry_title);
+    }
 
     template <typename... Ts>
     void columns(std::string col_name, Ts... rest) {
@@ -31,6 +33,7 @@ class table {
     void row(std::string row_name, Ts... results) {
         std::vector<std::string> row_entries;
         push_all(row_entries, row_name, results...);
+        row_entries.resize(columns_.size());
         entries_.push_back(row_entries);
     }
 

@@ -13,8 +13,8 @@
 #include <thread>
 #include <vector>
 
-#include <bulk/world.hpp>
 #include <bulk/messages.hpp>
+#include <bulk/world.hpp>
 
 // Mutexes need to be shared, i.e. single instance of the class
 // that is shared amongst threads.
@@ -28,7 +28,7 @@ namespace cpp {
 // Taken from
 // http://stackoverflow.com/questions/24465533/implementing-boostbarrier-in-c11
 class barrier {
-   public:
+  public:
     explicit barrier(std::size_t count)
         : threshold_(count), count_(count), generation_(0) {}
 
@@ -44,7 +44,7 @@ class barrier {
         }
     }
 
-   private:
+  private:
     std::mutex mutex_;
     std::condition_variable cond_;
     std::size_t threshold_;
@@ -64,7 +64,7 @@ struct queue_helper {
 
 // single `world_state` instance shared by every thread
 class world_state {
-   public:
+  public:
     explicit world_state(int processors) : sync_barrier(processors) {
         locations_.reserve(20 * processors);
     }
@@ -76,14 +76,14 @@ class world_state {
     std::mutex location_mutex;
     std::vector<void*> locations_;
 
-    std::mutex log_mutex;  // mutex for the vector and for sending output
+    std::mutex log_mutex; // mutex for the vector and for sending output
     std::vector<std::pair<int, std::string>> logs;
     std::function<void(int, const std::string&)> log_callback;
 };
 
 // separate `world` instance for every thread
 class world : public bulk::world {
-   public:
+  public:
     world(world_state* state, int pid, int nprocs)
         : state_(state), pid_(pid), nprocs_(nprocs) {}
     ~world() {}
@@ -120,11 +120,14 @@ class world : public bulk::world {
                 return m1.first < m2.first;
             });
             if (state_->log_callback == nullptr) {
-                for (auto& log : logs) std::cout << log.second << '\n';
+                for (auto& log : logs) {
+                    std::cout << log.second << '\n';
+                }
                 std::cout << std::flush;
             } else {
-                for (auto& log : logs)
+                for (auto& log : logs) {
                     state_->log_callback(log.first, log.second);
+                }
             }
             logs.clear();
         }
@@ -182,7 +185,7 @@ class world : public bulk::world {
         return (T*)(state_->var_pointer_);
     }
 
-   protected:
+  protected:
     int register_location_(void* location) override {
         int id = -1;
         {
@@ -290,8 +293,7 @@ class world : public bulk::world {
     int pid_;
     int nprocs_;
     std::vector<std::function<void(void)>> sync_operations_;
-
 };
 
-}  // namespace cpp
-}  // namespace bulk
+} // namespace cpp
+} // namespace bulk
