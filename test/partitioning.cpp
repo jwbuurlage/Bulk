@@ -12,7 +12,7 @@ void test_partitioning() {
         int p = world.active_processors();
 
         auto N = (int)sqrt(p);
-        BULK_REQUIRE(N * N == p);
+        BULK_SKIP_SECTION_IF("Partitionings", N * N != p);
 
         BULK_SECTION("Cyclic partitioning to 1D") {
             auto part =
