@@ -6,6 +6,7 @@
 
 #include "../examples/set_backend.hpp"
 #include "fit.hpp"
+#include "report.hpp"
 
 using namespace std::chrono;
 
@@ -32,7 +33,7 @@ double flop_rate(bulk::world& world) {
     auto flops = r_size * 4;
 
     auto flops_per_s = bulk::gather_all(world, 1000.0 * flops / total_ms);
-    return bulk::average(flops_per_s.begin(), flops_per_s.end());
+    return bulk::average(flops_per_s);
 }
 
 int main() {
@@ -101,12 +102,19 @@ int main() {
                         (r / 1000.0));
                 }
 
-                auto avg_r = bulk::average(rs.begin(), rs.end());
-                world.log("> p = %i\n> r = %f GLOPS\n> l = %f FLOPs\n> g = %f "
-                          "FLOPs\n> total = %f GLOPS\n> dt = %f FLOPs",
-                          p, avg_r, bulk::average(gs.begin(), gs.end()),
-                          bulk::average(ls.begin(), ls.end()), avg_r * p,
-                          bulk::average(durations.begin(), durations.end()));
+                auto avg_r = bulk::average(rs);
+
+                auto report = bulk::util::table("BSP parameters");
+                report.columns("value", "unit");
+
+                report.row("p", p);
+                report.row("r", avg_r, "GFLOPS");
+                report.row("g", bulk::average(gs), "FLOPs/word");
+                report.row("l", bulk::average(ls), "FLOPs");
+                report.row("total", avg_r * p, "GFLOPS");
+                report.row("clock", bulk::average(durations), "FLOPs");
+
+                world.log(report.print().c_str());
             }
         }
     });

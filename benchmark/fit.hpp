@@ -10,8 +10,10 @@ using optional = experimental::optional<T>;
 
 namespace bulk {
 
-template <typename FwdIterator>
-auto average(FwdIterator first, FwdIterator last) {
+template <typename Iterable>
+auto average(Iterable& iter) {
+    auto first = iter.begin();
+    auto last = iter.end();
     auto k = 0u;
     auto a = *first;
     a = 0;
