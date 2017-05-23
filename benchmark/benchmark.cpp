@@ -49,38 +49,47 @@ int main() {
         bulk::coarray<int> target(world, size);
 
         std::vector<size_t> test_sizes = {
-            4u,       8u,         64u,        512u,       1024u,
-            2'000u,   4'000u,     8'000u,     16'000u,    32'000u,
-            64'000u,  100'000u,   128'000u,   200'000u,   256'000u,
-            512'000u, 1'000'000u, 4'000'000u, 8'000'000u, 10'000'000u};
+            1'000u,     2'000u,     4'000u,     8'000u,     16'000u,  32'000u,
+            64'000u,    100'000u,   128'000u,   200'000u,   256'000u, 512'000u,
+            1'000'000u, 4'000'000u, 8'000'000u, 10'000'000u};
         std::vector<double> test_results;
 
         for (auto test_size : test_sizes) {
             double total = 0.0f;
-            int sample_size = p > 8 ? 8 : p - 1;
+            int sample_size = p > 4 ? 4 : p - 1;
             for (auto k = 0; k < sample_size; ++k) {
                 auto t = (world.next_processor() + k * (p / sample_size)) % p;
 
                 auto clock = bulk::util::timer();
-
                 target.put(t, dummy_data.begin(),
                            dummy_data.begin() + test_size);
                 world.sync();
-
                 auto total_ms = clock.get();
+
                 total += total_ms;
             }
 
             test_results.push_back(total / sample_size);
         }
 
-        auto parameters = bulk::util::fit(test_sizes, test_results);
-        if (parameters) {
-            auto l = parameters.value().first * (r / 1000.0);
-            auto g = parameters.value().second * (r / 1000.0);
+        std::vector<double> latencies;
+        auto latency_samples = 100;
+        for (auto i = 0; i < latency_samples; ++i) {
+            auto clock = bulk::util::timer();
+            world.sync();
+            auto x = clock.get();
+            latencies.push_back(x);
+        }
+        auto l_avg = bulk::util::average(latencies);
+        auto ls = bulk::gather_all(world, l_avg);
+        auto l_ms = bulk::util::average(ls);
+
+        auto slope = bulk::util::fit_slope(test_sizes, test_results, l_ms);
+        if (slope) {
+            auto g = slope.value() * (r / 1000.0);
             auto rs = bulk::gather_all(world, r / 1e9);
             auto gs = bulk::gather_all(world, g);
-            auto ls = bulk::gather_all(world, l);
+            auto l = l_ms * (r / 1000.0);
 
             if (s == 0) {
                 auto comm_report =
@@ -89,13 +98,12 @@ int main() {
 
                 for (auto i = 0u; i < test_results.size(); ++i) {
                     comm_report.row(std::to_string(test_sizes[i]),
-                                    test_results[i]);
+                                    test_results[i] * (r / 1000.0));
                 }
 
                 world.log(comm_report.print().c_str());
-                world.log("fit: [time] = %f + %f [size]", parameters.value().first,
-                          parameters.value().second);
-                world.log("--\n");
+                world.log("fit: [time] = %f + %f x [size]", l, g);
+                world.log("--");
 
                 std::vector<double> durations;
                 for (int i = 0; i < 100; ++i) {
@@ -112,7 +120,7 @@ int main() {
                 report.row("p", p);
                 report.row("r", avg_r, "GFLOPS");
                 report.row("g", bulk::util::average(gs), "FLOPs/word");
-                report.row("l", bulk::util::average(ls), "FLOPs");
+                report.row("l", l, "FLOPs");
                 report.row("total", avg_r * p, "GFLOPS");
                 report.row("clock", bulk::util::average(durations), "FLOPs");
 

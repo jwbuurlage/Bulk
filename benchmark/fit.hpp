@@ -11,8 +11,9 @@ using optional = experimental::optional<T>;
 namespace bulk {
 namespace util {
 
+/** Find the average of an iterable container. */
 template <typename Iterable>
-auto average(Iterable& iter) {
+double average(Iterable& iter) {
     auto first = iter.begin();
     auto last = iter.end();
     auto k = 0u;
@@ -22,7 +23,7 @@ auto average(Iterable& iter) {
         a += *first;
         ++k;
     }
-    return a / k;
+    return a / (double)k;
 }
 
 /** Compute the 'zip' of two vectors. */
@@ -36,6 +37,40 @@ std::vector<std::pair<T, U>> zip(std::vector<T> xs, std::vector<U> ys) {
     return result;
 }
 
+/**
+ * Find the estimator for the slope `g` given `xs` and `ys`, given a fixed
+ * offset `l`.
+ *
+ * g = (sum x * (y - l)) / (sum x * x)
+ */
+std::optional<double> fit_slope(const std::vector<size_t>& xs,
+                                const std::vector<double>& ys, float offset) {
+    if (xs.size() < 2 || ys.size() != xs.size()) {
+        return std::optional<double>();
+    }
+
+    auto points = zip(xs, ys);
+
+    auto num = std::accumulate(
+        points.begin(), points.end(), 0.0,
+        [=](double a, auto p) { return a + p.first * (p.second - offset); });
+
+    auto denum = std::accumulate(xs.begin(), xs.end(), 0.0,
+                                 [=](double a, double x) { return a + x * x; });
+
+    auto g = num / denum;
+
+    return {g};
+}
+
+/**
+ * Find the estimator for the slope `g` and offset `l` given `xs` and `ys`.
+ *
+ * g = (sum (x - x_avg) * (y - y_avg)) / (sum (x - x_avg) * (x - x_avg))
+ * l = avg_y - g * avg_x
+ *
+ * The result is an optional pair given as (offset, slope).
+ */
 std::optional<std::pair<double, double>> fit(const std::vector<size_t>& xs,
                                              const std::vector<double>& ys) {
     if (xs.size() < 2 || ys.size() != xs.size()) {
