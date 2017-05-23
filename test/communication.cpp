@@ -1,6 +1,8 @@
-#include <bulk/bulk.hpp>
+#include <chrono>
+
 #include "bulk_test_common.hpp"
 #include "set_backend.hpp"
+#include <bulk/bulk.hpp>
 
 extern environment env;
 
@@ -13,13 +15,30 @@ void test_communication() {
             // test `put` to single variable
             bulk::var<int> a(world, 3);
 
-            BULK_CHECK_ONCE(a.value() == 3, "correct initial value for variable");
+            BULK_CHECK_ONCE(a.value() == 3,
+                            "correct initial value for variable");
 
             bulk::put(world.next_processor(), s, a);
             world.sync();
 
             BULK_CHECK_ONCE(a.value() == ((s + p - 1) % p),
                             "receive correct value after putting");
+        }
+
+        BULK_SECTION("Put is delayed") {
+            using namespace std::chrono_literals;
+
+            // test `put` to single variable
+            bulk::var<int> a(world, s);
+
+            bulk::put(world.next_processor(), s, a);
+
+            // sleep
+            std::this_thread::sleep_for(20ms);
+
+            BULK_CHECK_ONCE(a.value() == s, "value not put during superstep");
+
+            world.sync();
         }
 
         BULK_SECTION("Sugarized put") {
@@ -69,7 +88,8 @@ void test_communication() {
 
             // test `put` to multiple variables
             std::vector<bulk::var<int>> xs;
-            for (int i = 0; i < size; ++i) xs.emplace_back(world);
+            for (int i = 0; i < size; ++i)
+                xs.emplace_back(world);
 
             for (int i = 0; i < size; ++i) {
                 bulk::put(world.next_processor(), s + i, xs[i]);
@@ -89,7 +109,8 @@ void test_communication() {
 
             // test `put` to multiple variables
             std::vector<bulk::var<int>> xs;
-            for (int i = 0; i < size; ++i) xs.emplace_back(world);
+            for (int i = 0; i < size; ++i)
+                xs.emplace_back(world);
 
             if (s == 0)
                 for (int i = 1; i < p; ++i) {
@@ -101,7 +122,8 @@ void test_communication() {
             world.sync();
 
             bulk::future<int> a(world);
-            if (s == 0) a = bulk::get(p - 1, xs[size - 1]);
+            if (s == 0)
+                a = bulk::get(p - 1, xs[size - 1]);
 
             world.sync();
 
@@ -164,7 +186,6 @@ void test_communication() {
 
             BULK_CHECK_ONCE(xs[5] == 6, "can put iterator range");
         }
-
 
         BULK_SECTION("Coarray") {
             bulk::coarray<int> zs(world, 10);
