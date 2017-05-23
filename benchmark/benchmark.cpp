@@ -4,9 +4,6 @@
 #include <bulk/bulk.hpp>
 
 #include "../examples/set_backend.hpp"
-#include "fit.hpp"
-#include "report.hpp"
-#include "timer.hpp"
 
 double flop_rate(bulk::world& world) {
     unsigned int r_size = 1 << 23;

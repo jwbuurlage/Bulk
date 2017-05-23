@@ -1,6 +1,9 @@
+#pragma once
+
 #include <array>
 
 namespace bulk {
+    namespace util {
 
 /** Free functions for flattening multi-indices in volumes. */
 template <int D>
@@ -24,4 +27,5 @@ std::array<int, D> unflatten(std::array<int, D> volume, int flattened) {
     return unflattened;
 }
 
+} // namespace util
 } // namespace bulk

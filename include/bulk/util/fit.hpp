@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cassert>
 #include <vector>
 
@@ -43,8 +45,9 @@ std::vector<std::pair<T, U>> zip(std::vector<T> xs, std::vector<U> ys) {
  *
  * g = (sum x * (y - l)) / (sum x * x)
  */
-std::optional<double> fit_slope(const std::vector<size_t>& xs,
-                                const std::vector<double>& ys, float offset) {
+inline std::optional<double> fit_slope(const std::vector<size_t>& xs,
+                                       const std::vector<double>& ys,
+                                       float offset) {
     if (xs.size() < 2 || ys.size() != xs.size()) {
         return std::optional<double>();
     }
@@ -71,8 +74,8 @@ std::optional<double> fit_slope(const std::vector<size_t>& xs,
  *
  * The result is an optional pair given as (offset, slope).
  */
-std::optional<std::pair<double, double>> fit(const std::vector<size_t>& xs,
-                                             const std::vector<double>& ys) {
+inline std::optional<std::pair<double, double>>
+fit(const std::vector<size_t>& xs, const std::vector<double>& ys) {
     if (xs.size() < 2 || ys.size() != xs.size()) {
         return std::optional<std::pair<double, double>>();
     }

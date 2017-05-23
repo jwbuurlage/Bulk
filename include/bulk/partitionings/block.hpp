@@ -82,7 +82,7 @@ class block_partitioning : public rectangular_partitioning<D, G> {
 
     /** Obtain the origin of the block of processor `t`. */
     index_type<D> origin(int t) const override {
-        auto multi_index = unflatten<G>(this->grid_size_, t);
+        auto multi_index = util::unflatten<G>(this->grid_size_, t);
         index_type<D> result = {};
         for (int i = 0; i < G; ++i) {
             auto d = axes_[i];

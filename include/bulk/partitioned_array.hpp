@@ -46,14 +46,12 @@ namespace bulk {
  */
 template <typename T, int D, int G>
 class partitioned_array {
-   public:
+  public:
     /** Construct a partitioned array from a given partitioning. */
     partitioned_array(bulk::world& world, multi_partitioning<D, G>& part)
-        : world_(world),
-          partitioning_(part),
-          data_(world,
-                partitioning_.local_count(world.processor_id())) {
-        multi_id_ = unflatten<D>(partitioning_.grid(), world.processor_id());
+        : world_(world), partitioning_(part),
+          data_(world, partitioning_.local_count(world.processor_id())) {
+        multi_id_ = util::unflatten<D>(partitioning_.grid(), world.processor_id());
     }
 
     /** Obtain an image to a (possibly remote) element using a global index. */
@@ -61,23 +59,23 @@ class partitioned_array {
         auto owner = partitioning_.owner(index);
         auto local_idx = partitioning_.global_to_local(index);
         return data_(
-            owner)[flatten<D>(partitioning_.local_size(owner), local_idx)];
+            owner)[util::flatten<D>(partitioning_.local_size(owner), local_idx)];
     }
 
     /** Obtain an element using its local index. */
     T& local(index_type<D> index) {
-        return data_[flatten<D>(partitioning_.local_size(multi_id_), index)];
+        return data_[util::flatten<D>(partitioning_.local_size(multi_id_), index)];
     }
 
     /// ditto
     const T& local(index_type<D> index) const {
-        return data_[flatten<D>(partitioning_.local_size(multi_id_), index)];
+        return data_[util::flatten<D>(partitioning_.local_size(multi_id_), index)];
     }
 
     /** Obtain a reference to the world. */
     auto world() const { return world_; }
 
-   private:
+  private:
     std::array<int, D> multi_id_;
 
     // world in which this array resides
@@ -90,4 +88,4 @@ class partitioned_array {
     bulk::coarray<T> data_;
 };
 
-}  // namespace bulk
+} // namespace bulk
