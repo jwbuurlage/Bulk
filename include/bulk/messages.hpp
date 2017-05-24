@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <tuple>
 #include <vector>
 
 #include "world.hpp"
@@ -17,13 +18,24 @@ namespace bulk {
 /**
  * This object contains a message for or from another processor.
  */
-template <typename Tag, typename Content>
-struct message {
-    /** a tag attached to the message */
-    Tag tag;
-    /** the content of the message */
-    Content content;
+
+// Partial specialization of alias templates is not allowed, so we need this
+// indirection
+template <typename T, typename Enable, typename... Ts>
+struct message_t;
+
+template <typename T, typename... Ts>
+struct message_t<T, typename std::enable_if_t<(sizeof...(Ts) > 0)>, Ts...> {
+    std::tuple<T, Ts...> content;
 };
+
+template <typename T, typename... Ts>
+struct message_t<T, typename std::enable_if_t<(sizeof...(Ts) == 0)>, Ts...> {
+    T content;
+};
+
+template <typename T, typename... Ts>
+struct message : public message_t<T, void, Ts...> {};
 
 // queue::impl subclasses queue_base
 // The reason that this is seperate is:
@@ -49,9 +61,11 @@ class queue_base {
  * \tparam Tag the type to use for the message tag
  * \tparam Content the type to use for the message content
  */
-template <typename Tag, typename Content>
+template <typename T, typename... Ts>
 class queue {
   public:
+    using M = message<T, Ts...>;
+
     /**
      * A queue is a mailbox for messages of a given type.
      * They allow a convenient syntax for message passing:
@@ -61,8 +75,11 @@ class queue {
     class sender {
       public:
         /** Send a message over the queue. */
-        void send(Tag tag, Content content) {
-            q_.impl_->send_(t_, tag, content);
+        template <typename... Us>
+        void send(Us... args) {
+            M msg;
+            msg.content = {args...};
+            q_.impl_->send_(t_, msg);
         }
 
       private:
@@ -82,20 +99,18 @@ class queue {
     ~queue() {}
 
     // Disallow copies
-    queue(queue<Tag, Content>& other) = delete;
-    void operator=(queue<Tag, Content>& other) = delete;
+    queue(queue& other) = delete;
+    void operator=(queue& other) = delete;
 
     /**
       * Move a queue.
       */
-    queue(queue<Tag, Content>&& other) { impl_ = std::move(other.impl_); }
+    queue(queue&& other) { impl_ = std::move(other.impl_); }
 
     /**
      * Move a queue.
      */
-    void operator=(queue<Tag, Content>&& other) {
-        impl_ = std::move(other.impl_);
-    }
+    void operator=(queue&& other) { impl_ = std::move(other.impl_); }
 
     /**
      * Get an object with which you can send to a remote queue
@@ -143,23 +158,22 @@ class queue {
         void operator=(impl& other) = delete;
         void operator=(impl&& other) = delete;
 
-        void send_(int t, Tag tag, Content content) {
-            message<Tag, Content> m{tag, content};
-            world_.send_(t, id_, &m, sizeof(m));
+        void send_(int t, M m) {
+            world_.send_(t, id_, &m.content, sizeof(m.content));
         }
 
         void* get_buffer_(int size_in_bytes) override {
-            data_.resize(size_in_bytes / sizeof(message<Tag, Content>));
+            data_.resize(size_in_bytes / sizeof(M::content));
             return &data_[0];
         }
 
         void unsafe_push_back(void* msg) override {
-            data_.push_back(*static_cast<message<Tag, Content>*>(msg));
+            data_.push_back(*static_cast<decltype(M::content)*>(msg));
         }
 
         void clear_() override { data_.clear(); }
 
-        std::vector<message<Tag, Content>> data_;
+        std::vector<decltype(M::content)> data_;
         bulk::world& world_;
         int id_;
     };

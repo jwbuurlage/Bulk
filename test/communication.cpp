@@ -241,7 +241,7 @@ void test_communication() {
         BULK_SECTION("Coarray slicing") {
             bulk::coarray<int> zs(world, 10, 0);
             zs(world.next_processor())[{2, 5}] = s;
-            zs(world.next_processor())[{0, 1}] = {s - 1, s - 2};
+            zs(world.next_processor())[{0, 2}] = {s - 1, s - 2};
 
             world.sync();
 
@@ -262,7 +262,8 @@ void test_communication() {
             q(world.next_processor()).send(123, 1337);
             world.sync();
             for (auto& msg : q) {
-                BULK_CHECK_ONCE(msg.tag == 123 && msg.content == 1337,
+                BULK_CHECK_ONCE(std::get<0>(msg) == 123 &&
+                                    std::get<1>(msg) == 1337,
                                 "message passed succesfully");
             }
         }
@@ -275,8 +276,8 @@ void test_communication() {
             int tag = 0;
             int content = 0;
             for (auto msg : q) {
-                tag = msg.tag;
-                content = msg.content;
+                tag = std::get<0>(msg);
+                content = std::get<1>(msg);
             }
             BULK_CHECK_ONCE(tag == 123 && content == 1337,
                             "message passed succesfully");
@@ -290,8 +291,8 @@ void test_communication() {
             int tag = 0;
             int content = 0;
             for (auto msg : q) {
-                tag = msg.tag;
-                content = msg.content;
+                tag = std::get<0>(msg);
+                content = std::get<1>(msg);
             }
             BULK_CHECK_ONCE(tag == 123 && content == 1337,
                             "message passed succesfully");
@@ -310,8 +311,8 @@ void test_communication() {
             int k = 0;
             BULK_CHECK_ONCE(!q.empty(), "multiple messages arrived");
             for (auto msg : q) {
-                BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
-                                    msg.content == contents[k++],
+                BULK_CHECK_ONCE(std::get<0>(msg) == world.prev_processor() &&
+                                    std::get<1>(msg) == contents[k++],
                                 "multiple messages passed succesfully");
             }
         }
@@ -320,11 +321,11 @@ void test_communication() {
             std::vector<int> contents = {1337, 12345, 1230519, 5, 8};
             std::vector<float> contents2 = {1.0f, 2.0f, 3.0f, 4.0f};
 
-            bulk::queue<int, int> q(world);
+            bulk::queue<int> q(world);
             bulk::queue<int, float> q2(world);
 
             for (size_t i = 0; i < contents.size(); ++i) {
-                q(world.next_processor()).send(s, contents[i]);
+                q(world.next_processor()).send(contents[i]);
             }
             for (size_t i = 0; i < contents2.size(); ++i) {
                 q2(world.next_processor()).send(s, contents2[i]);
@@ -335,8 +336,7 @@ void test_communication() {
             int k = 0;
             BULK_CHECK_ONCE(!q.empty() && !q2.empty(), "queues are non-empty");
             for (auto& msg : q) {
-                BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
-                                    msg.content == contents[k++],
+                BULK_CHECK_ONCE(msg == contents[k++],
                                 "received correct result on q");
             }
 
@@ -348,8 +348,8 @@ void test_communication() {
                             "second queue correct number of messages");
 
             for (auto& msg : q2) {
-                BULK_CHECK_ONCE(msg.tag == world.prev_processor() &&
-                                    msg.content == contents2[l++],
+                BULK_CHECK_ONCE(std::get<0>(msg) == world.prev_processor() &&
+                                    std::get<1>(msg) == contents2[l++],
                                 "received correct result on q2");
             }
 

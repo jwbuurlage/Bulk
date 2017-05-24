@@ -16,7 +16,8 @@ int main() {
         world.sync();
 
         for (auto& msg : q)
-            world.log("%d got sent %d, %d", s, msg.tag, msg.content);
+            world.log("%d got sent %d, %d", s, std::get<0>(msg),
+                      std::get<1>(msg));
     });
 
     return 0;

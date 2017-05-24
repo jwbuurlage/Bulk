@@ -66,7 +66,8 @@ class coarray {
             }
         }
 
-        auto get() { /* FIXME implement */
+        auto get() {
+            // FIXME implement
         }
 
       private:

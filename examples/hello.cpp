@@ -35,7 +35,7 @@ int main() {
 
         // Messages are now available in q
         for (auto& msg : q) {
-            world.log("%d got sent %d, %f", s, msg.tag, msg.content);
+            world.log("%d got sent %d, %f", s, std::get<0>(msg), std::get<1>(msg));
         }
     });
 

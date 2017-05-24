@@ -125,7 +125,7 @@ class world {
     template <typename T>
     friend class coarray;
 
-    template <typename Tag, typename Content>
+    template <typename T, typename... Ts>
     friend class queue;
 
     // Returns the id of the registered location
