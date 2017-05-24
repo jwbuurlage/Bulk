@@ -18,7 +18,7 @@ namespace bulk {
  * Distributed array with easy element access, loosely based on the behaviour
  * of Co-Array Fortran.
  *
- * Co-arrays provide a convenient way to share data across processors. Instead
+ * Coarrays provide a convenient way to share data across processors. Instead
  * of manually sending and receiving data elements, coarrays model distributed
  * data as a 2-dimensional array, where the first dimension is over the
  * processors, and the second dimension is over local 1-dimensional array
@@ -26,7 +26,7 @@ namespace bulk {
  *
  * It can be used as follows:
  * \code{.cpp}
- *     auto xs = create_coarray<int>(world, 10);
+ *     auto xs = bulk::coarray<int>(world, 10);
  *     // set the 5th element on the 1st processor to 4
  *     xs(1)[5] = 4;
  *     // set the 3rd element on the local processor to 2
@@ -35,9 +35,9 @@ namespace bulk {
  */
 template <typename T>
 class coarray {
-   public:
+  public:
     class writer {
-       public:
+      public:
         /**
          * Assign a value to a remote image element.
          *
@@ -47,7 +47,7 @@ class coarray {
 
         auto get() { return parent_.get(t_, i_); }
 
-       private:
+      private:
         friend coarray<T>;
 
         writer(bulk::world& world, coarray<T>& parent, int t, int i)
@@ -60,7 +60,7 @@ class coarray {
     };
 
     class image {
-       public:
+      public:
         image(bulk::world& world, coarray<T>& parent, int t)
             : world_(world), parent_(parent), t_(t) {}
 
@@ -73,7 +73,7 @@ class coarray {
          */
         writer operator[](int i) { return writer(world_, parent_, t_, i); }
 
-       private:
+      private:
         bulk::world& world_;
         coarray<T>& parent_;
         int t_;
@@ -104,6 +104,8 @@ class coarray {
         }
     }
 
+    coarray(coarray&& other) : world_(other.world()), data_(std::move(data_)) {}
+
     /**
      * Retrieve the coarray image with index t
      *
@@ -123,7 +125,8 @@ class coarray {
     const T& operator[](int i) const { return data_[i]; }
 
     /**
-     * Retrieve the world to which this coarray is registed.
+     * Get a reference to the world of the coarray.
+     *
      * \returns a reference to the world of the coarray
      */
     bulk::world& world() { return world_; }
@@ -145,34 +148,33 @@ class coarray {
     /**
      * Put the value `value` into element `idx` on processor `t`.
      */
-    void put(int t, int idx, T value) {
-        bulk::put<T>(t, &value, data_, idx, 1);
-    }
+    void put(int t, int idx, T value) { data_.put(t, &value, idx, 1); }
 
     /**
-     * Put data defined by an iterator pair in a remote image.
+     * Put a range of data in a remote image.
      */
     template <typename FwdIterator>
-    void put(int processor, FwdIterator first, FwdIterator last, int offset = 0) {
+    void put(int processor, FwdIterator first, FwdIterator last,
+             int offset = 0) {
         data_.put(processor, first, last, offset);
     }
 
     /**
-     * Obtain a future to the value of element `idx` on processor `t`.
+     * Get a future to the value of element `idx` on processor `t`.
      */
-    auto get(int t, int idx) { return bulk::get<T>(t, data_, idx, 1); }
+    auto get(int t, int idx) { return data_.get(t, idx, 1); }
 
     /**
-     * Obtain the size of the coarray.
+     * Get the size of the coarray.
      */
     std::size_t size() const { return data_.size(); }
 
     /**
-     * See if the coarray is empty.
+     * Check if the coarray is empty.
      */
     bool empty() const { return size() == 0; }
 
-   private:
+  private:
     friend image;
     friend writer;
 
@@ -182,4 +184,4 @@ class coarray {
     array<T>& data() { return data_; }
 };
 
-}  // namespace bulk
+} // namespace bulk

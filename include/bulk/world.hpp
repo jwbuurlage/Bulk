@@ -6,39 +6,39 @@
 /**
  * \file world.hpp
  *
- * This objects encodes the world of a processor and its place within it.
+ * This objects represents the world of a processor and its place within it.
  */
 
 namespace bulk {
 
 /**
- * This objects encodes the world of a processor and its place within it.
+ * This objects represents the world of a processor and its place within it.
  */
 class world {
   public:
     world(){};
     virtual ~world(){};
 
-    // No copies
+    // Disallow copies
     world(world& other) = delete;
     void operator=(world& other) = delete;
 
     /**
-     * Retrieve the total number of active processors in a spmd section
+     * Get the total number of active processors in a spmd section
      *
      * \returns the number of active processors
      */
     virtual int active_processors() const = 0;
 
     /**
-     * Retrieve the local processor id
+     * Get the local processor id
      *
      * \returns an integer containing the id of the local processor
      */
     virtual int processor_id() const = 0;
 
     /**
-     * Retrieve the id of the next logical processor
+     * Get the id of the next logical processor
      *
      * \returns an integer containing the id of the next processor
      */
@@ -50,7 +50,7 @@ class world {
     }
 
     /**
-     * Retrieve the id of the previous logical processor
+     * Get the id of the previous logical processor
      *
      * \returns an integer containing the id of the previous processor
      */
@@ -62,7 +62,7 @@ class world {
     }
 
     /**
-     * Performs a global barrier synchronization of the active processors
+     * Perform a global barrier synchronization of the active processors
      * and resolves any outstanding communication. Messages previously
      * received in queues are cleared for the next superstep.
      * The function must be called by all processors.
@@ -72,7 +72,7 @@ class world {
     virtual void sync() = 0;
 
     /**
-     * Performs a global barrier synchronization of the active processors
+     * Perform a global barrier synchronization of the active processors
      * without resolving outstanding communication. Queues are not cleared.
      * The function must be called by all processors.
      * When some processors call `sync` while others call `barrier`
@@ -103,7 +103,7 @@ class world {
     }
 
     /**
-     * Terminates the spmd program on all processors.
+     * Terminate the spmd program on all processors.
      *
      * This is not the normal way to exit a bulk program
      * and indicates an error has occurred.

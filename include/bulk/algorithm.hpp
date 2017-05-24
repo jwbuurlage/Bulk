@@ -3,25 +3,55 @@
 /**
  * \file algorithm.hpp
  *
- * This header providers various high-level functions to perform common
- * algorithms and  communication patterns found in bulk-synchronous parallel
- * programs.
+ * This header provides various high-level functions to perform common
+ * algorithms and communication patterns commonly found in bulk-synchronous
+ * parallel programs.
  */
 
 #include <vector>
 
-#include "world.hpp"
 #include "coarray.hpp"
 #include "communication.hpp"
-
+#include "world.hpp"
 
 namespace bulk {
 
 /**
+ * Create a coarray with images holding the given value on each processor.
+ *
+ * This function takes an argument, and writes it to the appropriate element on
+ * each remote processor.
+ *
+ * The cost is `p * g + l`.
+ *
+ * \tparam T the type of the value to put in the coarray
+ *
+ * \param value the value to write to each remote processor
+ * \param world the world in which the communication takes place
+ *
+ * \returns a coarray containing on each processor the argument given by each
+ * other processor.
+ */
+template <typename T>
+bulk::coarray<T> gather_all(bulk::world& world, T value) {
+    bulk::coarray<T> xs(world, world.active_processors());
+
+    for (int t = 0; t < world.active_processors(); ++t) {
+        xs(t)[world.processor_id()] = value;
+    }
+
+    world.sync();
+
+    return xs;
+}
+
+/**
  * Perform a left-associative fold over a distributed variable.
  *
- * This function applies a function to the images of a variable. This function
- * should be called in the same step on each processor.
+ * This function applies a function to the images of a variable.
+ *
+ * The cost is `F * p + p * g + l`, where `F` is the number of
+ * flops performed during a single call to `f`.
  *
  * \tparam T the type of the value held by \c x.
  * \tparam Func the binary function to apply to the images of \c x.
@@ -38,50 +68,13 @@ T foldl(var<T>& x, Func f, T start_value = 0) {
     auto& world = x.world();
     T result = start_value;
 
-    // FIXME: This should be done with puts instead of gets,
-    // which are faster on almost every platform
-
-    // allocate space to store each remote value locally
-    std::vector<bulk::future<T>> images;
-    for (int t = 0; t < world.active_processors(); ++t) {
-        // obtain the remote values
-        images.push_back(bulk::get<T>(t, x));
-    }
+    auto images = bulk::gather_all(world, x.value());
     world.sync();
     for (int t = 0; t < world.active_processors(); ++t) {
         // apply f iteratively to the current value, and each remote value
-        f(result, images[t].value());
+        f(result, images[t]);
     }
     return result;
-}
-
-/**
- * Creates a co-array with images holding the given value on each processor.
- *
- * This function takes an argument, and writes it to the appropriate element on
- * each remote processor. This function should be called in the same step on
- * each processor.
- *
- * \tparam T the type of the value to put in the co-array
- * \tparam World the world in which the communication takes place
- *
- * \param value the value to write to each remote processor
- * \param world the world of the targetted processors
- *
- * \returns a co-array containing on each processor the argument given by each
- * other processor.
- */
-template <typename T>
-bulk::coarray<T> gather_all(bulk::world& world, T value) {
-    bulk::coarray<T> xs(world, world.active_processors());
-
-    for (int t = 0; t < world.active_processors(); ++t) {
-        xs(t)[world.processor_id()] = value;
-    }
-
-    world.sync();
-
-    return xs;
 }
 
 } // namespace bulk

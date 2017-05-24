@@ -14,15 +14,15 @@ namespace bulk {
 class world;
 
 /**
- * This object encodes the parallel environment of this layer, and
- * provides information on the system.
+ * This object represents a parallel environment, and can be used to obtain
+ * information of the parallel system.
  */
 class environment {
-   public:
+  public:
     virtual ~environment() = default;
 
     /**
-     * Start an spmd section on a given number of processors.
+     * Start an SPMD section on a given number of processors.
      *
      * \param processors the number of processors to run on
      * \param spmd the spmd function that gets run on each (virtual) processor
@@ -31,7 +31,7 @@ class environment {
                        std::function<void(bulk::world&)> spmd) = 0;
 
     /**
-     * Retrieve the total number of processors available on the system
+     * Get the total number of processors available on the system
      *
      * \returns the number of available processors
     */
@@ -52,8 +52,8 @@ class environment {
      * callback at the same time, so there is no need for further
      * synchronization or locking mechanisms.
      */
-    virtual void set_log_callback(
-        std::function<void(int, const std::string&)> f) = 0;
+    virtual void
+    set_log_callback(std::function<void(int, const std::string&)> f) = 0;
 };
 
-}  // namespace bulk
+} // namespace bulk

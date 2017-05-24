@@ -38,7 +38,7 @@ class var {
         }
 
         /**
-         * Obtain a future to the remote image value.
+         * Get a future to the remote image value.
          */
         future<T> get() const { return var_.impl_->get(t_); }
 
@@ -98,7 +98,7 @@ class var {
     void operator=(var<T>&& other) { impl_ = std::move(other.impl_); }
 
     /**
-     * Obtain a image object to a remote image, added for syntactic sugar
+     * Get an image object to a remote image, added for syntactic sugar
      *
      * \returns a `var::image` object to the image with index `t`.
      */

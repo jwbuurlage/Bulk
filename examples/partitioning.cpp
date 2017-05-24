@@ -2,6 +2,10 @@
 
 #include "set_backend.hpp"
 
+namespace bulk {
+using namespace experimental;
+}
+
 int main() {
     environment env;
 

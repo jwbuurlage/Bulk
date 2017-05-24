@@ -1,6 +1,7 @@
 #include "partitioning.hpp"
 
 namespace bulk {
+namespace experimental {
 
 /**
  * A binary-space partitioning (aptly abbreviated BSP, of course because of its
@@ -18,7 +19,7 @@ namespace bulk {
  */
 template <int D>
 class tree_partitioning : public rectangular_partitioning<D, 1> {
-   public:
+  public:
     using rectangular_partitioning<D, 1>::local_size;
     using rectangular_partitioning<D, 1>::origin;
     using rectangular_partitioning<D, 1>::local_to_global;
@@ -96,10 +97,11 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
 
     index_type<D> origin(int t) const override { return origins_[t]; }
 
-   private:
+  private:
     binary_tree<split> splits_;
     std::vector<index_type<D>> origins_;
     std::vector<index_type<D>> extents_;
 };
 
-}  // namespace bulk
+} // namespace experimental
+} // namespace bulk

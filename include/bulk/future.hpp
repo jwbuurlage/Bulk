@@ -19,14 +19,14 @@ template <typename T>
 class future {
   public:
     /**
-     * Initializes the future and the buffer
+     * Initialize the future.
      */
     future(bulk::world& world) : world_(world) {
         buffer_ = std::make_unique<T>();
     }
 
     /**
-     * Deconstructs the future and its buffer
+     * Deconstruct the future.
      */
     ~future() {}
 
@@ -38,21 +38,22 @@ class future {
     }
 
     /**
-     * Move a future to another
+     * Move a future.
      */
     void operator=(future<T>&& other) {
         buffer_ = std::move(other.buffer_);
     }
 
     /**
-     * Returns the value held by the future
+     * Get a reference to the value held by the future.
      *
      * \returns a reference to the value
      */
     T& value() { return *buffer_.get(); }
 
     /**
-     * Retrieve the world to which this future is registed.
+     * Get a reference to the world of the future.
+     *
      * \returns a reference to the world of the future
      */
     bulk::world& world() { return world_; }

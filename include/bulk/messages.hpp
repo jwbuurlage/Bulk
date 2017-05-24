@@ -19,7 +19,7 @@ namespace bulk {
  */
 template <typename Tag, typename Content>
 struct message {
-    /** a tag to attach to the message */
+    /** a tag attached to the message */
     Tag tag;
     /** the content of the message */
     Content content;
@@ -31,7 +31,7 @@ struct message {
 // whereas we need to access this object
 // in a virtual function in `world`.
 class queue_base {
-   public:
+  public:
     queue_base(){};
     virtual ~queue_base(){};
 
@@ -51,20 +51,21 @@ class queue_base {
  */
 template <typename Tag, typename Content>
 class queue {
-   public:
+  public:
     /**
-     * This helper class adds syntactic sugar to the message passing interface
-     * In particular it allows the programmer to write
+     * A queue is a mailbox for messages of a given type.
+     * They allow a convenient syntax for message passing:
      *
-     *     q(pid).send(tag, content);
+     *     q(processor).send(tag, content);
      */
     class sender {
-       public:
+      public:
+        /** Send a message over the queue. */
         void send(Tag tag, Content content) {
             q_.impl_->send_(t_, tag, content);
         }
 
-       private:
+      private:
         friend queue;
 
         sender(queue& q, int t) : q_(q), t_(t) {}
@@ -75,62 +76,62 @@ class queue {
 
     /**
      * Construct a message queue and register it with world
-     * The world implementation can choose to perform a barrier sync
+     * The world implementation can choose to perform a synchronization
      */
     queue(bulk::world& world) { impl_ = std::make_unique<impl>(world); }
     ~queue() {}
 
-    // No copies
+    // Disallow copies
     queue(queue<Tag, Content>& other) = delete;
     void operator=(queue<Tag, Content>& other) = delete;
 
     /**
-      * Move constructor: move from one queue to a new one
+      * Move a queue.
       */
     queue(queue<Tag, Content>&& other) { impl_ = std::move(other.impl_); }
 
     /**
-     * Move assignment: move from one queue to an existing one
+     * Move a queue.
      */
     void operator=(queue<Tag, Content>&& other) {
         impl_ = std::move(other.impl_);
     }
 
     /**
-     * Obtain a sender object to a remote queue
+     * Get an object with which you can send to a remote queue
      */
     auto operator()(int t) { return sender(*this, t); }
 
     /**
-     * Obtain an iterator to the begin of the local queue
+     * Get an iterator to the begin of the local queue
      */
     auto begin() { return impl_->data_.begin(); }
 
     /**
-     * Obtain an iterator to the end of the local queue
+     * Get an iterator to the end of the local queue
      */
     auto end() { return impl_->data_.end(); }
 
     /**
-     * Obtain the number of messages in the queue.
+     * Get the number of messages in the local queue.
      */
     std::size_t size() { return impl_->data_.size(); }
 
     /**
-     * See if the queue is empy.
+     * Check if the queue is empty.
      */
     bool empty() { return impl_->data_.empty(); }
 
     /**
-     * Retrieve the world to which this queue is registed.
+     * Get a reference to the world of the queue.
      *
      * \returns a reference to the world of the queue
      */
     bulk::world& world() { return impl_->world_; }
 
-   private:
+  private:
     class impl : public queue_base {
-       public:
+      public:
         impl(bulk::world& world) : world_(world) {
             id_ = world.register_queue_(this);
         }
@@ -156,9 +157,7 @@ class queue {
             data_.push_back(*static_cast<message<Tag, Content>*>(msg));
         }
 
-        void clear_() override {
-            data_.clear();
-        }
+        void clear_() override { data_.clear(); }
 
         std::vector<message<Tag, Content>> data_;
         bulk::world& world_;
@@ -169,4 +168,4 @@ class queue {
     friend sender;
 };
 
-}  // namespace bulk
+} // namespace bulk

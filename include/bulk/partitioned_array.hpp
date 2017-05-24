@@ -34,6 +34,7 @@
 #include "partitionings/partitioning.hpp"
 
 namespace bulk {
+namespace experimental {
 
 /**
  * A partitioned array is a distributed array with an associated partitioning.
@@ -54,7 +55,7 @@ class partitioned_array {
         multi_id_ = util::unflatten<D>(partitioning_.grid(), world.processor_id());
     }
 
-    /** Obtain an image to a (possibly remote) element using a global index. */
+    /** Get an image to a (possibly remote) element using a global index. */
     auto global(index_type<D> index) {
         auto owner = partitioning_.owner(index);
         auto local_idx = partitioning_.global_to_local(index);
@@ -62,7 +63,7 @@ class partitioned_array {
             owner)[util::flatten<D>(partitioning_.local_size(owner), local_idx)];
     }
 
-    /** Obtain an element using its local index. */
+    /** Get an element using its local index. */
     T& local(index_type<D> index) {
         return data_[util::flatten<D>(partitioning_.local_size(multi_id_), index)];
     }
@@ -72,7 +73,7 @@ class partitioned_array {
         return data_[util::flatten<D>(partitioning_.local_size(multi_id_), index)];
     }
 
-    /** Obtain a reference to the world. */
+    /** Get a reference to the world of the array. */
     auto world() const { return world_; }
 
   private:
@@ -88,4 +89,5 @@ class partitioned_array {
     bulk::coarray<T> data_;
 };
 
+} // namespace experimental
 } // namespace bulk

@@ -1,8 +1,12 @@
 #include <cmath>
 
-#include <bulk/bulk.hpp>
 #include "bulk_test_common.hpp"
 #include "set_backend.hpp"
+#include <bulk/bulk.hpp>
+
+namespace bulk {
+using namespace experimental;
+}
 
 extern environment env;
 
@@ -36,9 +40,9 @@ void test_partitioning() {
                             "compute correctly the cyclic size");
             BULK_CHECK_ONCE(part.global_to_local({4, 3})[0] == 4 / N,
                             "compute correctly the cyclic local index");
-            BULK_CHECK_ONCE(
-                part.local_to_global({1, 1}, {s % N, s / N})[0] == N,
-                "compute correctly the cyclic global index");
+            BULK_CHECK_ONCE(part.local_to_global({1, 1}, {s % N, s / N})[0] ==
+                                N,
+                            "compute correctly the cyclic global index");
         }
 
         BULK_SECTION("Block partitioning") {
