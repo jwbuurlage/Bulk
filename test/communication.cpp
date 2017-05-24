@@ -12,6 +12,8 @@ void test_communication() {
         int s = world.processor_id();
         int p = world.active_processors();
 
+        BULK_SKIP_SECTION_IF("Communication", p < 1);
+
         BULK_SECTION("Put") {
             // test `put` to single variable
             bulk::var<int> a(world, 3);
@@ -24,6 +26,19 @@ void test_communication() {
 
             BULK_CHECK_ONCE(a.value() == ((s + p - 1) % p),
                             "receive correct value after putting");
+        }
+
+        BULK_SECTION("Broadcast") {
+            // test `put` to single variable
+            bulk::var<int> a(world, 3);
+
+            if (world.processor_id() == 1) {
+                a.broadcast(2);
+            }
+            world.sync();
+
+            BULK_CHECK_ONCE(a.value() == 2,
+                            "receive correct value after broadcasting");
         }
 
         BULK_SECTION("Put is delayed") {

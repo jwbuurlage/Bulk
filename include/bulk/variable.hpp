@@ -105,6 +105,15 @@ class var {
     image operator()(int t) { return image(*this, t); };
 
     /**
+     * Broadcast a value to all images.
+     */
+    void broadcast(T x) {
+        for (int t = 0; t < world().active_processors(); ++t) {
+            impl_->put(t, x);
+        }
+    }
+
+    /**
      * Implicitly get the value held by the local image of the var
      *
      * \note This is for code like `myint = myvar + 5;`.
