@@ -1,14 +1,17 @@
 Bulk
 ====
 
-Bulk is a new interface for writing parallel programs in C++ in bulk-synchronous style. The main goal of the project is to do away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example the BSPlib standard, or MPI. Furthermore, the interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and lambda functions, enabling safer and more efficient distributed programming.
+Bulk is a new interface for writing parallel programs in C++ in bulk-synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.
 
 Example
 -------
 
 ```cpp
 bulk::cpp::environment env;
-env.spawn(env.available_processors(), [](auto& world, int s, int p) {
+env.spawn(env.available_processors(), [](auto& world) {
+    auto s = world.processor_id();
+    auto p = world.active_processors();
+
     world.log("Hello, world %d/%d\n", s, p);
 
     auto a = bulk::var<int>(world);
@@ -32,7 +35,7 @@ env.spawn(env.available_processors(), [](auto& world, int s, int p) {
     }
     world.sync();
 
-    // Messages are now available in q
+    // messages are now available in q
     for (auto& msg : q) {
         world.log("%d got sent %d, %f\n", s, msg.tag, msg.content);
     }
@@ -47,7 +50,6 @@ Bulk supports a number of different *backends*, allowing the programs to run in 
 
 - `cpp` for multi-core systems using standard C++ threading support
 - `mpi` for distributed environments using MPI
-- `epiphany` for programs compiled for the [Parallella](http://www.parallella.org) development board
 
 The examples in the `examples` directory work for every backend. To build them, do the following. The backends (e.g. `cpp`, `mpi`) are built optionally, just remove or add the option if you do not require them.
 
@@ -76,4 +78,4 @@ Bulk is released under the MIT license, for details see the file LICENSE.md.
 Contributing
 ------------
 
-We very much welcome contributions. Please submit pull requests against the develop branch.
+We welcome contributions. Please submit pull requests against the develop branch.
