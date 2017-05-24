@@ -3,7 +3,7 @@
 #include <array>
 
 namespace bulk {
-    namespace util {
+namespace util {
 
 /** Free functions for flattening multi-indices in volumes. */
 template <int D>

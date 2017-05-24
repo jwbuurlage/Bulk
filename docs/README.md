@@ -4,9 +4,9 @@ The Bulk docs are built using mkdocs. Mkdocs can be installed using
 
     pip install mkdocs
 
-we need to install the Cinder theme
+we need to install the Material theme
 
-    pip install mkdocs-cinder
+    pip install mkdocs-material
 
 afterwards run
 
