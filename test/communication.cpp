@@ -238,6 +238,25 @@ void test_communication() {
             }
         }
 
+        BULK_SECTION("Coarray slicing") {
+            bulk::coarray<int> zs(world, 10, 0);
+            zs(world.next_processor())[{2, 5}] = s;
+            zs(world.next_processor())[{0, 1}] = {s - 1, s - 2};
+
+            world.sync();
+
+            for (int i = 2; i < 5; ++i) {
+                BULK_CHECK_ONCE(zs[i] == world.prev_processor(),
+                                "setting slice to constant");
+            }
+            BULK_CHECK_ONCE(zs[5] == 0,
+                            "outside the slice values are untouched");
+            BULK_CHECK_ONCE(zs[0] == world.prev_processor() - 1,
+                            "individual slice setting");
+            BULK_CHECK_ONCE(zs[1] == world.prev_processor() - 2,
+                            "individual slice setting");
+        }
+
         BULK_SECTION("Single message passing") {
             bulk::queue<int, int> q(world);
             q(world.next_processor()).send(123, 1337);

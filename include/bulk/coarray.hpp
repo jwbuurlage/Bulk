@@ -8,6 +8,7 @@
  */
 
 #include <cstddef>
+#include <vector>
 
 #include "array.hpp"
 #include "communication.hpp"
@@ -36,6 +37,50 @@ namespace bulk {
 template <typename T>
 class coarray {
   public:
+    struct slice {
+        int first;
+        int last;
+    };
+
+    class slice_writer {
+      public:
+        /**
+         * Assign a value to a slice of a remote image.
+         *
+         * \param value the new value of each element in the slice
+         */
+        void operator=(T value) {
+            for (int i = s_.first; i < s_.last; ++i) {
+                parent_.put(t_, i, value);
+            }
+        }
+
+        /**
+         * Assign values to a slice of a remote image.
+         *
+         * \param values the new values of in the slice
+         */
+        void operator=(std::vector<T> values) {
+            for (int i = s_.first; i < s_.last; ++i) {
+                parent_.put(t_, i - s_.first, values[i]);
+            }
+        }
+
+        auto get() { /* FIXME implement */
+        }
+
+      private:
+        friend coarray<T>;
+
+        slice_writer(bulk::world& world, coarray<T>& parent, int t, slice s)
+            : world_(world), parent_(parent), t_(t), s_(s) {}
+
+        bulk::world& world_;
+        coarray<T>& parent_;
+        int t_;
+        slice s_;
+    };
+
     class writer {
       public:
         /**
@@ -72,6 +117,10 @@ class coarray {
          * \returns an object that can be used to write to the remote element
          */
         writer operator[](int i) { return writer(world_, parent_, t_, i); }
+
+        slice_writer operator[](slice s) {
+            return slice_writer(world_, parent_, t_, s);
+        }
 
       private:
         bulk::world& world_;
