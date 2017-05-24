@@ -23,7 +23,7 @@
 // is only a single instance.
 
 namespace bulk {
-namespace cpp {
+namespace thread {
 
 // Taken from
 // http://stackoverflow.com/questions/24465533/implementing-boostbarrier-in-c11
@@ -295,5 +295,5 @@ class world : public bulk::world {
     std::vector<std::function<void(void)>> sync_operations_;
 };
 
-} // namespace cpp
+} // namespace thread
 } // namespace bulk

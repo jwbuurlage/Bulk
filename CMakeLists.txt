@@ -27,4 +27,4 @@ set(
 
 
 add_subdirectory("backends/mpi/build" "bin/mpi" EXCLUDE_FROM_ALL)
-add_subdirectory("backends/cpp/build" "bin/cpp" EXCLUDE_FROM_ALL)
+add_subdirectory("backends/thread/build" "bin/thread" EXCLUDE_FROM_ALL)

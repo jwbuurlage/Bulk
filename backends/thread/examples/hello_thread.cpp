@@ -1,8 +1,8 @@
-#include <bulk/backends/cpp/cpp.hpp>
+#include <bulk/backends/thread/thread.hpp>
 #include <bulk/bulk.hpp>
 
 int main() {
-    bulk::cpp::environment env;
+    bulk::thread::environment env;
 
     env.spawn(env.available_processors(), [](bulk::world& world) {
         int s = world.processor_id();

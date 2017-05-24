@@ -19,7 +19,7 @@ using environment = bulk::xeonphi::environment;
 
 #else
 
-#include <bulk/backends/cpp/cpp.hpp>
-using environment = bulk::cpp::environment;
+#include <bulk/backends/thread/thread.hpp>
+using environment = bulk::thread::environment;
 
 #endif

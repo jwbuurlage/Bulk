@@ -7,7 +7,7 @@
 #include <bulk/messages.hpp>
 
 namespace bulk {
-namespace cpp {
+namespace thread {
 
 template <typename Tag, typename Content, typename World>
 class queue {
@@ -124,5 +124,5 @@ class queue {
     World& world_;
 };
 
-}  // namespace cpp
+}  // namespace thread
 }  // namespace bulk

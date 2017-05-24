@@ -12,7 +12,7 @@
  */
 
 namespace bulk {
-namespace cpp {
+namespace thread {
 
 /**
  * Represents a distributed object with an image for each processor, that is
@@ -32,7 +32,7 @@ class var {
          * \param value the new value of the image
          */
         void operator=(T value) {
-            // normally we use bulk::put here, but because the cpp backend does
+            // normally we use bulk::put here, but because the thread backend does
             // not conform to the shared internals we need to do it
             // differently..
             var_.get_ref(t_) = value;
@@ -159,5 +159,5 @@ class var {
     World& world_;
 };
 
-} // namespace cpp
+} // namespace thread
 } // namespace bulk

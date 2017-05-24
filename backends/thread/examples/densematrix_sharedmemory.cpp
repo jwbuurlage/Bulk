@@ -1,6 +1,6 @@
 #include <chrono>
 #include <cmath>
-#include <bulk/backends/cpp/cpp.hpp>
+#include <bulk/backends/thread/thread.hpp>
 #include <bulk/bulk.hpp>
 
 using namespace std::chrono;
@@ -30,7 +30,7 @@ void multiply_add(int I, int J) {
 }
 
 int main() {
-    bulk::cpp::environment env;
+    bulk::thread::environment env;
 
     for (auto i = 0u; i < matrix_size; ++i) {
         for (auto j = 0u; j < matrix_size; ++j) {

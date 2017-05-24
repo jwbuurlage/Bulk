@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace bulk {
-namespace cpp {
+namespace thread {
 
 class environment : public bulk::environment {
   public:
@@ -25,7 +25,7 @@ class environment : public bulk::environment {
         state.log_callback = log_callback;
 
         // Create the threads and thereby start them
-        std::vector<bulk::cpp::world> ws;
+        std::vector<bulk::thread::world> ws;
         ws.reserve(processors);
         for (int i = 0; i < processors; i++) {
             ws.emplace_back(&state, i, processors);
@@ -66,5 +66,5 @@ class environment : public bulk::environment {
     std::function<void(int, const std::string&)> log_callback;
 };
 
-} // namespace cpp
+} // namespace thread
 } // namespace bulk

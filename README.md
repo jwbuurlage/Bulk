@@ -7,7 +7,7 @@ Example
 -------
 
 ```cpp
-bulk::cpp::environment env;
+bulk::thread::environment env;
 env.spawn(env.available_processors(), [](auto& world) {
     auto s = world.processor_id();
     auto p = world.active_processors();
@@ -48,19 +48,19 @@ Building
 
 Bulk supports a number of different *backends*, allowing the programs to run in parallel using:
 
-- `cpp` for multi-core systems using standard C++ threading support
+- `thread` for multi-core systems using standard C++ `<thread>` threading support
 - `mpi` for distributed environments using MPI
 
-The examples in the `examples` directory work for every backend. To build them, do the following. The backends (e.g. `cpp`, `mpi`) are built optionally, just remove or add the option if you do not require them.
+The examples in the `examples` directory work for every backend. To build them, do the following. The backends (e.g. `thread`, `mpi`) are built optionally, just remove or add the option if you do not require them.
 
     mkdir build
     cd build
     cmake ..
-    make cpp mpi
+    make thread mpi
 
-The examples will be compiled in the `bin/{backend}` directory, prepended with the backend name, i.e. to run the `hello` example with the `cpp` backend:
+The examples will be compiled in the `bin/{backend}` directory, prepended with the backend name, i.e. to run the `hello` example with the `thread` backend:
 
-    ./bin/cpp/cpp_hello
+    ./bin/thread/thread_hello
 
 Authors
 -------

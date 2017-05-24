@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-set(BACKEND_NAME cpp)
+set(BACKEND_NAME thread)
 project(bulk_${BACKEND_NAME})
 
 add_custom_target(${BACKEND_NAME})
-add_definitions(-DBACKEND_CPP)
+add_definitions(-DBACKEND_THREAD)
 
 include_directories(
     "../../../include"
@@ -42,7 +42,7 @@ set(
 
 set(
     CPP_EXAMPLE_SOURCES
-    "hello_cpp.cpp"
+    "hello_thread.cpp"
     "densematrix_sharedmemory.cpp"
     )
 

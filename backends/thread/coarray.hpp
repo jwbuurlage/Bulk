@@ -4,11 +4,11 @@
 /**
  * \file coarray.hpp
  *
- * This header provides the cpp implementation of a coarray
+ * This header provides the thread implementation of a coarray
  */
 
 namespace bulk {
-namespace cpp {
+namespace thread {
 
 template <typename T, class World>
 class coarray {
@@ -168,5 +168,5 @@ class coarray {
     World& world_;
 };
 
-} // namespace cpp
+} // namespace thread
 } // namespace bulk
