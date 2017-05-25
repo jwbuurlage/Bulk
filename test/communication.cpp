@@ -41,7 +41,7 @@ void test_communication() {
                             "receive correct value after broadcasting");
         }
 
-        BULK_SECTION("Put is delayed") {
+        BULK_SECTION("Put and get delayed") {
             using namespace std::chrono_literals;
 
             // test `put` to single variable
@@ -57,6 +57,20 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK(a.value() == world.prev_processor(), "receive data after sync");
+
+            a.value() = 42;
+
+            world.sync();
+
+            auto b = bulk::get(world.next_processor(), a);
+
+            std::this_thread::sleep_for(20ms);
+
+            a.value() = 45;
+
+            world.sync();
+
+            BULK_CHECK(b.value() == 45, "receive correct value after get");
         }
 
         BULK_SECTION("Sugarized put") {
@@ -154,15 +168,17 @@ void test_communication() {
 
             world.sync();
 
+            BULK_CHECK(xs[2].value() == s,
+                       "receive correct value after heterogeneous puts");
+
             bulk::future<int> a(world);
             if (s == 0)
                 a = bulk::get(p - 1, xs[size - 1]);
 
             world.sync();
 
-            BULK_CHECK(
-                a.value() == p - 1,
-                "receive correct value after heterogeneous puts and getting");
+            BULK_CHECK_ONCE(a.value() == p - 1,
+                            "receive correct value after getting");
         }
 
         BULK_SECTION("Get") {
