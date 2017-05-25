@@ -90,7 +90,7 @@ void test_communication() {
 
         BULK_SECTION("Put non-int") {
             // test `put` float to single variable
-            bulk::var<float> a(world);
+            bulk::var<float> a(world, 5.0f);
 
             bulk::put(world.next_processor(), 1.0f, a);
             world.sync();
@@ -98,6 +98,21 @@ void test_communication() {
             BULK_CHECK(a.value() == 1.0f,
                             "receive correct value after putting float");
         }
+
+        BULK_SECTION("Put custom struct") {
+            struct custom_struct {
+                int x;
+                float y;
+            };
+            bulk::var<custom_struct> a(world, {4, 8.0f});
+
+            bulk::put(world.next_processor(), {3, 2.0f}, a);
+            world.sync();
+
+            BULK_CHECK(a.value().x == 3 && a.value().y == 2.0f,
+                       "receive correct value after putting custom struct");
+        }
+
 
         BULK_SECTION("Put multiple") {
             int size = 5;
