@@ -11,7 +11,9 @@ using namespace experimental;
 extern environment env;
 
 void test_partitioning() {
-    env.spawn(env.available_processors(), [](auto& world) {
+
+    auto N = (int)sqrt(env.available_processors());
+    env.spawn(N * N, [](auto& world) {
         int s = world.processor_id();
         int p = world.active_processors();
 

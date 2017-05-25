@@ -23,7 +23,7 @@ extern int total, success, cur_failed;
         }                                                                      \
         cur_failed = 0;                                                        \
     }                                                                          \
-    world.sync(); // Sync in order to output the log messages
+    world.barrier();
 
 #define BULK_CHECK_ONCE(body, error)                                           \
     if (world.processor_id() == 0) {                                           \

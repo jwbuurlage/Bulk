@@ -52,9 +52,11 @@ void test_communication() {
             // sleep
             std::this_thread::sleep_for(20ms);
 
-            BULK_CHECK(a.value() == s, "value not put during superstep");
+            BULK_CHECK(a.value() == s, "local copy untouched before sync");
 
             world.sync();
+
+            BULK_CHECK(a.value() == world.prev_processor(), "receive data after sync");
         }
 
         BULK_SECTION("Sugarized put") {
@@ -215,7 +217,7 @@ void test_communication() {
             xs.put(world.next_processor(), test.begin(), test.end());
             world.sync();
 
-            BULK_CHECK(xs[5] == 6, "can put iterator range");
+            BULK_CHECK(xs[5] == 6, "put iterator range");
         }
 
         BULK_SECTION("Coarray") {
