@@ -136,7 +136,8 @@ class world : public bulk::world {
 
   protected:
     // Returns the id of the registered location
-    int register_location_(void* location) override final {
+    int register_location_(void* location, size_t size) override final {
+        (void)size;
         locations_[next_index_] = location;
         return next_index_++;
     }

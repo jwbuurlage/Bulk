@@ -30,7 +30,7 @@ class array {
      */
     array(bulk::world& world, std::size_t size) : world_(world), size_(size) {
         data_ = std::unique_ptr<T[]>(new T[size]);
-        id_ = world_.register_location_(data_.get());
+        id_ = world_.register_location_(data_.get(), size * sizeof(T));
     }
 
     /**
