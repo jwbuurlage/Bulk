@@ -104,6 +104,7 @@ class world : public bulk::world {
         state_ = other.state_;
         pid_ = other.pid_;
         nprocs_ = other.nprocs_;
+        get_tasks_ = std::move(other.get_tasks_);
     }
 
     int active_processors() const override { return nprocs_; }
@@ -112,6 +113,21 @@ class world : public bulk::world {
     void barrier() override { state_->sync_barrier.wait(); }
 
     void sync() override {
+        barrier();
+
+        // core A: x = 5;
+        // core B: put(A, 18, x);
+        // core C: get(x, A);
+        // We guarantee that C gets the value 5 and not 18
+        // so we require an extra barrier here after the gets
+        // TODO: Can we somehow avoid this by turning all gets into
+        // puts when the get is performed?
+
+        for (auto& gt : get_tasks_) {
+            memcpy(gt.dst, gt.src, gt.size);
+        }
+        get_tasks_.clear();
+
         barrier();
 
         auto& vars = state_->variables_;
@@ -251,17 +267,17 @@ class world : public bulk::world {
         memcpy((char*)v.receiveBuffer + size * offset, values, size * count);
         return;
     }
-    // TODO: implement delayed get
     void get_(int processor, int var_id, std::size_t size,
               void* target) override {
-        memcpy(target, get_location_(var_id, processor), size);
+        get_tasks_.push_back({target, get_location_(var_id, processor), size});
         return;
     }
     // Size is per element
     void get_(int processor, int var_id, std::size_t size, void* target,
               std::size_t offset, int count) override {
-        memcpy(target, (char*)get_location_(var_id, processor) + size * offset,
-               size * count);
+        get_tasks_.push_back(
+            {target, (char*)get_location_(var_id, processor) + size * offset,
+             size * count});
         return;
     }
 
@@ -317,6 +333,13 @@ class world : public bulk::world {
     world_state* state_;
     int pid_;
     int nprocs_;
+
+    struct get_task {
+        void* dst;
+        void* src;
+        size_t size;
+    };
+    std::vector<get_task> get_tasks_;
 };
 
 } // namespace thread
