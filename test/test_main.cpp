@@ -4,6 +4,7 @@
 
 int total = 0;
 int success = 0;
+int cur_failed = 0;
 
 extern void test_initialization();
 extern void test_communication();

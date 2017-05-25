@@ -11,22 +11,22 @@ void test_initialization() {
 
 
         BULK_SECTION("Init") {
-            BULK_CHECK_ONCE(s == world.processor_id(),
+            BULK_CHECK(s == world.processor_id(),
                             "correct processor id");
-            BULK_CHECK_ONCE(p == world.active_processors(),
+            BULK_CHECK(p == world.active_processors(),
                             "correct number of processors");
 
             // we can create a variable
             bulk::var<int> x(world);
             x = 5;
-            BULK_CHECK_ONCE(x.value() == 5, "write to variable");
+            BULK_CHECK(x.value() == 5, "write to variable");
 
             // we can create multiple variables in one step
             bulk::var<int> y(world);
 
             // we can reassign variables
             x = bulk::var<int>(world);
-            BULK_CHECK_ONCE(x.value() == 0, "reassign variable");
+            BULK_CHECK(x.value() == 0, "reassign variable");
         }
     });
 }

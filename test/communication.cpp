@@ -18,13 +18,13 @@ void test_communication() {
             // test `put` to single variable
             bulk::var<int> a(world, 3);
 
-            BULK_CHECK_ONCE(a.value() == 3,
+            BULK_CHECK(a.value() == 3,
                             "correct initial value for variable");
 
             bulk::put(world.next_processor(), s, a);
             world.sync();
 
-            BULK_CHECK_ONCE(a.value() == ((s + p - 1) % p),
+            BULK_CHECK(a.value() == ((s + p - 1) % p),
                             "receive correct value after putting");
         }
 
@@ -37,7 +37,7 @@ void test_communication() {
             }
             world.sync();
 
-            BULK_CHECK_ONCE(a.value() == 2,
+            BULK_CHECK(a.value() == 2,
                             "receive correct value after broadcasting");
         }
 
@@ -52,7 +52,7 @@ void test_communication() {
             // sleep
             std::this_thread::sleep_for(20ms);
 
-            BULK_CHECK_ONCE(a.value() == s, "value not put during superstep");
+            BULK_CHECK(a.value() == s, "value not put during superstep");
 
             world.sync();
         }
@@ -64,7 +64,7 @@ void test_communication() {
             a(world.next_processor()) = s;
             world.sync();
 
-            BULK_CHECK_ONCE(a.value() == ((s + p - 1) % p),
+            BULK_CHECK(a.value() == ((s + p - 1) % p),
                             "receive correct value after sugarized putting");
         }
 
@@ -74,7 +74,7 @@ void test_communication() {
             bulk::put(s, s, a);
             world.sync();
 
-            BULK_CHECK_ONCE(a.value() == s,
+            BULK_CHECK(a.value() == s,
                             "receive correct value after putting to self");
         }
 
@@ -84,7 +84,7 @@ void test_communication() {
             auto b = bulk::get(s, a);
             world.sync();
 
-            BULK_CHECK_ONCE(b.value() == s,
+            BULK_CHECK(b.value() == s,
                             "receive correct value after getting from self");
         }
 
@@ -95,7 +95,7 @@ void test_communication() {
             bulk::put(world.next_processor(), 1.0f, a);
             world.sync();
 
-            BULK_CHECK_ONCE(a.value() == 1.0f,
+            BULK_CHECK(a.value() == 1.0f,
                             "receive correct value after putting float");
         }
 
@@ -114,7 +114,7 @@ void test_communication() {
             world.sync();
 
             for (int i = 0; i < size; ++i) {
-                BULK_CHECK_ONCE(xs[i].value() == ((s + p - 1) % p) + i,
+                BULK_CHECK(xs[i].value() == ((s + p - 1) % p) + i,
                                 "receive correct value after multiple puts to "
                                 "array of variables");
             }
@@ -143,7 +143,7 @@ void test_communication() {
 
             world.sync();
 
-            BULK_CHECK_ONCE(
+            BULK_CHECK(
                 a.value() == p - 1,
                 "receive correct value after heterogeneous puts and getting");
         }
@@ -156,7 +156,7 @@ void test_communication() {
             auto c = bulk::get(world.next_processor(), b);
             world.sync();
 
-            BULK_CHECK_ONCE(c.value() == world.next_processor(),
+            BULK_CHECK(c.value() == world.next_processor(),
                             "receive correct value after getting");
         }
 
@@ -168,7 +168,7 @@ void test_communication() {
             auto c = b(world.next_processor()).get();
             world.sync();
 
-            BULK_CHECK_ONCE(c.value() == world.next_processor(),
+            BULK_CHECK(c.value() == world.next_processor(),
                             "receive correct value after sugarized getting");
         }
 
@@ -187,7 +187,7 @@ void test_communication() {
             world.sync();
 
             for (auto& y : ys) {
-                BULK_CHECK_ONCE(y.value() == world.next_processor(),
+                BULK_CHECK(y.value() == world.next_processor(),
                                 "receive correct value after getting multiple");
             }
         }
@@ -200,33 +200,33 @@ void test_communication() {
             xs.put(world.next_processor(), test.begin(), test.end());
             world.sync();
 
-            BULK_CHECK_ONCE(xs[5] == 6, "can put iterator range");
+            BULK_CHECK(xs[5] == 6, "can put iterator range");
         }
 
         BULK_SECTION("Coarray") {
             bulk::coarray<int> zs(world, 10);
 
-            BULK_CHECK_ONCE(zs.size() == 10,
+            BULK_CHECK(zs.size() == 10,
                             "can obtain the size of a coarray");
-            BULK_CHECK_ONCE(zs.empty() == false, "can check for emptyness");
+            BULK_CHECK(zs.empty() == false, "can check for emptyness");
 
             zs(world.next_processor())[1] = s;
 
             world.sync();
 
-            BULK_CHECK_ONCE(
+            BULK_CHECK(
                 zs[1] == world.prev_processor(),
                 "putting to remote coarray image gives correct result");
 
             zs[3] = 2;
 
-            BULK_CHECK_ONCE(zs[3] == 2,
+            BULK_CHECK(zs[3] == 2,
                             "writing to local coarray gives correct result");
 
             auto a = zs(2)[1].get();
             world.sync();
 
-            BULK_CHECK_ONCE(a.value() == 1,
+            BULK_CHECK(a.value() == 1,
                             "getting from coarray gives correct result");
         }
 
@@ -234,7 +234,7 @@ void test_communication() {
             auto xs = bulk::gather_all(world, s);
             int t = 0;
             for (auto x : xs) {
-                BULK_CHECK_ONCE(x == t++, "gather operation succeeded");
+                BULK_CHECK(x == t++, "gather operation succeeded");
             }
         }
 
@@ -246,14 +246,14 @@ void test_communication() {
             world.sync();
 
             for (int i = 2; i < 5; ++i) {
-                BULK_CHECK_ONCE(zs[i] == world.prev_processor(),
+                BULK_CHECK(zs[i] == world.prev_processor(),
                                 "setting slice to constant");
             }
-            BULK_CHECK_ONCE(zs[5] == 0,
+            BULK_CHECK(zs[5] == 0,
                             "outside the slice values are untouched");
-            BULK_CHECK_ONCE(zs[0] == world.prev_processor() - 1,
+            BULK_CHECK(zs[0] == world.prev_processor() - 1,
                             "individual slice setting");
-            BULK_CHECK_ONCE(zs[1] == world.prev_processor() - 2,
+            BULK_CHECK(zs[1] == world.prev_processor() - 2,
                             "individual slice setting");
         }
 
@@ -262,7 +262,7 @@ void test_communication() {
             q(world.next_processor()).send(123, 1337);
             world.sync();
             for (auto& msg : q) {
-                BULK_CHECK_ONCE(std::get<0>(msg) == 123 &&
+                BULK_CHECK(std::get<0>(msg) == 123 &&
                                     std::get<1>(msg) == 1337,
                                 "message passed succesfully");
             }
@@ -279,7 +279,7 @@ void test_communication() {
                 tag = std::get<0>(msg);
                 content = std::get<1>(msg);
             }
-            BULK_CHECK_ONCE(tag == 123 && content == 1337,
+            BULK_CHECK(tag == 123 && content == 1337,
                             "message passed succesfully");
         }
 
@@ -294,7 +294,7 @@ void test_communication() {
                 tag = std::get<0>(msg);
                 content = std::get<1>(msg);
             }
-            BULK_CHECK_ONCE(tag == 123 && content == 1337,
+            BULK_CHECK(tag == 123 && content == 1337,
                             "message passed succesfully");
         }
 
@@ -309,9 +309,9 @@ void test_communication() {
             world.sync();
 
             int k = 0;
-            BULK_CHECK_ONCE(!q.empty(), "multiple messages arrived");
+            BULK_CHECK(!q.empty(), "multiple messages arrived");
             for (auto msg : q) {
-                BULK_CHECK_ONCE(std::get<0>(msg) == world.prev_processor() &&
+                BULK_CHECK(std::get<0>(msg) == world.prev_processor() &&
                                     std::get<1>(msg) == contents[k++],
                                 "multiple messages passed succesfully");
             }
@@ -334,29 +334,29 @@ void test_communication() {
             world.sync();
 
             int k = 0;
-            BULK_CHECK_ONCE(!q.empty() && !q2.empty(), "queues are non-empty");
+            BULK_CHECK(!q.empty() && !q2.empty(), "queues are non-empty");
             for (auto& msg : q) {
-                BULK_CHECK_ONCE(msg == contents[k++],
+                BULK_CHECK(msg == contents[k++],
                                 "received correct result on q");
             }
 
             int l = 0;
-            BULK_CHECK_ONCE(q.size() == contents.size(),
+            BULK_CHECK(q.size() == contents.size(),
                             "first queue correct number of messages");
 
-            BULK_CHECK_ONCE(q2.size() == contents2.size(),
+            BULK_CHECK(q2.size() == contents2.size(),
                             "second queue correct number of messages");
 
             for (auto& msg : q2) {
-                BULK_CHECK_ONCE(std::get<0>(msg) == world.prev_processor() &&
+                BULK_CHECK(std::get<0>(msg) == world.prev_processor() &&
                                     std::get<1>(msg) == contents2[l++],
                                 "received correct result on q2");
             }
 
             world.sync();
 
-            BULK_CHECK_ONCE(q.empty(), "first queue gets emptied");
-            BULK_CHECK_ONCE(q2.empty(), "second queue gets emptied");
+            BULK_CHECK(q.empty(), "first queue gets emptied");
+            BULK_CHECK(q2.empty(), "second queue gets emptied");
         }
     });
 }
