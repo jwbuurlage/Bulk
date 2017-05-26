@@ -136,13 +136,24 @@ class world : public bulk::world {
 
   protected:
     // Returns the id of the registered location
-    int register_location_(void* location, size_t size) override final {
-        (void)size;
-        locations_[next_index_] = location;
-        return next_index_++;
+    int register_location_(void* location,
+                           size_t size[[maybe_unused]]) override final {
+        auto idx = 0u;
+        for (; idx < locations_.size(); ++idx) {
+            if (locations_[idx] == nullptr) {
+                break;
+            }
+        }
+        if (idx == locations_.size()) {
+            locations_.push_back(nullptr);
+        }
+        locations_[idx] = location;
+        return idx;
     }
 
-    void unregister_location_(int id) override final { locations_.erase(id); }
+    void unregister_location_(int id) override final {
+        locations_[id] = nullptr;
+    }
 
     void put_(int processor, const void* value, size_t size,
               int var_id) override final {
@@ -186,10 +197,20 @@ class world : public bulk::world {
 
     // Messages
     int register_queue_(queue_base* q) override {
-        queues_[next_queue_index_] = q;
-        return next_queue_index_++;
+        auto idx = 0u;
+        for (; idx < queues_.size(); ++idx) {
+            if (queues_[idx] == nullptr) {
+                break;
+            }
+        }
+        if (idx == queues_.size()) {
+            queues_.push_back(nullptr);
+        }
+        queues_[idx] = q;
+        return idx;
     }
-    void unregister_queue_(int id) override { queues_.erase(id); }
+
+    void unregister_queue_(int id) override { queues_[id] = nullptr; }
 
     // data consists of both tag and content. size is total size.
     void send_(int processor, int queue_id, const void* data,
@@ -258,7 +279,7 @@ class world : public bulk::world {
             case put_t::single: {
                 reader >> var_id;
                 reader >> size;
-                reader.copy(size, locations_.at(var_id));
+                reader.copy(size, locations_[var_id]);
                 break;
             }
 
@@ -267,7 +288,7 @@ class world : public bulk::world {
                 reader >> offset;
                 reader >> size;
 
-                auto write_location = (char*)locations_.at(var_id) + offset;
+                auto write_location = (char*)locations_[var_id] + offset;
                 reader.copy(size, write_location);
 
                 break;
@@ -304,8 +325,7 @@ class world : public bulk::world {
 
                 get_response_buffers_[processor] << target;
                 get_response_buffers_[processor] << size;
-                get_response_buffers_[processor].push(size,
-                                                      locations_.at(var_id));
+                get_response_buffers_[processor].push(size, locations_[var_id]);
 
                 break;
             }
@@ -320,7 +340,7 @@ class world : public bulk::world {
                 get_response_buffers_[processor] << target;
                 get_response_buffers_[processor] << size;
                 get_response_buffers_[processor].push(
-                    size, (char*)locations_.at(var_id) + offset);
+                    size, (char*)locations_[var_id] + offset);
 
                 break;
             }
@@ -353,18 +373,25 @@ class world : public bulk::world {
         auto reader = buf.reader();
         int queue_id;
         size_t size;
+
         while (!reader.empty()) {
             reader >> queue_id;
             reader >> size;
-            queues_.at(queue_id)->unsafe_push_back(reader.current_location());
+            if (!queues_[queue_id]) {
+              // queue already deleted
+              continue;
+            }
+            queues_[queue_id]->unsafe_push_back(reader.current_location());
             reader.update(size);
         }
         buf.clear();
     }
 
     void clear_messages_() {
-        for (auto& q : queues_) {
-            q.second->clear_();
+        for (auto q : queues_) {
+            if (q) {
+                q->clear_();
+            }
         }
     }
 
@@ -375,9 +402,9 @@ class world : public bulk::world {
     int active_processors_ = 0;
 
     int next_index_ = 0;
-    std::map<int, void*> locations_;
+    std::vector<void*> locations_;
     int next_queue_index_ = 0;
-    std::map<int, queue_base*> queues_;
+    std::vector<queue_base*> queues_;
 
     // see how many puts and gets each processor receives
     std::vector<int> ones_;

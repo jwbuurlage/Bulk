@@ -46,6 +46,8 @@ env.spawn(env.available_processors(), [](auto& world) {
 Building
 --------
 
+Bulk requires an up-to-date compiler, that supports C++17, e.g. GCC >= 7.0, or Clang >= 4.0.
+
 Bulk supports a number of different *backends*, allowing the programs to run in parallel using:
 
 - `thread` for multi-core systems using standard C++ `<thread>` threading support
