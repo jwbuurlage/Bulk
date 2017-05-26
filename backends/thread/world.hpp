@@ -34,7 +34,6 @@ struct registered_variable {
     void* buffer;        // Local copy, stored in var::impl
     char* receiveBuffer; // Fixed size receive buffer, allocated by world
     size_t size;         // Size of the allocated receive buffer
-    bool flagged;        // If something was sent this superstep
 };
 
 struct registered_queue {
@@ -80,6 +79,7 @@ class world : public bulk::world {
         pid_ = other.pid_;
         nprocs_ = other.nprocs_;
         get_tasks_ = std::move(other.get_tasks_);
+        put_tasks_ = std::move(other.put_tasks_);
     }
 
     int active_processors() const override { return nprocs_; }
@@ -98,22 +98,21 @@ class world : public bulk::world {
         // TODO: Can we somehow avoid this by turning all gets into
         // puts when the get is performed?
 
-        for (auto& gt : get_tasks_) {
-            memcpy(gt.dst, gt.src, gt.size);
+        // Gets to this processor
+        for (auto& t : get_tasks_) {
+            memcpy(t.dst, t.src, t.size);
         }
         get_tasks_.clear();
 
         barrier();
 
-        auto& vars = state_->variables_;
-        for (auto i = 0u; i < vars.size(); i += nprocs_) {
-            auto& var = vars[i + pid_];
-            if (var.buffer && var.flagged) { // If this is a registered variable
-                memcpy(var.buffer, var.receiveBuffer, var.size);
-                var.flagged = false;
-            }
+        // Puts from this processor
+        for (auto& t : put_tasks_) {
+            memcpy(t.dst, t.src, t.size);
         }
+        put_tasks_.clear();
 
+        // Queue messages to this processor
         auto& qs = state_->queues_;
         for (auto i = 0u; i < qs.size(); i += nprocs_) {
             auto& rq = qs[i + pid_];
@@ -227,21 +226,30 @@ class world : public bulk::world {
     void put_(int processor, const void* value, std::size_t size,
               int var_id) override {
         auto& v = get_var_(var_id, processor);
-        v.flagged = true;
-        // possible check: if (size > v.size)
+        if (size != v.size) {
+            log("BULK ERROR: put out of bounds");
+            return;
+        }
         memcpy(v.receiveBuffer, value, size);
+        put_tasks_.push_back({v.buffer, v.receiveBuffer, size});
         return;
     }
 
     // Offset and count are number of elements
     // Size is size per element
     void put_(int processor, const void* values, std::size_t size, int var_id,
-              std::size_t offset, int count) override {
+              std::size_t offset, std::size_t count) override {
         auto& v = get_var_(var_id, processor);
-        v.flagged = true;
-        memcpy((char*)v.receiveBuffer + size * offset, values, size * count);
+        if (size * (offset + count) > v.size) {
+            log("BULK ERROR: array put out of bounds");
+            return;
+        }
+        memcpy(v.receiveBuffer + size * offset, values, size * count);
+        put_tasks_.push_back({(char*)v.buffer + size * offset,
+                              v.receiveBuffer + size * offset, size * count});
         return;
     }
+
     void get_(int processor, int var_id, std::size_t size,
               void* target) override {
         get_tasks_.push_back({target, get_location_(var_id, processor), size});
@@ -249,7 +257,7 @@ class world : public bulk::world {
     }
     // Size is per element
     void get_(int processor, int var_id, std::size_t size, void* target,
-              std::size_t offset, int count) override {
+              std::size_t offset, std::size_t count) override {
         get_tasks_.push_back(
             {target, (char*)get_location_(var_id, processor) + size * offset,
              size * count});
@@ -309,12 +317,13 @@ class world : public bulk::world {
     int pid_;
     int nprocs_;
 
-    struct get_task {
+    struct copy_task {
         void* dst;
         void* src;
         size_t size;
     };
-    std::vector<get_task> get_tasks_;
+    std::vector<copy_task> get_tasks_;
+    std::vector<copy_task> put_tasks_;
 };
 
 } // namespace thread
