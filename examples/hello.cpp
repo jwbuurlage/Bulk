@@ -34,8 +34,8 @@ int main() {
         world.sync();
 
         // Messages are now available in q
-        for (auto& msg : q) {
-            world.log("%d got sent %d, %f", s, std::get<0>(msg), std::get<1>(msg));
+        for (auto [tag, content] : q) {
+            world.log("%d got sent %d, %f", s, tag, content);
         }
     });
 

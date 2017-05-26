@@ -1,7 +1,6 @@
 #include "partitioning.hpp"
 
-namespace bulk {
-namespace experimental {
+namespace bulk::experimental {
 
 /**
  * A binary-space partitioning (aptly abbreviated BSP, of course because of its
@@ -31,7 +30,7 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
      * `data_size`: the global number of processors along each axis
      */
     tree_partitioning(index_type<D> data_size, int procs,
-                      binary_tree<split>&& splits)
+                      util::binary_tree<util::split>&& splits)
         : rectangular_partitioning<D, 1>(data_size, {procs}),
           splits_(std::move(splits)) {
         // resize extents and origins
@@ -98,10 +97,9 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
     index_type<D> origin(int t) const override { return origins_[t]; }
 
   private:
-    binary_tree<split> splits_;
+    util::binary_tree<util::split> splits_;
     std::vector<index_type<D>> origins_;
     std::vector<index_type<D>> extents_;
 };
 
-} // namespace experimental
-} // namespace bulk
+} // namespace bulk::experimental

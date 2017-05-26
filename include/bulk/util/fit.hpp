@@ -2,16 +2,9 @@
 
 #include <cassert>
 #include <vector>
+#include <optional>
 
-#include <experimental/optional>
-
-namespace std {
-template <typename T>
-using optional = experimental::optional<T>;
-}
-
-namespace bulk {
-namespace util {
+namespace bulk::util {
 
 /** Find the average of an iterable container. */
 template <typename Iterable>
@@ -100,5 +93,4 @@ fit(const std::vector<size_t>& xs, const std::vector<double>& ys) {
     return std::optional<std::pair<double, double>>({l, g});
 }
 
-} // namespace util
-} // namespace bulk
+} // namespace bulk::util

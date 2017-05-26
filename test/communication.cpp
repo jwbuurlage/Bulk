@@ -294,9 +294,9 @@ void test_communication() {
             bulk::queue<int, int> q(world);
             q(world.next_processor()).send(123, 1337);
             world.sync();
-            for (auto& msg : q) {
-                BULK_CHECK(std::get<0>(msg) == 123 &&
-                                    std::get<1>(msg) == 1337,
+            for (auto [tag, content] : q) {
+                BULK_CHECK(tag == 123 &&
+                                    content == 1337,
                                 "message passed succesfully");
             }
         }
@@ -308,9 +308,9 @@ void test_communication() {
             world.sync();
             int tag = 0;
             int content = 0;
-            for (auto msg : q) {
-                tag = std::get<0>(msg);
-                content = std::get<1>(msg);
+            for (auto [x, y] : q) {
+                tag = x;
+                content = y;
             }
             BULK_CHECK(tag == 123 && content == 1337,
                             "message passed succesfully");
@@ -323,9 +323,9 @@ void test_communication() {
             world.sync();
             int tag = 0;
             int content = 0;
-            for (auto msg : q) {
-                tag = std::get<0>(msg);
-                content = std::get<1>(msg);
+            for (auto [x, y] : q) {
+                tag = x;
+                content = y;
             }
             BULK_CHECK(tag == 123 && content == 1337,
                             "message passed succesfully");
@@ -343,9 +343,9 @@ void test_communication() {
 
             int k = 0;
             BULK_CHECK(!q.empty(), "multiple messages arrived");
-            for (auto msg : q) {
-                BULK_CHECK(std::get<0>(msg) == world.prev_processor() &&
-                                    std::get<1>(msg) == contents[k++],
+            for (auto [tag, content] : q) {
+                BULK_CHECK(tag == world.prev_processor() &&
+                                    content == contents[k++],
                                 "multiple messages passed succesfully");
             }
         }
@@ -380,9 +380,9 @@ void test_communication() {
             BULK_CHECK(q2.size() == contents2.size(),
                             "second queue correct number of messages");
 
-            for (auto& msg : q2) {
-                BULK_CHECK(std::get<0>(msg) == world.prev_processor() &&
-                                    std::get<1>(msg) == contents2[l++],
+            for (auto [tag, content] : q2) {
+                BULK_CHECK(tag == world.prev_processor() &&
+                                    content == contents2[l++],
                                 "received correct result on q2");
             }
 

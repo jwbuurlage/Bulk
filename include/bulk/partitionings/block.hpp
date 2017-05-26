@@ -1,7 +1,6 @@
 #include "partitioning.hpp"
 
-namespace bulk {
-namespace experimental {
+namespace bulk::experimental {
 
 /**
  * A block distribution. This equally block-distributes the first G axes.
@@ -104,5 +103,4 @@ class block_partitioning : public rectangular_partitioning<D, G> {
     }
 };
 
-} // namespace experimental
-} // namespace bulk
+} // namespace bulk::experimental

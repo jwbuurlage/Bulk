@@ -1,7 +1,6 @@
 #include "partitioning.hpp"
 
-namespace bulk {
-namespace experimental {
+namespace bulk::experimental {
 
 /**
  * A cyclic partitioning distributes the indices of a D-dimension space over the
@@ -72,5 +71,4 @@ class cyclic_partitioning : public multi_partitioning<D, G> {
     }
 };
 
-} // namespace experimental
-} // namespace bulk
+} // namespace bulk::experimental

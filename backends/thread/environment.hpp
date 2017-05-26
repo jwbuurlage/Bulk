@@ -6,8 +6,7 @@
 #include <thread>
 #include <vector>
 
-namespace bulk {
-namespace thread {
+namespace bulk::thread {
 
 class environment : public bulk::environment {
   public:
@@ -66,5 +65,4 @@ class environment : public bulk::environment {
     std::function<void(int, const std::string&)> log_callback;
 };
 
-} // namespace thread
-} // namespace bulk
+} // namespace bulk::thread

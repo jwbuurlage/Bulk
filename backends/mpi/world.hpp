@@ -11,8 +11,7 @@
 
 #include "memory_buffer.hpp"
 
-namespace bulk {
-namespace mpi {
+namespace bulk::mpi {
 
 enum class message_t : int { put, get_request, get_response, send };
 
@@ -137,7 +136,7 @@ class world : public bulk::world {
   protected:
     // Returns the id of the registered location
     int register_location_(void* location,
-                           size_t size[[maybe_unused]]) override final {
+                           [[maybe_unused]] size_t size) override final {
         auto idx = 0u;
         for (; idx < locations_.size(); ++idx) {
             if (locations_[idx] == nullptr) {
@@ -420,5 +419,4 @@ class world : public bulk::world {
     memory_buffer message_buffer_;
 };
 
-} // namespace mpi
-} // namespace bulk
+} // namespace bulk::mpi

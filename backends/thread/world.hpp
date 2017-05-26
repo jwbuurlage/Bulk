@@ -22,8 +22,7 @@
 // Therefore we create an extra class `world_state` of which there
 // is only a single instance.
 
-namespace bulk {
-namespace thread {
+namespace bulk::thread {
 
 // FIXME: receive buffer could be only partially written to
 // i.e. sliced write in a coarray
@@ -326,5 +325,4 @@ class world : public bulk::world {
     std::vector<copy_task> put_tasks_;
 };
 
-} // namespace thread
-} // namespace bulk
+} // namespace bulk::thread

@@ -3,8 +3,7 @@
 #include <condition_variable>
 #include <mutex>
 
-namespace bulk {
-namespace thread {
+namespace bulk::thread {
 
 // Taken from
 // http://stackoverflow.com/questions/24465533/implementing-boostbarrier-in-c11
@@ -34,5 +33,4 @@ class barrier {
     std::size_t generation_;
 };
 
-} // namespace thread
-} // namespace bulk
+} // namespace bulk::thread

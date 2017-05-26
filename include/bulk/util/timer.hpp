@@ -2,8 +2,7 @@
 
 #include <chrono>
 
-namespace bulk {
-namespace util {
+namespace bulk::util {
 
 using namespace std::chrono;
 
@@ -23,5 +22,4 @@ class timer {
     const time_point<clock> begin_time_;
 };
 
-} // namespace util
-} // namespace bulk
+} // namespace bulk::util
