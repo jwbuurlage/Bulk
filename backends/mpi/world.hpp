@@ -136,7 +136,8 @@ class world : public bulk::world {
 
   protected:
     // Returns the id of the registered location
-    int register_location_(void* location) override final {
+    int register_location_(void* location, size_t size) override final {
+        (void)size;
         locations_[next_index_] = location;
         return next_index_++;
     }
@@ -153,7 +154,7 @@ class world : public bulk::world {
 
     // Size is per element
     void put_(int processor, const void* values, size_t size, int var_id,
-              size_t offset, int count) override final {
+              size_t offset, size_t count) override final {
         put_buffers_[processor] << put_t::multiple;
         put_buffers_[processor] << var_id;
         size_t total_offset = offset * size;
@@ -173,7 +174,7 @@ class world : public bulk::world {
 
     // Size is per element
     void get_(int processor, int var_id, size_t size, void* target,
-              size_t offset, int count) override final {
+              size_t offset, size_t count) override final {
         get_request_buffers_[processor] << get_t::request_multiple;
         get_request_buffers_[processor] << var_id;
         size_t total_offset = offset * size;

@@ -30,7 +30,7 @@ class array {
      */
     array(bulk::world& world, std::size_t size) : world_(world), size_(size) {
         data_ = std::unique_ptr<T[]>(new T[size]);
-        id_ = world_.register_location_(data_.get());
+        id_ = world_.register_location_(data_.get(), size * sizeof(T));
     }
 
     /**
@@ -90,7 +90,7 @@ class array {
      * \param offset the element where the writing should start
      * \param count the number of elements to be written
      */
-    void put(int processor, T* values, int offset, int count = 1) {
+    void put(int processor, const T* values, int offset, int count = 1) {
         world_.put_(processor, values, sizeof(T), id_, offset, count);
     }
 

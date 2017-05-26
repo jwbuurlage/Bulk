@@ -153,7 +153,7 @@ class var {
        public:
         var_impl(bulk::world& world) : world_(world), value_{} {
             // register_location_ can include a barrier in certain backends
-            id_ = world.register_location_(&value_);
+            id_ = world.register_location_(&value_, sizeof(T));
         }
         virtual ~var_impl() { world_.unregister_location_(id_); }
 

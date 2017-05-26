@@ -129,19 +129,19 @@ class world {
     friend class queue;
 
     // Returns the id of the registered location
-    virtual int register_location_(void* location) = 0;
+    virtual int register_location_(void* location, std::size_t size) = 0;
     virtual void unregister_location_(int id) = 0;
 
     virtual void put_(int processor, const void* value, std::size_t size,
                       int var_id) = 0;
     // size is per element
     virtual void put_(int processor, const void* values, std::size_t size, int var_id,
-                      std::size_t offset, int count) = 0;
+                      std::size_t offset, std::size_t count) = 0;
 
     virtual void get_(int processor, int var_id, std::size_t size, void* target) = 0;
     // size is per element
     virtual void get_(int processor, int var_id, std::size_t size, void* target,
-                      std::size_t offset, int count) = 0;
+                      std::size_t offset, std::size_t count) = 0;
 
     virtual int register_queue_(class queue_base* q) = 0;
     virtual void unregister_queue_(int id) = 0;

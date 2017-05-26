@@ -59,11 +59,14 @@ class coarray {
          * Assign values to a slice of a remote image.
          *
          * \param values the new values of in the slice
+         *
+         * Note: when sizes don't match, the rule is
+         *     array[{2,10}] = {3,2,4};
+         * will fill the array as
+         *     {x,x,3,2,4,3,2,4,3,2,x,x};
          */
-        void operator=(std::vector<T> values) {
-            for (int i = s_.first; i < s_.last; ++i) {
-                parent_.put(t_, i - s_.first, values[i]);
-            }
+        void operator=(const std::vector<T>& values) {
+            parent_.put(t_, s_, values);
         }
 
         auto get() {
@@ -199,6 +202,25 @@ class coarray {
      * Put the value `value` into element `idx` on processor `t`.
      */
     void put(int t, int idx, T value) { data_.put(t, &value, idx, 1); }
+
+    /**
+     * Put a range of data in a remote image.
+     *
+     * Note: when sizes don't match, the rule is
+     *     array[{2,10}] = {3,2,4};
+     * will fill the array as
+     *     {x,x,3,2,4,3,2,4,3,2,x,x};
+     */
+    void put(int processor, slice s, const std::vector<T> values) {
+        for (int i = s.first;; i += values.size()) {
+            int remaining = s.last - i;
+            if (remaining < 0)
+                break;
+            if (remaining > (int)values.size())
+                remaining = values.size();
+            data_.put(processor, values.data(), i, (int)remaining);
+        }
+    }
 
     /**
      * Put a range of data in a remote image.
