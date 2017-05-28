@@ -400,9 +400,7 @@ class world : public bulk::world {
     int processor_id_ = 0;
     int active_processors_ = 0;
 
-    int next_index_ = 0;
     std::vector<void*> locations_;
-    int next_queue_index_ = 0;
     std::vector<queue_base*> queues_;
 
     // see how many puts and gets each processor receives
