@@ -3,8 +3,10 @@ Bulk
 
 Bulk is a new interface for writing parallel programs in C++ in bulk-synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.
 
-Example
+Examples
 -------
+
+Hello world!
 
 ```cpp
 bulk::thread::environment env;
@@ -12,35 +14,43 @@ env.spawn(env.available_processors(), [](auto& world) {
     auto s = world.processor_id();
     auto p = world.active_processors();
 
-    world.log("Hello, world %d/%d\n", s, p);
-
-    auto a = bulk::var<int>(world);
-    a(world.next_processor()) = s;
-    world.sync();
-    // ... the local a is now updated
-
-    auto b = a(world.next_processor()).get();
-    world.sync();
-    // ... b.value() is now available
-
-    // coarrays are distributed arrays, each processor has an array to which
-    // other processors can write
-    auto xs = bulk::coarray<int>(world, 10);
-    xs(world.next_processor())[3] = s;
-
-    // messages can be passed to queues that specify a tag type, and a content type
-    auto q = bulk::queue<int, float>(world);
-    for (int t = 0; t < p; ++t) {
-        q(t).send(s, 3.1415f);  // send (s, pi) to processor t
-    }
-    world.sync();
-
-    // messages are now available in q
-    for (auto& msg : q) {
-        world.log("%d got sent %d, %f\n", s, msg.tag, msg.content);
-    }
+    world.log("Hello world from processor %d / %d\n", s, p);
 });
+```
 
+Distributed variables are the easiest way to communicate.
+
+```cpp
+auto a = bulk::var<int>(world);
+a(world.next_processor()) = s;
+world.sync();
+// ... a is now updated
+
+auto b = a(world.next_processor()).get();
+world.sync();
+// ... b.value() is now available
+```
+
+Coarrays are convenient distributed arrays.
+
+```cpp
+auto xs = bulk::coarray<int>(world, 10);
+xs(world.next_processor())[3] = s;
+```
+
+Message passing can be used for more flexible communication.
+
+```cpp
+auto q = bulk::queue<int, float>(world);
+for (int t = 0; t < p; ++t) {
+    q(t).send(s, 3.1415f);  // send (s, pi) to processor t
+}
+world.sync();
+
+// messages are now available in q
+for (auto [tag, content] : q) {
+    world.log("%d got sent %d, %f\n", s, tag, content);
+}
 ```
 
 Building
