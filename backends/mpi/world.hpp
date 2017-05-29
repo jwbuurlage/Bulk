@@ -62,9 +62,6 @@ class world : public bulk::world {
         get_response_buffers_.resize(active_processors_);
         message_buffers_.resize(active_processors_);
 
-        next_index_ = 0;
-        next_queue_index_ = 0;
-
         ones_.resize(active_processors_);
         std::fill(ones_.begin(), ones_.end(), 1);
     }
