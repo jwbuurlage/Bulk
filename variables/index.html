@@ -1246,11 +1246,11 @@ returns, all communication staged in the previous superstep is
 guarenteed to have occured.</p>
 <p><center>
 <img alt="The structure of a superstep. First, computations are performed.
-&lt;/center&gt;
 Optionally, communication is staged for later execution. After each core
 finishes their computations, outstanding communications are performed.
 This process is repeated until the SPMD section
-terminates." src="../images/superstep.png" /></p>
+terminates." src="../images/superstep.png" />
+</center></p>
 <p>In case of <em>put</em>, the remote image now contains the value written to it
 (assuming that the local processor is the only one who wrote to that
 specific remote image). For read requests using <em>get</em>, it is slightly
