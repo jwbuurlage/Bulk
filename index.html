@@ -1260,7 +1260,7 @@
 <h2 id="about-bsp">About BSP<a class="headerlink" href="#about-bsp" title="Permanent link">&para;</a></h2>
 <p>The bulk synchrnoous parallel (BSP) programming model, is a way of writing parallel and distributed programs. Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed <em>synchronization points</em>. These synchronizations delimit so-called <em>supersteps</em>. This way of writing parallel programs has a number of advantages over competing models, at the cost of losing some flexibility and possible performance in terms of communication.</p>
 <ul>
-<li>The resulting programs are structured, easy to understand and mantain, and can be reasoned about</li>
+<li>The resulting programs are structured, easy to understand and maintain, and can be reasoned about</li>
 <li>Data races are eliminated almost by construction, only have to follow a small set of simple rules.</li>
 <li>Scalability is easy to obtain, since programs are written in a SPMD<sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup> fashion, and the cost of a program can be analyzed explicitely.</li>
 <li>The number of communication mechanisms required are very limited, roughly only distinguishing between anonymous or named communication. This makes BSP based libraries very economic (you can do much with very little).</li>
