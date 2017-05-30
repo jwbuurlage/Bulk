@@ -2,13 +2,18 @@
     "docs": [
         {
             "location": "/",
-            "text": "Bulk\n\u00b6\n\n\n\n\n\n\n\n\nBulk is a new interface for writing parallel programs in C++ in bulk-synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.\n\n\nAuthors\n\u00b6\n\n\nBulk is developed by:\n\n\n\n\nJan-Willem Buurlage (jwbuurlage)\n\n\nTom Bannink (tombana)\n\n\n\n\nExamples\n\u00b6\n\n\nHello world!\n\n\nbulk\n::\nthread\n::\nenvironment\n \nenv\n;\n\n\nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nauto\n&\n \nworld\n)\n \n{\n\n    \nauto\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n    \nauto\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n    \nworld\n.\nlog\n(\n\"Hello world from processor %d / %d\n\\n\n\"\n,\n \ns\n,\n \np\n);\n\n\n});\n\n\n\n\n\n\nDistributed variables are the easiest way to communicate.\n\n\nauto\n \na\n \n=\n \nbulk\n::\nvar\n<\nint\n>\n(\nworld\n);\n\n\na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n\nworld\n.\nsync\n();\n\n\n// ... a is now updated\n\n\n\nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\nworld\n.\nsync\n();\n\n\n// ... b.value() is now available\n\n\n\n\n\n\nCoarrays provide a convenient syntax for working with distributed arrays.\n\n\nauto\n \nxs\n \n=\n \nbulk\n::\ncoarray\n<\nint\n>\n(\nworld\n,\n \n10\n);\n\n\nxs\n(\nworld\n.\nnext_processor\n())[\n3\n]\n \n=\n \ns\n;\n\n\n\n\n\n\nMessage passing can be used for more flexible communication.\n\n\nauto\n \nq\n \n=\n \nbulk\n::\nqueue\n<\nint\n,\n \nfloat\n>\n(\nworld\n);\n\n\nfor\n \n(\nint\n \nt\n \n=\n \n0\n;\n \nt\n \n<\n \np\n;\n \n++\nt\n)\n \n{\n\n    \nq\n(\nt\n).\nsend\n(\ns\n,\n \n3.1415f\n);\n  \n// send (s, pi) to processor t\n\n\n}\n\n\nworld\n.\nsync\n();\n\n\n\n// messages are now available in q\n\n\nfor\n \n(\nauto\n \n[\ntag\n,\n \ncontent\n]\n \n:\n \nq\n)\n \n{\n\n    \nworld\n.\nlog\n(\n\"%d got sent %d, %f\n\\n\n\"\n,\n \ns\n,\n \ntag\n,\n \ncontent\n);\n\n\n}\n\n\n\n\n\n\nAPI\n\u00b6\n\n\nBulk provides a modern bulk-synchronous parallel API which is \ndocumented in detail here\n.\n\n\nLicense\n\u00b6\n\n\nBulk is released under the MIT license, for details see the file LICENSE.md.\n\n\nContributing\n\u00b6\n\n\nWe welcome contributions. Please submit pull requests against the develop branch.",
+            "text": "Bulk\n\u00b6\n\n\n\n\n\n\n\n\nBulk is a new interface for writing parallel programs in C++ in bulk-synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.\n\n\nAbout BSP\n\u00b6\n\n\nThe bulk synchrnoous parallel (BSP) programming model, is a way of writing parallel and distributed programs. Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed \nsynchronization points\n. These synchronizations delimit so-called \nsupersteps\n. This way of writing parallel programs has a number of advantages over competing models, at the cost of losing some flexibility and possible performance in terms of communication.\n\n\n\n\nThe resulting programs are structured, easy to understand and mantain, and can be reasoned about\n\n\nData races are eliminated almost by construction, only have to follow a small set of simple rules.\n\n\nScalability is easy to obtain, since programs are written in a SPMD\n1\n fashion, and the cost of a program can be analyzed explicitely.\n\n\nThe number of communication mechanisms required are very limited, roughly only distinguishing between anonymous or named communication. This makes BSP based libraries very economic (you can do much with very little).\n\n\nLow cost of entry, easy to write \ncorrect\n BSP programs, while it is notoriously hard to write correct asynchronous parallel programs.\n\n\n\n\nAuthors\n\u00b6\n\n\nBulk is developed by:\n\n\n\n\nJan-Willem Buurlage (jwbuurlage)\n\n\nTom Bannink (tombana)\n\n\n\n\nExamples\n\u00b6\n\n\nHello world!\n\n\nbulk\n::\nthread\n::\nenvironment\n \nenv\n;\n\n\nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nauto\n&\n \nworld\n)\n \n{\n\n    \nauto\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n    \nauto\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n    \nworld\n.\nlog\n(\n\"Hello world from processor %d / %d\n\\n\n\"\n,\n \ns\n,\n \np\n);\n\n\n});\n\n\n\n\n\n\nDistributed variables are the easiest way to communicate.\n\n\nauto\n \na\n \n=\n \nbulk\n::\nvar\n<\nint\n>\n(\nworld\n);\n\n\na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n\nworld\n.\nsync\n();\n\n\n// ... a is now updated\n\n\n\nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\nworld\n.\nsync\n();\n\n\n// ... b.value() is now available\n\n\n\n\n\n\nCoarrays provide a convenient syntax for working with distributed arrays.\n\n\nauto\n \nxs\n \n=\n \nbulk\n::\ncoarray\n<\nint\n>\n(\nworld\n,\n \n10\n);\n\n\nxs\n(\nworld\n.\nnext_processor\n())[\n3\n]\n \n=\n \ns\n;\n\n\n\n\n\n\nMessage passing can be used for more flexible communication.\n\n\nauto\n \nq\n \n=\n \nbulk\n::\nqueue\n<\nint\n,\n \nfloat\n>\n(\nworld\n);\n\n\nfor\n \n(\nint\n \nt\n \n=\n \n0\n;\n \nt\n \n<\n \np\n;\n \n++\nt\n)\n \n{\n\n    \nq\n(\nt\n).\nsend\n(\ns\n,\n \n3.1415f\n);\n  \n// send (s, pi) to processor t\n\n\n}\n\n\nworld\n.\nsync\n();\n\n\n\n// messages are now available in q\n\n\nfor\n \n(\nauto\n \n[\ntag\n,\n \ncontent\n]\n \n:\n \nq\n)\n \n{\n\n    \nworld\n.\nlog\n(\n\"%d got sent %d, %f\n\\n\n\"\n,\n \ns\n,\n \ntag\n,\n \ncontent\n);\n\n\n}\n\n\n\n\n\n\nAPI\n\u00b6\n\n\nBulk provides a modern bulk-synchronous parallel API which is \ndocumented in detail here\n.\n\n\nLicense\n\u00b6\n\n\nBulk is released under the MIT license, for details see the file LICENSE.md.\n\n\nContributing\n\u00b6\n\n\nWe welcome contributions. Please submit pull requests against the develop branch.\n\n\n\n\n\n\n\n\n\n\nSingle program multiple data, meaning that every processor runs the same code but on different data.\u00a0\n\u21a9",
             "title": "Home"
         },
         {
             "location": "/#bulk",
             "text": "Bulk is a new interface for writing parallel programs in C++ in bulk-synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.",
             "title": "Bulk"
+        },
+        {
+            "location": "/#about-bsp",
+            "text": "The bulk synchrnoous parallel (BSP) programming model, is a way of writing parallel and distributed programs. Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed  synchronization points . These synchronizations delimit so-called  supersteps . This way of writing parallel programs has a number of advantages over competing models, at the cost of losing some flexibility and possible performance in terms of communication.   The resulting programs are structured, easy to understand and mantain, and can be reasoned about  Data races are eliminated almost by construction, only have to follow a small set of simple rules.  Scalability is easy to obtain, since programs are written in a SPMD 1  fashion, and the cost of a program can be analyzed explicitely.  The number of communication mechanisms required are very limited, roughly only distinguishing between anonymous or named communication. This makes BSP based libraries very economic (you can do much with very little).  Low cost of entry, easy to write  correct  BSP programs, while it is notoriously hard to write correct asynchronous parallel programs.",
+            "title": "About BSP"
         },
         {
             "location": "/#authors",
@@ -32,7 +37,7 @@
         },
         {
             "location": "/#contributing",
-            "text": "We welcome contributions. Please submit pull requests against the develop branch.",
+            "text": "We welcome contributions. Please submit pull requests against the develop branch.      Single program multiple data, meaning that every processor runs the same code but on different data.\u00a0 \u21a9",
             "title": "Contributing"
         },
         {
@@ -277,7 +282,7 @@
         },
         {
             "location": "/api/queue/",
-            "text": "bulk::queue\n\u00b6\n\n\nDefined in header \n<bulk/messages.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n,\n \ntypename\n...\n \nTs\n>\n\n\nclass\n \nqueue\n;\n\n\n\n\n\n\nbulk::queue\n is an inbox for receiving messages passed by processors.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the values stored in the images of the variable.\n\n\nTs\n - a parameter pack, optionally containing extra message content\n\n\n\n\nMember types\n\u00b6\n\n\n\n\nmessage_type\n: the underlying type used by the messages\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the queue\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the queue\n\n\n\n\n\n\noperator=\n\n\nassign the queue\n\n\n\n\n\n\nCommunication\n\n\n\n\n\n\n\n\noperator()\n\n\nobtain a sender to a remote queue\n\n\n\n\n\n\nContainer\n\n\n\n\n\n\n\n\nbegin\n\n\nobtain an iterator to the start\n\n\n\n\n\n\nend\n\n\nobtain an iterator to the end\n\n\n\n\n\n\nsize\n\n\nobtain the number of messages\n\n\n\n\n\n\nempty\n\n\ncheck if the queue is empty\n\n\n\n\n\n\nWorld access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the world of the queue\n\n\n\n\n\n\n\n\nNested classes\n\u00b6\n\n\n\n\nsender\n: an object providing syntactic sugar for sending messages\n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n\"bulk/bulk.hpp\"\n\n\n\n#include\n \n\"set_backend.hpp\"\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nenvironment\n \nenv\n;\n\n\n    \nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nbulk\n::\nworld\n&\n \nworld\n)\n \n{\n\n        \nint\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n        \nint\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n        \nbulk\n::\nvar\n<\nint\n>\n \na\n(\nworld\n);\n\n\n        \na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d <- %d\"\n,\n \ns\n,\n \np\n,\n \na\n.\nvalue\n());\n\n\n        \nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d -> %d\"\n,\n \ns\n,\n \np\n,\n \nb\n.\nvalue\n());\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
+            "text": "bulk::queue\n\u00b6\n\n\nDefined in header \n<bulk/messages.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n,\n \ntypename\n...\n \nTs\n>\n\n\nclass\n \nqueue\n;\n\n\n\n\n\n\nbulk::queue\n is an inbox for receiving messages passed by processors.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the message content\n\n\nTs\n - a parameter pack, optionally containing extra message content\n\n\n\n\nMember types\n\u00b6\n\n\n\n\nmessage_type\n: the underlying type used by the messages. Equal to:\n\n\nT\n if \nsizeof...(Ts) == 0\n,\n\n\nstd::tuple<T, Ts...>\n otherwise.\n\n\n\n\n\n\niterator\n: the type of the iterator used for the local inbox\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the queue\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the queue\n\n\n\n\n\n\noperator=\n\n\nassign the queue\n\n\n\n\n\n\nCommunication\n\n\n\n\n\n\n\n\noperator()\n\n\nobtain a sender to a remote queue\n\n\n\n\n\n\nContainer\n\n\n\n\n\n\n\n\nbegin\n\n\nobtain an iterator to the start\n\n\n\n\n\n\nend\n\n\nobtain an iterator to the end\n\n\n\n\n\n\nsize\n\n\nobtain the number of messages\n\n\n\n\n\n\nempty\n\n\ncheck if the queue is empty\n\n\n\n\n\n\nWorld access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the world of the queue\n\n\n\n\n\n\n\n\nNested classes\n\u00b6\n\n\n\n\nsender\n: an object providing syntactic sugar for sending messages\n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n\"bulk/bulk.hpp\"\n\n\n\n#include\n \n\"set_backend.hpp\"\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nenvironment\n \nenv\n;\n\n\n    \nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nbulk\n::\nworld\n&\n \nworld\n)\n \n{\n\n        \nauto\n \nraw_queue\n \n=\n \nbulk\n::\nqueue\n<\nint\n>\n(\nworld\n);\n\n        \nraw_queue\n(\nworld\n.\nnext_processor\n()).\nsend\n(\n1\n);\n\n        \nraw_queue\n(\nworld\n.\nnext_processor\n()).\nsend\n(\n2\n);\n\n        \nraw_queue\n(\nworld\n.\nnext_processor\n()).\nsend\n(\n123\n);\n\n\n        \nauto\n \ntuple_queue\n \n=\n \nbulk\n::\nqueue\n<\nint\n,\n \nint\n,\n \nint\n>\n(\nworld\n);\n\n        \ntuple_queue\n(\nworld\n.\nnext_processor\n()).\nsend\n(\n1\n,\n \n2\n,\n \n3\n);\n\n        \ntuple_queue\n(\nworld\n.\nnext_processor\n()).\nsend\n(\n4\n,\n \n5\n,\n \n6\n);\n\n\n        \nworld\n.\nsync\n();\n\n\n        \n// read queue\n\n        \nfor\n \n(\nauto\n \nx\n \n:\n \nraw_queue\n)\n \n{\n\n            \nworld\n.\nlog\n(\n\"the first queue received a message: %d\"\n,\n \nx\n);\n\n        \n}\n\n\n        \nfor\n \n(\nauto\n \n[\ni\n,\n \nj\n,\n \nk\n]\n \n:\n \ntuple_queue\n)\n \n{\n\n            \nworld\n.\nlog\n(\n\"the second queue received a tuple: (%d, %d, %d)\"\n,\n\n                      \ni\n,\n \nj\n,\n \nk\n);\n\n        \n}\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
             "title": "queue"
         },
         {
@@ -287,12 +292,12 @@
         },
         {
             "location": "/api/queue/#template-parameters",
-            "text": "T  - the type of the values stored in the images of the variable.  Ts  - a parameter pack, optionally containing extra message content",
+            "text": "T  - the type of the message content  Ts  - a parameter pack, optionally containing extra message content",
             "title": "Template parameters"
         },
         {
             "location": "/api/queue/#member-types",
-            "text": "message_type : the underlying type used by the messages",
+            "text": "message_type : the underlying type used by the messages. Equal to:  T  if  sizeof...(Ts) == 0 ,  std::tuple<T, Ts...>  otherwise.    iterator : the type of the iterator used for the local inbox",
             "title": "Member types"
         },
         {
@@ -307,28 +312,78 @@
         },
         {
             "location": "/api/queue/#example",
-            "text": "#include   \"bulk/bulk.hpp\"  #include   \"set_backend.hpp\"  int   main ()   { \n     environment   env ; \n\n     env . spawn ( env . available_processors (),   []( bulk :: world &   world )   { \n         int   s   =   world . processor_id (); \n         int   p   =   world . active_processors (); \n\n         bulk :: var < int >   a ( world ); \n\n         a ( world . next_processor ())   =   s ; \n         world . sync (); \n\n         world . log ( \"%d/%d <- %d\" ,   s ,   p ,   a . value ()); \n\n         auto   b   =   a ( world . next_processor ()). get (); \n\n         world . sync (); \n\n         world . log ( \"%d/%d -> %d\" ,   s ,   p ,   b . value ()); \n     }); \n\n     return   0 ;  }",
+            "text": "#include   \"bulk/bulk.hpp\"  #include   \"set_backend.hpp\"  int   main ()   { \n     environment   env ; \n\n     env . spawn ( env . available_processors (),   []( bulk :: world &   world )   { \n         auto   raw_queue   =   bulk :: queue < int > ( world ); \n         raw_queue ( world . next_processor ()). send ( 1 ); \n         raw_queue ( world . next_processor ()). send ( 2 ); \n         raw_queue ( world . next_processor ()). send ( 123 ); \n\n         auto   tuple_queue   =   bulk :: queue < int ,   int ,   int > ( world ); \n         tuple_queue ( world . next_processor ()). send ( 1 ,   2 ,   3 ); \n         tuple_queue ( world . next_processor ()). send ( 4 ,   5 ,   6 ); \n\n         world . sync (); \n\n         // read queue \n         for   ( auto   x   :   raw_queue )   { \n             world . log ( \"the first queue received a message: %d\" ,   x ); \n         } \n\n         for   ( auto   [ i ,   j ,   k ]   :   tuple_queue )   { \n             world . log ( \"the second queue received a tuple: (%d, %d, %d)\" , \n                       i ,   j ,   k ); \n         } \n     }); \n\n     return   0 ;  }",
             "title": "Example"
         },
         {
             "location": "/api/timer/",
-            "text": "",
+            "text": "bulk::util::timer\n\u00b6\n\n\nDefined in header \n<bulk/util/timer.hpp>\n.\n\n\nclass\n \ntimer\n;\n\n\n\n\n\n\nConstructs a timer that immediately starts ticking.\n\n\nbulk::util::timer::get\n\u00b6\n\n\ntemplate\n \n<\ntypename\n \nresolution\n \n=\n \nstd\n::\nmilli\n>\n\n\ndouble\n \nget\n()\n\n\n\n\n\n\n\n\nreturns\n the number of (by default) milliseconds that have passed since the construction of the timer.",
             "title": "timer"
         },
         {
+            "location": "/api/timer/#bulkutiltimer",
+            "text": "Defined in header  <bulk/util/timer.hpp> .  class   timer ;   Constructs a timer that immediately starts ticking.",
+            "title": "bulk::util::timer"
+        },
+        {
+            "location": "/api/timer/#bulkutiltimerget",
+            "text": "template   < typename   resolution   =   std :: milli >  double   get ()    returns  the number of (by default) milliseconds that have passed since the construction of the timer.",
+            "title": "bulk::util::timer::get"
+        },
+        {
             "location": "/api/foldl/",
-            "text": "bulk::reduce\n\u00b6\n\n\nNot yet available",
+            "text": "bulk::foldl\n\u00b6\n\n\ntemplate\n \n<\ntypename\n \nT\n,\n \ntypename\n \nFunc\n>\n\n\nT\n \nfoldl\n(\nvar\n<\nT\n>&\n \nx\n,\n \nFunc\n \nf\n,\n \nT\n \nstart_value\n \n=\n \n0\n)\n\n\n\n\n\n\nPerform a left-fold over a distributed variable.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the value type of the variable/array\n\n\nFunc\n - type of a binary function of the form \n(T, T) -> T\n that is used to fold\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nx\n - the distributed variable\n\n\nf\n - the folding function\n\n\nstart_value\n - the (optional) initial alue of the accumulator\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n: \ncostof(f) * p + sizeof(T) * p * g + l",
             "title": "foldl"
         },
         {
-            "location": "/api/foldl/#bulkreduce",
-            "text": "Not yet available",
-            "title": "bulk::reduce"
+            "location": "/api/foldl/#bulkfoldl",
+            "text": "template   < typename   T ,   typename   Func >  T   foldl ( var < T >&   x ,   Func   f ,   T   start_value   =   0 )   Perform a left-fold over a distributed variable.",
+            "title": "bulk::foldl"
+        },
+        {
+            "location": "/api/foldl/#template-parameters",
+            "text": "T  - the value type of the variable/array  Func  - type of a binary function of the form  (T, T) -> T  that is used to fold",
+            "title": "Template parameters"
+        },
+        {
+            "location": "/api/foldl/#parameters",
+            "text": "x  - the distributed variable  f  - the folding function  start_value  - the (optional) initial alue of the accumulator",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/foldl/#complexity-and-cost",
+            "text": "Cost :  costof(f) * p + sizeof(T) * p * g + l",
+            "title": "Complexity and cost"
         },
         {
             "location": "/api/gather_all/",
-            "text": "",
+            "text": "bulk::gather_all\n\u00b6\n\n\ntemplate\n \n<\ntypename\n \nT\n>\n\n\nbulk\n::\ncoarray\n<\nT\n>\n \ngather_all\n(\nbulk\n::\nworld\n&\n \nworld\n,\n \nT\n \nvalue\n)\n\n\n\n\n\n\nThis function takes a value on each processor, and gathers all of these in the local images of a coarray.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the value type\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nworld\n - the world in which we gather\n\n\nvalue\n - the distributed variable\n\n\n\n\nReturns\n\u00b6\n\n\n\n\nA coarray, whose local images consists of \np\n elements with on the \ns\n-th position the value passed by the \ns\n-th processor.\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n: \nsizeof(T) * p * g + l",
             "title": "gather_all"
+        },
+        {
+            "location": "/api/gather_all/#bulkgather_all",
+            "text": "template   < typename   T >  bulk :: coarray < T >   gather_all ( bulk :: world &   world ,   T   value )   This function takes a value on each processor, and gathers all of these in the local images of a coarray.",
+            "title": "bulk::gather_all"
+        },
+        {
+            "location": "/api/gather_all/#template-parameters",
+            "text": "T  - the value type",
+            "title": "Template parameters"
+        },
+        {
+            "location": "/api/gather_all/#parameters",
+            "text": "world  - the world in which we gather  value  - the distributed variable",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/gather_all/#returns",
+            "text": "A coarray, whose local images consists of  p  elements with on the  s -th position the value passed by the  s -th processor.",
+            "title": "Returns"
+        },
+        {
+            "location": "/api/gather_all/#complexity-and-cost",
+            "text": "Cost :  sizeof(T) * p * g + l",
+            "title": "Complexity and cost"
         },
         {
             "location": "/api/flatten/",
@@ -424,6 +479,21 @@
             "location": "/api/coarray/writer/#bulkcoarraywriteroperator",
             "text": "void   operator = ( T   value );    parameters    value  - the new value of the element",
             "title": "bulk::coarray::writer::operator="
+        },
+        {
+            "location": "/api/queue/sender/",
+            "text": "bulk::queue::sender\n\u00b6\n\n\nDefined in header \n<bulk/messages.hpp>\n.\n\n\nclass\n \nsender\n\n\n\n\n\n\nProvides a way to send messages to remote queues.\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nsend\n\n\nassign values to the variable",
+            "title": "queue::sender"
+        },
+        {
+            "location": "/api/queue/sender/#bulkqueuesender",
+            "text": "Defined in header  <bulk/messages.hpp> .  class   sender   Provides a way to send messages to remote queues.",
+            "title": "bulk::queue::sender"
+        },
+        {
+            "location": "/api/queue/sender/#member-functions",
+            "text": "Value access     send  assign values to the variable",
+            "title": "Member functions"
         },
         {
             "location": "/api/environment/spawn/",
@@ -703,7 +773,7 @@
         {
             "location": "/api/var/image/get/",
             "text": "bulk::var::image::get\n\u00b6\n\n\nfuture\n<\nT\n>\n \nget\n()\n \nconst\n;\n\n\n\n\n\n\nObtain a future to a remote image value\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nsizeof(T) * g\n;",
-            "title": "var::image::get="
+            "title": "var::image::get"
         },
         {
             "location": "/api/var/image/get/#bulkvarimageget",
@@ -717,12 +787,12 @@
         },
         {
             "location": "/api/future/constructor/",
-            "text": "bulk::future::future\n\u00b6\n\n\nfuture\n(\nworld\n&\n \nworld\n);\n \n// 1.\n\n\n\n\n\n\nConstructs a future for use in \nworld\n.\n\n\nParameters\n\u00b6\n\n\n\n\nworld\n - the world this future belongs to",
+            "text": "bulk::future::future\n\u00b6\n\n\nfuture\n(\nworld\n&\n \nworld\n);\n\n\n\n\n\n\nConstructs a message future for use in \nworld\n.\n\n\nParameters\n\u00b6\n\n\n\n\nworld\n - the world this future belongs to",
             "title": "future::constructor"
         },
         {
             "location": "/api/future/constructor/#bulkfuturefuture",
-            "text": "future ( world &   world );   // 1.   Constructs a future for use in  world .",
+            "text": "future ( world &   world );   Constructs a message future for use in  world .",
             "title": "bulk::future::future"
         },
         {
@@ -777,12 +847,12 @@
         },
         {
             "location": "/api/future/world/",
-            "text": "bulk::future::world\n\u00b6\n\n\nbulk\n::\nworld\n&\n \nworld\n();\n\n\n\n\n\n\nReturns a reference to the world the variable belongs to\n\n\nReturn value\n\u00b6\n\n\n\n\nA reference to the world.",
+            "text": "bulk::future::world\n\u00b6\n\n\nbulk\n::\nworld\n&\n \nworld\n();\n\n\n\n\n\n\nReturns a reference to the world the future belongs to\n\n\nReturn value\n\u00b6\n\n\n\n\nA reference to the world.",
             "title": "future::world"
         },
         {
             "location": "/api/future/world/#bulkfutureworld",
-            "text": "bulk :: world &   world ();   Returns a reference to the world the variable belongs to",
+            "text": "bulk :: world &   world ();   Returns a reference to the world the future belongs to",
             "title": "bulk::future::world"
         },
         {
@@ -876,18 +946,143 @@
             "title": "Return value"
         },
         {
+            "location": "/api/queue/constructor/",
+            "text": "bulk::queue::queue\n\u00b6\n\n\nqueue\n(\nworld\n&\n \nworld\n);\n\n\n\n\n\n\nConstructs a message queue for use in \nworld\n.\n\n\nParameters\n\u00b6\n\n\n\n\nworld\n - the world this queue belongs to",
+            "title": "queue::constructor"
+        },
+        {
+            "location": "/api/queue/constructor/#bulkqueuequeue",
+            "text": "queue ( world &   world );   Constructs a message queue for use in  world .",
+            "title": "bulk::queue::queue"
+        },
+        {
+            "location": "/api/queue/constructor/#parameters",
+            "text": "world  - the world this queue belongs to",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/queue/deconstructor/",
+            "text": "bulk::queue::~queue\n\u00b6\n\n\n~\nqueue\n();\n\n\n\n\n\n\nDeconstructs a queue, clears and deregisters it.",
+            "title": "queue::deconstructor"
+        },
+        {
+            "location": "/api/queue/deconstructor/#bulkqueuequeue",
+            "text": "~ queue ();   Deconstructs a queue, clears and deregisters it.",
+            "title": "bulk::queue::~queue"
+        },
+        {
+            "location": "/api/queue/begin/",
+            "text": "bulk::queue::begin\n\u00b6\n\n\niterator\n \nbegin\n();\n\n\n\n\n\n\nObtain an iterator to the begin of the local queue.\n\n\nReturn value\n\u00b6\n\n\n\n\nan iterator to the begin of the local queue",
+            "title": "queue::begin"
+        },
+        {
+            "location": "/api/queue/begin/#bulkqueuebegin",
+            "text": "iterator   begin ();   Obtain an iterator to the begin of the local queue.",
+            "title": "bulk::queue::begin"
+        },
+        {
+            "location": "/api/queue/begin/#return-value",
+            "text": "an iterator to the begin of the local queue",
+            "title": "Return value"
+        },
+        {
+            "location": "/api/queue/end/",
+            "text": "bulk::queue::end\n\u00b6\n\n\niterator\n \nend\n();\n\n\n\n\n\n\nObtain an iterator to the end of the local queue.\n\n\nReturn value\n\u00b6\n\n\n\n\nan iterator to the end of the local queue",
+            "title": "queue::end"
+        },
+        {
+            "location": "/api/queue/end/#bulkqueueend",
+            "text": "iterator   end ();   Obtain an iterator to the end of the local queue.",
+            "title": "bulk::queue::end"
+        },
+        {
+            "location": "/api/queue/end/#return-value",
+            "text": "an iterator to the end of the local queue",
+            "title": "Return value"
+        },
+        {
+            "location": "/api/queue/size/",
+            "text": "bulk::queue::size\n\u00b6\n\n\nsize_t\n \nsize\n()\n \nconst\n;\n\n\n\n\n\n\nObtain the number of messages in the local queue.\n\n\nReturn value\n\u00b6\n\n\n\n\nthe number of messages in the local queue",
+            "title": "queue::size"
+        },
+        {
+            "location": "/api/queue/size/#bulkqueuesize",
+            "text": "size_t   size ()   const ;   Obtain the number of messages in the local queue.",
+            "title": "bulk::queue::size"
+        },
+        {
+            "location": "/api/queue/size/#return-value",
+            "text": "the number of messages in the local queue",
+            "title": "Return value"
+        },
+        {
+            "location": "/api/queue/empty/",
+            "text": "bulk::queue::empty\n\u00b6\n\n\nbool\n \nempty\n()\n \nconst\n;\n\n\n\n\n\n\nChecks whether the inbox is empty.\n\n\nReturn value\n\u00b6\n\n\n\n\ntrue\n if the inbox is empty, \nfalse\n otherwise.",
+            "title": "queue::empty"
+        },
+        {
+            "location": "/api/queue/empty/#bulkqueueempty",
+            "text": "bool   empty ()   const ;   Checks whether the inbox is empty.",
+            "title": "bulk::queue::empty"
+        },
+        {
+            "location": "/api/queue/empty/#return-value",
+            "text": "true  if the inbox is empty,  false  otherwise.",
+            "title": "Return value"
+        },
+        {
+            "location": "/api/queue/world/",
+            "text": "bulk::queue::world\n\u00b6\n\n\nbulk\n::\nworld\n&\n \nworld\n();\n\n\n\n\n\n\nReturns a reference to the world the queue belongs to\n\n\nReturn value\n\u00b6\n\n\n\n\nA reference to the world.",
+            "title": "queue::world"
+        },
+        {
+            "location": "/api/queue/world/#bulkqueueworld",
+            "text": "bulk :: world &   world ();   Returns a reference to the world the queue belongs to",
+            "title": "bulk::queue::world"
+        },
+        {
+            "location": "/api/queue/world/#return-value",
+            "text": "A reference to the world.",
+            "title": "Return value"
+        },
+        {
+            "location": "/api/queue/sender/send/",
+            "text": "bulk::queue::sender::send\n\u00b6\n\n\ntemplate\n \n<\ntypename\n...\n \nUs\n>\n\n\nvoid\n \nsend\n(\nUs\n...\n \nargs\n)\n\n\n\n\n\n\nSend a message to a remote queue\n\n\nParameters\n\u00b6\n\n\n\n\nargs\n - the content to send\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nsizeof(Us...) * g",
+            "title": "queue::sender::send"
+        },
+        {
+            "location": "/api/queue/sender/send/#bulkqueuesendersend",
+            "text": "template   < typename ...   Us >  void   send ( Us ...   args )   Send a message to a remote queue",
+            "title": "bulk::queue::sender::send"
+        },
+        {
+            "location": "/api/queue/sender/send/#parameters",
+            "text": "args  - the content to send",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/queue/sender/send/#complexity-and-cost",
+            "text": "Cost  -  sizeof(Us...) * g",
+            "title": "Complexity and cost"
+        },
+        {
             "location": "/providers/mpi/",
-            "text": "",
+            "text": "MPI\n\u00b6\n\n\nIf you choose to use the MPI backend, then simply include the Bulk headers, and set up your project build as though it is an MPI project. We suggest to use the OpenMPI implementation, since is the implemnetation we test against.",
+            "title": "MPI"
+        },
+        {
+            "location": "/providers/mpi/#mpi",
+            "text": "If you choose to use the MPI backend, then simply include the Bulk headers, and set up your project build as though it is an MPI project. We suggest to use the OpenMPI implementation, since is the implemnetation we test against.",
             "title": "MPI"
         },
         {
             "location": "/providers/thread/",
-            "text": "<thread>\n\u00b6\n\n\nThis backend uses the shared-memory parallelism provided by the standard C++ library \n<thread>\n.\n\n\nTo use it on Linux, link against \nlibpthread\n.",
+            "text": "<thread>\n\u00b6\n\n\nThis backend uses the shared-memory parallelism provided by the standard C++ library \n<thread>\n.\n\n\nTo use it on Linux, link against the \npthread\n library.",
             "title": "thread"
         },
         {
             "location": "/providers/thread/#thread",
-            "text": "This backend uses the shared-memory parallelism provided by the standard C++ library  <thread> .  To use it on Linux, link against  libpthread .",
+            "text": "This backend uses the shared-memory parallelism provided by the standard C++ library  <thread> .  To use it on Linux, link against the  pthread  library.",
             "title": "&lt;thread&gt;"
         },
         {

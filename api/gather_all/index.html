@@ -481,10 +481,60 @@
     
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
     
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        gather_all
+      </label>
     
     <a href="./" title="gather_all" class="md-nav__link md-nav__link--active">
       gather_all
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#template-parameters" title="Template parameters" class="md-nav__link">
+    Template parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameters" title="Parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#returns" title="Returns" class="md-nav__link">
+    Returns
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complexity-and-cost" title="Complexity and cost" class="md-nav__link">
+    Complexity and cost
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -569,6 +619,18 @@
   <li class="md-nav__item">
     <a href="../coarray/writer/" title="coarray::writer" class="md-nav__link">
       coarray::writer
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/sender/" title="queue::sender" class="md-nav__link">
+      queue::sender
     </a>
   </li>
 
@@ -807,8 +869,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../var/image/get/" title="var::image::get=" class="md-nav__link">
-      var::image::get=
+    <a href="../var/image/get/" title="var::image::get" class="md-nav__link">
+      var::image::get
     </a>
   </li>
 
@@ -933,6 +995,102 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/constructor/" title="queue::constructor" class="md-nav__link">
+      queue::constructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/deconstructor/" title="queue::deconstructor" class="md-nav__link">
+      queue::deconstructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/begin/" title="queue::begin" class="md-nav__link">
+      queue::begin
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/end/" title="queue::end" class="md-nav__link">
+      queue::end
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/size/" title="queue::size" class="md-nav__link">
+      queue::size
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/empty/" title="queue::empty" class="md-nav__link">
+      queue::empty
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/world/" title="queue::world" class="md-nav__link">
+      queue::world
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/sender/send/" title="queue::sender::send" class="md-nav__link">
+      queue::sender::send
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -1029,6 +1187,43 @@
 <nav class="md-nav md-nav--secondary">
   
   
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#template-parameters" title="Template parameters" class="md-nav__link">
+    Template parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameters" title="Parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#returns" title="Returns" class="md-nav__link">
+    Returns
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complexity-and-cost" title="Complexity and cost" class="md-nav__link">
+    Complexity and cost
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
   
 </nav>
                   </div>
@@ -1041,9 +1236,30 @@
               
                 
                 
-                  <h1>gather_all</h1>
-                
-                
+                <h1 id="bulkgather_all"><code>bulk::gather_all</code><a class="headerlink" href="#bulkgather_all" title="Permanent link">&para;</a></h1>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">gather_all</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">world</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">T</span> <span class="n">value</span><span class="p">)</span>
+</pre></div>
+
+
+<p>This function takes a value on each processor, and gathers all of these in the local images of a coarray.</p>
+<h2 id="template-parameters">Template parameters<a class="headerlink" href="#template-parameters" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>T</code> - the value type</li>
+</ul>
+<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>world</code> - the world in which we gather</li>
+<li><code>value</code> - the distributed variable</li>
+</ul>
+<h2 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h2>
+<ul>
+<li>A coarray, whose local images consists of <code>p</code> elements with on the <code>s</code>-th position the value passed by the <code>s</code>-th processor.</li>
+</ul>
+<h2 id="complexity-and-cost">Complexity and cost<a class="headerlink" href="#complexity-and-cost" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Cost</strong>: <code>sizeof(T) * p * g + l</code></li>
+</ul>
                 
                   
                 

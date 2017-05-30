@@ -433,10 +433,39 @@
     
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
     
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        timer
+      </label>
     
     <a href="./" title="timer" class="md-nav__link md-nav__link--active">
       timer
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bulkutiltimerget" title="bulk::util::timer::get" class="md-nav__link">
+    bulk::util::timer::get
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -569,6 +598,18 @@
   <li class="md-nav__item">
     <a href="../coarray/writer/" title="coarray::writer" class="md-nav__link">
       coarray::writer
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/sender/" title="queue::sender" class="md-nav__link">
+      queue::sender
     </a>
   </li>
 
@@ -807,8 +848,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../var/image/get/" title="var::image::get=" class="md-nav__link">
-      var::image::get=
+    <a href="../var/image/get/" title="var::image::get" class="md-nav__link">
+      var::image::get
     </a>
   </li>
 
@@ -933,6 +974,102 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/constructor/" title="queue::constructor" class="md-nav__link">
+      queue::constructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/deconstructor/" title="queue::deconstructor" class="md-nav__link">
+      queue::deconstructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/begin/" title="queue::begin" class="md-nav__link">
+      queue::begin
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/end/" title="queue::end" class="md-nav__link">
+      queue::end
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/size/" title="queue::size" class="md-nav__link">
+      queue::size
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/empty/" title="queue::empty" class="md-nav__link">
+      queue::empty
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/world/" title="queue::world" class="md-nav__link">
+      queue::world
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/sender/send/" title="queue::sender::send" class="md-nav__link">
+      queue::sender::send
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -1029,6 +1166,22 @@
 <nav class="md-nav md-nav--secondary">
   
   
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bulkutiltimerget" title="bulk::util::timer::get" class="md-nav__link">
+    bulk::util::timer::get
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
   
 </nav>
                   </div>
@@ -1041,9 +1194,22 @@
               
                 
                 
-                  <h1>timer</h1>
-                
-                
+                <h1 id="bulkutiltimer"><code>bulk::util::timer</code><a class="headerlink" href="#bulkutiltimer" title="Permanent link">&para;</a></h1>
+<p>Defined in header <code>&lt;bulk/util/timer.hpp&gt;</code>.</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">timer</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Constructs a timer that immediately starts ticking.</p>
+<h3 id="bulkutiltimerget"><code>bulk::util::timer::get</code><a class="headerlink" href="#bulkutiltimerget" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">resolution</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">milli</span><span class="o">&gt;</span>
+<span class="kt">double</span> <span class="n">get</span><span class="p">()</span>
+</pre></div>
+
+
+<ul>
+<li><strong>returns</strong> the number of (by default) milliseconds that have passed since the construction of the timer.</li>
+</ul>
                 
                   
                 

@@ -472,9 +472,50 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        foldl
+      </label>
+    
     <a href="./" title="foldl" class="md-nav__link md-nav__link--active">
       foldl
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#template-parameters" title="Template parameters" class="md-nav__link">
+    Template parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameters" title="Parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complexity-and-cost" title="Complexity and cost" class="md-nav__link">
+    Complexity and cost
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -571,6 +612,18 @@
   <li class="md-nav__item">
     <a href="../coarray/writer/" title="coarray::writer" class="md-nav__link">
       coarray::writer
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/sender/" title="queue::sender" class="md-nav__link">
+      queue::sender
     </a>
   </li>
 
@@ -809,8 +862,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../var/image/get/" title="var::image::get=" class="md-nav__link">
-      var::image::get=
+    <a href="../var/image/get/" title="var::image::get" class="md-nav__link">
+      var::image::get
     </a>
   </li>
 
@@ -935,6 +988,102 @@
   </li>
 
         
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/constructor/" title="queue::constructor" class="md-nav__link">
+      queue::constructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/deconstructor/" title="queue::deconstructor" class="md-nav__link">
+      queue::deconstructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/begin/" title="queue::begin" class="md-nav__link">
+      queue::begin
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/end/" title="queue::end" class="md-nav__link">
+      queue::end
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/size/" title="queue::size" class="md-nav__link">
+      queue::size
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/empty/" title="queue::empty" class="md-nav__link">
+      queue::empty
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/world/" title="queue::world" class="md-nav__link">
+      queue::world
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../queue/sender/send/" title="queue::sender::send" class="md-nav__link">
+      queue::sender::send
+    </a>
+  </li>
+
+        
       </ul>
     </nav>
   </li>
@@ -1034,6 +1183,34 @@
     
   
   
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#template-parameters" title="Template parameters" class="md-nav__link">
+    Template parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameters" title="Parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complexity-and-cost" title="Complexity and cost" class="md-nav__link">
+    Complexity and cost
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1045,8 +1222,28 @@
               
                 
                 
-                <h1 id="bulkreduce"><code>bulk::reduce</code><a class="headerlink" href="#bulkreduce" title="Permanent link">&para;</a></h1>
-<p>Not yet available</p>
+                <h1 id="bulkfoldl"><code>bulk::foldl</code><a class="headerlink" href="#bulkfoldl" title="Permanent link">&para;</a></h1>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="p">,</span> <span class="k">typename</span> <span class="n">Func</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">foldl</span><span class="p">(</span><span class="n">var</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">x</span><span class="p">,</span> <span class="n">Func</span> <span class="n">f</span><span class="p">,</span> <span class="n">T</span> <span class="n">start_value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Perform a left-fold over a distributed variable.</p>
+<h2 id="template-parameters">Template parameters<a class="headerlink" href="#template-parameters" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>T</code> - the value type of the variable/array</li>
+<li><code>Func</code> - type of a binary function of the form <code>(T, T) -&gt; T</code> that is used to fold</li>
+</ul>
+<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>x</code> - the distributed variable</li>
+<li><code>f</code> - the folding function</li>
+<li><code>start_value</code> - the (optional) initial alue of the accumulator</li>
+</ul>
+<h2 id="complexity-and-cost">Complexity and cost<a class="headerlink" href="#complexity-and-cost" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Cost</strong>: <code>costof(f) * p + sizeof(T) * p * g + l</code></li>
+</ul>
                 
                   
                 
