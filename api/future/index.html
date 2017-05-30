@@ -432,20 +432,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#see-also" title="See also" class="md-nav__link">
-    See also
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example" title="Example" class="md-nav__link">
-    Example
-  </a>
-  
-</li>
-      
       
       
     </ul>
@@ -521,30 +507,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../put/" title="put" class="md-nav__link">
-      put
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../get/" title="get" class="md-nav__link">
-      get
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
     <a href="../foldl/" title="foldl" class="md-nav__link">
       foldl
     </a>
@@ -602,11 +564,11 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5-4" type="checkbox" id="nav-5-4">
     
     <label class="md-nav__link" for="nav-5-4">
-      Member classes
+      Nested classes
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="2">
       <label class="md-nav__title" for="nav-5-4">
-        Member classes
+        Nested classes
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -619,6 +581,30 @@
   <li class="md-nav__item">
     <a href="../var/image/" title="var::image" class="md-nav__link">
       var::image
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../coarray/image/" title="coarray::image" class="md-nav__link">
+      coarray::image
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../coarray/writer/" title="coarray::writer" class="md-nav__link">
+      coarray::writer
     </a>
   </li>
 
@@ -845,7 +831,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../var/image_assignment_operator/" title="var::image::operator=" class="md-nav__link">
+    <a href="../var/image/assignment_operator/" title="var::image::operator=" class="md-nav__link">
       var::image::operator=
     </a>
   </li>
@@ -857,8 +843,128 @@
 
 
   <li class="md-nav__item">
-    <a href="../var/image_get/" title="var::image::get=" class="md-nav__link">
+    <a href="../var/image/get/" title="var::image::get=" class="md-nav__link">
       var::image::get=
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="constructor/" title="future::constructor" class="md-nav__link">
+      future::constructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="deconstructor/" title="future::deconstructor" class="md-nav__link">
+      future::deconstructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="assignment_operator/" title="future::operator=" class="md-nav__link">
+      future::operator=
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="value/" title="future::value" class="md-nav__link">
+      future::value
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="world/" title="future::world" class="md-nav__link">
+      future::world
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../coarray/constructor/" title="coarray::constructor" class="md-nav__link">
+      coarray::constructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../coarray/deconstructor/" title="coarray::deconstructor" class="md-nav__link">
+      coarray::deconstructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../coarray/parentheses_operator/" title="coarray::operator()" class="md-nav__link">
+      coarray::operator()
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../coarray/square_brackets_operator/" title="coarray::operator[]" class="md-nav__link">
+      coarray::operator[]
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../coarray/world/" title="coarray::world" class="md-nav__link">
+      coarray::world
     </a>
   </li>
 
@@ -979,20 +1085,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#see-also" title="See also" class="md-nav__link">
-    See also
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example" title="Example" class="md-nav__link">
-    Example
-  </a>
-  
-</li>
-      
       
       
     </ul>
@@ -1010,16 +1102,15 @@
                 
                 <h1 id="bulkfuture"><code>bulk::future</code><a class="headerlink" href="#bulkfuture" title="Permanent link">&para;</a></h1>
 <p>Defined in header <code>&lt;bulk/future.hpp&gt;</code>.</p>
-<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="p">,</span> <span class="k">class</span> <span class="nc">Hub</span><span class="o">&gt;</span>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
 <span class="k">class</span> <span class="nc">future</span><span class="p">;</span>
 </pre></div>
 
 
-<p><code>bulk::future</code> represents a value that will become known in the upcoming superstep.</p>
+<p><code>bulk::future</code> represents a value that will or has become known in the superstep after its creation.</p>
 <h2 id="template-parameters">Template parameters<a class="headerlink" href="#template-parameters" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>T</code> - the type of the value stored in the future</li>
-<li><code>Hub</code> - the type of hub to which the future belongs.</li>
 </ul>
 <h2 id="member-functions">Member functions<a class="headerlink" href="#member-functions" title="Permanent link">&para;</a></h2>
 <table>
@@ -1031,23 +1122,23 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="future/constructor.md">(constructor)</a></td>
+<td><a href="constructor/">(constructor)</a></td>
 <td>constructs the future</td>
 </tr>
 <tr>
-<td><a href="future/deconstructor.md">(deconstructor)</a></td>
+<td><a href="deconstructor/">(deconstructor)</a></td>
 <td>deconstructs the future</td>
 </tr>
 <tr>
-<td><a href="future/assignment_operator.md"><code>operator=</code></a></td>
-<td>assign values to the future</td>
+<td><a href="assignment_operator/"><code>operator=</code></a></td>
+<td>assign a future</td>
 </tr>
 <tr>
 <td><strong>Value access</strong></td>
 <td></td>
 </tr>
 <tr>
-<td><a href="future/value.md"><code>value</code></a></td>
+<td><a href="value/"><code>value</code></a></td>
 <td>returns the value of the future</td>
 </tr>
 <tr>
@@ -1055,46 +1146,11 @@
 <td></td>
 </tr>
 <tr>
-<td><a href="future/hub.md"><code>hub</code></a></td>
+<td><a href="world/"><code>world</code></a></td>
 <td>returns the hub to which the future belongs</td>
 </tr>
 </tbody>
 </table>
-<h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="future/create_future.md"><code>create_future</code></a></li>
-</ul>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-
-<span class="cp">#include</span> <span class="cpf">&lt;bulk/hub.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;bulk/variable.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;bulk/communication.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;bulk/bsp/bulk.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;bulk/util/log.hpp&gt;</span><span class="cp"></span>
-
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">auto</span> <span class="n">hub</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">hub</span><span class="o">&lt;</span><span class="n">bulk</span><span class="o">::</span><span class="n">bsp</span><span class="o">::</span><span class="n">provider</span><span class="o">&gt;</span><span class="p">();</span>
-
-    <span class="n">hub</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">hub</span><span class="p">.</span><span class="n">available_processors</span><span class="p">(),</span> <span class="p">[</span><span class="o">&amp;</span><span class="n">hub</span><span class="p">](</span><span class="kt">int</span> <span class="n">s</span><span class="p">,</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">auto</span> <span class="n">a</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">create_var</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">hub</span><span class="p">);</span>
-
-        <span class="n">bulk</span><span class="o">::</span><span class="n">put</span><span class="p">(</span><span class="n">hub</span><span class="p">.</span><span class="n">next_processor</span><span class="p">(),</span> <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
-        <span class="n">hub</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
-
-        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">s</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; &lt;- &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">a</span><span class="p">.</span><span class="n">value</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-
-        <span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">get</span><span class="p">(</span><span class="n">hub</span><span class="p">.</span><span class="n">next_processor</span><span class="p">(),</span> <span class="n">a</span><span class="p">);</span>
-
-        <span class="n">hub</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
-
-        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">s</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; -&gt; &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">b</span><span class="p">.</span><span class="n">value</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-    <span class="p">});</span>
-
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
                 
                   
                 

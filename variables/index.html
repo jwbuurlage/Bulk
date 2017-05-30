@@ -494,30 +494,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/put/" title="put" class="md-nav__link">
-      put
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../api/get/" title="get" class="md-nav__link">
-      get
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
     <a href="../api/foldl/" title="foldl" class="md-nav__link">
       foldl
     </a>
@@ -575,11 +551,11 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5-4" type="checkbox" id="nav-5-4">
     
     <label class="md-nav__link" for="nav-5-4">
-      Member classes
+      Nested classes
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="2">
       <label class="md-nav__title" for="nav-5-4">
-        Member classes
+        Nested classes
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -592,6 +568,30 @@
   <li class="md-nav__item">
     <a href="../api/var/image/" title="var::image" class="md-nav__link">
       var::image
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/image/" title="coarray::image" class="md-nav__link">
+      coarray::image
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/writer/" title="coarray::writer" class="md-nav__link">
+      coarray::writer
     </a>
   </li>
 
@@ -818,7 +818,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/var/image_assignment_operator/" title="var::image::operator=" class="md-nav__link">
+    <a href="../api/var/image/assignment_operator/" title="var::image::operator=" class="md-nav__link">
       var::image::operator=
     </a>
   </li>
@@ -830,8 +830,128 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/var/image_get/" title="var::image::get=" class="md-nav__link">
+    <a href="../api/var/image/get/" title="var::image::get=" class="md-nav__link">
       var::image::get=
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/constructor/" title="future::constructor" class="md-nav__link">
+      future::constructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/deconstructor/" title="future::deconstructor" class="md-nav__link">
+      future::deconstructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/assignment_operator/" title="future::operator=" class="md-nav__link">
+      future::operator=
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/value/" title="future::value" class="md-nav__link">
+      future::value
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/world/" title="future::world" class="md-nav__link">
+      future::world
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/constructor/" title="coarray::constructor" class="md-nav__link">
+      coarray::constructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/deconstructor/" title="coarray::deconstructor" class="md-nav__link">
+      coarray::deconstructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/parentheses_operator/" title="coarray::operator()" class="md-nav__link">
+      coarray::operator()
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/square_brackets_operator/" title="coarray::operator[]" class="md-nav__link">
+      coarray::operator[]
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/world/" title="coarray::world" class="md-nav__link">
+      coarray::world
     </a>
   </li>
 
@@ -1003,7 +1123,9 @@ the next logical processor, we write:</p>
 <p class="admonition-title">Note</p>
 <p>Equivalently, we can use the short-hand syntax: <code>x(world.next_processor()) = 1</code> for putting, and <code>auto y = x(world.next_processor()).get()</code> for getting.</p>
 </div>
-<p><img alt="image" src="../images/variable.png" /></p>
+<p><center>
+<img alt="image" src="../images/variable.png" />
+</center></p>
 <p>This communication is <em>asynchronous</em>, meaning that the values are not
 valid immediately after the execution of the communication primitives.
 Instead, they are available in the next &lsquo;section&rsquo; of the program, known
@@ -1014,7 +1136,9 @@ point of the program, and resolves all outstanding communication such as
 those staged by calls to put and get. After the barrier synchronization
 returns, all communication staged in the previous superstep is
 guarenteed to have occured.</p>
-<p><img alt="The structure of a superstep. First, computations are performed.
+<p><center>
+<img alt="The structure of a superstep. First, computations are performed.
+&lt;/center&gt;
 Optionally, communication is staged for later execution. After each core
 finishes their computations, outstanding communications are performed.
 This process is repeated until the SPMD section

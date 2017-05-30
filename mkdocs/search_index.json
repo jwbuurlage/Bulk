@@ -77,7 +77,7 @@
         },
         {
             "location": "/environment_world/",
-            "text": "Environment and world\n\u00b6\n\n\nIn the upcoming sections we will get you started with programming in Bulk. Two important concepts are that of an environment and a world.\n\n\nIn these code examples, we will often use the short-hand \ns\n for the \nlocal processor id\n, and \np\n for the \nactive number of processors\n, and we will not always define these variables explicitely.\n\n\nParallel environments\n\u00b6\n\n\nA program runs in some parallel environment. For example, this\nenvironment could be an MPI cluster, a many-core co-processor, or simply\nthreads on a multi-core computer. This environment is accessed within\nthe program through a \nbulk::environment\n object.\nThis object is specialized for each \nbackend\n, which is an\nimplementation of the lower-level communication that reflect the actual\nenvironment. For example, to setup a environment on an MPI cluster, we\nwould write:\n\n\n#include\n \n<bulk/bulk.hpp>\n\n\n#include\n \n<bulk/backends/mpi/mpi.hpp>\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nbulk\n::\nmpi\n::\nenvironment\n \nenv\n;\n\n\n}\n\n\n\n\n\n\nFor a list of default providers, consult the \nbackends\n section of this\ndocumentation.\n\n\nThis environment object contains information on the parallel system, for\nexample we can request the number of processors that are available.\n\n\nWe note that throughout this documentation (and in the library),\n\nprocessor\n is a general term for the entity that executes the SPMD\nsection (more on this later) and communicates with other processors \u2013\nthis can be an MPI node, a core, or a thread, depending on the backend\nthat is used, but they are all treated in the same manner.\n\n\nauto\n \nprocessor_count\n \n=\n \nenv\n.\navailable_processors\n();\n\n\n\n\n\n\nThis information can be used to \nspawn\n the program on the right amount\nof processors. Programs written in Bulk follow that \nSPMD\n (Single\nProgram Multiple Data) paradigm. This means that each processor executes\nthe same code, but has its own (local) data that it manipulates. In\nBulk, the SPMD section is a \nfunction object\n. This can be a C++ lambda,\na \nstd::function\n, or a C function pointer. In this\ndocumentation we will use lambda functions for our examples.\n\n\nThis function will run on each processor, and should take three\narguments. The first, contains the \nworld\n object, which we will\ndescribe in detail in the next section. The SPMD section is executed\nin the following way:\n\n\nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nauto\n&\n \nworld\n)\n \n{\n\n    \nauto\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n    \nauto\n \np\n \n=\n \nworld\n.\navailable_proecssors\n();\n\n    \nworld\n.\nlog\n(\n\"Hello world from processor %d / %d!\"\n,\n \ns\n,\n \np\n);\n\n\n}\n\n\n\n\n\n\nThe \nspawn\n function takes two arguments. The first is the\ntotal number of processors to run the SPMD section on, here we simply\nuse all the processors that are available. The second is the SPMD\nfunction itself, that is run on the given number of processors.\n\n\nThe world of a processor\n\u00b6\n\n\n\n\nEach processor can communicate to other processors using the \nworld\n\nobject of type \nbulk::world\n. The world object contains\nsome information on the specifics of SPMD section, such as the number of\nprocessors executing the section, and its identifier (as we have seen,\nthese are also provided as arguments for programmer convenience). We can\nalso obtain indices of the neighbouring processors:\n\n\nauto\n \nnext\n \n=\n \nworld\n.\nnext_processor\n();\n\n\nauto\n \nprevious\n \n=\n \nworld\n.\nprev_processor\n();\n\n\n\n\n\n\nThe next and previous processor can also be computed manually using:\n\n\nnext\n \n=\n \n(\ns\n \n+\n \n1\n)\n \n%\n \np\n;\n\n\nprevious\n \n=\n \n(\ns\n \n+\n \np\n \n-\n \n1\n)\n \n%\n \np\n;\n\n\n\n\n\n\nHowever, we would suggest using the appropriate methods of world to\nincrease readability. Another important mechanism exposed through the\nworld object is the ability to perform a \nbulk-synchronization\n, which\nis the cornerstone of programs written in BSP style:\n\n\nworld\n.\nsync\n();\n\n\n\n\n\n\nWe will see the specific uses of bulk-synchronization in the upcoming\nsections.",
+            "text": "Environment and world\n\u00b6\n\n\nIn the upcoming sections we will get you started with programming in Bulk. Two important concepts are that of an environment and a world.\n\n\nIn these code examples, we will often use the short-hand \ns\n for the \nlocal processor id\n, and \np\n for the \nactive number of processors\n, and we will not always define these variables explicitely.\n\n\nParallel environments\n\u00b6\n\n\nA program runs in some parallel environment. For example, this\nenvironment could be an MPI cluster, a many-core co-processor, or simply\nthreads on a multi-core computer. This environment is accessed within\nthe program through a \nbulk::environment\n object.\nThis object is specialized for each \nbackend\n, which is an\nimplementation of the lower-level communication that reflect the actual\nenvironment. For example, to setup a environment on an MPI cluster, we\nwould write:\n\n\n#include\n \n<bulk/bulk.hpp>\n\n\n#include\n \n<bulk/backends/mpi/mpi.hpp>\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nbulk\n::\nmpi\n::\nenvironment\n \nenv\n;\n\n\n}\n\n\n\n\n\n\nFor a list of default providers, consult the \nbackends\n section of this\ndocumentation.\n\n\nThis environment object contains information on the parallel system, for\nexample we can request the number of processors that are available.\n\n\nWe note that throughout this documentation (and in the library),\n\nprocessor\n is a general term for the entity that executes the SPMD\nsection (more on this later) and communicates with other processors \u2013\nthis can be an MPI node, a core, or a thread, depending on the backend\nthat is used, but they are all treated in the same manner.\n\n\nauto\n \nprocessor_count\n \n=\n \nenv\n.\navailable_processors\n();\n\n\n\n\n\n\nThis information can be used to \nspawn\n the program on the right amount\nof processors. Programs written in Bulk follow that \nSPMD\n (Single\nProgram Multiple Data) paradigm. This means that each processor executes\nthe same code, but has its own (local) data that it manipulates. In\nBulk, the SPMD section is a \nfunction object\n. This can be a C++ lambda,\na \nstd::function\n, or a C function pointer. In this\ndocumentation we will use lambda functions for our examples.\n\n\nThis function will run on each processor, and should take three\narguments. The first, contains the \nworld\n object, which we will\ndescribe in detail in the next section. The SPMD section is executed\nin the following way:\n\n\nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nauto\n&\n \nworld\n)\n \n{\n\n    \nauto\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n    \nauto\n \np\n \n=\n \nworld\n.\navailable_proecssors\n();\n\n    \nworld\n.\nlog\n(\n\"Hello world from processor %d / %d!\"\n,\n \ns\n,\n \np\n);\n\n\n}\n\n\n\n\n\n\nThe \nspawn\n function takes two arguments. The first is the\ntotal number of processors to run the SPMD section on, here we simply\nuse all the processors that are available. The second is the SPMD\nfunction itself, that is run on the given number of processors.\n\n\nThe world of a processor\n\u00b6\n\n\n\n\n\n\n\n\nEach processor can communicate to other processors using the \nworld\n\nobject of type \nbulk::world\n. The world object contains\nsome information on the specifics of SPMD section, such as the number of\nprocessors executing the section, and its identifier (as we have seen,\nthese are also provided as arguments for programmer convenience). We can\nalso obtain indices of the neighbouring processors:\n\n\nauto\n \nnext\n \n=\n \nworld\n.\nnext_processor\n();\n\n\nauto\n \nprevious\n \n=\n \nworld\n.\nprev_processor\n();\n\n\n\n\n\n\nThe next and previous processor can also be computed manually using:\n\n\nnext\n \n=\n \n(\ns\n \n+\n \n1\n)\n \n%\n \np\n;\n\n\nprevious\n \n=\n \n(\ns\n \n+\n \np\n \n-\n \n1\n)\n \n%\n \np\n;\n\n\n\n\n\n\nHowever, we would suggest using the appropriate methods of world to\nincrease readability. Another important mechanism exposed through the\nworld object is the ability to perform a \nbulk-synchronization\n, which\nis the cornerstone of programs written in BSP style:\n\n\nworld\n.\nsync\n();\n\n\n\n\n\n\nWe will see the specific uses of bulk-synchronization in the upcoming\nsections.",
             "title": "Environment and world"
         },
         {
@@ -97,7 +97,7 @@
         },
         {
             "location": "/variables/",
-            "text": "Variables\n\u00b6\n\n\nNow that we are able to set up the environment, and gained some\nfamiliarity with the \nworld\n object that can be used to communicate with\nother processors, we are ready to discuss communication between\nprocessors. The most fundamental way of communicating between processors\nis using \ndistributed variables\n. The variables can be created as\nfollows:\n\n\nauto x = bulk::var<int>(world);\n\n\n\n\n\nHere we create a distributed variable that holds an integer. A\ndistributed variable exists on every processor, but can have different\nvalues on different processors. These different local \u2018copies\u2019 are\nreferred to as \nimages\n of the variable. The variable lives within the\n\nworld\n of the current SPMD section, and we explicitely write this by\npassing the world object as a parameter to the variable creation\nfunction.\n\n\nWhile \nx\n refers to the \nlocal image\n of a variable, it is\nidentified with images on remote processors by the order in which\nvariables are constructed (which is possible because of the SPMD nature\nof Bulk programs). This allows us to \nwrite to\n and \nread from\n remote\nimages of a variable by simply passing \nx\n to communication\nfunctions.\n\n\nBulk-synchronous communication\n\u00b6\n\n\nThe main way to manipulate remote images of variables is using the\ncommunication primitives \nbulk::put\n and\n\nbulk::get\n for writing and reading respectively. For\nexample, to write the value \n1\n to the remote image held by\nthe next logical processor, we write:\n\n\nbulk::put(world.next_processor(), 1, x);\n\n\n\n\n\nTo obtain the value of a remote image we write:\n\n\nauto y = bulk::get(world.next_processor(), x);\n\n\n\n\n\n\n\nNote\n\n\nEquivalently, we can use the short-hand syntax: \nx(world.next_processor()) = 1\n for putting, and \nauto y = x(world.next_processor()).get()\n for getting.\n\n\n\n\n\n\nThis communication is \nasynchronous\n, meaning that the values are not\nvalid immediately after the execution of the communication primitives.\nInstead, they are available in the next \u2018section\u2019 of the program, known\nas a (BSP) \nsuperstep\n. Supersteps can be viewed as the section of the\nprogram within successive calls to \nworld.sync()\n. This\nbarrier synchronization asserts that all processors have reached that\npoint of the program, and resolves all outstanding communication such as\nthose staged by calls to put and get. After the barrier synchronization\nreturns, all communication staged in the previous superstep is\nguarenteed to have occured.\n\n\n\n\nIn case of \nput\n, the remote image now contains the value written to it\n(assuming that the local processor is the only one who wrote to that\nspecific remote image). For read requests using \nget\n, it is slightly\nmore complicated. The type of \ny\n is a\n\nbulk::future<T>\n. A future object is a placeholder, that\nwill contain the correct value in the next superstep. This value can be\nobtained after the synchronization using:\n\n\nauto value = y.value();\n\n\n\n\n\nThis way of communicating is particularly useful when dealing with\nsimple data objects. If instead we deal with distributed array-like\nobjects, we recommend using \nco-arrays\n, which are introduced in the\nnext section.",
+            "text": "Variables\n\u00b6\n\n\nNow that we are able to set up the environment, and gained some\nfamiliarity with the \nworld\n object that can be used to communicate with\nother processors, we are ready to discuss communication between\nprocessors. The most fundamental way of communicating between processors\nis using \ndistributed variables\n. The variables can be created as\nfollows:\n\n\nauto x = bulk::var<int>(world);\n\n\n\n\n\nHere we create a distributed variable that holds an integer. A\ndistributed variable exists on every processor, but can have different\nvalues on different processors. These different local \u2018copies\u2019 are\nreferred to as \nimages\n of the variable. The variable lives within the\n\nworld\n of the current SPMD section, and we explicitely write this by\npassing the world object as a parameter to the variable creation\nfunction.\n\n\nWhile \nx\n refers to the \nlocal image\n of a variable, it is\nidentified with images on remote processors by the order in which\nvariables are constructed (which is possible because of the SPMD nature\nof Bulk programs). This allows us to \nwrite to\n and \nread from\n remote\nimages of a variable by simply passing \nx\n to communication\nfunctions.\n\n\nBulk-synchronous communication\n\u00b6\n\n\nThe main way to manipulate remote images of variables is using the\ncommunication primitives \nbulk::put\n and\n\nbulk::get\n for writing and reading respectively. For\nexample, to write the value \n1\n to the remote image held by\nthe next logical processor, we write:\n\n\nbulk::put(world.next_processor(), 1, x);\n\n\n\n\n\nTo obtain the value of a remote image we write:\n\n\nauto y = bulk::get(world.next_processor(), x);\n\n\n\n\n\n\n\nNote\n\n\nEquivalently, we can use the short-hand syntax: \nx(world.next_processor()) = 1\n for putting, and \nauto y = x(world.next_processor()).get()\n for getting.\n\n\n\n\n\n\n\n\n\n\nThis communication is \nasynchronous\n, meaning that the values are not\nvalid immediately after the execution of the communication primitives.\nInstead, they are available in the next \u2018section\u2019 of the program, known\nas a (BSP) \nsuperstep\n. Supersteps can be viewed as the section of the\nprogram within successive calls to \nworld.sync()\n. This\nbarrier synchronization asserts that all processors have reached that\npoint of the program, and resolves all outstanding communication such as\nthose staged by calls to put and get. After the barrier synchronization\nreturns, all communication staged in the previous superstep is\nguarenteed to have occured.\n\n\n\n\n\n\nIn case of \nput\n, the remote image now contains the value written to it\n(assuming that the local processor is the only one who wrote to that\nspecific remote image). For read requests using \nget\n, it is slightly\nmore complicated. The type of \ny\n is a\n\nbulk::future<T>\n. A future object is a placeholder, that\nwill contain the correct value in the next superstep. This value can be\nobtained after the synchronization using:\n\n\nauto value = y.value();\n\n\n\n\n\nThis way of communicating is particularly useful when dealing with\nsimple data objects. If instead we deal with distributed array-like\nobjects, we recommend using \nco-arrays\n, which are introduced in the\nnext section.",
             "title": "Distributed variables"
         },
         {
@@ -107,7 +107,7 @@
         },
         {
             "location": "/variables/#bulk-synchronous-communication",
-            "text": "The main way to manipulate remote images of variables is using the\ncommunication primitives  bulk::put  and bulk::get  for writing and reading respectively. For\nexample, to write the value  1  to the remote image held by\nthe next logical processor, we write:  bulk::put(world.next_processor(), 1, x);  To obtain the value of a remote image we write:  auto y = bulk::get(world.next_processor(), x);   Note  Equivalently, we can use the short-hand syntax:  x(world.next_processor()) = 1  for putting, and  auto y = x(world.next_processor()).get()  for getting.    This communication is  asynchronous , meaning that the values are not\nvalid immediately after the execution of the communication primitives.\nInstead, they are available in the next \u2018section\u2019 of the program, known\nas a (BSP)  superstep . Supersteps can be viewed as the section of the\nprogram within successive calls to  world.sync() . This\nbarrier synchronization asserts that all processors have reached that\npoint of the program, and resolves all outstanding communication such as\nthose staged by calls to put and get. After the barrier synchronization\nreturns, all communication staged in the previous superstep is\nguarenteed to have occured.   In case of  put , the remote image now contains the value written to it\n(assuming that the local processor is the only one who wrote to that\nspecific remote image). For read requests using  get , it is slightly\nmore complicated. The type of  y  is a bulk::future<T> . A future object is a placeholder, that\nwill contain the correct value in the next superstep. This value can be\nobtained after the synchronization using:  auto value = y.value();  This way of communicating is particularly useful when dealing with\nsimple data objects. If instead we deal with distributed array-like\nobjects, we recommend using  co-arrays , which are introduced in the\nnext section.",
+            "text": "The main way to manipulate remote images of variables is using the\ncommunication primitives  bulk::put  and bulk::get  for writing and reading respectively. For\nexample, to write the value  1  to the remote image held by\nthe next logical processor, we write:  bulk::put(world.next_processor(), 1, x);  To obtain the value of a remote image we write:  auto y = bulk::get(world.next_processor(), x);   Note  Equivalently, we can use the short-hand syntax:  x(world.next_processor()) = 1  for putting, and  auto y = x(world.next_processor()).get()  for getting.      This communication is  asynchronous , meaning that the values are not\nvalid immediately after the execution of the communication primitives.\nInstead, they are available in the next \u2018section\u2019 of the program, known\nas a (BSP)  superstep . Supersteps can be viewed as the section of the\nprogram within successive calls to  world.sync() . This\nbarrier synchronization asserts that all processors have reached that\npoint of the program, and resolves all outstanding communication such as\nthose staged by calls to put and get. After the barrier synchronization\nreturns, all communication staged in the previous superstep is\nguarenteed to have occured.    In case of  put , the remote image now contains the value written to it\n(assuming that the local processor is the only one who wrote to that\nspecific remote image). For read requests using  get , it is slightly\nmore complicated. The type of  y  is a bulk::future<T> . A future object is a placeholder, that\nwill contain the correct value in the next superstep. This value can be\nobtained after the synchronization using:  auto value = y.value();  This way of communicating is particularly useful when dealing with\nsimple data objects. If instead we deal with distributed array-like\nobjects, we recommend using  co-arrays , which are introduced in the\nnext section.",
             "title": "Bulk-synchronous communication"
         },
         {
@@ -132,12 +132,12 @@
         },
         {
             "location": "/api/",
-            "text": "Bulk API reference\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSystem\n\n\n\n\n\n\n\n\nbulk::environment\n\n\nthe central object that encapsulates the distributed system\n\n\n\n\n\n\nbulk::world\n\n\nan implementation of the low-level functions\n\n\n\n\n\n\nDistributed objects and communication\n\n\n\n\n\n\n\n\nbulk::var\n\n\na distributed variable with an image for each processor\n\n\n\n\n\n\nbulk::future\n\n\nan object which encapsulates a value known in future supersteps\n\n\n\n\n\n\nbulk::coarray\n\n\na distributed array with a local array image for each processor\n\n\n\n\n\n\nbulk::put\n\n\nsend information to a remote processor\n\n\n\n\n\n\nbulk::get\n\n\nobtain information from a remote processor\n\n\n\n\n\n\nMessage passing\n\n\n\n\n\n\n\n\nbulk::queue\n\n\na container containing messages\n\n\n\n\n\n\nAlgorithm\n\n\n\n\n\n\n\n\nbulk::foldl\n\n\na left fold over a \nvar\n\n\n\n\n\n\nbulk::gather_all\n\n\ngather results\n\n\n\n\n\n\nUtility\n\n\n\n\n\n\n\n\nbulk::util::timer\n\n\nwall timer for benchmarking\n\n\n\n\n\n\nbulk::util::flatten\n\n\nflatten multi-indices\n\n\n\n\n\n\nbulk::util::unflatten\n\n\nunflatten mutli-indices",
+            "text": "Bulk API reference\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSystem\n\n\n\n\n\n\n\n\nbulk::environment\n\n\nthe central object that encapsulates the distributed system\n\n\n\n\n\n\nbulk::world\n\n\nan implementation of the low-level functions\n\n\n\n\n\n\nDistributed objects and communication\n\n\n\n\n\n\n\n\nbulk::var\n\n\na distributed variable with an image for each processor\n\n\n\n\n\n\nbulk::future\n\n\nan object which encapsulates a value known in future supersteps\n\n\n\n\n\n\nbulk::coarray\n\n\na distributed array with a local array image for each processor\n\n\n\n\n\n\nMessage passing\n\n\n\n\n\n\n\n\nbulk::queue\n\n\na container containing messages\n\n\n\n\n\n\nAlgorithms\n\n\n\n\n\n\n\n\nbulk::foldl\n\n\na left fold over a \nvar\n\n\n\n\n\n\nbulk::gather_all\n\n\ngather results\n\n\n\n\n\n\nUtility\n\n\n\n\n\n\n\n\nbulk::util::timer\n\n\nwall timer for benchmarking\n\n\n\n\n\n\nbulk::util::flatten\n\n\nflatten multi-indices\n\n\n\n\n\n\nbulk::util::unflatten\n\n\nunflatten mutli-indices",
             "title": "Index"
         },
         {
             "location": "/api/#bulk-api-reference",
-            "text": "System     bulk::environment  the central object that encapsulates the distributed system    bulk::world  an implementation of the low-level functions    Distributed objects and communication     bulk::var  a distributed variable with an image for each processor    bulk::future  an object which encapsulates a value known in future supersteps    bulk::coarray  a distributed array with a local array image for each processor    bulk::put  send information to a remote processor    bulk::get  obtain information from a remote processor    Message passing     bulk::queue  a container containing messages    Algorithm     bulk::foldl  a left fold over a  var    bulk::gather_all  gather results    Utility     bulk::util::timer  wall timer for benchmarking    bulk::util::flatten  flatten multi-indices    bulk::util::unflatten  unflatten mutli-indices",
+            "text": "System     bulk::environment  the central object that encapsulates the distributed system    bulk::world  an implementation of the low-level functions    Distributed objects and communication     bulk::var  a distributed variable with an image for each processor    bulk::future  an object which encapsulates a value known in future supersteps    bulk::coarray  a distributed array with a local array image for each processor    Message passing     bulk::queue  a container containing messages    Algorithms     bulk::foldl  a left fold over a  var    bulk::gather_all  gather results    Utility     bulk::util::timer  wall timer for benchmarking    bulk::util::flatten  flatten multi-indices    bulk::util::unflatten  unflatten mutli-indices",
             "title": "Bulk API reference"
         },
         {
@@ -182,7 +182,7 @@
         },
         {
             "location": "/api/var/",
-            "text": "bulk::var\n\u00b6\n\n\nDefined in header \n<bulk/variable.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n>\n\n\nclass\n \nvar\n;\n\n\n\n\n\n\nbulk::var\n represents a distributed object with an image on each processor. This image is readable and writable from remote processors.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the values stored in the images of the variable.\n\n\n\n\nMember types\n\u00b6\n\n\n\n\nvalue_type\n: the type of the distributed data\n\n\nimage\n: an object providing syntactic sugar for reading and writing to images\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the variable\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the variable\n\n\n\n\n\n\noperator=\n\n\nassign values to the variable\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nvalue\n\n\nreturns the value of the local variable image\n\n\n\n\n\n\noperator T\n\n\nimplicit cast to value reference\n\n\n\n\n\n\nCommunication\n\n\n\n\n\n\n\n\noperator()\n\n\nobtain an image to a remote value\n\n\n\n\n\n\nbroadcast\n\n\nbroadcast a value to all remote images\n\n\n\n\n\n\nWorld access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the world of the variable\n\n\n\n\n\n\n\n\nSee also\n\u00b6\n\n\n\n\nbulk::var::image\n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n\"bulk/bulk.hpp\"\n\n\n\n#include\n \n\"set_backend.hpp\"\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nenvironment\n \nenv\n;\n\n\n    \nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nbulk\n::\nworld\n&\n \nworld\n)\n \n{\n\n        \nint\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n        \nint\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n        \nbulk\n::\nvar\n<\nint\n>\n \na\n(\nworld\n);\n\n\n        \na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d <- %d\"\n,\n \ns\n,\n \np\n,\n \na\n.\nvalue\n());\n\n\n        \nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d -> %d\"\n,\n \ns\n,\n \np\n,\n \nb\n.\nvalue\n());\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
+            "text": "bulk::var\n\u00b6\n\n\nDefined in header \n<bulk/variable.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n>\n\n\nclass\n \nvar\n;\n\n\n\n\n\n\nbulk::var\n represents a distributed object with an image on each processor. This image is readable and writable from remote processors.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the values stored in the images of the variable.\n\n\n\n\nMember types\n\u00b6\n\n\n\n\nvalue_type\n: the type of the distributed data (i.e. \nT\n)\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the variable\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the variable\n\n\n\n\n\n\noperator=\n\n\nassign values to the variable\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nvalue\n\n\nreturns the value of the local variable image\n\n\n\n\n\n\noperator T\n\n\nimplicit cast to value reference\n\n\n\n\n\n\nCommunication\n\n\n\n\n\n\n\n\noperator()\n\n\nobtain an image to a remote value\n\n\n\n\n\n\nbroadcast\n\n\nbroadcast a value to all remote images\n\n\n\n\n\n\nWorld access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the world of the variable\n\n\n\n\n\n\n\n\nNested classes\n\u00b6\n\n\n\n\nimage\n: an object providing syntactic sugar for reading and writing to images. \n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n\"bulk/bulk.hpp\"\n\n\n\n#include\n \n\"set_backend.hpp\"\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nenvironment\n \nenv\n;\n\n\n    \nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nbulk\n::\nworld\n&\n \nworld\n)\n \n{\n\n        \nint\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n        \nint\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n        \nbulk\n::\nvar\n<\nint\n>\n \na\n(\nworld\n);\n\n\n        \na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d <- %d\"\n,\n \ns\n,\n \np\n,\n \na\n.\nvalue\n());\n\n\n        \nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d -> %d\"\n,\n \ns\n,\n \np\n,\n \nb\n.\nvalue\n());\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
             "title": "var"
         },
         {
@@ -197,7 +197,7 @@
         },
         {
             "location": "/api/var/#member-types",
-            "text": "value_type : the type of the distributed data  image : an object providing syntactic sugar for reading and writing to images",
+            "text": "value_type : the type of the distributed data (i.e.  T )",
             "title": "Member types"
         },
         {
@@ -206,9 +206,9 @@
             "title": "Member functions"
         },
         {
-            "location": "/api/var/#see-also",
-            "text": "bulk::var::image",
-            "title": "See also"
+            "location": "/api/var/#nested-classes",
+            "text": "image : an object providing syntactic sugar for reading and writing to images.",
+            "title": "Nested classes"
         },
         {
             "location": "/api/var/#example",
@@ -217,58 +217,53 @@
         },
         {
             "location": "/api/future/",
-            "text": "bulk::future\n\u00b6\n\n\nDefined in header \n<bulk/future.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n,\n \nclass\n \nHub\n>\n\n\nclass\n \nfuture\n;\n\n\n\n\n\n\nbulk::future\n represents a value that will become known in the upcoming superstep.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the value stored in the future\n\n\nHub\n - the type of hub to which the future belongs.\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the future\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the future\n\n\n\n\n\n\noperator=\n\n\nassign values to the future\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nvalue\n\n\nreturns the value of the future\n\n\n\n\n\n\nHub access\n\n\n\n\n\n\n\n\nhub\n\n\nreturns the hub to which the future belongs\n\n\n\n\n\n\n\n\nSee also\n\u00b6\n\n\n\n\ncreate_future\n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n<iostream>\n\n\n\n#include\n \n<bulk/hub.hpp>\n\n\n#include\n \n<bulk/variable.hpp>\n\n\n#include\n \n<bulk/communication.hpp>\n\n\n#include\n \n<bulk/bsp/bulk.hpp>\n\n\n#include\n \n<bulk/util/log.hpp>\n\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nauto\n \nhub\n \n=\n \nbulk\n::\nhub\n<\nbulk\n::\nbsp\n::\nprovider\n>\n();\n\n\n    \nhub\n.\nspawn\n(\nhub\n.\navailable_processors\n(),\n \n[\n&\nhub\n](\nint\n \ns\n,\n \nint\n)\n \n{\n\n        \nauto\n \na\n \n=\n \nbulk\n::\ncreate_var\n<\nint\n>\n(\nhub\n);\n\n\n        \nbulk\n::\nput\n(\nhub\n.\nnext_processor\n(),\n \ns\n,\n \na\n);\n\n        \nhub\n.\nsync\n();\n\n\n        \nstd\n::\ncout\n \n<<\n \ns\n \n<<\n \n\" <- \"\n \n<<\n \na\n.\nvalue\n()\n \n<<\n \nstd\n::\nendl\n;\n\n\n        \nauto\n \nb\n \n=\n \nbulk\n::\nget\n(\nhub\n.\nnext_processor\n(),\n \na\n);\n\n\n        \nhub\n.\nsync\n();\n\n\n        \nstd\n::\ncout\n \n<<\n \ns\n \n<<\n \n\" -> \"\n \n<<\n \nb\n.\nvalue\n()\n \n<<\n \nstd\n::\nendl\n;\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
+            "text": "bulk::future\n\u00b6\n\n\nDefined in header \n<bulk/future.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n>\n\n\nclass\n \nfuture\n;\n\n\n\n\n\n\nbulk::future\n represents a value that will or has become known in the superstep after its creation.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the value stored in the future\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the future\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the future\n\n\n\n\n\n\noperator=\n\n\nassign a future\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nvalue\n\n\nreturns the value of the future\n\n\n\n\n\n\nHub access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the hub to which the future belongs",
             "title": "future"
         },
         {
             "location": "/api/future/#bulkfuture",
-            "text": "Defined in header  <bulk/future.hpp> .  template   < typename   T ,   class   Hub >  class   future ;   bulk::future  represents a value that will become known in the upcoming superstep.",
+            "text": "Defined in header  <bulk/future.hpp> .  template   < typename   T >  class   future ;   bulk::future  represents a value that will or has become known in the superstep after its creation.",
             "title": "bulk::future"
         },
         {
             "location": "/api/future/#template-parameters",
-            "text": "T  - the type of the value stored in the future  Hub  - the type of hub to which the future belongs.",
+            "text": "T  - the type of the value stored in the future",
             "title": "Template parameters"
         },
         {
             "location": "/api/future/#member-functions",
-            "text": "(constructor)  constructs the future    (deconstructor)  deconstructs the future    operator=  assign values to the future    Value access     value  returns the value of the future    Hub access     hub  returns the hub to which the future belongs",
+            "text": "(constructor)  constructs the future    (deconstructor)  deconstructs the future    operator=  assign a future    Value access     value  returns the value of the future    Hub access     world  returns the hub to which the future belongs",
             "title": "Member functions"
         },
         {
-            "location": "/api/future/#see-also",
-            "text": "create_future",
-            "title": "See also"
-        },
-        {
-            "location": "/api/future/#example",
-            "text": "#include   <iostream>  #include   <bulk/hub.hpp>  #include   <bulk/variable.hpp>  #include   <bulk/communication.hpp>  #include   <bulk/bsp/bulk.hpp>  #include   <bulk/util/log.hpp>  int   main ()   { \n     auto   hub   =   bulk :: hub < bulk :: bsp :: provider > (); \n\n     hub . spawn ( hub . available_processors (),   [ & hub ]( int   s ,   int )   { \n         auto   a   =   bulk :: create_var < int > ( hub ); \n\n         bulk :: put ( hub . next_processor (),   s ,   a ); \n         hub . sync (); \n\n         std :: cout   <<   s   <<   \" <- \"   <<   a . value ()   <<   std :: endl ; \n\n         auto   b   =   bulk :: get ( hub . next_processor (),   a ); \n\n         hub . sync (); \n\n         std :: cout   <<   s   <<   \" -> \"   <<   b . value ()   <<   std :: endl ; \n     }); \n\n     return   0 ;  }",
-            "title": "Example"
-        },
-        {
             "location": "/api/coarray/",
-            "text": "bulk::coarray\n\u00b6\n\n\nDefined in header \n<bulk/coarray.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n,\n \nclass\n \nWorld\n>\n\n\nclass\n \ncoarray\n;\n\n\n\n\n\n\nDistributed array with easy element access, loosely based on the behaviour of \nCo-Array Fortran\n.\n\n\nUsage\n\u00b6\n\n\nCo-arrays provide a convenient way to share data across processors. Instead of\nmanually sending and receiving data elements, co-arrays model distributed data\nas a 2-dimensional array, where the first dimension is over the processors,\nand the second dimension is over local 1-dimensional array indices.\n\n\nauto\n \nxs\n \n=\n \ncreate_coarray\n<\nint\n>\n(\nworld\n,\n \n10\n);\n\n\n// set the 5th element on the 1st processor to 4\n\n\nxs\n(\n1\n)[\n5\n]\n \n=\n \n4\n;\n\n\n// set the 3rd element on the local processor to 2\n\n\nxs\n[\n3\n]\n \n=\n \n2\n;\n\n\n\n\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the value stored in the local image of the coarray.\n\n\nWorld\n - the type of world to which this coarray belongs.\n\n\n\n\nMember classes\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nimage\n\n\nrepresentation of coarray image\n\n\n\n\n\n\nwriter\n\n\nallows for modification for remote coarray image\n\n\n\n\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the coarray\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the coarray\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\noperator()\n\n\nobtain an image of the coarray\n\n\n\n\n\n\noperator[]\n\n\naccess the local elements of the coarray\n\n\n\n\n\n\nWorld access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the world to which the coarray belongs\n\n\n\n\n\n\n\n\nSee also\n\u00b6\n\n\n\n\ncreate_coarray",
+            "text": "bulk::coarray\n\u00b6\n\n\nDefined in header \n<bulk/coarray.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n>\n\n\nclass\n \ncoarray\n;\n\n\n\n\n\n\nDistributed array with easy element access, loosely based on the behaviour of \nCoarray Fortran\n.\n\n\nUsage\n\u00b6\n\n\nCoarrays provide a convenient way to share data across processors. Instead of\nmanually sending and receiving data elements, coarrays model distributed data\nas a 2-dimensional array, where the first dimension is over the processors,\nand the second dimension is over local 1-dimensional array indices.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the value stored in the local image of the coarray.\n\n\n\n\nMember types\n\u00b6\n\n\n\n\nvalue_type\n: the type of the image values (i.e. \nT\n).\n\n\n\n\nNested classes\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nimage\n\n\nrepresentation of coarray image\n\n\n\n\n\n\nwriter\n\n\nallows for modification for remote coarray image\n\n\n\n\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the coarray\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the coarray\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\noperator()\n\n\nobtain an image of the coarray\n\n\n\n\n\n\noperator[]\n\n\naccess the local elements of the coarray\n\n\n\n\n\n\nWorld access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the world to which the coarray belongs\n\n\n\n\n\n\n\n\nExample\n\u00b6\n\n\nauto\n \nxs\n \n=\n \nbulk\n::\ncoarray\n<\nint\n>\n(\nworld\n,\n \n10\n);\n\n\n// set the 5th element on the 1st processor to 4\n\n\nxs\n(\n1\n)[\n5\n]\n \n=\n \n4\n;\n\n\n// set the 3rd element on the local processor to 2\n\n\nxs\n[\n3\n]\n \n=\n \n2\n;",
             "title": "coarray"
         },
         {
             "location": "/api/coarray/#bulkcoarray",
-            "text": "Defined in header  <bulk/coarray.hpp> .  template   < typename   T ,   class   World >  class   coarray ;   Distributed array with easy element access, loosely based on the behaviour of  Co-Array Fortran .",
+            "text": "Defined in header  <bulk/coarray.hpp> .  template   < typename   T >  class   coarray ;   Distributed array with easy element access, loosely based on the behaviour of  Coarray Fortran .",
             "title": "bulk::coarray"
         },
         {
             "location": "/api/coarray/#usage",
-            "text": "Co-arrays provide a convenient way to share data across processors. Instead of\nmanually sending and receiving data elements, co-arrays model distributed data\nas a 2-dimensional array, where the first dimension is over the processors,\nand the second dimension is over local 1-dimensional array indices.  auto   xs   =   create_coarray < int > ( world ,   10 );  // set the 5th element on the 1st processor to 4  xs ( 1 )[ 5 ]   =   4 ;  // set the 3rd element on the local processor to 2  xs [ 3 ]   =   2 ;",
+            "text": "Coarrays provide a convenient way to share data across processors. Instead of\nmanually sending and receiving data elements, coarrays model distributed data\nas a 2-dimensional array, where the first dimension is over the processors,\nand the second dimension is over local 1-dimensional array indices.",
             "title": "Usage"
         },
         {
             "location": "/api/coarray/#template-parameters",
-            "text": "T  - the type of the value stored in the local image of the coarray.  World  - the type of world to which this coarray belongs.",
+            "text": "T  - the type of the value stored in the local image of the coarray.",
             "title": "Template parameters"
         },
         {
-            "location": "/api/coarray/#member-classes",
+            "location": "/api/coarray/#member-types",
+            "text": "value_type : the type of the image values (i.e.  T ).",
+            "title": "Member types"
+        },
+        {
+            "location": "/api/coarray/#nested-classes",
             "text": "image  representation of coarray image    writer  allows for modification for remote coarray image",
-            "title": "Member classes"
+            "title": "Nested classes"
         },
         {
             "location": "/api/coarray/#member-functions",
@@ -276,79 +271,49 @@
             "title": "Member functions"
         },
         {
-            "location": "/api/coarray/#see-also",
-            "text": "create_coarray",
-            "title": "See also"
+            "location": "/api/coarray/#example",
+            "text": "auto   xs   =   bulk :: coarray < int > ( world ,   10 );  // set the 5th element on the 1st processor to 4  xs ( 1 )[ 5 ]   =   4 ;  // set the 3rd element on the local processor to 2  xs [ 3 ]   =   2 ;",
+            "title": "Example"
         },
         {
             "location": "/api/queue/",
-            "text": "",
+            "text": "bulk::queue\n\u00b6\n\n\nDefined in header \n<bulk/messages.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n,\n \ntypename\n...\n \nTs\n>\n\n\nclass\n \nqueue\n;\n\n\n\n\n\n\nbulk::queue\n is an inbox for receiving messages passed by processors.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the values stored in the images of the variable.\n\n\nTs\n - a parameter pack, optionally containing extra message content\n\n\n\n\nMember types\n\u00b6\n\n\n\n\nmessage_type\n: the underlying type used by the messages\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the variable\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the variable\n\n\n\n\n\n\noperator=\n\n\nassign values to the variable\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nvalue\n\n\nreturns the value of the local variable image\n\n\n\n\n\n\noperator T\n\n\nimplicit cast to value reference\n\n\n\n\n\n\nCommunication\n\n\n\n\n\n\n\n\noperator()\n\n\nobtain an image to a remote value\n\n\n\n\n\n\nbroadcast\n\n\nbroadcast a value to all remote images\n\n\n\n\n\n\nWorld access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the world of the variable\n\n\n\n\n\n\n\n\nNested classes\n\u00b6\n\n\n\n\nsender\n: an object providing syntactic sugar for sending messages\n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n\"bulk/bulk.hpp\"\n\n\n\n#include\n \n\"set_backend.hpp\"\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nenvironment\n \nenv\n;\n\n\n    \nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nbulk\n::\nworld\n&\n \nworld\n)\n \n{\n\n        \nint\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n        \nint\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n        \nbulk\n::\nvar\n<\nint\n>\n \na\n(\nworld\n);\n\n\n        \na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d <- %d\"\n,\n \ns\n,\n \np\n,\n \na\n.\nvalue\n());\n\n\n        \nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d -> %d\"\n,\n \ns\n,\n \np\n,\n \nb\n.\nvalue\n());\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
             "title": "queue"
+        },
+        {
+            "location": "/api/queue/#bulkqueue",
+            "text": "Defined in header  <bulk/messages.hpp> .  template   < typename   T ,   typename ...   Ts >  class   queue ;   bulk::queue  is an inbox for receiving messages passed by processors.",
+            "title": "bulk::queue"
+        },
+        {
+            "location": "/api/queue/#template-parameters",
+            "text": "T  - the type of the values stored in the images of the variable.  Ts  - a parameter pack, optionally containing extra message content",
+            "title": "Template parameters"
+        },
+        {
+            "location": "/api/queue/#member-types",
+            "text": "message_type : the underlying type used by the messages",
+            "title": "Member types"
+        },
+        {
+            "location": "/api/queue/#member-functions",
+            "text": "(constructor)  constructs the variable    (deconstructor)  deconstructs the variable    operator=  assign values to the variable    Value access     value  returns the value of the local variable image    operator T  implicit cast to value reference    Communication     operator()  obtain an image to a remote value    broadcast  broadcast a value to all remote images    World access     world  returns the world of the variable",
+            "title": "Member functions"
+        },
+        {
+            "location": "/api/queue/#nested-classes",
+            "text": "sender : an object providing syntactic sugar for sending messages",
+            "title": "Nested classes"
+        },
+        {
+            "location": "/api/queue/#example",
+            "text": "#include   \"bulk/bulk.hpp\"  #include   \"set_backend.hpp\"  int   main ()   { \n     environment   env ; \n\n     env . spawn ( env . available_processors (),   []( bulk :: world &   world )   { \n         int   s   =   world . processor_id (); \n         int   p   =   world . active_processors (); \n\n         bulk :: var < int >   a ( world ); \n\n         a ( world . next_processor ())   =   s ; \n         world . sync (); \n\n         world . log ( \"%d/%d <- %d\" ,   s ,   p ,   a . value ()); \n\n         auto   b   =   a ( world . next_processor ()). get (); \n\n         world . sync (); \n\n         world . log ( \"%d/%d -> %d\" ,   s ,   p ,   b . value ()); \n     }); \n\n     return   0 ;  }",
+            "title": "Example"
         },
         {
             "location": "/api/timer/",
             "text": "",
             "title": "timer"
-        },
-        {
-            "location": "/api/put/",
-            "text": "bulk::put\n\u00b6\n\n\ntemplate\n \n<\ntypename\n \nT\n,\n \ntypename\n \nHub\n>\n\n\nvoid\n \nput\n(\nint\n \nprocessor\n,\n \nT\n \nvalue\n,\n \nvar\n<\nT\n,\n \nHub\n>&\n \nthe_variable\n);\n \n// 1.\n\n\n\ntemplate\n \n<\ntypename\n \nT\n,\n \ntypename\n \nHub\n>\n\n\nvoid\n \nput\n(\nint\n \nprocessor\n,\n \nT\n \nvalue\n,\n \narray\n<\nT\n,\n \nHub\n>&\n \nthe_array\n,\n \nint\n \noffset\n \n=\n \n0\n,\n\n         \nint\n \ncount\n \n=\n \n1\n);\n \n// 2.\n\n\n\n\n\n\nPut a value in a (remote) image of a \nvariable\n (1.), or \narray\n (2.).\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the value type of the variable/array\n\n\nHub\n - the type of the hub that the variable/array belongs to\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nprocessor\n - the index of the (remote) processor\n\n\nvalue\n - the value to write\n\n\nthe_variable\n - the target variable\n\n\nthe_array\n - the target array\n\n\noffset\n - the index of the array element to start writing at\n\n\ncount\n - a number of elements to write\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\n\n\nCost\n\n\n\n\nsizeof(T) * g\n\n\n(sizeof(T) * count) * g\n\n\n\n\n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n<iostream>\n\n\n\n#include\n \n<bulk/hub.hpp>\n\n\n#include\n \n<bulk/communication.hpp>\n\n\n#include\n \n<bulk/bsp/bulk.hpp>\n\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nauto\n \nhub\n \n=\n \nbulk\n::\nhub\n<\nbulk\n::\nbsp\n::\nprovider\n>\n();\n\n\n    \nhub\n.\nspawn\n(\nhub\n.\navailable_processors\n(),\n \n[\n&\nhub\n](\nint\n \ns\n,\n \nint\n)\n \n{\n\n        \nauto\n \nx\n \n=\n \nbulk\n::\ncreate_var\n<\nint\n>\n(\nhub\n);\n\n        \nbulk\n::\nput\n(\nhub\n.\nnext_processor\n(),\n \ns\n,\n \nx\n);\n \n// 1.\n\n        \nhub\n.\nsync\n();\n\n\n        \nstd\n::\ncout\n \n<<\n \ns\n \n<<\n \n\" <- \"\n \n<<\n \nx\n.\nvalue\n()\n \n<<\n \nstd\n::\nendl\n;\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
-            "title": "put"
-        },
-        {
-            "location": "/api/put/#bulkput",
-            "text": "template   < typename   T ,   typename   Hub >  void   put ( int   processor ,   T   value ,   var < T ,   Hub >&   the_variable );   // 1.  template   < typename   T ,   typename   Hub >  void   put ( int   processor ,   T   value ,   array < T ,   Hub >&   the_array ,   int   offset   =   0 , \n          int   count   =   1 );   // 2.   Put a value in a (remote) image of a  variable  (1.), or  array  (2.).",
-            "title": "bulk::put"
-        },
-        {
-            "location": "/api/put/#template-parameters",
-            "text": "T  - the value type of the variable/array  Hub  - the type of the hub that the variable/array belongs to",
-            "title": "Template parameters"
-        },
-        {
-            "location": "/api/put/#parameters",
-            "text": "processor  - the index of the (remote) processor  value  - the value to write  the_variable  - the target variable  the_array  - the target array  offset  - the index of the array element to start writing at  count  - a number of elements to write",
-            "title": "Parameters"
-        },
-        {
-            "location": "/api/put/#complexity-and-cost",
-            "text": "Cost   sizeof(T) * g  (sizeof(T) * count) * g",
-            "title": "Complexity and cost"
-        },
-        {
-            "location": "/api/put/#example",
-            "text": "#include   <iostream>  #include   <bulk/hub.hpp>  #include   <bulk/communication.hpp>  #include   <bulk/bsp/bulk.hpp>  int   main ()   { \n     auto   hub   =   bulk :: hub < bulk :: bsp :: provider > (); \n\n     hub . spawn ( hub . available_processors (),   [ & hub ]( int   s ,   int )   { \n         auto   x   =   bulk :: create_var < int > ( hub ); \n         bulk :: put ( hub . next_processor (),   s ,   x );   // 1. \n         hub . sync (); \n\n         std :: cout   <<   s   <<   \" <- \"   <<   x . value ()   <<   std :: endl ; \n     }); \n\n     return   0 ;  }",
-            "title": "Example"
-        },
-        {
-            "location": "/api/get/",
-            "text": "bulk::get\n\u00b6\n\n\ntemplate\n \n<\ntypename\n \nT\n,\n \ntypename\n \nHub\n>\n\n\nfuture\n<\nT\n,\n \nHub\n>\n \nget\n(\nint\n \nprocessor\n,\n \nvar\n<\nT\n,\n \nHub\n>&\n \nthe_variable\n);\n \n// 1.\n\n\n\n\n\n\nGet a value from a (remote) image of a \nvariable\n (1.).\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the value type of the variable/array\n\n\nHub\n - the type of the hub that the variable/array belongs to\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nprocessor\n - the index of the (remote) processor\n\n\nthe_variable\n - the source variable\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\n\n\nCost\n\n\n\n\nsizeof(T) * g\n\n\n\n\n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n<iostream>\n\n\n\n#include\n \n<bulk/hub.hpp>\n\n\n#include\n \n<bulk/communication.hpp>\n\n\n#include\n \n<bulk/bsp/bulk.hpp>\n\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nauto\n \nhub\n \n=\n \nbulk\n::\nhub\n<\nbulk\n::\nbsp\n::\nprovider\n>\n();\n\n\n    \nhub\n.\nspawn\n(\nhub\n.\navailable_processors\n(),\n \n[\n&\nhub\n](\nint\n \ns\n,\n \nint\n)\n \n{\n\n        \nauto\n \nx\n \n=\n \nbulk\n::\ncreate_var\n<\nint\n>\n(\nhub\n);\n\n        \nauto\n \ny\n \n=\n \nbulk\n::\nget\n(\nhub\n.\nnext_processor\n(),\n \nx\n);\n \n// 1.\n\n\n        \nhub\n.\nsync\n();\n\n\n        \nstd\n::\ncout\n \n<<\n \ns\n \n<<\n \n\" <- \"\n \n<<\n \ny\n.\nvalue\n()\n \n<<\n \nstd\n::\nendl\n;\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
-            "title": "get"
-        },
-        {
-            "location": "/api/get/#bulkget",
-            "text": "template   < typename   T ,   typename   Hub >  future < T ,   Hub >   get ( int   processor ,   var < T ,   Hub >&   the_variable );   // 1.   Get a value from a (remote) image of a  variable  (1.).",
-            "title": "bulk::get"
-        },
-        {
-            "location": "/api/get/#template-parameters",
-            "text": "T  - the value type of the variable/array  Hub  - the type of the hub that the variable/array belongs to",
-            "title": "Template parameters"
-        },
-        {
-            "location": "/api/get/#parameters",
-            "text": "processor  - the index of the (remote) processor  the_variable  - the source variable",
-            "title": "Parameters"
-        },
-        {
-            "location": "/api/get/#complexity-and-cost",
-            "text": "Cost   sizeof(T) * g",
-            "title": "Complexity and cost"
-        },
-        {
-            "location": "/api/get/#example",
-            "text": "#include   <iostream>  #include   <bulk/hub.hpp>  #include   <bulk/communication.hpp>  #include   <bulk/bsp/bulk.hpp>  int   main ()   { \n     auto   hub   =   bulk :: hub < bulk :: bsp :: provider > (); \n\n     hub . spawn ( hub . available_processors (),   [ & hub ]( int   s ,   int )   { \n         auto   x   =   bulk :: create_var < int > ( hub ); \n         auto   y   =   bulk :: get ( hub . next_processor (),   x );   // 1. \n\n         hub . sync (); \n\n         std :: cout   <<   s   <<   \" <- \"   <<   y . value ()   <<   std :: endl ; \n     }); \n\n     return   0 ;  }",
-            "title": "Example"
         },
         {
             "location": "/api/foldl/",
@@ -389,6 +354,46 @@
             "location": "/api/var/image/#member-functions",
             "text": "Value access     operator=  assign values to the variable    get  returns the value of the local variable image",
             "title": "Member functions"
+        },
+        {
+            "location": "/api/coarray/image/",
+            "text": "bulk::coarray::image\n\u00b6\n\n\nDefined in header \n<bulk/coarray.hpp>\n.\n\n\nclass\n \nimage\n;\n\n\n\n\n\n\nA coarray image, allows for remote element access\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\noperator[]\n\n\nreturns a writer to a remote image element\n\n\n\n\n\n\n\n\nbulk::coarray::image::operator[]\n\u00b6\n\n\nwriter\n \noperator\n[](\nint\n \ni\n);\n\n\n\n\n\n\n\n\nparameters\n \n\n\ni\n - the index of the image element\n\n\n\n\n\n\nreturns\n a \nbulk::coarray::writer\n to the remote image element",
+            "title": "coarray::image"
+        },
+        {
+            "location": "/api/coarray/image/#bulkcoarrayimage",
+            "text": "Defined in header  <bulk/coarray.hpp> .  class   image ;   A coarray image, allows for remote element access",
+            "title": "bulk::coarray::image"
+        },
+        {
+            "location": "/api/coarray/image/#member-functions",
+            "text": "operator[]  returns a writer to a remote image element",
+            "title": "Member functions"
+        },
+        {
+            "location": "/api/coarray/image/#bulkcoarrayimageoperator",
+            "text": "writer   operator []( int   i );    parameters    i  - the index of the image element    returns  a  bulk::coarray::writer  to the remote image element",
+            "title": "bulk::coarray::image::operator[]"
+        },
+        {
+            "location": "/api/coarray/writer/",
+            "text": "bulk::coarray::writer\n\u00b6\n\n\nDefined in header \n<bulk/coarray.hpp>\n.\n\n\nclass\n \nwriter\n;\n\n\n\n\n\n\nA coarray image writer, allows for the modification of remote elements.\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\noperator=\n\n\nassign a value to a remote element\n\n\n\n\n\n\n\n\nbulk::coarray::writer::operator=\n\u00b6\n\n\nvoid\n \noperator\n=\n(\nT\n \nvalue\n);\n\n\n\n\n\n\n\n\nparameters\n \n\n\nvalue\n - the new value of the element",
+            "title": "coarray::writer"
+        },
+        {
+            "location": "/api/coarray/writer/#bulkcoarraywriter",
+            "text": "Defined in header  <bulk/coarray.hpp> .  class   writer ;   A coarray image writer, allows for the modification of remote elements.",
+            "title": "bulk::coarray::writer"
+        },
+        {
+            "location": "/api/coarray/writer/#member-functions",
+            "text": "operator=  assign a value to a remote element",
+            "title": "Member functions"
+        },
+        {
+            "location": "/api/coarray/writer/#bulkcoarraywriteroperator",
+            "text": "void   operator = ( T   value );    parameters    value  - the new value of the element",
+            "title": "bulk::coarray::writer::operator="
         },
         {
             "location": "/api/environment/spawn/",
@@ -512,12 +517,12 @@
         },
         {
             "location": "/api/var/constructor/",
-            "text": "bulk::var::var\n\u00b6\n\n\nvar\n(\nbulk\n::\nworld\n&\n \nworld\n);\n \n// (1)\n\n\nvar\n(\nbulk\n::\nworld\n&\n \nworld\n,\n \nT\n \nvalue\n);\n \n// (2)\n\n\n\n\n\n\n\n\nConstructs a variable and registers it with \nworld\n. Requires \nT\n to be trivially constructable.\n\n\n\u2026 In addition, set the initial value of the local image to \nvalue\n.\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nworld\n - the world this variable belongs to\n\n\nvalue\n - initial value of the local image\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nl\n or free (backend dependent)",
+            "text": "bulk::var::var\n\u00b6\n\n\nvar\n(\nworld\n&\n \nworld\n);\n \n// (1)\n\n\nvar\n(\nworld\n&\n \nworld\n,\n \nT\n \nvalue\n);\n \n// (2)\n\n\n\n\n\n\n\n\nConstructs a variable and registers it with \nworld\n. Requires \nT\n to be trivially constructable.\n\n\n\u2026 In addition, set the initial value of the local image to \nvalue\n.\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nworld\n - the world this variable belongs to\n\n\nvalue\n - initial value of the local image\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nl\n or free (backend dependent)",
             "title": "var::constructor"
         },
         {
             "location": "/api/var/constructor/#bulkvarvar",
-            "text": "var ( bulk :: world &   world );   // (1)  var ( bulk :: world &   world ,   T   value );   // (2)    Constructs a variable and registers it with  world . Requires  T  to be trivially constructable.  \u2026 In addition, set the initial value of the local image to  value .",
+            "text": "var ( world &   world );   // (1)  var ( world &   world ,   T   value );   // (2)    Constructs a variable and registers it with  world . Requires  T  to be trivially constructable.  \u2026 In addition, set the initial value of the local image to  value .",
             "title": "bulk::var::var"
         },
         {
@@ -547,12 +552,12 @@
         },
         {
             "location": "/api/var/assignment_operator/",
-            "text": "bulk::var::operator=\n\u00b6\n\n\nvoid\n \noperator\n=\n(\nvar\n<\nT\n>&&\n \nother\n);\n \n// 1.\n\n\n\n\n\n\n\n\nMove assignment operator. Replaces the target variable \n*this\n with the source variable \nother\n, and invalidates the source.\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nother\n - another variable to move away from\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nl\n or free (backend dependent)",
+            "text": "bulk::var::operator=\n\u00b6\n\n\nvoid\n \noperator\n=\n(\nvar\n<\nT\n>&&\n \nother\n);\n\n\n\n\n\n\nMove assignment operator. Replaces the target variable \n*this\n with the source variable \nother\n, and invalidates the source.\n\n\nParameters\n\u00b6\n\n\n\n\nother\n - another variable to move away from\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nl\n or free (backend dependent)",
             "title": "var::operator="
         },
         {
             "location": "/api/var/assignment_operator/#bulkvaroperator",
-            "text": "void   operator = ( var < T >&&   other );   // 1.    Move assignment operator. Replaces the target variable  *this  with the source variable  other , and invalidates the source.",
+            "text": "void   operator = ( var < T >&&   other );   Move assignment operator. Replaces the target variable  *this  with the source variable  other , and invalidates the source.",
             "title": "bulk::var::operator="
         },
         {
@@ -646,29 +651,199 @@
             "title": "Return value"
         },
         {
-            "location": "/api/var/image_assignment_operator/",
-            "text": "bulk::var::operator=\n\u00b6\n\n\nvoid\n \noperator\n=\n(\nvar\n<\nT\n>&&\n \nother\n);\n \n// 1.\n\n\n\n\n\n\n\n\nMove assignment operator. Replaces the target variable \n*this\n with the source variable \nother\n, and invalidates the source.\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nother\n - another variable to move away from\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nl\n or free (backend dependent)",
+            "location": "/api/var/image/assignment_operator/",
+            "text": "bulk::var::image::operator=\n\u00b6\n\n\nvar\n<\nT\n>&\n \noperator\n=\n(\nconst\n \nT\n&\n \nvalue\n);\n\n\n\n\n\n\nAssign a value to a remote image\n\n\nParameters\n\u00b6\n\n\n\n\nvalue\n - the new value of the image\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nsizeof(T) * g",
             "title": "var::image::operator="
         },
         {
-            "location": "/api/var/image_assignment_operator/#bulkvaroperator",
-            "text": "void   operator = ( var < T >&&   other );   // 1.    Move assignment operator. Replaces the target variable  *this  with the source variable  other , and invalidates the source.",
-            "title": "bulk::var::operator="
+            "location": "/api/var/image/assignment_operator/#bulkvarimageoperator",
+            "text": "var < T >&   operator = ( const   T &   value );   Assign a value to a remote image",
+            "title": "bulk::var::image::operator="
         },
         {
-            "location": "/api/var/image_assignment_operator/#parameters",
-            "text": "other  - another variable to move away from",
+            "location": "/api/var/image/assignment_operator/#parameters",
+            "text": "value  - the new value of the image",
             "title": "Parameters"
         },
         {
-            "location": "/api/var/image_assignment_operator/#complexity-and-cost",
+            "location": "/api/var/image/assignment_operator/#complexity-and-cost",
+            "text": "Cost  -  sizeof(T) * g",
+            "title": "Complexity and cost"
+        },
+        {
+            "location": "/api/var/image/get/",
+            "text": "bulk::var::image::get\n\u00b6\n\n\nfuture\n<\nT\n>\n \nget\n()\n \nconst\n;\n\n\n\n\n\n\nObtain a future to a remote image value\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nsizeof(T) * g\n;",
+            "title": "var::image::get="
+        },
+        {
+            "location": "/api/var/image/get/#bulkvarimageget",
+            "text": "future < T >   get ()   const ;   Obtain a future to a remote image value",
+            "title": "bulk::var::image::get"
+        },
+        {
+            "location": "/api/var/image/get/#complexity-and-cost",
+            "text": "Cost  -  sizeof(T) * g ;",
+            "title": "Complexity and cost"
+        },
+        {
+            "location": "/api/future/constructor/",
+            "text": "bulk::future::future\n\u00b6\n\n\nfuture\n(\nworld\n&\n \nworld\n);\n \n// 1.\n\n\n\n\n\n\nConstructs a future for use in \nworld\n.\n\n\nParameters\n\u00b6\n\n\n\n\nworld\n - the world this future belongs to",
+            "title": "future::constructor"
+        },
+        {
+            "location": "/api/future/constructor/#bulkfuturefuture",
+            "text": "future ( world &   world );   // 1.   Constructs a future for use in  world .",
+            "title": "bulk::future::future"
+        },
+        {
+            "location": "/api/future/constructor/#parameters",
+            "text": "world  - the world this future belongs to",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/future/deconstructor/",
+            "text": "bulk::future::~future\n\u00b6\n\n\n~\nfuture\n();\n\n\n\n\n\n\nDeconstructs a future and invalidates its buffer.",
+            "title": "future::deconstructor"
+        },
+        {
+            "location": "/api/future/deconstructor/#bulkfuturefuture",
+            "text": "~ future ();   Deconstructs a future and invalidates its buffer.",
+            "title": "bulk::future::~future"
+        },
+        {
+            "location": "/api/future/assignment_operator/",
+            "text": "bulk::future::operator=\n\u00b6\n\n\nvoid\n \noperator\n=\n(\nfuture\n<\nT\n>&&\n \nother\n);\n\n\n\n\n\n\nMove assignment operator. Replaces the target future \n*this\n with the source future \nother\n, and invalidates the source.\n\n\nParameters\n\u00b6\n\n\n\n\nother\n - another future to move away from",
+            "title": "future::operator="
+        },
+        {
+            "location": "/api/future/assignment_operator/#bulkfutureoperator",
+            "text": "void   operator = ( future < T >&&   other );   Move assignment operator. Replaces the target future  *this  with the source future  other , and invalidates the source.",
+            "title": "bulk::future::operator="
+        },
+        {
+            "location": "/api/future/assignment_operator/#parameters",
+            "text": "other  - another future to move away from",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/future/value/",
+            "text": "bulk::future::value\n\u00b6\n\n\nT\n&\n \nvalue\n();\n\n\n\n\n\n\nReturns a reference to the value held by the future\n\n\nReturn value\n\u00b6\n\n\nA reference to the value\n\n\nNote\n\u00b6\n\n\nThis becomes valid after the next global synchronisation upon the initialization of the value of the future using e.g. \nbulk::get\n.",
+            "title": "future::value"
+        },
+        {
+            "location": "/api/future/value/#bulkfuturevalue",
+            "text": "T &   value ();   Returns a reference to the value held by the future",
+            "title": "bulk::future::value"
+        },
+        {
+            "location": "/api/future/value/#return-value",
+            "text": "A reference to the value",
+            "title": "Return value"
+        },
+        {
+            "location": "/api/future/value/#note",
+            "text": "This becomes valid after the next global synchronisation upon the initialization of the value of the future using e.g.  bulk::get .",
+            "title": "Note"
+        },
+        {
+            "location": "/api/future/world/",
+            "text": "bulk::future::world\n\u00b6\n\n\nbulk\n::\nworld\n&\n \nworld\n();\n\n\n\n\n\n\nReturns a reference to the world the variable belongs to\n\n\nReturn value\n\u00b6\n\n\n\n\nA reference to the world.",
+            "title": "future::world"
+        },
+        {
+            "location": "/api/future/world/#bulkfutureworld",
+            "text": "bulk :: world &   world ();   Returns a reference to the world the variable belongs to",
+            "title": "bulk::future::world"
+        },
+        {
+            "location": "/api/future/world/#return-value",
+            "text": "A reference to the world.",
+            "title": "Return value"
+        },
+        {
+            "location": "/api/coarray/constructor/",
+            "text": "bulk::coarray::coarray\n\u00b6\n\n\ncoarray\n(\nworld\n&\n \nworld\n,\n \nint\n \nlocal_size\n);\n \n// (1)\n\n\ncoarray\n(\nworld\n&\n \nworld\n,\n \nint\n \nlocal_size\n,\n \nT\n \ndefault_value\n);\n \n// (2)\n\n\n\n\n\n\n\n\nConstructs a coarray of size \np x local_size\n and registers it with \nworld\n.\n\n\n\u2026 In addition, also initializes the elements as \ndefault_value\n.\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nworld\n - the world this variable belongs to\n\n\nlocal_size\n - the size of the coarray image of the local processor\n\n\ndefault_value\n - the initial value of the local coarray elements\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nl\n or free (backend dependent)",
+            "title": "coarray::constructor"
+        },
+        {
+            "location": "/api/coarray/constructor/#bulkcoarraycoarray",
+            "text": "coarray ( world &   world ,   int   local_size );   // (1)  coarray ( world &   world ,   int   local_size ,   T   default_value );   // (2)    Constructs a coarray of size  p x local_size  and registers it with  world .  \u2026 In addition, also initializes the elements as  default_value .",
+            "title": "bulk::coarray::coarray"
+        },
+        {
+            "location": "/api/coarray/constructor/#parameters",
+            "text": "world  - the world this variable belongs to  local_size  - the size of the coarray image of the local processor  default_value  - the initial value of the local coarray elements",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/coarray/constructor/#complexity-and-cost",
             "text": "Cost  -  l  or free (backend dependent)",
             "title": "Complexity and cost"
         },
         {
-            "location": "/api/var/image_get/",
-            "text": "",
-            "title": "var::image::get="
+            "location": "/api/coarray/deconstructor/",
+            "text": "bulk::coarray::~coarray\n\u00b6\n\n\n~\ncoarray\n();\n\n\n\n\n\n\nDeconstructs a coarray and deregisters it with its \nworld\n.\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nl\n or free (backend dependent)",
+            "title": "coarray::deconstructor"
+        },
+        {
+            "location": "/api/coarray/deconstructor/#bulkcoarraycoarray",
+            "text": "~ coarray ();   Deconstructs a coarray and deregisters it with its  world .",
+            "title": "bulk::coarray::~coarray"
+        },
+        {
+            "location": "/api/coarray/deconstructor/#complexity-and-cost",
+            "text": "Cost  -  l  or free (backend dependent)",
+            "title": "Complexity and cost"
+        },
+        {
+            "location": "/api/coarray/parentheses_operator/",
+            "text": "bulk::coarray::operator()\n\u00b6\n\n\nimage\n \noperator\n()(\nint\n \nt\n);\n\n\n\n\n\n\nObtain an object encapsulating the image of the coarray.\n\n\nParameters\n\u00b6\n\n\n\n\nt\n - the image index",
+            "title": "coarray::operator()"
+        },
+        {
+            "location": "/api/coarray/parentheses_operator/#bulkcoarrayoperator",
+            "text": "image   operator ()( int   t );   Obtain an object encapsulating the image of the coarray.",
+            "title": "bulk::coarray::operator()"
+        },
+        {
+            "location": "/api/coarray/parentheses_operator/#parameters",
+            "text": "t  - the image index",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/coarray/square_brackets_operator/",
+            "text": "bulk::coarray::operator[]\n\u00b6\n\n\nT\n&\n \noperator\n[](\nint\n \ni\n);\n\n\n\n\n\n\nAccess the i-th element of the local coarray image\n\n\nReturns\n\u00b6\n\n\nA reference to the i-th element of the local image.\n\n\nParameters\n\u00b6\n\n\n\n\ni\n - the element index",
+            "title": "coarray::operator[]"
+        },
+        {
+            "location": "/api/coarray/square_brackets_operator/#bulkcoarrayoperator",
+            "text": "T &   operator []( int   i );   Access the i-th element of the local coarray image",
+            "title": "bulk::coarray::operator[]"
+        },
+        {
+            "location": "/api/coarray/square_brackets_operator/#returns",
+            "text": "A reference to the i-th element of the local image.",
+            "title": "Returns"
+        },
+        {
+            "location": "/api/coarray/square_brackets_operator/#parameters",
+            "text": "i  - the element index",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/coarray/world/",
+            "text": "bulk::coarray::world\n\u00b6\n\n\nbulk\n::\nworld\n&\n \nworld\n();\n\n\n\n\n\n\nReturns a reference to the world the variable belongs to\n\n\nReturn value\n\u00b6\n\n\n\n\nA reference to the world.",
+            "title": "coarray::world"
+        },
+        {
+            "location": "/api/coarray/world/#bulkcoarrayworld",
+            "text": "bulk :: world &   world ();   Returns a reference to the world the variable belongs to",
+            "title": "bulk::coarray::world"
+        },
+        {
+            "location": "/api/coarray/world/#return-value",
+            "text": "A reference to the world.",
+            "title": "Return value"
         },
         {
             "location": "/providers/mpi/",
@@ -697,7 +872,7 @@
         },
         {
             "location": "/CHANGELOG/",
-            "text": "Changelog\n\u00b6\n\n\n0.1.0\n\u00b6\n\n\n2017-01-01\n\u00b6\n\n\n\n\nInitial release",
+            "text": "Changelog\n\u00b6\n\n\n0.1.0\n\u00b6\n\n\n2017-01-01\n\n\n\n\nInitial release",
             "title": "Release Notes"
         },
         {
@@ -707,13 +882,8 @@
         },
         {
             "location": "/CHANGELOG/#010",
-            "text": "",
+            "text": "2017-01-01   Initial release",
             "title": "0.1.0"
-        },
-        {
-            "location": "/CHANGELOG/#2017-01-01",
-            "text": "Initial release",
-            "title": "2017-01-01"
         }
     ]
 }
