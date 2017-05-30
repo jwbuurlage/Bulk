@@ -277,7 +277,7 @@
         },
         {
             "location": "/api/queue/",
-            "text": "bulk::queue\n\u00b6\n\n\nDefined in header \n<bulk/messages.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n,\n \ntypename\n...\n \nTs\n>\n\n\nclass\n \nqueue\n;\n\n\n\n\n\n\nbulk::queue\n is an inbox for receiving messages passed by processors.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the values stored in the images of the variable.\n\n\nTs\n - a parameter pack, optionally containing extra message content\n\n\n\n\nMember types\n\u00b6\n\n\n\n\nmessage_type\n: the underlying type used by the messages\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the variable\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the variable\n\n\n\n\n\n\noperator=\n\n\nassign values to the variable\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nvalue\n\n\nreturns the value of the local variable image\n\n\n\n\n\n\noperator T\n\n\nimplicit cast to value reference\n\n\n\n\n\n\nCommunication\n\n\n\n\n\n\n\n\noperator()\n\n\nobtain an image to a remote value\n\n\n\n\n\n\nbroadcast\n\n\nbroadcast a value to all remote images\n\n\n\n\n\n\nWorld access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the world of the variable\n\n\n\n\n\n\n\n\nNested classes\n\u00b6\n\n\n\n\nsender\n: an object providing syntactic sugar for sending messages\n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n\"bulk/bulk.hpp\"\n\n\n\n#include\n \n\"set_backend.hpp\"\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nenvironment\n \nenv\n;\n\n\n    \nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nbulk\n::\nworld\n&\n \nworld\n)\n \n{\n\n        \nint\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n        \nint\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n        \nbulk\n::\nvar\n<\nint\n>\n \na\n(\nworld\n);\n\n\n        \na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d <- %d\"\n,\n \ns\n,\n \np\n,\n \na\n.\nvalue\n());\n\n\n        \nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d -> %d\"\n,\n \ns\n,\n \np\n,\n \nb\n.\nvalue\n());\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
+            "text": "bulk::queue\n\u00b6\n\n\nDefined in header \n<bulk/messages.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n,\n \ntypename\n...\n \nTs\n>\n\n\nclass\n \nqueue\n;\n\n\n\n\n\n\nbulk::queue\n is an inbox for receiving messages passed by processors.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the values stored in the images of the variable.\n\n\nTs\n - a parameter pack, optionally containing extra message content\n\n\n\n\nMember types\n\u00b6\n\n\n\n\nmessage_type\n: the underlying type used by the messages\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the queue\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the queue\n\n\n\n\n\n\noperator=\n\n\nassign the queue\n\n\n\n\n\n\nCommunication\n\n\n\n\n\n\n\n\noperator()\n\n\nobtain a sender to a remote queue\n\n\n\n\n\n\nContainer\n\n\n\n\n\n\n\n\nbegin\n\n\nobtain an iterator to the start\n\n\n\n\n\n\nend\n\n\nobtain an iterator to the end\n\n\n\n\n\n\nsize\n\n\nobtain the number of messages\n\n\n\n\n\n\nempty\n\n\ncheck if the queue is empty\n\n\n\n\n\n\nWorld access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the world of the queue\n\n\n\n\n\n\n\n\nNested classes\n\u00b6\n\n\n\n\nsender\n: an object providing syntactic sugar for sending messages\n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n\"bulk/bulk.hpp\"\n\n\n\n#include\n \n\"set_backend.hpp\"\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nenvironment\n \nenv\n;\n\n\n    \nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nbulk\n::\nworld\n&\n \nworld\n)\n \n{\n\n        \nint\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n        \nint\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n        \nbulk\n::\nvar\n<\nint\n>\n \na\n(\nworld\n);\n\n\n        \na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d <- %d\"\n,\n \ns\n,\n \np\n,\n \na\n.\nvalue\n());\n\n\n        \nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d -> %d\"\n,\n \ns\n,\n \np\n,\n \nb\n.\nvalue\n());\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
             "title": "queue"
         },
         {
@@ -297,7 +297,7 @@
         },
         {
             "location": "/api/queue/#member-functions",
-            "text": "(constructor)  constructs the variable    (deconstructor)  deconstructs the variable    operator=  assign values to the variable    Value access     value  returns the value of the local variable image    operator T  implicit cast to value reference    Communication     operator()  obtain an image to a remote value    broadcast  broadcast a value to all remote images    World access     world  returns the world of the variable",
+            "text": "(constructor)  constructs the queue    (deconstructor)  deconstructs the queue    operator=  assign the queue    Communication     operator()  obtain a sender to a remote queue    Container     begin  obtain an iterator to the start    end  obtain an iterator to the end    size  obtain the number of messages    empty  check if the queue is empty    World access     world  returns the world of the queue",
             "title": "Member functions"
         },
         {
@@ -332,13 +332,43 @@
         },
         {
             "location": "/api/flatten/",
-            "text": "",
+            "text": "bulk::util::flatten\n\u00b6\n\n\ntemplate\n \n<\nint\n \nD\n>\n\n\nint\n \nflatten\n(\nstd\n::\narray\n<\nint\n,\n \nD\n>\n \nvolume\n,\n \nstd\n::\narray\n<\nint\n,\n \nD\n>\n \nidxs\n);\n\n\n\n\n\n\nFlatten a multi-index in a D-dimensional volume.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nD\n - the dimension of the index space\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nvolume\n - the size of the volume\n\n\nidxs\n - the multi-index",
             "title": "flatten"
         },
         {
+            "location": "/api/flatten/#bulkutilflatten",
+            "text": "template   < int   D >  int   flatten ( std :: array < int ,   D >   volume ,   std :: array < int ,   D >   idxs );   Flatten a multi-index in a D-dimensional volume.",
+            "title": "bulk::util::flatten"
+        },
+        {
+            "location": "/api/flatten/#template-parameters",
+            "text": "D  - the dimension of the index space",
+            "title": "Template parameters"
+        },
+        {
+            "location": "/api/flatten/#parameters",
+            "text": "volume  - the size of the volume  idxs  - the multi-index",
+            "title": "Parameters"
+        },
+        {
             "location": "/api/unflatten/",
-            "text": "",
+            "text": "bulk::util::unflatten\n\u00b6\n\n\ntemplate\n \n<\nint\n \nD\n>\n\n\nstd\n::\narray\n<\nint\n,\n \nD\n>\n \nunflatten\n(\nstd\n::\narray\n<\nint\n,\n \nD\n>\n \nvolume\n,\n \nint\n \nflattened\n);\n\n\n\n\n\n\nUnflatten a multi-index in a D-dimensional volume.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nD\n - the dimension of the index space\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nvolume\n - the size of the volume\n\n\nidxs\n - the multi-index",
             "title": "unflatten"
+        },
+        {
+            "location": "/api/unflatten/#bulkutilunflatten",
+            "text": "template   < int   D >  std :: array < int ,   D >   unflatten ( std :: array < int ,   D >   volume ,   int   flattened );   Unflatten a multi-index in a D-dimensional volume.",
+            "title": "bulk::util::unflatten"
+        },
+        {
+            "location": "/api/unflatten/#template-parameters",
+            "text": "D  - the dimension of the index space",
+            "title": "Template parameters"
+        },
+        {
+            "location": "/api/unflatten/#parameters",
+            "text": "volume  - the size of the volume  idxs  - the multi-index",
+            "title": "Parameters"
         },
         {
             "location": "/api/var/image/",

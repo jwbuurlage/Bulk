@@ -1170,27 +1170,15 @@
 <tbody>
 <tr>
 <td><a href="../var/constructor/">(constructor)</a></td>
-<td>constructs the variable</td>
+<td>constructs the queue</td>
 </tr>
 <tr>
 <td><a href="../var/deconstructor/">(deconstructor)</a></td>
-<td>deconstructs the variable</td>
+<td>deconstructs the queue</td>
 </tr>
 <tr>
 <td><a href="../var/assignment_operator/"><code>operator=</code></a></td>
-<td>assign values to the variable</td>
-</tr>
-<tr>
-<td><strong>Value access</strong></td>
-<td></td>
-</tr>
-<tr>
-<td><a href="../var/value/"><code>value</code></a></td>
-<td>returns the value of the local variable image</td>
-</tr>
-<tr>
-<td><a href="../var/T_operator/"><code>operator T</code></a></td>
-<td>implicit cast to value reference</td>
+<td>assign the queue</td>
 </tr>
 <tr>
 <td><strong>Communication</strong></td>
@@ -1198,19 +1186,35 @@
 </tr>
 <tr>
 <td><a href="../var/paren_operator/"><code>operator()</code></a></td>
-<td>obtain an image to a remote value</td>
+<td>obtain a sender to a remote queue</td>
 </tr>
 <tr>
-<td><a href="../var/broadcast/"><code>broadcast</code></a></td>
-<td>broadcast a value to all remote images</td>
+<td><strong>Container</strong></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="queue/begin.md"><code>begin</code></a></td>
+<td>obtain an iterator to the start</td>
+</tr>
+<tr>
+<td><a href="queue/end.md"><code>end</code></a></td>
+<td>obtain an iterator to the end</td>
+</tr>
+<tr>
+<td><a href="queue/size.md"><code>size</code></a></td>
+<td>obtain the number of messages</td>
+</tr>
+<tr>
+<td><a href="queue/empty.md"><code>empty</code></a></td>
+<td>check if the queue is empty</td>
 </tr>
 <tr>
 <td><strong>World access</strong></td>
 <td></td>
 </tr>
 <tr>
-<td><a href="../var/world/"><code>world</code></a></td>
-<td>returns the world of the variable</td>
+<td><a href="queue/world.md"><code>world</code></a></td>
+<td>returns the world of the queue</td>
 </tr>
 </tbody>
 </table>

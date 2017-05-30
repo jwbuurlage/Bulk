@@ -493,10 +493,46 @@
     
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
     
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        flatten
+      </label>
     
     <a href="./" title="flatten" class="md-nav__link md-nav__link--active">
       flatten
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#template-parameters" title="Template parameters" class="md-nav__link">
+    Template parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameters" title="Parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -1029,6 +1065,29 @@
 <nav class="md-nav md-nav--secondary">
   
   
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#template-parameters" title="Template parameters" class="md-nav__link">
+    Template parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameters" title="Parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
   
 </nav>
                   </div>
@@ -1041,9 +1100,22 @@
               
                 
                 
-                  <h1>flatten</h1>
-                
-                
+                <h1 id="bulkutilflatten"><code>bulk::util::flatten</code><a class="headerlink" href="#bulkutilflatten" title="Permanent link">&para;</a></h1>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="kt">int</span> <span class="n">D</span><span class="o">&gt;</span>
+<span class="kt">int</span> <span class="n">flatten</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">D</span><span class="o">&gt;</span> <span class="n">volume</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">D</span><span class="o">&gt;</span> <span class="n">idxs</span><span class="p">);</span>
+</pre></div>
+
+
+<p>Flatten a multi-index in a D-dimensional volume.</p>
+<h2 id="template-parameters">Template parameters<a class="headerlink" href="#template-parameters" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>D</code> - the dimension of the index space</li>
+</ul>
+<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>volume</code> - the size of the volume</li>
+<li><code>idxs</code> - the multi-index</li>
+</ul>
                 
                   
                 
