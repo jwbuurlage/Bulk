@@ -2,7 +2,7 @@
     "docs": [
         {
             "location": "/",
-            "text": "Bulk\n\u00b6\n\n\nBulk is a new interface for writing parallel programs in C++ in bulk-synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.\n\n\nAuthors\n\u00b6\n\n\nBulk is developed by:\n\n\n\n\nJan-Willem Buurlage (jwbuurlage)\n\n\nTom Bannink (tombana)\n\n\n\n\nExamples\n\u00b6\n\n\nHello world!\n\n\nbulk\n::\nthread\n::\nenvironment\n \nenv\n;\n\n\nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nauto\n&\n \nworld\n)\n \n{\n\n    \nauto\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n    \nauto\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n    \nworld\n.\nlog\n(\n\"Hello world from processor %d / %d\n\\n\n\"\n,\n \ns\n,\n \np\n);\n\n\n});\n\n\n\n\n\n\nDistributed variables are the easiest way to communicate.\n\n\nauto\n \na\n \n=\n \nbulk\n::\nvar\n<\nint\n>\n(\nworld\n);\n\n\na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n\nworld\n.\nsync\n();\n\n\n// ... a is now updated\n\n\n\nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\nworld\n.\nsync\n();\n\n\n// ... b.value() is now available\n\n\n\n\n\n\nCoarrays provide a convenient syntax for working with distributed arrays.\n\n\nauto\n \nxs\n \n=\n \nbulk\n::\ncoarray\n<\nint\n>\n(\nworld\n,\n \n10\n);\n\n\nxs\n(\nworld\n.\nnext_processor\n())[\n3\n]\n \n=\n \ns\n;\n\n\n\n\n\n\nMessage passing can be used for more flexible communication.\n\n\nauto\n \nq\n \n=\n \nbulk\n::\nqueue\n<\nint\n,\n \nfloat\n>\n(\nworld\n);\n\n\nfor\n \n(\nint\n \nt\n \n=\n \n0\n;\n \nt\n \n<\n \np\n;\n \n++\nt\n)\n \n{\n\n    \nq\n(\nt\n).\nsend\n(\ns\n,\n \n3.1415f\n);\n  \n// send (s, pi) to processor t\n\n\n}\n\n\nworld\n.\nsync\n();\n\n\n\n// messages are now available in q\n\n\nfor\n \n(\nauto\n \n[\ntag\n,\n \ncontent\n]\n \n:\n \nq\n)\n \n{\n\n    \nworld\n.\nlog\n(\n\"%d got sent %d, %f\n\\n\n\"\n,\n \ns\n,\n \ntag\n,\n \ncontent\n);\n\n\n}\n\n\n\n\n\n\nAPI\n\u00b6\n\n\nBulk provides a modern bulk-synchronous parallel API which is \ndocumented in detail here\n.\n\n\nLicense\n\u00b6\n\n\nBulk is released under the MIT license, for details see the file LICENSE.md.\n\n\nContributing\n\u00b6\n\n\nWe welcome contributions. Please submit pull requests against the develop branch.",
+            "text": "Bulk\n\u00b6\n\n\n\n\n\n\n\n\nBulk is a new interface for writing parallel programs in C++ in bulk-synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.\n\n\nAuthors\n\u00b6\n\n\nBulk is developed by:\n\n\n\n\nJan-Willem Buurlage (jwbuurlage)\n\n\nTom Bannink (tombana)\n\n\n\n\nExamples\n\u00b6\n\n\nHello world!\n\n\nbulk\n::\nthread\n::\nenvironment\n \nenv\n;\n\n\nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nauto\n&\n \nworld\n)\n \n{\n\n    \nauto\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n    \nauto\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n    \nworld\n.\nlog\n(\n\"Hello world from processor %d / %d\n\\n\n\"\n,\n \ns\n,\n \np\n);\n\n\n});\n\n\n\n\n\n\nDistributed variables are the easiest way to communicate.\n\n\nauto\n \na\n \n=\n \nbulk\n::\nvar\n<\nint\n>\n(\nworld\n);\n\n\na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n\nworld\n.\nsync\n();\n\n\n// ... a is now updated\n\n\n\nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\nworld\n.\nsync\n();\n\n\n// ... b.value() is now available\n\n\n\n\n\n\nCoarrays provide a convenient syntax for working with distributed arrays.\n\n\nauto\n \nxs\n \n=\n \nbulk\n::\ncoarray\n<\nint\n>\n(\nworld\n,\n \n10\n);\n\n\nxs\n(\nworld\n.\nnext_processor\n())[\n3\n]\n \n=\n \ns\n;\n\n\n\n\n\n\nMessage passing can be used for more flexible communication.\n\n\nauto\n \nq\n \n=\n \nbulk\n::\nqueue\n<\nint\n,\n \nfloat\n>\n(\nworld\n);\n\n\nfor\n \n(\nint\n \nt\n \n=\n \n0\n;\n \nt\n \n<\n \np\n;\n \n++\nt\n)\n \n{\n\n    \nq\n(\nt\n).\nsend\n(\ns\n,\n \n3.1415f\n);\n  \n// send (s, pi) to processor t\n\n\n}\n\n\nworld\n.\nsync\n();\n\n\n\n// messages are now available in q\n\n\nfor\n \n(\nauto\n \n[\ntag\n,\n \ncontent\n]\n \n:\n \nq\n)\n \n{\n\n    \nworld\n.\nlog\n(\n\"%d got sent %d, %f\n\\n\n\"\n,\n \ns\n,\n \ntag\n,\n \ncontent\n);\n\n\n}\n\n\n\n\n\n\nAPI\n\u00b6\n\n\nBulk provides a modern bulk-synchronous parallel API which is \ndocumented in detail here\n.\n\n\nLicense\n\u00b6\n\n\nBulk is released under the MIT license, for details see the file LICENSE.md.\n\n\nContributing\n\u00b6\n\n\nWe welcome contributions. Please submit pull requests against the develop branch.",
             "title": "Home"
         },
         {
@@ -182,7 +182,7 @@
         },
         {
             "location": "/api/var/",
-            "text": "bulk::var\n\u00b6\n\n\nDefined in header \n<bulk/variable.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n>\n\n\nclass\n \nvar\n;\n\n\n\n\n\n\nbulk::var\n represents a distributed object with an image on each processor. This image is readable and writable from remote processors.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the values stored in the images of the variable.\n\n\n\n\nMember types\n\u00b6\n\n\n\n\nvalue_type\n: the type of the distributed data\n\n\nimage\n: an object providing syntactic sugar for reading and writing to images\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the variable\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the variable\n\n\n\n\n\n\noperator=\n\n\nassign values to the variable\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nvalue\n\n\nreturns the value of the local variable image\n\n\n\n\n\n\noperator T\n\n\nimplicit cast to value reference\n\n\n\n\n\n\nCommunication\n\n\n\n\n\n\n\n\noperator()\n\n\nobtain an image to a remote value\n\n\n\n\n\n\nbroadcast\n\n\nbroadcast a value to all remote images\n\n\n\n\n\n\nWorld access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the world to which the variable belongs\n\n\n\n\n\n\n\n\nSee also\n\u00b6\n\n\n\n\nbulk::var::image\n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n\"bulk/bulk.hpp\"\n\n\n\n#include\n \n\"set_backend.hpp\"\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nenvironment\n \nenv\n;\n\n\n    \nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nbulk\n::\nworld\n&\n \nworld\n)\n \n{\n\n        \nint\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n        \nint\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n        \nbulk\n::\nvar\n<\nint\n>\n \na\n(\nworld\n);\n\n\n        \na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d <- %d\"\n,\n \ns\n,\n \np\n,\n \na\n.\nvalue\n());\n\n\n        \nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d -> %d\"\n,\n \ns\n,\n \np\n,\n \nb\n.\nvalue\n());\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
+            "text": "bulk::var\n\u00b6\n\n\nDefined in header \n<bulk/variable.hpp>\n.\n\n\ntemplate\n \n<\ntypename\n \nT\n>\n\n\nclass\n \nvar\n;\n\n\n\n\n\n\nbulk::var\n represents a distributed object with an image on each processor. This image is readable and writable from remote processors.\n\n\nTemplate parameters\n\u00b6\n\n\n\n\nT\n - the type of the values stored in the images of the variable.\n\n\n\n\nMember types\n\u00b6\n\n\n\n\nvalue_type\n: the type of the distributed data\n\n\nimage\n: an object providing syntactic sugar for reading and writing to images\n\n\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n(constructor)\n\n\nconstructs the variable\n\n\n\n\n\n\n(deconstructor)\n\n\ndeconstructs the variable\n\n\n\n\n\n\noperator=\n\n\nassign values to the variable\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nvalue\n\n\nreturns the value of the local variable image\n\n\n\n\n\n\noperator T\n\n\nimplicit cast to value reference\n\n\n\n\n\n\nCommunication\n\n\n\n\n\n\n\n\noperator()\n\n\nobtain an image to a remote value\n\n\n\n\n\n\nbroadcast\n\n\nbroadcast a value to all remote images\n\n\n\n\n\n\nWorld access\n\n\n\n\n\n\n\n\nworld\n\n\nreturns the world of the variable\n\n\n\n\n\n\n\n\nSee also\n\u00b6\n\n\n\n\nbulk::var::image\n\n\n\n\nExample\n\u00b6\n\n\n#include\n \n\"bulk/bulk.hpp\"\n\n\n\n#include\n \n\"set_backend.hpp\"\n\n\n\nint\n \nmain\n()\n \n{\n\n    \nenvironment\n \nenv\n;\n\n\n    \nenv\n.\nspawn\n(\nenv\n.\navailable_processors\n(),\n \n[](\nbulk\n::\nworld\n&\n \nworld\n)\n \n{\n\n        \nint\n \ns\n \n=\n \nworld\n.\nprocessor_id\n();\n\n        \nint\n \np\n \n=\n \nworld\n.\nactive_processors\n();\n\n\n        \nbulk\n::\nvar\n<\nint\n>\n \na\n(\nworld\n);\n\n\n        \na\n(\nworld\n.\nnext_processor\n())\n \n=\n \ns\n;\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d <- %d\"\n,\n \ns\n,\n \np\n,\n \na\n.\nvalue\n());\n\n\n        \nauto\n \nb\n \n=\n \na\n(\nworld\n.\nnext_processor\n()).\nget\n();\n\n\n        \nworld\n.\nsync\n();\n\n\n        \nworld\n.\nlog\n(\n\"%d/%d -> %d\"\n,\n \ns\n,\n \np\n,\n \nb\n.\nvalue\n());\n\n    \n});\n\n\n    \nreturn\n \n0\n;\n\n\n}",
             "title": "var"
         },
         {
@@ -202,7 +202,7 @@
         },
         {
             "location": "/api/var/#member-functions",
-            "text": "(constructor)  constructs the variable    (deconstructor)  deconstructs the variable    operator=  assign values to the variable    Value access     value  returns the value of the local variable image    operator T  implicit cast to value reference    Communication     operator()  obtain an image to a remote value    broadcast  broadcast a value to all remote images    World access     world  returns the world to which the variable belongs",
+            "text": "(constructor)  constructs the variable    (deconstructor)  deconstructs the variable    operator=  assign values to the variable    Value access     value  returns the value of the local variable image    operator T  implicit cast to value reference    Communication     operator()  obtain an image to a remote value    broadcast  broadcast a value to all remote images    World access     world  returns the world of the variable",
             "title": "Member functions"
         },
         {
@@ -376,6 +376,21 @@
             "title": "unflatten"
         },
         {
+            "location": "/api/var/image/",
+            "text": "bulk::var::image\n\u00b6\n\n\nDefined in header \n<bulk/variable.hpp>\n.\n\n\nclass\n \nimage\n\n\n\n\n\n\nbulk::var::image\n provides syntactic sugar for dealing with remote images.\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\noperator=\n\n\nassign values to the variable\n\n\n\n\n\n\nget\n\n\nreturns the value of the local variable image",
+            "title": "var::image"
+        },
+        {
+            "location": "/api/var/image/#bulkvarimage",
+            "text": "Defined in header  <bulk/variable.hpp> .  class   image   bulk::var::image  provides syntactic sugar for dealing with remote images.",
+            "title": "bulk::var::image"
+        },
+        {
+            "location": "/api/var/image/#member-functions",
+            "text": "Value access     operator=  assign values to the variable    get  returns the value of the local variable image",
+            "title": "Member functions"
+        },
+        {
             "location": "/api/environment/spawn/",
             "text": "bulk::environment::spawn\n\u00b6\n\n\nvoid\n \nspawn\n(\nint\n \nprocessors\n,\n \nstd\n::\nfunction\n<\nvoid\n(\nbulk\n::\nworld\n&\n)\n>\n \nspmd\n);\n\n\n\n\n\n\nStart an SPMD section on a given number of processors.\n\n\nParameters\n\u00b6\n\n\n\n\nprocessors\n - the number of processors to run the SPMD section on.\n\n\nspmd\n - the SPMD function that gets run on each (virtual) processor. A reference to the world of the processor will be passed as the first and only argument.",
             "title": "environment::spawn"
@@ -494,6 +509,166 @@
             "location": "/api/world/barrier/#complexity-and-cost",
             "text": "Cost  -  l  (approximately)",
             "title": "Complexity and cost"
+        },
+        {
+            "location": "/api/var/constructor/",
+            "text": "bulk::var::var\n\u00b6\n\n\nvar\n(\nbulk\n::\nworld\n&\n \nworld\n);\n \n// (1)\n\n\nvar\n(\nbulk\n::\nworld\n&\n \nworld\n,\n \nT\n \nvalue\n);\n \n// (2)\n\n\n\n\n\n\n\n\nConstructs a variable and registers it with \nworld\n. Requires \nT\n to be trivially constructable.\n\n\n\u2026 In addition, set the initial value of the local image to \nvalue\n.\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nworld\n - the world this variable belongs to\n\n\nvalue\n - initial value of the local image\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nl\n or free (backend dependent)",
+            "title": "var::constructor"
+        },
+        {
+            "location": "/api/var/constructor/#bulkvarvar",
+            "text": "var ( bulk :: world &   world );   // (1)  var ( bulk :: world &   world ,   T   value );   // (2)    Constructs a variable and registers it with  world . Requires  T  to be trivially constructable.  \u2026 In addition, set the initial value of the local image to  value .",
+            "title": "bulk::var::var"
+        },
+        {
+            "location": "/api/var/constructor/#parameters",
+            "text": "world  - the world this variable belongs to  value  - initial value of the local image",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/var/constructor/#complexity-and-cost",
+            "text": "Cost  -  l  or free (backend dependent)",
+            "title": "Complexity and cost"
+        },
+        {
+            "location": "/api/var/deconstructor/",
+            "text": "bulk::var::~var\n\u00b6\n\n\n~\nvar\n();\n\n\n\n\n\n\nDeconstructs a variable and deregisters it with its \nworld\n.\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nl\n or free, depending on the backend",
+            "title": "var::deconstructor"
+        },
+        {
+            "location": "/api/var/deconstructor/#bulkvarvar",
+            "text": "~ var ();   Deconstructs a variable and deregisters it with its  world .",
+            "title": "bulk::var::~var"
+        },
+        {
+            "location": "/api/var/deconstructor/#complexity-and-cost",
+            "text": "Cost  -  l  or free, depending on the backend",
+            "title": "Complexity and cost"
+        },
+        {
+            "location": "/api/var/assignment_operator/",
+            "text": "bulk::var::operator=\n\u00b6\n\n\nvoid\n \noperator\n=\n(\nvar\n<\nT\n>&&\n \nother\n);\n \n// 1.\n\n\n\n\n\n\n\n\nMove assignment operator. Replaces the target variable \n*this\n with the source variable \nother\n, and invalidates the source.\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nother\n - another variable to move away from\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nl\n or free (backend dependent)",
+            "title": "var::operator="
+        },
+        {
+            "location": "/api/var/assignment_operator/#bulkvaroperator",
+            "text": "void   operator = ( var < T >&&   other );   // 1.    Move assignment operator. Replaces the target variable  *this  with the source variable  other , and invalidates the source.",
+            "title": "bulk::var::operator="
+        },
+        {
+            "location": "/api/var/assignment_operator/#parameters",
+            "text": "other  - another variable to move away from",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/var/assignment_operator/#complexity-and-cost",
+            "text": "Cost  -  l  or free (backend dependent)",
+            "title": "Complexity and cost"
+        },
+        {
+            "location": "/api/var/value/",
+            "text": "bulk::var::value\n\u00b6\n\n\nT\n&\n \nvalue\n();\n\n\n\n\n\n\nReturns a reference to the value held by the local image of the variable.\n\n\nReturn value\n\u00b6\n\n\n\n\nA reference to the value of the local image",
+            "title": "var::value"
+        },
+        {
+            "location": "/api/var/value/#bulkvarvalue",
+            "text": "T &   value ();   Returns a reference to the value held by the local image of the variable.",
+            "title": "bulk::var::value"
+        },
+        {
+            "location": "/api/var/value/#return-value",
+            "text": "A reference to the value of the local image",
+            "title": "Return value"
+        },
+        {
+            "location": "/api/var/T_operator/",
+            "text": "bulk::var::operator T\n\u00b6\n\n\noperator\n \nT\n&\n();\n\n\noperator\n \nconst\n \nT\n&\n();\n\n\n\n\n\n\nObtain an implicit (const) reference to the value of the local image.\n\n\nExample\n\u00b6\n\n\nThis allows for convenient syntax when working with local images, e.g.:\n\n\nauto\n \nx\n \n=\n \nbulk\n::\nvar\n<\nint\n>\n(\nworld\n,\n \n5\n);\n\n\nauto\n \ny\n \n=\n \nx\n \n+\n \n5\n;\n \n// y is an int with value 10",
+            "title": "var::operator T"
+        },
+        {
+            "location": "/api/var/T_operator/#bulkvaroperator-t",
+            "text": "operator   T & ();  operator   const   T & ();   Obtain an implicit (const) reference to the value of the local image.",
+            "title": "bulk::var::operator T"
+        },
+        {
+            "location": "/api/var/T_operator/#example",
+            "text": "This allows for convenient syntax when working with local images, e.g.:  auto   x   =   bulk :: var < int > ( world ,   5 );  auto   y   =   x   +   5 ;   // y is an int with value 10",
+            "title": "Example"
+        },
+        {
+            "location": "/api/var/paren_operator/",
+            "text": "bulk::var::operator()\n\u00b6\n\n\nimage\n \noperator\n()(\nint\n \nt\n);\n\n\n\n\n\n\nObtain an image object, used to communicate with a remote image.\n\n\nParameters\n\u00b6\n\n\n\n\nt\n - the id of the remote processor",
+            "title": "var::operator()"
+        },
+        {
+            "location": "/api/var/paren_operator/#bulkvaroperator",
+            "text": "image   operator ()( int   t );   Obtain an image object, used to communicate with a remote image.",
+            "title": "bulk::var::operator()"
+        },
+        {
+            "location": "/api/var/paren_operator/#parameters",
+            "text": "t  - the id of the remote processor",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/var/broadcast/",
+            "text": "bulk::var::broadcast\n\u00b6\n\n\nvoid\n \nbroadcast\n(\nT\n \nx\n);\n\n\n\n\n\n\nBroadcasts a value to all images.\n\n\nFor one variable, this function should be called by a single processor in any given superstep. The broadcasted value is valid starting from the subsequent superstep.\n\n\nParameters\n\u00b6\n\n\n\n\nx\n - the value to broadcast\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \np * g",
+            "title": "var::broadcast"
+        },
+        {
+            "location": "/api/var/broadcast/#bulkvarbroadcast",
+            "text": "void   broadcast ( T   x );   Broadcasts a value to all images.  For one variable, this function should be called by a single processor in any given superstep. The broadcasted value is valid starting from the subsequent superstep.",
+            "title": "bulk::var::broadcast"
+        },
+        {
+            "location": "/api/var/broadcast/#parameters",
+            "text": "x  - the value to broadcast",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/var/broadcast/#complexity-and-cost",
+            "text": "Cost  -  p * g",
+            "title": "Complexity and cost"
+        },
+        {
+            "location": "/api/var/world/",
+            "text": "bulk::var::world\n\u00b6\n\n\nbulk\n::\nworld\n&\n \nworld\n();\n\n\n\n\n\n\nReturns a reference to the world the variable belongs to\n\n\nReturn value\n\u00b6\n\n\n\n\nA reference to the world.",
+            "title": "var::world"
+        },
+        {
+            "location": "/api/var/world/#bulkvarworld",
+            "text": "bulk :: world &   world ();   Returns a reference to the world the variable belongs to",
+            "title": "bulk::var::world"
+        },
+        {
+            "location": "/api/var/world/#return-value",
+            "text": "A reference to the world.",
+            "title": "Return value"
+        },
+        {
+            "location": "/api/var/image_assignment_operator/",
+            "text": "bulk::var::operator=\n\u00b6\n\n\nvoid\n \noperator\n=\n(\nvar\n<\nT\n>&&\n \nother\n);\n \n// 1.\n\n\n\n\n\n\n\n\nMove assignment operator. Replaces the target variable \n*this\n with the source variable \nother\n, and invalidates the source.\n\n\n\n\nParameters\n\u00b6\n\n\n\n\nother\n - another variable to move away from\n\n\n\n\nComplexity and cost\n\u00b6\n\n\n\n\nCost\n - \nl\n or free (backend dependent)",
+            "title": "var::image::operator="
+        },
+        {
+            "location": "/api/var/image_assignment_operator/#bulkvaroperator",
+            "text": "void   operator = ( var < T >&&   other );   // 1.    Move assignment operator. Replaces the target variable  *this  with the source variable  other , and invalidates the source.",
+            "title": "bulk::var::operator="
+        },
+        {
+            "location": "/api/var/image_assignment_operator/#parameters",
+            "text": "other  - another variable to move away from",
+            "title": "Parameters"
+        },
+        {
+            "location": "/api/var/image_assignment_operator/#complexity-and-cost",
+            "text": "Cost  -  l  or free (backend dependent)",
+            "title": "Complexity and cost"
+        },
+        {
+            "location": "/api/var/image_get/",
+            "text": "",
+            "title": "var::image::get="
         },
         {
             "location": "/providers/mpi/",
