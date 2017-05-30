@@ -42,7 +42,7 @@ void test_partitioning() {
                        "compute correctly the cyclic size");
             BULK_CHECK(part.global_to_local({4, 3})[0] == 4 / N,
                        "compute correctly the cyclic local index");
-            BULK_CHECK(part.local_to_global({1, 1}, {s % N, s / N})[0] == N,
+            BULK_CHECK(part.local_to_global({1, 1}, {s % N, s / N})[0] == N + (s % N),
                        "compute correctly the cyclic global index");
         }
 
