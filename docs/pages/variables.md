@@ -66,11 +66,11 @@ guarenteed to have occured.
 
 <center>
 ![The structure of a superstep. First, computations are performed.
-</center>
 Optionally, communication is staged for later execution. After each core
 finishes their computations, outstanding communications are performed.
 This process is repeated until the SPMD section
 terminates.](images/superstep.png)
+</center>
 
 In case of *put*, the remote image now contains the value written to it
 (assuming that the local processor is the only one who wrote to that
