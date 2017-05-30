@@ -3,33 +3,28 @@
 Defined in header `<bulk/coarray.hpp>`.
 
 ```cpp
-template <typename T, class World>
+template <typename T>
 class coarray;
 ```
 
-Distributed array with easy element access, loosely based on the behaviour of [Co-Array Fortran](https://en.wikipedia.org/wiki/Coarray_Fortran).
+Distributed array with easy element access, loosely based on the behaviour of [Coarray Fortran](https://en.wikipedia.org/wiki/Coarray_Fortran).
 
 ## Usage
 
-Co-arrays provide a convenient way to share data across processors. Instead of
-manually sending and receiving data elements, co-arrays model distributed data
+Coarrays provide a convenient way to share data across processors. Instead of
+manually sending and receiving data elements, coarrays model distributed data
 as a 2-dimensional array, where the first dimension is over the processors,
 and the second dimension is over local 1-dimensional array indices.
-
-```cpp
-auto xs = create_coarray<int>(world, 10);
-// set the 5th element on the 1st processor to 4
-xs(1)[5] = 4;
-// set the 3rd element on the local processor to 2
-xs[3] = 2;
-```
 
 ## Template parameters
 
 * `T` - the type of the value stored in the local image of the coarray.
-* `World` - the type of world to which this coarray belongs.
 
-## Member classes
+## Member types
+
+- `value_type`: the type of the image values (i.e. `T`).
+
+## Nested classes
 |                               |                                                  |
 |-------------------------------|--------------------------------------------------|
 | [`image`](coarray/image.md)   | representation of coarray image                  |
@@ -46,6 +41,13 @@ xs[3] = 2;
 | **World access**                                    |                                                |
 | [`world`](coarray/world.md)                         | returns the world to which the coarray belongs |
 
-## See also
+## Example
 
-- [`create_coarray`](coarray/create_coarray.md)
+```cpp
+auto xs = bulk::coarray<int>(world, 10);
+// set the 5th element on the 1st processor to 4
+xs(1)[5] = 4;
+// set the 3rd element on the local processor to 2
+xs[3] = 2;
+```
+

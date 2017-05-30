@@ -8,4 +8,4 @@ Returns the id of the next logical processor.
 
 ## Return value
 
-An `int` containing the id of the next processor
+- `int`: The id of the next processor

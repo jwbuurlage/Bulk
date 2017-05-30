@@ -22,11 +22,9 @@ class future;
  */
 template <typename T>
 class var {
-   public:
+  public:
     class image {
-       public:
-        image(var<T>& v, int t) : var_(v), t_(t) {}
-
+      public:
         /**
          * Assign a value to a remote image
          *
@@ -42,7 +40,11 @@ class var {
          */
         future<T> get() const { return var_.impl_->get(t_); }
 
-       private:
+      private:
+        friend var;
+
+        image(var<T>& v, int t) : var_(v), t_(t) {}
+
         var<T>& var_;
         int t_;
     };
@@ -80,7 +82,8 @@ class var {
         // FIXME: what if the variable has moved, do we delay moving until next
         // superstep?
 
-        if (impl_) impl_->world_.barrier();
+        if (impl_)
+            impl_->world_.barrier();
     }
 
     // A variable can not be copied
@@ -145,12 +148,12 @@ class var {
      */
     bulk::world& world() { return impl_->world_; }
 
-   private:
+  private:
     // Default implementation is a value, world and id.
     // Backends can subclass bulk::var<T>::var_impl to add more.
     // Backends can overload var_impl::put and var_impl::get.
     class var_impl {
-       public:
+      public:
         var_impl(bulk::world& world) : world_(world), value_{} {
             // register_location_ can include a barrier in certain backends
             id_ = world.register_location_(&value_, sizeof(T));
@@ -181,4 +184,4 @@ class var {
     friend class image;
 };
 
-}  // namespace bulk
+} // namespace bulk

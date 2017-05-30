@@ -1,32 +1,11 @@
 # `bulk::future::future`
 
 ```cpp
-future(Hub& hub); // 1.
+future(world& world);
 ```
 
-1. Constructs a future for use in `hub`.
+Constructs a message future for use in `world`.
 
 ## Parameters
 
-* `hub` - the hub this future belongs to
-
-## Example
-
-```cpp
-#include <iostream>
-
-#include <bulk/hub.hpp>
-#include <bulk/future.hpp>
-#include <bulk/bsp/bulk.hpp>
-
-
-int main() {
-    auto hub = bulk::hub<bulk::bsp::provider>();
-
-    hub.spawn(hub.available_processors(), [&hub](int s, int p) {
-        auto f = bulk::future<int, decltype(hub)>(hub);
-    });
-
-    return 0;
-}
-```
+* `world` - the world this future belongs to

@@ -1,6 +1,8 @@
 Bulk
 ====
 
+![](docs/pages/images/logo-square.png)
+
 Bulk is a new interface for writing parallel programs in C++ in bulk-synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.
 
 Examples
@@ -14,7 +16,7 @@ env.spawn(env.available_processors(), [](auto& world) {
     auto s = world.processor_id();
     auto p = world.active_processors();
 
-    world.log("Hello world from processor %d / %d\n", s, p);
+    world.log("Hello world from processor %d / %d!", s, p);
 });
 ```
 

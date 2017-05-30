@@ -64,20 +64,22 @@ class queue_base {
 template <typename T, typename... Ts>
 class queue {
   public:
-    using M = message<T, Ts...>;
+    using message_wrapper = message<T, Ts...>;
+    using message_type = decltype(message_wrapper::content);
+    using iterator = typename std::vector<message_type>::iterator;
 
     /**
      * A queue is a mailbox for messages of a given type.
      * They allow a convenient syntax for message passing:
      *
-     *     q(processor).send(tag, content);
+     *     q(processor).send(content...);
      */
     class sender {
       public:
         /** Send a message over the queue. */
         template <typename... Us>
         void send(Us... args) {
-            M msg;
+            message_wrapper msg;
             msg.content = {args...};
             q_.impl_->send_(t_, msg);
         }
@@ -120,17 +122,17 @@ class queue {
     /**
      * Get an iterator to the begin of the local queue
      */
-    auto begin() { return impl_->data_.begin(); }
+    iterator begin() { return impl_->data_.begin(); }
 
     /**
      * Get an iterator to the end of the local queue
      */
-    auto end() { return impl_->data_.end(); }
+    iterator end() { return impl_->data_.end(); }
 
     /**
      * Get the number of messages in the local queue.
      */
-    std::size_t size() { return impl_->data_.size(); }
+    size_t size() { return impl_->data_.size(); }
 
     /**
      * Check if the queue is empty.
@@ -145,6 +147,7 @@ class queue {
     bulk::world& world() { return impl_->world_; }
 
   private:
+
     class impl : public queue_base {
       public:
         impl(bulk::world& world) : world_(world) {
@@ -158,22 +161,23 @@ class queue {
         void operator=(impl& other) = delete;
         void operator=(impl&& other) = delete;
 
-        void send_(int t, M m) {
+        void send_(int t, message_wrapper m) {
             world_.send_(t, id_, &m.content, sizeof(m.content));
         }
 
         void* get_buffer_(int size_in_bytes) override {
-            data_.resize(size_in_bytes / sizeof(M::content));
+            data_.resize(size_in_bytes / sizeof(message_type));
             return &data_[0];
         }
 
         void unsafe_push_back(void* msg) override {
-            data_.push_back(*static_cast<decltype(M::content)*>(msg));
+            data_.push_back(
+                *static_cast<message_type*>(msg));
         }
 
         void clear_() override { data_.clear(); }
 
-        std::vector<decltype(M::content)> data_;
+        std::vector<message_type> data_;
         bulk::world& world_;
         int id_;
     };

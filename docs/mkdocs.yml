@@ -2,76 +2,103 @@ site_name: Bulk
 
 theme: 'material'
 google_analytics: ['UA-59249373-1', 'http://codu.in/bulk/docs']
+repo_name: "jwbuurlage/bulk"
 repo_url: "https://github.com/jwbuurlage/bulk"
 copyright: "Bulk is licensed under the <a href='https://github.com/jwbuurlage/bulk/blob/master/LICENSE.md'>MIT license</a>"
+
+markdown_extensions:
+    - smarty
+    - sane_lists
+    - admonition
+    - codehilite(guess_lang=false)
+    - toc(permalink=true)
+    - footnotes
+    - pymdownx.arithmatex
+
+extra_javascript:
+      - 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'
 
 docs_dir: pages
 
 pages:
 - Home: 'index.md'
+- Getting started: 'getting_started.md'
+- Tour: 'tour.md'
+- Introduction to Bulk:
+    - Environment and world: 'environment_world.md'
+    - Distributed variables: 'variables.md'
+    - Coarrays: 'coarrays.md'
+    - Message passing: 'message_passing.md'
 - API:
     - 'Index': 'api/index.md'
     - Classes:
-        - 'hub': 'api/environment.md'
+        - 'environment': 'api/environment.md'
         - 'world': 'api/world.md'
-        - 'provider': 'api/provider.md'
         - 'var': 'api/var.md'
         - 'future': 'api/future.md'
         - 'coarray': 'api/coarray.md'
-        - 'message': 'api/message.md'
-        - 'message_container': 'api/message_container.md'
+        - 'queue': 'api/queue.md'
+        - 'timer': 'api/timer.md'
     - Functions:
-        - 'put': 'api/put.md'
-        - 'get': 'api/get.md'
         - 'foldl': 'api/foldl.md'
-        - environment:
-            - 'available_processors': 'api/environment/available_processors.md'
-            - 'spawn' : 'api/environment/spawn.md'
-            - 'provider' : 'api/environment/provider.md'
-        - world:
-            - 'active_processors': 'api/world/active_processors.md'
-            - 'messages' : 'api/world/messages.md'
-            - 'next_processor' : 'api/world/next_processor.md'
-            - 'prev_processor' : 'api/world/prev_processor.md'
-            - 'processor_id' : 'api/world/processor_id.md'
-            - 'provider' : 'api/world/provider.md'
-            - 'send' : 'api/world/send.md'
-            - 'sync' : 'api/world/sync.md'
-        - var:
-            - '(constructor)' : 'api/var/constructor.md'
-            - '(deconstructor)' : 'api/var/deconstructor.md'
-            - 'operator=' : 'api/var/assignment_operator.md'
-            - 'value' : 'api/var/value.md'
-            - 'hub' : 'api/var/hub.md'
-            - 'bulk::create_var' : 'api/var/create_var.md'
-        - future:
-            - '(constructor)' : 'api/future/constructor.md'
-            - '(deconstructor)' : 'api/future/deconstructor.md'
-            - 'operator=' : 'api/future/assignment_operator.md'
-            - 'value' : 'api/future/value.md'
-            - 'hub' : 'api/future/hub.md'
-            - 'bulk::create_future' : 'api/future/create_future.md'
-        - coarray:
-            - '(constructor)' : 'api/coarray/constructor.md'
-            - '(deconstructor)' : 'api/coarray/deconstructor.md'
-            - 'operator()' : 'api/coarray/parentheses_operator.md'
-            - 'operator[]' : 'api/coarray/square_brackets_operator.md'
-            - 'hub' : 'api/coarray/hub.md'
-            - 'bulk::create_coarray' : 'api/coarray/create_coarray.md'
-            - '(class) image' : 'api/coarray/image.md'
-            - '(class) writer' : 'api/coarray/writer.md'
-    - Utility:
-        - 'log': 'api/log.md'
-
+        - 'gather_all': 'api/gather_all.md'
+        - 'flatten': 'api/flatten.md'
+        - 'unflatten': 'api/unflatten.md'
+    - Nested classes:
+        - 'var::image': 'api/var/image.md'
+        - 'coarray::image': 'api/coarray/image.md'
+        - 'coarray::writer': 'api/coarray/writer.md'
+        - 'queue::sender': 'api/queue/sender.md'
+    - Member functions:
+        - 'environment::spawn': 'api/environment/spawn.md'
+        - 'environment::available_processors': 'api/environment/available_processors.md'
+        - 'world::processor_id': 'api/world/processor_id.md'
+        - 'world::active_processors': 'api/world/active_processors.md'
+        - 'world::next_processor': 'api/world/next_processor.md'
+        - 'world::prev_processor': 'api/world/prev_processor.md'
+        - 'world::sync': 'api/world/sync.md'
+        - 'world::barrier': 'api/world/barrier.md'
+        - 'var::constructor': 'api/var/constructor.md'
+        - 'var::deconstructor': 'api/var/deconstructor.md'
+        - 'var::operator=': 'api/var/assignment_operator.md'
+        - 'var::value': 'api/var/value.md'
+        - 'var::operator T': 'api/var/T_operator.md'
+        - 'var::operator()': 'api/var/paren_operator.md'
+        - 'var::broadcast': 'api/var/broadcast.md'
+        - 'var::world': 'api/var/world.md'
+        - 'var::image::operator=': 'api/var/image/assignment_operator.md'
+        - 'var::image::get': 'api/var/image/get.md'
+        - 'future::constructor': 'api/future/constructor.md'
+        - 'future::deconstructor': 'api/future/deconstructor.md'
+        - 'future::operator=': 'api/future/assignment_operator.md'
+        - 'future::value': 'api/future/value.md'
+        - 'future::world': 'api/future/world.md'
+        - 'coarray::constructor': 'api/coarray/constructor.md'
+        - 'coarray::deconstructor': 'api/coarray/deconstructor.md'
+        - 'coarray::operator()': 'api/coarray/parentheses_operator.md'
+        - 'coarray::operator[]': 'api/coarray/square_brackets_operator.md'
+        - 'coarray::world': 'api/coarray/world.md'
+        - 'queue::constructor': 'api/queue/constructor.md'
+        - 'queue::deconstructor': 'api/queue/deconstructor.md'
+        - 'queue::begin': 'api/queue/begin.md'
+        - 'queue::end': 'api/queue/end.md'
+        - 'queue::size': 'api/queue/size.md'
+        - 'queue::empty': 'api/queue/empty.md'
+        - 'queue::world': 'api/queue/world.md'
+        - 'queue::sender::send': 'api/queue/sender/send.md'
 - Providers:
-    - Multicore:
-        - 'Native C++': 'providers/cpp.md'
-        - 'Multicore-BSP': 'providers/mcbsp.md'
-    - Clusters:
-        - 'gRPC': 'providers/grpc.md'
-    - Embedded:
-        - 'Epiphany BSP': 'providers/ebsp.md'
+    - MPI: 'providers/mpi.md'
+    - thread: 'providers/thread.md'
+- BSP model: 'bsp.md'
+- Release Notes: 'CHANGELOG.md'
 
 extra:
-    release: "0.0.1"
-    version: "0.0.1"
+    palette:
+        primary: 'blue grey'
+        accent: 'orange'
+    social:
+        - type: 'github-alt'
+          link: 'https://github.com/jwbuurlage'
+        - type: 'twitter'
+          link: 'https://twitter.com/jwbuurlage'
+    logo: 'images/logo.svg'

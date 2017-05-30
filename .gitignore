@@ -8,7 +8,8 @@ examples/build/*
 bin/*
 examples/bin/*
 
-docs/*
-!docs/diagrams/*.tex
-!docs/doxygen/Doxyfile
-!docs/sphinx/source*
+*.aux
+*.log
+*.pdf
+docs/doxygen/output
+docs/site

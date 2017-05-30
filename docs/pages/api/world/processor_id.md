@@ -8,4 +8,4 @@ Returns the local processor id
 
 ## Return value
 
-An `int` containing the id of the local processor.
+- `int`: The id of the local processor.

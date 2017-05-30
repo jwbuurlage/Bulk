@@ -21,7 +21,7 @@ Get a value from a (remote) image of a *variable* (1.).
 
 * **Cost**
 
-    1. `sizeof(T) * g`
+- `sizeof(T) * g`
 
 ## Example
 

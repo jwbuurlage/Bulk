@@ -8,4 +8,4 @@ Returns the total number of active processors in an SPMD section.
 
 ## Return value
 
-An `int` containing the number of active processors.
+- `int`: The number of active processors.

@@ -4,8 +4,8 @@
 ~coarray();
 ```
 
-Deconstructs a coarray and deregisters it with `hub`.
+Deconstructs a coarray and deregisters it with its `world`.
 
 ## Complexity and cost
 
-* **Cost** - `l`
+* **Cost** - `l` or free (backend dependent)

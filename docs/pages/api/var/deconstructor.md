@@ -4,8 +4,8 @@
 ~var();
 ```
 
-Deconstructs a variable and deregisters it with `hub`.
+Deconstructs a variable and deregisters it with its `world`.
 
 ## Complexity and cost
 
-* **Cost** - `l`
+* **Cost** - `l` or free, depending on the backend

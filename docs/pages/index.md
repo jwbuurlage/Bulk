@@ -1,16 +1,86 @@
 Bulk
 ====
 
-Bulk is a library for writing parallel and distributed software.
+<center>
+
+![image](images/logo.svg)
+
+</center>
+
+Bulk is a new interface for writing parallel programs in C++ in bulk-synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.
+
+Authors
+-------
+
+Bulk is developed by:
+
+* Jan-Willem Buurlage (jwbuurlage)
+* Tom Bannink (tombana)
+
+Examples
+--------
+
+Hello world!
+
+```cpp
+bulk::thread::environment env;
+env.spawn(env.available_processors(), [](auto& world) {
+    auto s = world.processor_id();
+    auto p = world.active_processors();
+
+    world.log("Hello world from processor %d / %d\n", s, p);
+});
+```
+
+Distributed variables are the easiest way to communicate.
+
+```cpp
+auto a = bulk::var<int>(world);
+a(world.next_processor()) = s;
+world.sync();
+// ... a is now updated
+
+auto b = a(world.next_processor()).get();
+world.sync();
+// ... b.value() is now available
+```
+
+Coarrays provide a convenient syntax for working with distributed arrays.
+
+```cpp
+auto xs = bulk::coarray<int>(world, 10);
+xs(world.next_processor())[3] = s;
+```
+
+Message passing can be used for more flexible communication.
+
+```cpp
+auto q = bulk::queue<int, float>(world);
+for (int t = 0; t < p; ++t) {
+    q(t).send(s, 3.1415f);  // send (s, pi) to processor t
+}
+world.sync();
+
+// messages are now available in q
+for (auto [tag, content] : q) {
+    world.log("%d got sent %d, %f\n", s, tag, content);
+}
+```
 
 API
 ---
 
 Bulk provides a modern bulk-synchronous parallel API which is [documented in detail here](api/index.md).
 
-Philosophy
-----------
+License
+-------
 
-Bulk strives to provide a modern interface for writing performant parallel and distributed software. The lowest level is to be implemented with heavily optimized technologies such as MPI, while the higher levels provide a level of abstraction that allows average developers to develop highly efficient parallel software for both HPC and Big Data applications.
+Bulk is released under the MIT license, for details see the file LICENSE.md.
 
-The Bulk project aims to provide the performance and fine-grain tunability of HPC software libraries such as MPI, with the ease-of-programming commonly found in Big Data platforms such as Hadoop and Spark.
+Contributing
+------------
+
+We welcome contributions. Please submit pull requests against the develop branch.
+
+
+
