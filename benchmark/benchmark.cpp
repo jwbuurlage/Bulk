@@ -12,14 +12,13 @@ double flop_rate(bulk::world& world) {
     std::vector<float> ys = xs;
     std::vector<float> zs = xs;
 
-    auto clock = bulk::util::timer();
-
     auto alpha = 1.0f / 3.0f;
     auto beta = 4.0f / 9.0f;
+
+    auto clock = bulk::util::timer();
     for (auto i = 0u; i < r_size; ++i) {
         zs[i] = zs[i] + alpha * xs[i] - beta * ys[i];
     }
-
     auto total_ms = clock.get();
 
     auto flops = r_size * 4;

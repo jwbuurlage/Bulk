@@ -169,6 +169,7 @@ class var {
         virtual void put(int processor, const T& source) {
             world_.put_(processor, &source, sizeof(T), id_);
         }
+
         virtual future<T> get(int processor) const {
             future<T> result(world_);
             world_.get_(processor, id_, sizeof(T), &result.value());

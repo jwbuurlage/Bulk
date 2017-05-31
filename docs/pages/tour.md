@@ -153,4 +153,7 @@ for (int t = 0; t < p; ++t) {
         max = global_max[t];
     }
 }
+
+bsp_pop_reg(global_max);
+free(global_max);
 ```
