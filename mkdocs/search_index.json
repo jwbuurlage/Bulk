@@ -1142,7 +1142,7 @@
         },
         {
             "location": "/CHANGELOG/",
-            "text": "Changelog\n\u00b6\n\n\n0.1.0\n\u00b6\n\n\n2017-01-01\n\n\n\n\nInitial release",
+            "text": "Changelog\n\u00b6\n\n\n0.1.0\n\u00b6\n\n\n2017-06-01\n\n\n\n\nInitial release. A complete modern replacement for BSPlib.",
             "title": "Release Notes"
         },
         {
@@ -1152,7 +1152,7 @@
         },
         {
             "location": "/CHANGELOG/#010",
-            "text": "2017-01-01   Initial release",
+            "text": "2017-06-01   Initial release. A complete modern replacement for BSPlib.",
             "title": "0.1.0"
         }
     ]
