@@ -3,7 +3,7 @@
 Defined in header `<bulk/messages.hpp>`.
 
 ```cpp
-class sender
+class sender;
 ```
 
 Provides a way to send messages to remote queues.

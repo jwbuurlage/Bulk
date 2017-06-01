@@ -48,6 +48,8 @@ pages:
         - 'var::image': 'api/var/image.md'
         - 'coarray::image': 'api/coarray/image.md'
         - 'coarray::writer': 'api/coarray/writer.md'
+        - 'coarray::slice': 'api/coarray/slice.md'
+        - 'coarray::slice_writer': 'api/coarray/slice_writer.md'
         - 'queue::sender': 'api/queue/sender.md'
     - Member functions:
         - 'environment::spawn': 'api/environment/spawn.md'
@@ -73,6 +75,7 @@ pages:
         - 'future::operator=': 'api/future/assignment_operator.md'
         - 'future::value': 'api/future/value.md'
         - 'future::world': 'api/future/world.md'
+        - 'future::operator[]': 'api/future/bracket_operator.md'
         - 'coarray::constructor': 'api/coarray/constructor.md'
         - 'coarray::deconstructor': 'api/coarray/deconstructor.md'
         - 'coarray::operator()': 'api/coarray/parentheses_operator.md'
@@ -86,11 +89,11 @@ pages:
         - 'queue::empty': 'api/queue/empty.md'
         - 'queue::world': 'api/queue/world.md'
         - 'queue::sender::send': 'api/queue/sender/send.md'
-- Bulk vs BSPlib: 'bulk_vs_bsplib.md'
-- Providers:
-    - MPI: 'providers/mpi.md'
-    - thread: 'providers/thread.md'
+- Backends:
+    - MPI: 'backends/mpi.md'
+    - thread: 'backends/thread.md'
 - BSP model: 'bsp.md'
+- Bulk vs BSPlib: 'bulk_vs_bsplib.md'
 - Release Notes: 'CHANGELOG.md'
 
 extra:
