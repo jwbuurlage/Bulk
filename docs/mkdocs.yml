@@ -86,6 +86,7 @@ pages:
         - 'queue::empty': 'api/queue/empty.md'
         - 'queue::world': 'api/queue/world.md'
         - 'queue::sender::send': 'api/queue/sender/send.md'
+- Bulk vs BSPlib: 'bulk_vs_bsplib.md'
 - Providers:
     - MPI: 'providers/mpi.md'
     - thread: 'providers/thread.md'
