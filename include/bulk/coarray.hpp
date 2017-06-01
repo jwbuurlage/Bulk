@@ -76,10 +76,9 @@ class coarray {
       private:
         friend coarray<T>;
 
-        slice_writer(bulk::world& world, coarray<T>& parent, int t, slice s)
-            : world_(world), parent_(parent), t_(t), s_(s) {}
+        slice_writer(coarray<T>& parent, int t, slice s)
+            : parent_(parent), t_(t), s_(s) {}
 
-        bulk::world& world_;
         coarray<T>& parent_;
         int t_;
         slice s_;
@@ -99,10 +98,9 @@ class coarray {
       private:
         friend coarray<T>;
 
-        writer(bulk::world& world, coarray<T>& parent, int t, int i)
-            : world_(world), parent_(parent), t_(t), i_(i) {}
+        writer(coarray<T>& parent, int t, int i)
+            : parent_(parent), t_(t), i_(i) {}
 
-        bulk::world& world_;
         coarray<T>& parent_;
         int t_;
         int i_;
@@ -110,8 +108,8 @@ class coarray {
 
     class image {
       public:
-        image(bulk::world& world, coarray<T>& parent, int t)
-            : world_(world), parent_(parent), t_(t) {}
+        image(coarray<T>& parent, int t)
+            : parent_(parent), t_(t) {}
 
         /**
          * Obtain a writer to the remote element.
@@ -120,14 +118,13 @@ class coarray {
          *
          * \returns an object that can be used to write to the remote element
          */
-        writer operator[](int i) { return writer(world_, parent_, t_, i); }
+        writer operator[](int i) { return writer(parent_, t_, i); }
 
         slice_writer operator[](slice s) {
-            return slice_writer(world_, parent_, t_, s);
+            return slice_writer(parent_, t_, s);
         }
 
       private:
-        bulk::world& world_;
         coarray<T>& parent_;
         int t_;
     };
@@ -141,7 +138,7 @@ class coarray {
     template <
         typename = std::enable_if_t<std::is_trivially_constructible<T>::value>>
     coarray(bulk::world& world, int local_size)
-        : world_(world), data_(world_, local_size) {}
+        : data_(world, local_size) {}
 
     /**
      * Initialize and registers the coarray with the world
@@ -151,13 +148,13 @@ class coarray {
      * \param default_value the initial value of each local element
      */
     coarray(bulk::world& world, int local_size, T default_value)
-        : world_(world), data_(world_, local_size) {
+        : data_(world, local_size) {
         for (int i = 0; i < local_size; ++i) {
             data_[i] = default_value;
         }
     }
 
-    coarray(coarray&& other) : world_(other.world()), data_(std::move(data_)) {}
+    coarray(coarray&& other) : data_(std::move(other.data_)) {}
 
     /**
      * Retrieve the coarray image with index t
@@ -166,7 +163,7 @@ class coarray {
      *
      * \returns the coarray image with index t
      */
-    image operator()(int t) { return image(world_, *this, t); }
+    image operator()(int t) { return image(*this, t); }
 
     /**
      * Access the `i`th element of the local coarray image
@@ -182,7 +179,7 @@ class coarray {
      *
      * \returns a reference to the world of the coarray
      */
-    bulk::world& world() { return world_; }
+    bulk::world& world() { return data_.world(); }
 
     /**
      * Get an iterator to the beginning of the local image of the coarray.
@@ -254,10 +251,7 @@ class coarray {
     friend image;
     friend writer;
 
-    bulk::world& world_;
     array<T> data_;
-
-    array<T>& data() { return data_; }
 };
 
 } // namespace bulk
