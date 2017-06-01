@@ -5,9 +5,10 @@ In this section we highlight some of the differences between Bulk and BSPlib.
 ## No global state
 
 In BSPlib, the SPMD section is delimited using `bsp_begin()` and `bsp_end()` calls. In Bulk,
-the SPMD section is passed as an argument to the `environment::spawn` function. Compare:
+the SPMD section is passed as an argument to the `environment::spawn` function.
 
-```c
+```cpp
+// BSPlib
 #include <bsp.h>
 
 int main() {
@@ -19,11 +20,8 @@ int main() {
 
     return 0;
 }
-```
 
-to:
-
-```cpp
+// Bulk
 #include <bulk/bulk.hpp>
 #include <bulk/backends/mpi/mpi.hpp>
 
@@ -52,17 +50,15 @@ Variables and message queues are registered upon creation, and deregistered when
 they go out of scope. This means that explicit registration calls are no longer
 necessary. Compare:
 
-```c
+```cpp
+// BSPlib
 int x = 0;
 bsp_push_reg(&x, sizeof(int));
 bsp_sync();
 ...
 bsp_pop_reg(&x);
-```
 
-to:
-
-```cpp
+// Bulk
 auto x = bulk::var<int>(world);
 ```
 
@@ -71,7 +67,8 @@ auto x = bulk::var<int>(world);
 Communication using simple distributed variables is expressed more compactly in
 Bulk. Compare:
 
-```c
+```cpp
+// BSPlib
 int b = 3;
 bsp_put((s + 1) % p, &b, &x, 0, sizeof(int));
 
@@ -79,9 +76,8 @@ int c = 0;
 bsp_get((s + 1) % p, &x, 0, &c, sizeof(int));
 
 bsp_sync();
-```
-to:
-```cpp
+
+// Bulk
 x(world.next_processor()) = 3;
 auto c = x(world.next_processor()).get();
 
@@ -91,32 +87,29 @@ world.sync();
 ## Arrays
 
 Bulk treats distributed arrays differently from simple values. This is done using coarrays. Compare:
-```c
+```cpp
+// BSPlib
 int* xs = malloc(10 * sizeof(int));
 bsp_push_reg(xs, 10 * sizeof(int));
 bsp_sync();
 
-// set a slice
 int ys[3] = {1, 2, 3};
 bsp_put((s + 1) % p, ys, xs, 2, 3 * sizeof(int));
-
-// set an element
 int z = 5;
 bsp_put((s + 1) % p, &z, xs, 0, sizeof(int));
+
 bsp_sync();
 
 ...
 
 bsp_pop_reg(xs);
 free(xs);
-```
-to:
-```cpp
+
+// Bulk
 auto xs = bulk::coarray<int>(world, 10);
-// set a slice
 xs(world.next_processor())[{2, 5}] = {2, 3, 4};
-// set an element
 xs(world.next_processor())[0] = 5;
+
 world.sync();
 ```
 
@@ -124,7 +117,8 @@ world.sync();
 
 In BSPlib, messages consist of a _tag_ and a _content_. In Bulk, we don't force this message structure, but we do support it. Compare:
 
-```c
+```cpp
+// BSPlib
 int s = bsp_pid();
 int p = bsp_nprocs();
 
@@ -149,9 +143,8 @@ for (int i = 0; i < packets; ++i) {
     bsp_move(&payload_in, sizeof(int));
     printf("payload: %i, tag: %i", payload_in, tag_in);
 }
-```
-to
-```cpp
+
+// Bulk
 auto s = world.processor_id();
 auto p = world.active_processors();
 
