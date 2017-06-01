@@ -601,6 +601,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#bulkcoarraywriterget" title="bulk::coarray::writer::get" class="md-nav__link">
+    bulk::coarray::writer::get
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1098,15 +1105,27 @@
       
 
 
+  <li class="md-nav__item">
+    <a href="../../../bulk_vs_bsplib/" title="Bulk vs BSPlib" class="md-nav__link">
+      Bulk vs BSPlib
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
     
-    <label class="md-nav__link" for="nav-6">
+    <label class="md-nav__link" for="nav-7">
       Providers
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-6">
+      <label class="md-nav__title" for="nav-7">
         Providers
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -1200,6 +1219,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#bulkcoarraywriterget" title="bulk::coarray::writer::get" class="md-nav__link">
+    bulk::coarray::writer::get
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1240,6 +1266,10 @@
 <td><code>operator=</code></td>
 <td>assign a value to a remote element</td>
 </tr>
+<tr>
+<td><code>get</code></td>
+<td>obtain a remote value</td>
+</tr>
 </tbody>
 </table>
 <h3 id="bulkcoarraywriteroperator"><code>bulk::coarray::writer::operator=</code><a class="headerlink" href="#bulkcoarraywriteroperator" title="Permanent link">&para;</a></h3>
@@ -1250,6 +1280,17 @@
 <ul>
 <li><strong>parameters</strong> <ul>
 <li><code>value</code> - the new value of the element</li>
+</ul>
+</li>
+</ul>
+<h3 id="bulkcoarraywriterget"><code>bulk::coarray::writer::get</code><a class="headerlink" href="#bulkcoarraywriterget" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><span class="n">future</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">get</span><span class="p">();</span>
+</pre></div>
+
+
+<ul>
+<li><strong>returns</strong> <ul>
+<li>a future to the element</li>
 </ul>
 </li>
 </ul>

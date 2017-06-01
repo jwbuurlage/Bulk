@@ -15,7 +15,7 @@
     
     
       
-        <title>BSP model - Bulk</title>
+        <title>Bulk vs BSPlib - Bulk</title>
       
     
     
@@ -77,7 +77,7 @@
             
               
             
-            BSP model
+            Bulk vs BSPlib
           
         </span>
       </div>
@@ -1036,11 +1036,75 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="../bulk_vs_bsplib/" title="Bulk vs BSPlib" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Bulk vs BSPlib
+      </label>
+    
+    <a href="./" title="Bulk vs BSPlib" class="md-nav__link md-nav__link--active">
       Bulk vs BSPlib
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#no-global-state" title="No global state" class="md-nav__link">
+    No global state
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registration-of-variables" title="Registration of variables" class="md-nav__link">
+    Registration of variables
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#communication" title="Communication" class="md-nav__link">
+    Communication
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arrays" title="Arrays" class="md-nav__link">
+    Arrays
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#message-passing" title="Message passing" class="md-nav__link">
+    Message passing
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -1096,20 +1160,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
-    
-      
-    
-    
-    <a href="./" title="BSP model" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../bsp/" title="BSP model" class="md-nav__link">
       BSP model
     </a>
-    
   </li>
 
     
@@ -1142,6 +1197,48 @@
     
   
   
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#no-global-state" title="No global state" class="md-nav__link">
+    No global state
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registration-of-variables" title="Registration of variables" class="md-nav__link">
+    Registration of variables
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#communication" title="Communication" class="md-nav__link">
+    Communication
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arrays" title="Arrays" class="md-nav__link">
+    Arrays
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#message-passing" title="Message passing" class="md-nav__link">
+    Message passing
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1153,84 +1250,164 @@
               
                 
                 
-                <h1 id="bsp-model">BSP Model<a class="headerlink" href="#bsp-model" title="Permanent link">&para;</a></h1>
-<p>The bulk synchronous parallel (BSP) model was developed by Leslie Valiant in the 1980s. The BSP model is intended as a bridging model between parallel hardware and software. It is an elegant and simple model that has a small and easy to understand interface.</p>
-<p>The BSP model is defined on an abstract computer called a BSP computer. This computer has three important requirements.</p>
-<ol>
-<li>It has <span>\(n\)</span> processors capable of computation and communication, i.e. it allows for local memory transactions.</li>
-<li>It has a network in place that allows the different processors to send and receive data.</li>
-<li>It has a mechanism that allows for the synchronisation of these processors, e.g. by means of a blocking barrier.</li>
-</ol>
-<p>A BSP program consists of a number of distinct blocks of computation and communication called <em>supersteps</em>. These steps are separated by a barrier synchronisation, and consist of a computation and a communication step.</p>
-<p>An important part of a BSP algorithm is the associated cost function. To this end we introduce two important concepts: namely an <span>\(h\)</span>-relation, and a notion of the <em>work</em> done by a processor. Furthermore we introduce two parameters that define a BSP computer: <span>\(g\)</span> and <span>\(l\)</span>.</p>
-<p>An <span>\(h\)</span>-relation is a superstep in which each processor sends or receives a maximum of <span>\(h\)</span> words of data. We commonly denote with <span>\(p\)</span> the id of a processor such that we can write for the <span>\(h\)</span>-relation:</p>
-<span>\[h = \max_p \left\{ \max \{ (h_p)_\text{sent}, (h_p)_\text{received} \}~|~\text{processors } p \right\}\]</span><p>Where <span>\(h_p\)</span> denotes the number of words received or sent by processor <span>\(p\)</span>. Similarly we define the work <span>\(w\)</span> done in a superstep as the maximum number of flops, floating point operations, performed by all processors. Finally we define the latency <span>\(l\)</span> of a superstep as the fixed constant overhead, used primarily to account for the barrier synchronisation. The values for <span>\(g\)</span> and <span>\(l\)</span> are platform-specific constants that are found emperically. The values for <span>\(w\)</span> and <span>\(h\)</span> are superstep specific and commonly obtained analytically. The total BSP cost associated to a BSP algorithm is:</p>
-<span>\[T = \sum_{\text{supersteps } i} (w_i + g \cdot h_i + l)\]</span><p>The BSP model has gained significant interest in the last couple of years. Most notably because Google has adopted the model and has developed some technologies based on BSP such as MapReduce and Pregel. The standard for BSP implementations is <a href="http://www.bsp-worldwide.org/">BSPlib</a>. Modern implementations of the BSPlib include BSPonMPI, which simulates the BSP model on top of MPI, and MulticoreBSP, which provides a BSP implementation for shared-memory multi-core computers.</p>
-<p>For a more detailed introduction on the BSP model, as well as a large number of examples of BSP programs we refer to the <a href="http://ukcatalogue.oup.com/product/9780198529392.do">introductory textbook on BSP and MPI</a> by Rob Bisseling.</p>
-<p>A large number of algorithms have already been implemented using the BSP model. Some of them with their associated cost function are listed below:</p>
-<table>
-<thead>
-<tr>
-<th>Problem</th>
-<th>BSP Complexity</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Matrix multiplication</td>
-<td><span>\(n^3/p + (n^2/p^{2/3}) \cdot g + l\)</span></td>
-</tr>
-<tr>
-<td>Sorting</td>
-<td><span>\((n \log n)/p + (n/p)\cdot g + l\)</span></td>
-</tr>
-<tr>
-<td>Fast Fourier Transform</td>
-<td><span>\((n \log n)/p + (n/p)\cdot g + l\)</span></td>
-</tr>
-<tr>
-<td>LU Decomposition</td>
-<td><span>\(n^3/p + (n^2/p^{1/2})\cdot g + p^{1/2}\cdot l\)</span></td>
-</tr>
-<tr>
-<td>Cholesky Factorisation</td>
-<td><span>\(n^3/p + (n^2/p^{1/2})\cdot g + p^{1/2}\cdot l\)</span></td>
-</tr>
-<tr>
-<td>Algebraic Path Problem (Shortest Paths)</td>
-<td><span>\(n^3/p + (n^2/p^{1/2})\cdot g + p^{1/2}\cdot l\)</span></td>
-</tr>
-<tr>
-<td>Triangular Solver</td>
-<td><span>\(n^2/p + n\cdot g + p\cdot l\)</span></td>
-</tr>
-<tr>
-<td>String Edit Problem</td>
-<td><span>\(n^2/p + n\cdot g + p\cdot l\)</span></td>
-</tr>
-<tr>
-<td>Dense Matrix-Vector Multiplication</td>
-<td><span>\(n^2/p + (n/p^{1/2})\cdot g+l\)</span></td>
-</tr>
-<tr>
-<td>Sparse Matrix-Vector Multiplication (2D grid)</td>
-<td><span>\(n/p + (n/p)^{1/2}\cdot g+l\)</span></td>
-</tr>
-<tr>
-<td>Sparse Matrix-Vector Multiplication (3D grid)</td>
-<td><span>\(n/p + (n/p)^{2/3}\cdot g+l\)</span></td>
-</tr>
-<tr>
-<td>Sparse Matrix-Vector Multiplication (random)</td>
-<td><span>\(n/p + (n/p)\cdot g+l\)</span></td>
-</tr>
-<tr>
-<td>List Ranking</td>
-<td><span>\(n/p + (n/p)\cdot g+(\log p)\cdot l\)</span></td>
-</tr>
-</tbody>
-</table>
-<p><em>(From: McColl 1998 &ldquo;Foundations of Time-Critical Scalable Computing&rdquo;)</em></p>
+                <h1 id="bulk-vs-bsplib">Bulk vs BSPlib<a class="headerlink" href="#bulk-vs-bsplib" title="Permanent link">&para;</a></h1>
+<p>In this section we highlight some of the differences between Bulk and BSPlib.</p>
+<h2 id="no-global-state">No global state<a class="headerlink" href="#no-global-state" title="Permanent link">&para;</a></h2>
+<p>In BSPlib, the SPMD section is delimited using <code>bsp_begin()</code> and <code>bsp_end()</code> calls. In Bulk,
+the SPMD section is passed as an argument to the <code>environment::spawn</code> function.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// BSPlib</span>
+<span class="cp">#include</span> <span class="cpf">&lt;bsp.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">bsp_begin</span><span class="p">(</span><span class="n">bsp_nprocs</span><span class="p">());</span>
+    <span class="kt">int</span> <span class="n">s</span> <span class="o">=</span> <span class="n">bsp_pid</span><span class="p">();</span>
+    <span class="kt">int</span> <span class="n">p</span> <span class="o">=</span> <span class="n">bsp_nprocs</span><span class="p">();</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello World from processor %d / %d&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+    <span class="n">bsp_end</span><span class="p">();</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Bulk</span>
+<span class="cp">#include</span> <span class="cpf">&lt;bulk/bulk.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;bulk/backends/mpi/mpi.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">bulk</span><span class="o">::</span><span class="n">mpi</span><span class="o">::</span><span class="n">environment</span> <span class="n">env</span><span class="p">;</span>
+    <span class="n">env</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">available_processors</span><span class="p">(),</span> <span class="p">[](</span><span class="k">auto</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">auto</span> <span class="n">s</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">processor_id</span><span class="p">();</span>
+    <span class="k">auto</span> <span class="n">p</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">active_processors</span><span class="p">();</span>
+
+    <span class="n">world</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&quot;Hello world from processor %d / %d!&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>When using BSPlib, all calls to the parallel system happen globally. In particular, calls such as <code>bsp_sync()</code> and
+<code>bsp_push_reg(...)</code> implicitely modify some global state.</p>
+<p>In Bulk, the state is captured in a <code>world</code> object. Besides the well-known
+reasons not to use global state, this allows for multi-layered parallelism. For
+example, one world could contain the nodes in an MPI cluster, while another
+world represents the multi-core system on such a node.</p>
+<h2 id="registration-of-variables">Registration of variables<a class="headerlink" href="#registration-of-variables" title="Permanent link">&para;</a></h2>
+<p>Variables and message queues are registered upon creation, and deregistered when
+they go out of scope. This means that explicit registration calls are no longer
+necessary. Compare:</p>
+<div class="codehilite"><pre><span></span><span class="c1">// BSPlib</span>
+<span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">bsp_push_reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">bsp_sync</span><span class="p">();</span>
+<span class="p">...</span>
+<span class="n">bsp_pop_reg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">);</span>
+
+<span class="c1">// Bulk</span>
+<span class="k">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">var</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
+</pre></div>
+
+
+<h2 id="communication">Communication<a class="headerlink" href="#communication" title="Permanent link">&para;</a></h2>
+<p>Communication using simple distributed variables is expressed more compactly in
+Bulk. Compare:</p>
+<div class="codehilite"><pre><span></span><span class="c1">// BSPlib</span>
+<span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="n">bsp_put</span><span class="p">((</span><span class="n">s</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+
+<span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">bsp_get</span><span class="p">((</span><span class="n">s</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+
+<span class="n">bsp_sync</span><span class="p">();</span>
+
+<span class="c1">// Bulk</span>
+<span class="n">x</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">())</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="k">auto</span> <span class="n">c</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">()).</span><span class="n">get</span><span class="p">();</span>
+
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+</pre></div>
+
+
+<h2 id="arrays">Arrays<a class="headerlink" href="#arrays" title="Permanent link">&para;</a></h2>
+<p>Bulk treats distributed arrays differently from simple values. This is done using coarrays. Compare:</p>
+<div class="codehilite"><pre><span></span><span class="c1">// BSPlib</span>
+<span class="kt">int</span><span class="o">*</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">bsp_push_reg</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">bsp_sync</span><span class="p">();</span>
+
+<span class="kt">int</span> <span class="n">ys</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">};</span>
+<span class="n">bsp_put</span><span class="p">((</span><span class="n">s</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="kt">int</span> <span class="n">z</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<span class="n">bsp_put</span><span class="p">((</span><span class="n">s</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">z</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+
+<span class="n">bsp_sync</span><span class="p">();</span>
+
+<span class="p">...</span>
+
+<span class="n">bsp_pop_reg</span><span class="p">(</span><span class="n">xs</span><span class="p">);</span>
+<span class="n">free</span><span class="p">(</span><span class="n">xs</span><span class="p">);</span>
+
+<span class="c1">// Bulk</span>
+<span class="k">auto</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+<span class="n">xs</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">())[{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">}]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>
+<span class="n">xs</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+</pre></div>
+
+
+<h2 id="message-passing">Message passing<a class="headerlink" href="#message-passing" title="Permanent link">&para;</a></h2>
+<p>In BSPlib, messages consist of a <em>tag</em> and a <em>content</em>. In Bulk, we don&rsquo;t force this message structure, but we do support it. Compare:</p>
+<div class="codehilite"><pre><span></span><span class="c1">// BSPlib</span>
+<span class="kt">int</span> <span class="n">s</span> <span class="o">=</span> <span class="n">bsp_pid</span><span class="p">();</span>
+<span class="kt">int</span> <span class="n">p</span> <span class="o">=</span> <span class="n">bsp_nprocs</span><span class="p">();</span>
+
+<span class="kt">int</span> <span class="n">tagsize</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+<span class="n">bsp_set_tagsize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tagsize</span><span class="p">);</span>
+<span class="n">bsp_sync</span><span class="p">();</span>
+
+<span class="kt">int</span> <span class="n">tag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">payload</span> <span class="o">=</span> <span class="mi">42</span> <span class="o">+</span> <span class="n">s</span><span class="p">;</span>
+<span class="n">bsp_send</span><span class="p">((</span><span class="n">s</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tag</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">payload</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="n">bsp_sync</span><span class="p">();</span>
+
+<span class="kt">int</span> <span class="n">packets</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">accum_bytes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">bsp_qsize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">packets</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">accum_bytes</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="n">payload_in</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">payload_size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">tag_in</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">packets</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">bsp_get_tag</span><span class="p">(</span><span class="o">&amp;</span><span class="n">payload_size</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tag_in</span><span class="p">);</span>
+    <span class="n">bsp_move</span><span class="p">(</span><span class="o">&amp;</span><span class="n">payload_in</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;payload: %i, tag: %i&quot;</span><span class="p">,</span> <span class="n">payload_in</span><span class="p">,</span> <span class="n">tag_in</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Bulk</span>
+<span class="k">auto</span> <span class="n">s</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">processor_id</span><span class="p">();</span>
+<span class="k">auto</span> <span class="n">p</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">active_processors</span><span class="p">();</span>
+
+<span class="k">auto</span> <span class="n">q</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">queue</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
+<span class="n">q</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span> <span class="o">+</span> <span class="n">s</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="p">[</span><span class="n">tag</span><span class="p">,</span> <span class="n">content</span><span class="p">]</span> <span class="o">:</span> <span class="n">queue</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">world</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&quot;payload: %i, tag: %i&quot;</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">tag</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>In addition, Bulk supports sending arbitrary data either using custom structs, or by composing messages on the fly. For example, to send a 3D tensor element with indices and its value, we can write:</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">q</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">queue</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
+<span class="n">q</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">4.0f</span><span class="p">);</span>
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">value</span><span class="p">]</span> <span class="o">:</span> <span class="n">queue</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">world</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&quot;element: A(%i, %i, %i) = %f&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Also, multiple queues can be constructed, which eliminates a common use case for using tags.</p>
                 
                   
                 
@@ -1249,7 +1426,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../providers/thread/" title="thread" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../api/queue/sender/send/" title="queue::sender::send" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -1258,19 +1435,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                thread
+                queue::sender::send
               </span>
             </div>
           </a>
         
         
-          <a href="../CHANGELOG/" title="Release Notes" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../providers/mpi/" title="MPI" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Release Notes
+                MPI
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

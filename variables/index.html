@@ -286,8 +286,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#bulk-synchronous-communication" title="Bulk-synchronous communication" class="md-nav__link">
-    Bulk-synchronous communication
+  <a href="#bulk-synchronous-communication" title="Bulk synchronous communication" class="md-nav__link">
+    Bulk synchronous communication
   </a>
   
 </li>
@@ -1079,15 +1079,27 @@
       
 
 
+  <li class="md-nav__item">
+    <a href="../bulk_vs_bsplib/" title="Bulk vs BSPlib" class="md-nav__link">
+      Bulk vs BSPlib
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
     
-    <label class="md-nav__link" for="nav-6">
+    <label class="md-nav__link" for="nav-7">
       Providers
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-6">
+      <label class="md-nav__title" for="nav-7">
         Providers
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -1167,8 +1179,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#bulk-synchronous-communication" title="Bulk-synchronous communication" class="md-nav__link">
-    Bulk-synchronous communication
+  <a href="#bulk-synchronous-communication" title="Bulk synchronous communication" class="md-nav__link">
+    Bulk synchronous communication
   </a>
   
 </li>
@@ -1212,7 +1224,7 @@ variables are constructed (which is possible because of the SPMD nature
 of Bulk programs). This allows us to <em>write to</em> and <em>read from</em> remote
 images of a variable by simply passing <code>x</code> to communication
 functions.</p>
-<h2 id="bulk-synchronous-communication">Bulk-synchronous communication<a class="headerlink" href="#bulk-synchronous-communication" title="Permanent link">&para;</a></h2>
+<h2 id="bulk-synchronous-communication">Bulk synchronous communication<a class="headerlink" href="#bulk-synchronous-communication" title="Permanent link">&para;</a></h2>
 <p>The main way to manipulate remote images of variables is using the
 communication primitives <code>bulk::put</code> and
 <code>bulk::get</code> for writing and reading respectively. For

@@ -1108,15 +1108,27 @@
       
 
 
+  <li class="md-nav__item">
+    <a href="bulk_vs_bsplib/" title="Bulk vs BSPlib" class="md-nav__link">
+      Bulk vs BSPlib
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
     
-    <label class="md-nav__link" for="nav-6">
+    <label class="md-nav__link" for="nav-7">
       Providers
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-6">
+      <label class="md-nav__title" for="nav-7">
         Providers
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -1256,7 +1268,7 @@
 <p><center></p>
 <p><img alt="image" src="./images/logo.svg" /></p>
 <p></center></p>
-<p>Bulk is a new interface for writing parallel programs in C++ in bulk-synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.</p>
+<p>Bulk is a new interface for writing parallel programs in C++ in bulk synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.</p>
 <h2 id="about-bsp">About BSP<a class="headerlink" href="#about-bsp" title="Permanent link">&para;</a></h2>
 <p>The bulk synchronous parallel (BSP) programming model, is a way of writing parallel and distributed programs. Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed <em>synchronization points</em>. These synchronizations delimit so-called <em>supersteps</em>. This way of writing parallel programs has a number of advantages over competing models, at the cost of losing some flexibility and possible performance in terms of communication.</p>
 <ul>
@@ -1317,7 +1329,7 @@
 
 
 <h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
-<p>Bulk provides a modern bulk-synchronous parallel API which is <a href="api/">documented in detail here</a>.</p>
+<p>Bulk provides a modern bulk synchronous parallel API which is <a href="api/">documented in detail here</a>.</p>
 <h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
 <p>Bulk is released under the MIT license, for details see the file LICENSE.md.</p>
 <h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>

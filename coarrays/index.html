@@ -279,9 +279,36 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Coarrays
+      </label>
+    
     <a href="./" title="Coarrays" class="md-nav__link md-nav__link--active">
       Coarrays
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#slices" title="Slices" class="md-nav__link">
+    Slices
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -1052,15 +1079,27 @@
       
 
 
+  <li class="md-nav__item">
+    <a href="../bulk_vs_bsplib/" title="Bulk vs BSPlib" class="md-nav__link">
+      Bulk vs BSPlib
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
     
-    <label class="md-nav__link" for="nav-6">
+    <label class="md-nav__link" for="nav-7">
       Providers
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-6">
+      <label class="md-nav__title" for="nav-7">
         Providers
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -1136,6 +1175,20 @@
     
   
   
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#slices" title="Slices" class="md-nav__link">
+    Slices
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1150,14 +1203,14 @@
                 <h1 id="coarrays">Coarrays<a class="headerlink" href="#coarrays" title="Permanent link">&para;</a></h1>
 <p>Coarrays are a convenient way to store, and manipulate distributed
 arrays. These <em>distributed arrays</em> can be seen as distributed variables,
-whose images are a local array. With Bulk, we provide a co-array that is
+whose images are a local array. With Bulk, we provide a coarray that is
 modeled after <a href="https://en.wikipedia.org/wiki/Coarray_Fortran">Coarray Fortran</a>.</p>
 <div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
 </pre></div>
 
 
-<p>Here, we create a co-array with local size equal to <em>5</em>. The total
-number of elements in the co-array is therefore <code>5 * p</code>. We
+<p>Here, we create a coarray with local size equal to <em>5</em>. The total
+number of elements in the coarray is therefore <code>5 * p</code>. We
 use a constant size here, but this is not required as the local size is
 allowed to vary over the processors. Coarrays provide syntactic sugar
 to make manipulating distributed arrays as easy as possible. For
@@ -1176,7 +1229,22 @@ image of an array is iterable, so we can write for example:</p>
 </pre></div>
 
 
-<p>To compute the local sum of the numbers in the co-array image.</p>
+<p>To compute the local sum of the numbers in the coarray image.</p>
+<h2 id="slices">Slices<a class="headerlink" href="#slices" title="Permanent link">&para;</a></h2>
+<p>Often, you need to deal with multiple elements of a coarray iamge at once. For
+this, Bulk supports for slices. For example, to write to a range of elements at
+once:</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+<span class="n">xs</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">())[{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">}]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>
+</pre></div>
+
+
+<p>Or to get a range of elements:</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">xs</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">())[{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">}].</span><span class="n">get</span><span class="p">();</span>
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+<span class="c1">// ys[0], ys[1], ys[2] are now available;</span>
+</pre></div>
                 
                   
                 

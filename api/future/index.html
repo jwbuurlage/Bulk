@@ -1092,15 +1092,27 @@
       
 
 
+  <li class="md-nav__item">
+    <a href="../../bulk_vs_bsplib/" title="Bulk vs BSPlib" class="md-nav__link">
+      Bulk vs BSPlib
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
     
-    <label class="md-nav__link" for="nav-6">
+    <label class="md-nav__link" for="nav-7">
       Providers
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-6">
+      <label class="md-nav__title" for="nav-7">
         Providers
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -1211,14 +1223,17 @@
                 <h1 id="bulkfuture"><code>bulk::future</code><a class="headerlink" href="#bulkfuture" title="Permanent link">&para;</a></h1>
 <p>Defined in header <code>&lt;bulk/future.hpp&gt;</code>.</p>
 <div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
-<span class="k">class</span> <span class="nc">future</span><span class="p">;</span>
+<span class="k">class</span> <span class="nc">future</span><span class="p">;</span> <span class="c1">// (1)</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">future</span><span class="o">&lt;</span><span class="n">T</span><span class="p">[]</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// (2)</span>
 </pre></div>
 
 
-<p><code>bulk::future</code> represents a value that will or has become known in the superstep after its creation.</p>
+<p><code>bulk::future</code> represents a value (1) or array (2) that will or has become known in the superstep after its creation.</p>
 <h2 id="template-parameters">Template parameters<a class="headerlink" href="#template-parameters" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>T</code> - the type of the value stored in the future</li>
+<li><code>T</code> - the type of the value(s) stored in the future</li>
 </ul>
 <h2 id="member-functions">Member functions<a class="headerlink" href="#member-functions" title="Permanent link">&para;</a></h2>
 <table>
@@ -1247,7 +1262,11 @@
 </tr>
 <tr>
 <td><a href="value/"><code>value</code></a></td>
-<td>returns the value of the future</td>
+<td>returns the value of the future (1)</td>
+</tr>
+<tr>
+<td><a href="future/bracket_operator.md"><code>operator[]</code></a></td>
+<td>return an element of the array (2)</td>
 </tr>
 <tr>
 <td><strong>Hub access</strong></td>
