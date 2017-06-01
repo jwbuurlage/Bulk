@@ -69,8 +69,8 @@ class coarray {
             parent_.put(t_, s_, values);
         }
 
-        auto get() {
-            // FIXME implement
+        future<T[]> get() {
+            return parent_.get(t_, s_.first, s_.last);
         }
 
       private:
@@ -234,7 +234,11 @@ class coarray {
     /**
      * Get a future to the value of element `idx` on processor `t`.
      */
-    auto get(int t, int idx) { return data_.get(t, idx, 1); }
+    future<T> get(int t, int idx) { return data_.get(t, idx); }
+
+    future<T[]> get(int t, int first, int last) {
+        return data_.get(t, first, last - first);
+    }
 
     /**
      * Get the size of the coarray.

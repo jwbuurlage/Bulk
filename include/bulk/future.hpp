@@ -63,4 +63,49 @@ class future {
     bulk::world& world_;
 };
 
+template <typename T>
+class future<T[]> {
+    public:
+    /**
+     * Initialize the future.
+     */
+    future(bulk::world& world, int size) : world_(world) {
+        buffer_ = std::unique_ptr<T[]>(new T[size]);
+    }
+
+    /**
+     * Deconstruct the future.
+     */
+    ~future() {}
+
+    future(const future<T[]>& other) = delete;
+    void operator=(const future<T[]>& other) = delete;
+
+    future(future<T[]>&& other) : world_(other.world_) {
+        *this = std::move(other);
+    }
+
+    void operator=(future<T[]>&& other) {
+        buffer_ = std::move(other.buffer_);
+    }
+
+    /**
+     * ...
+     */
+    T& operator[](int i) { return buffer_[i]; }
+
+    /**
+     * Get a reference to the world of the future.
+     *
+     * \returns a reference to the world of the future
+     */
+    bulk::world& world() { return world_; }
+
+    T* buffer() { return buffer_.get(); }
+
+  private:
+    std::unique_ptr<T[]> buffer_;
+    bulk::world& world_;
+};
+
 } // namespace bulk

@@ -225,6 +225,7 @@ void test_communication() {
             }
         }
 
+
         BULK_SECTION("Put array") {
             std::vector<int> test(10);
             std::iota(test.begin(), test.end(), 1);
@@ -288,6 +289,22 @@ void test_communication() {
                             "individual slice setting");
             BULK_CHECK(zs[1] == world.prev_processor() - 2,
                             "individual slice setting");
+        }
+
+        BULK_SECTION("Get slice") {
+            bulk::coarray<int> zs(world, 10, 0);
+            std::iota(zs.begin(), zs.end(), 0);
+
+            auto xs = zs((s + 2) % p)[{2, 6}].get();
+            world.sync();
+
+            bool flag = false;
+            for (int i = 2; i < 6; ++i) {
+                if (xs[i] != i) {
+                    flag = true;
+                }
+            }
+            BULK_CHECK(flag, "getting slices");
         }
 
         BULK_SECTION("Single message passing") {
