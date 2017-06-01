@@ -2,6 +2,6 @@
 
 ## 0.1.0
 
-2017-01-01
+2017-06-01
 
-- Initial release
+- Initial release. A complete modern replacement for BSPlib.
