@@ -527,12 +527,12 @@
         },
         {
             "location": "/api/queue/sender/",
-            "text": "bulk::queue::sender\n\u00b6\n\n\nDefined in header \n<bulk/messages.hpp>\n.\n\n\nclass\n \nsender\n\n\n\n\n\n\nProvides a way to send messages to remote queues.\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nsend\n\n\nassign values to the variable",
+            "text": "bulk::queue::sender\n\u00b6\n\n\nDefined in header \n<bulk/messages.hpp>\n.\n\n\nclass\n \nsender\n;\n\n\n\n\n\n\nProvides a way to send messages to remote queues.\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nsend\n\n\nassign values to the variable",
             "title": "queue::sender"
         },
         {
             "location": "/api/queue/sender/#bulkqueuesender",
-            "text": "Defined in header  <bulk/messages.hpp> .  class   sender   Provides a way to send messages to remote queues.",
+            "text": "Defined in header  <bulk/messages.hpp> .  class   sender ;   Provides a way to send messages to remote queues.",
             "title": "bulk::queue::sender"
         },
         {
