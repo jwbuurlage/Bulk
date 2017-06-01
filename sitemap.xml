@@ -88,14 +88,6 @@
     
 
     
-    <url>
-     <loc>/bulk_vs_bsplib/</loc>
-     <lastmod>2017-06-01</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    
-
-    
         
     <url>
      <loc>/backends/mpi/</loc>
@@ -114,6 +106,14 @@
     
     <url>
      <loc>/bsp/</loc>
+     <lastmod>2017-06-01</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>/bulk_vs_bsplib/</loc>
      <lastmod>2017-06-01</lastmod>
      <changefreq>daily</changefreq>
     </url>
