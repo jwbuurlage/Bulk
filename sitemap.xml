@@ -98,13 +98,13 @@
     
         
     <url>
-     <loc>/providers/mpi/</loc>
+     <loc>/backends/mpi/</loc>
      <lastmod>2017-06-01</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>/providers/thread/</loc>
+     <loc>/backends/thread/</loc>
      <lastmod>2017-06-01</lastmod>
      <changefreq>daily</changefreq>
     </url>

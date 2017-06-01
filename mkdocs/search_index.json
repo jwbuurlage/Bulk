@@ -1111,22 +1111,22 @@
             "title": "Message passing"
         },
         {
-            "location": "/providers/mpi/",
+            "location": "/backends/mpi/",
             "text": "MPI\n\u00b6\n\n\nIf you choose to use the MPI backend, then simply include the Bulk headers, and set up your project build as though it is an MPI project. We suggest to use the OpenMPI implementation, since is the implemnetation we test against.",
             "title": "MPI"
         },
         {
-            "location": "/providers/mpi/#mpi",
+            "location": "/backends/mpi/#mpi",
             "text": "If you choose to use the MPI backend, then simply include the Bulk headers, and set up your project build as though it is an MPI project. We suggest to use the OpenMPI implementation, since is the implemnetation we test against.",
             "title": "MPI"
         },
         {
-            "location": "/providers/thread/",
+            "location": "/backends/thread/",
             "text": "<thread>\n\u00b6\n\n\nThis backend uses the shared-memory parallelism provided by the standard C++ library \n<thread>\n.\n\n\nTo use it on Linux, link against the \npthread\n library.",
             "title": "thread"
         },
         {
-            "location": "/providers/thread/#thread",
+            "location": "/backends/thread/#thread",
             "text": "This backend uses the shared-memory parallelism provided by the standard C++ library  <thread> .  To use it on Linux, link against the  pthread  library.",
             "title": "&lt;thread&gt;"
         },
