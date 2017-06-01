@@ -491,6 +491,41 @@
             "title": "bulk::coarray::writer::get"
         },
         {
+            "location": "/api/coarray/slice/",
+            "text": "bulk::coarray::slice\n\u00b6\n\n\nDefined in header \n<bulk/coarray.hpp>\n.\n\n\nstruct\n \nslice\n \n{\n\n    \nint\n \nfirst\n;\n\n    \nint\n \nlast\n;\n\n\n};",
+            "title": "coarray::slice"
+        },
+        {
+            "location": "/api/coarray/slice/#bulkcoarrayslice",
+            "text": "Defined in header  <bulk/coarray.hpp> .  struct   slice   { \n     int   first ; \n     int   last ;  };",
+            "title": "bulk::coarray::slice"
+        },
+        {
+            "location": "/api/coarray/slice_writer/",
+            "text": "bulk::coarray::slice_writer\n\u00b6\n\n\nDefined in header \n<bulk/coarray.hpp>\n.\n\n\nclass\n \nslice_writer\n;\n\n\n\n\n\n\nModify remote slices.\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\noperator=\n\n\nassign a value to a remote element\n\n\n\n\n\n\nget\n\n\nget a future to a slice\n\n\n\n\n\n\n\n\nbulk::coarray::slice_writer::operator=\n\u00b6\n\n\nvoid\n \noperator\n=\n(\nconst\n \nstd\n::\nvector\n<\nT\n>&\n \nvalues\n);\n\n\n\n\n\n\n\n\nparameters\n \n\n\nvalues\n - the new values of the slice\n\n\n\n\n\n\n\n\nbulk::coarray::slice_writer::get\n\u00b6\n\n\nfuture\n<\nT\n[]\n>\n \nget\n();\n\n\n\n\n\n\n\n\nreturns\n \n\n\na future array containing the slice",
+            "title": "coarray::slice_writer"
+        },
+        {
+            "location": "/api/coarray/slice_writer/#bulkcoarrayslice_writer",
+            "text": "Defined in header  <bulk/coarray.hpp> .  class   slice_writer ;   Modify remote slices.",
+            "title": "bulk::coarray::slice_writer"
+        },
+        {
+            "location": "/api/coarray/slice_writer/#member-functions",
+            "text": "operator=  assign a value to a remote element    get  get a future to a slice",
+            "title": "Member functions"
+        },
+        {
+            "location": "/api/coarray/slice_writer/#bulkcoarrayslice_writeroperator",
+            "text": "void   operator = ( const   std :: vector < T >&   values );    parameters    values  - the new values of the slice",
+            "title": "bulk::coarray::slice_writer::operator="
+        },
+        {
+            "location": "/api/coarray/slice_writer/#bulkcoarrayslice_writerget",
+            "text": "future < T [] >   get ();    returns    a future array containing the slice",
+            "title": "bulk::coarray::slice_writer::get"
+        },
+        {
             "location": "/api/queue/sender/",
             "text": "bulk::queue::sender\n\u00b6\n\n\nDefined in header \n<bulk/messages.hpp>\n.\n\n\nclass\n \nsender\n\n\n\n\n\n\nProvides a way to send messages to remote queues.\n\n\nMember functions\n\u00b6\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nValue access\n\n\n\n\n\n\n\n\nsend\n\n\nassign values to the variable",
             "title": "queue::sender"
@@ -869,6 +904,26 @@
             "location": "/api/future/world/#return-value",
             "text": "A reference to the world.",
             "title": "Return value"
+        },
+        {
+            "location": "/api/future/bracket_operator/",
+            "text": "bulk::future<T[]>::operator[]\n\u00b6\n\n\nT\n&\n \noperator\n[](\nint\n \ni\n);\n\n\n\n\n\n\nAccess the i-th element of the array image of the future.\n\n\nReturns\n\u00b6\n\n\nA reference to the i-th element of the future.\n\n\nParameters\n\u00b6\n\n\n\n\ni\n - the element index",
+            "title": "future::operator[]"
+        },
+        {
+            "location": "/api/future/bracket_operator/#bulkfuturetoperator",
+            "text": "T &   operator []( int   i );   Access the i-th element of the array image of the future.",
+            "title": "bulk::future&lt;T[]&gt;::operator[]"
+        },
+        {
+            "location": "/api/future/bracket_operator/#returns",
+            "text": "A reference to the i-th element of the future.",
+            "title": "Returns"
+        },
+        {
+            "location": "/api/future/bracket_operator/#parameters",
+            "text": "i  - the element index",
+            "title": "Parameters"
         },
         {
             "location": "/api/coarray/constructor/",
