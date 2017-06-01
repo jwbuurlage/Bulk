@@ -25,10 +25,12 @@ and the second dimension is over local 1-dimensional array indices.
 - `value_type`: the type of the image values (i.e. `T`).
 
 ## Nested classes
-|                               |                                                  |
-|-------------------------------|--------------------------------------------------|
-| [`image`](coarray/image.md)   | representation of coarray image                  |
-| [`writer`](coarray/writer.md) | allows for modification for remote coarray image |
+|                                           |                                                  |
+|-------------------------------------------|--------------------------------------------------|
+| [`image`](coarray/image.md)               | representation of coarray image                  |
+| [`writer`](coarray/writer.md)             | allows for modification for remote coarray image |
+| [`slice`](coarray/slice.md)               | slices of coarrays                               |
+| [`slice_writer`](coarray/slice_writer.md) | modify slices of coarrays                        |
 
 ## Member functions
 |                                                     |                                                |
@@ -49,5 +51,8 @@ auto xs = bulk::coarray<int>(world, 10);
 xs(1)[5] = 4;
 // set the 3rd element on the local processor to 2
 xs[3] = 2;
+// set a slice
+xs(1)[{2, 5}] = {1, 2, 3};
+// get a slice
+auto values = xs(2)[{2, 5}].get();
 ```
-
