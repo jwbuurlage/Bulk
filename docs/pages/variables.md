@@ -27,7 +27,7 @@ of Bulk programs). This allows us to *write to* and *read from* remote
 images of a variable by simply passing `x` to communication
 functions.
 
-Bulk-synchronous communication
+Bulk synchronous communication
 ------------------------------
 
 The main way to manipulate remote images of variables is using the

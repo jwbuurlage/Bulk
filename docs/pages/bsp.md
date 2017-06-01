@@ -1,6 +1,6 @@
 # BSP Model
 
-The Bulk Synchronous Parallel (BSP) model was developed by Leslie Valiant in the 1980s. The BSP model is intended as a bridging model between parallel hardware and software. It is an elegant and simple model that has a small and easy to understand interface.
+The bulk synchronous parallel (BSP) model was developed by Leslie Valiant in the 1980s. The BSP model is intended as a bridging model between parallel hardware and software. It is an elegant and simple model that has a small and easy to understand interface.
 
 The BSP model is defined on an abstract computer called a BSP computer. This computer has three important requirements.
 

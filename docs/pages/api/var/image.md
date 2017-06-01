@@ -3,7 +3,7 @@
 Defined in header `<bulk/variable.hpp>`.
 
 ```cpp
-class image
+class image;
 ```
 
 `bulk::var::image` provides syntactic sugar for dealing with remote images.

@@ -25,7 +25,7 @@ queue(world.next_processor()).send(2, 5.0f);
 This will send two messages to the next logical processor, with tags 1
 and 2 respectively, and with contents 1.0f and 5.0f. As with
 communication through variables, this mechanism is also
-*bulk-synchronous*, which means that the remote queue will only have
+*bulk synchronous*, which means that the remote queue will only have
 access to the messages in the next superstep.
 
 !!! warning

@@ -96,12 +96,12 @@ previous = (s + p - 1) % p;
 
 However, we would suggest using the appropriate methods of world to
 increase readability. Another important mechanism exposed through the
-world object is the ability to perform a *bulk-synchronization*, which
+world object is the ability to perform a *bulk synchronization*, which
 is the cornerstone of programs written in BSP style:
 
 ```cpp
 world.sync();
 ```
 
-We will see the specific uses of bulk-synchronization in the upcoming
+We will see the specific uses of bulk synchronization in the upcoming
 sections.
