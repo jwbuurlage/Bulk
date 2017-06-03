@@ -18,14 +18,13 @@ void test_communication() {
             // test `put` to single variable
             bulk::var<int> a(world, 3);
 
-            BULK_CHECK(a.value() == 3,
-                            "correct initial value for variable");
+            BULK_CHECK(a.value() == 3, "correct initial value for variable");
 
             bulk::put(world.next_processor(), s, a);
             world.sync();
 
             BULK_CHECK(a.value() == ((s + p - 1) % p),
-                            "receive correct value after putting");
+                       "receive correct value after putting");
         }
 
         BULK_SECTION("Broadcast") {
@@ -38,7 +37,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK(a.value() == 2,
-                            "receive correct value after broadcasting");
+                       "receive correct value after broadcasting");
         }
 
         BULK_SECTION("Put and get delayed") {
@@ -56,7 +55,8 @@ void test_communication() {
 
             world.sync();
 
-            BULK_CHECK(a.value() == world.prev_processor(), "receive data after sync");
+            BULK_CHECK(a.value() == world.prev_processor(),
+                       "receive data after sync");
 
             a.value() = 42;
 
@@ -81,7 +81,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK(a.value() == ((s + p - 1) % p),
-                            "receive correct value after sugarized putting");
+                       "receive correct value after sugarized putting");
         }
 
         BULK_SECTION("Put to self") {
@@ -91,7 +91,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK(a.value() == s,
-                            "receive correct value after putting to self");
+                       "receive correct value after putting to self");
         }
 
         BULK_SECTION("Get from self") {
@@ -101,7 +101,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK(b.value() == s,
-                            "receive correct value after getting from self");
+                       "receive correct value after getting from self");
         }
 
         BULK_SECTION("Put non-int") {
@@ -112,7 +112,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK(a.value() == 1.0f,
-                            "receive correct value after putting float");
+                       "receive correct value after putting float");
         }
 
         BULK_SECTION("Put custom struct") {
@@ -128,7 +128,6 @@ void test_communication() {
             BULK_CHECK(a.value().x == 3 && a.value().y == 2.0f,
                        "receive correct value after putting custom struct");
         }
-
 
         BULK_SECTION("Put multiple") {
             int size = 5;
@@ -146,8 +145,8 @@ void test_communication() {
 
             for (int i = 0; i < size; ++i) {
                 BULK_CHECK(xs[i].value() == ((s + p - 1) % p) + i,
-                                "receive correct value after multiple puts to "
-                                "array of variables");
+                           "receive correct value after multiple puts to "
+                           "array of variables");
             }
         }
 
@@ -190,7 +189,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK(c.value() == world.next_processor(),
-                            "receive correct value after getting");
+                       "receive correct value after getting");
         }
 
         BULK_SECTION("Sugarized get") {
@@ -202,7 +201,7 @@ void test_communication() {
             world.sync();
 
             BULK_CHECK(c.value() == world.next_processor(),
-                            "receive correct value after sugarized getting");
+                       "receive correct value after sugarized getting");
         }
 
         BULK_SECTION("Get multiple") {
@@ -221,10 +220,9 @@ void test_communication() {
 
             for (auto& y : ys) {
                 BULK_CHECK(y.value() == world.next_processor(),
-                                "receive correct value after getting multiple");
+                           "receive correct value after getting multiple");
             }
         }
-
 
         BULK_SECTION("Put array") {
             std::vector<int> test(10);
@@ -240,28 +238,30 @@ void test_communication() {
         BULK_SECTION("Coarray") {
             bulk::coarray<int> zs(world, 10);
 
-            BULK_CHECK(zs.size() == 10,
-                            "can obtain the size of a coarray");
+            BULK_CHECK(zs.size() == 10, "can obtain the size of a coarray");
             BULK_CHECK(zs.empty() == false, "can check for emptyness");
 
             zs(world.next_processor())[1] = s;
 
             world.sync();
 
-            BULK_CHECK(
-                zs[1] == world.prev_processor(),
-                "putting to remote coarray image gives correct result");
+            BULK_CHECK(zs[1] == world.prev_processor(),
+                       "putting to remote coarray image gives correct result");
 
             zs[3] = 2;
 
             BULK_CHECK(zs[3] == 2,
-                            "writing to local coarray gives correct result");
+                       "writing to local coarray gives correct result");
 
             auto a = zs(2)[1].get();
             world.sync();
 
             BULK_CHECK(a.value() == 1,
-                            "getting from coarray gives correct result");
+                       "getting from coarray gives correct result");
+
+            zs(s)[3] = 1234;
+            world.sync();
+            BULK_CHECK(zs[3] == 1234, "put to self with coarray");
         }
 
         BULK_SECTION("Coarray iteration") {
@@ -281,14 +281,33 @@ void test_communication() {
 
             for (int i = 2; i < 5; ++i) {
                 BULK_CHECK(zs[i] == world.prev_processor(),
-                                "setting slice to constant");
+                           "setting slice to constant");
             }
-            BULK_CHECK(zs[5] == 0,
-                            "outside the slice values are untouched");
+            BULK_CHECK(zs[5] == 0, "outside the slice values are untouched");
             BULK_CHECK(zs[0] == world.prev_processor() - 1,
-                            "individual slice setting");
+                       "individual slice setting");
             BULK_CHECK(zs[1] == world.prev_processor() - 2,
-                            "individual slice setting");
+                       "individual slice setting");
+        }
+
+        BULK_SECTION("All-to-all coarray slicing") {
+            auto local = std::vector<int>(p);
+            std::iota(local.begin(), local.end(), s * p);
+
+            auto samples = bulk::coarray<int>(world, p * p);
+            for (int t = 0; t < p; ++t) {
+                samples(t)[{s * p, (s + 1) * p}] = local;
+            }
+            world.sync();
+
+            bool flag = true;
+            for (int i = 0; i < p * p; ++i) {
+                if (samples[i] != i) {
+                    flag = false;
+                    break;
+                }
+            }
+            BULK_CHECK(flag, "all-to-all slicing");
         }
 
         BULK_SECTION("Get slice") {
@@ -311,10 +330,9 @@ void test_communication() {
             bulk::queue<int, int> q(world);
             q(world.next_processor()).send(123, 1337);
             world.sync();
-            for (auto [tag, content] : q) {
-                BULK_CHECK(tag == 123 &&
-                                    content == 1337,
-                                "message passed succesfully");
+            for (auto[tag, content] : q) {
+                BULK_CHECK(tag == 123 && content == 1337,
+                           "message passed succesfully");
             }
         }
 
@@ -325,12 +343,12 @@ void test_communication() {
             world.sync();
             int tag = 0;
             int content = 0;
-            for (auto [x, y] : q) {
+            for (auto[x, y] : q) {
                 tag = x;
                 content = y;
             }
             BULK_CHECK(tag == 123 && content == 1337,
-                            "message passed succesfully");
+                       "message passed succesfully");
         }
 
         BULK_SECTION("Multiple messages to self") {
@@ -340,12 +358,12 @@ void test_communication() {
             world.sync();
             int tag = 0;
             int content = 0;
-            for (auto [x, y] : q) {
+            for (auto[x, y] : q) {
                 tag = x;
                 content = y;
             }
             BULK_CHECK(tag == 123 && content == 1337,
-                            "message passed succesfully");
+                       "message passed succesfully");
         }
 
         BULK_SECTION("Multiple message passing") {
@@ -360,10 +378,10 @@ void test_communication() {
 
             int k = 0;
             BULK_CHECK(!q.empty(), "multiple messages arrived");
-            for (auto [tag, content] : q) {
+            for (auto[tag, content] : q) {
                 BULK_CHECK(tag == world.prev_processor() &&
-                                    content == contents[k++],
-                                "multiple messages passed succesfully");
+                               content == contents[k++],
+                           "multiple messages passed succesfully");
             }
         }
 
@@ -387,20 +405,20 @@ void test_communication() {
             BULK_CHECK(!q.empty() && !q2.empty(), "queues are non-empty");
             for (auto& msg : q) {
                 BULK_CHECK(msg == contents[k++],
-                                "received correct result on q");
+                           "received correct result on q");
             }
 
             int l = 0;
             BULK_CHECK(q.size() == contents.size(),
-                            "first queue correct number of messages");
+                       "first queue correct number of messages");
 
             BULK_CHECK(q2.size() == contents2.size(),
-                            "second queue correct number of messages");
+                       "second queue correct number of messages");
 
-            for (auto [tag, content] : q2) {
+            for (auto[tag, content] : q2) {
                 BULK_CHECK(tag == world.prev_processor() &&
-                                    content == contents2[l++],
-                                "received correct result on q2");
+                               content == contents2[l++],
+                           "received correct result on q2");
             }
 
             world.sync();

@@ -5,9 +5,9 @@
 namespace bulk::mpi {
 
 class memory_buffer {
-   public:
+  public:
     class memory_reader {
-       public:
+      public:
         memory_reader(memory_buffer& buf) : buf_(buf) {}
         size_t location_ = 0;
 
@@ -26,11 +26,9 @@ class memory_buffer {
 
         char* current_location() { return buf_.data() + location_; }
 
-        void update(std::size_t size) {
-            location_ += size;
-        }
+        void update(std::size_t size) { location_ += size; }
 
-       private:
+      private:
         memory_buffer& buf_;
     };
 
@@ -42,7 +40,9 @@ class memory_buffer {
     memory_buffer() : memory_buffer(16384) {}
 
     ~memory_buffer() {
-        if (data_) free(data_);
+        if (data_) {
+            free(data_);
+        }
     }
 
     void ensure_room(std::size_t size) {
@@ -72,7 +72,7 @@ class memory_buffer {
 
     memory_reader reader() { return memory_reader(*this); }
 
-   private:
+  private:
     void enlarge_() {
         int factor = 2;
 
@@ -90,4 +90,4 @@ class memory_buffer {
     char* data_ = nullptr;
 };
 
-}  // namespace bulk::mpi
+} // namespace bulk::mpi
