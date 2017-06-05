@@ -12,7 +12,7 @@ void test_communication() {
         int s = world.processor_id();
         int p = world.active_processors();
 
-        BULK_SKIP_SECTION_IF("Communication", p < 1);
+        BULK_SKIP_SECTION_IF("Communication", p <= 1);
 
         BULK_SECTION("Put") {
             // test `put` to single variable
@@ -307,7 +307,28 @@ void test_communication() {
                     break;
                 }
             }
-            BULK_CHECK(flag, "all-to-all slicing");
+            BULK_CHECK(flag, "all-to-all slicing with equal blocks");
+
+            auto local_size = 1024;
+            auto local_large = std::vector<int>(local_size);
+            std::iota(local_large.begin(), local_large.end(), s * local_size);
+
+            auto large_samples = bulk::coarray<int>(world, p * local_size);
+            for (int t = 0; t < p; ++t) {
+                large_samples(t)[{s * local_size,
+                                  s * local_size + (local_size / p) * s}] =
+                    local_large;
+            }
+            world.sync();
+
+            bool large_flag = true;
+            for (int i = 0; i < p; ++i) {
+                if (samples[i * local_size] != i * local_size) {
+                    large_flag = false;
+                    break;
+                }
+            }
+            BULK_CHECK(large_flag, "all-to-all slicing with unequal blocks");
         }
 
         BULK_SECTION("Get slice") {

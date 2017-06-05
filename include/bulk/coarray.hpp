@@ -7,6 +7,7 @@
  * similar to the coarrays defined in Co-array Fortran.
  */
 
+#include <cassert>
 #include <cstddef>
 #include <vector>
 
@@ -69,9 +70,7 @@ class coarray {
             parent_.put(t_, s_, values);
         }
 
-        future<T[]> get() {
-            return parent_.get(t_, s_.first, s_.last);
-        }
+        future<T[]> get() { return parent_.get(t_, s_.first, s_.last); }
 
       private:
         friend coarray<T>;
@@ -108,8 +107,7 @@ class coarray {
 
     class image {
       public:
-        image(coarray<T>& parent, int t)
-            : parent_(parent), t_(t) {}
+        image(coarray<T>& parent, int t) : parent_(parent), t_(t) {}
 
         /**
          * Obtain a writer to the remote element.
@@ -121,6 +119,8 @@ class coarray {
         writer operator[](int i) { return writer(parent_, t_, i); }
 
         slice_writer operator[](slice s) {
+            assert(s.first >= 0 && s.first < (int)parent_.size());
+            assert(s.last >= s.first && s.last <= (int)parent_.size());
             return slice_writer(parent_, t_, s);
         }
 
@@ -137,8 +137,7 @@ class coarray {
      */
     template <
         typename = std::enable_if_t<std::is_trivially_constructible<T>::value>>
-    coarray(bulk::world& world, int local_size)
-        : data_(world, local_size) {}
+    coarray(bulk::world& world, int local_size) : data_(world, local_size) {}
 
     /**
      * Initialize and registers the coarray with the world
@@ -202,21 +201,11 @@ class coarray {
 
     /**
      * Put a range of data in a remote image.
-     *
-     * Note: when sizes don't match, the rule is
-     *     array[{2,10}] = {3,2,4};
-     * will fill the array as
-     *     {x,x,3,2,4,3,2,4,3,2,x,x};
      */
     void put(int processor, slice s, const std::vector<T> values) {
-        for (int i = s.first;; i += values.size()) {
-            int remaining = s.last - i;
-            if (remaining < 0)
-                break;
-            if (remaining > (int)values.size())
-                remaining = values.size();
-            data_.put(processor, values.data(), i, (int)remaining);
-        }
+        auto count = (int)values.size() < (s.last - s.first) ? values.size()
+                                                        : (s.last - s.first);
+        data_.put(processor, values.data(), s.first, count);
     }
 
     /**
