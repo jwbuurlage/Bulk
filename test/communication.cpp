@@ -316,14 +316,14 @@ void test_communication() {
             auto large_samples = bulk::coarray<int>(world, p * local_size);
             for (int t = 0; t < p; ++t) {
                 large_samples(t)[{s * local_size,
-                                  s * local_size + (local_size / p) * s}] =
+                                  s * local_size + 1 + (local_size / p) * s}] =
                     local_large;
             }
             world.sync();
 
             bool large_flag = true;
             for (int i = 0; i < p; ++i) {
-                if (samples[i * local_size] != i * local_size) {
+                if (large_samples[i * local_size] != i * local_size) {
                     large_flag = false;
                     break;
                 }
