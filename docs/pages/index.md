@@ -7,12 +7,12 @@ Bulk
 
 </center>
 
-Bulk is a new interface for writing parallel programs in C++ in bulk synchronous style. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.
+Bulk is a new interface for writing parallel programs in C++. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.
 
 About BSP
 ---------
 
-The bulk synchronous parallel (BSP) programming model, is a way of writing parallel and distributed programs. Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed _synchronization points_. These synchronizations delimit so-called _supersteps_. This way of writing parallel programs has a number of advantages over competing models, at the cost of losing some flexibility and possible performance in terms of communication.
+The bulk synchronous parallel (BSP) programming model, is a way of writing parallel and distributed programs. BSP is the underlying model for Bulk. Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed _synchronization points_. These synchronizations delimit so-called _supersteps_. This way of writing parallel programs has a number of advantages over competing models, at the cost of losing some flexibility and possible performance in terms of communication.
 
 - The resulting programs are structured, easy to understand and maintain, and can be reasoned about
 - Data races are eliminated almost by construction, only have to follow a small set of simple rules.
