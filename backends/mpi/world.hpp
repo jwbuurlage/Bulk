@@ -249,15 +249,15 @@ class world : public bulk::world {
                       &status);
 
             // count size of incoming message
-            int count = 0;
-            MPI_Get_count(&status, MPI_BYTE, &count);
+            int incoming_size = 0;
+            MPI_Get_count(&status, MPI_BYTE, &incoming_size);
 
-            buf.ensure_room(count);
+            buf.ensure_room(incoming_size);
 
-            MPI_Recv(buf.buffer(), count, MPI_BYTE, MPI_ANY_SOURCE,
+            MPI_Recv(buf.buffer(), incoming_size, MPI_BYTE, status.MPI_SOURCE,
                      static_cast<int>(tag), MPI_COMM_WORLD, &status);
 
-            buf.update(count);
+            buf.update(incoming_size);
         }
     }
 

@@ -2,13 +2,15 @@
 
 ## 0.2.0
 
+Unreleased
+
 ### Added
 
 - ...
 
 ### Fixed
 
-- ...
+- Fixed bug in MPI backend where messages could get truncated
 
 ### Removed
 

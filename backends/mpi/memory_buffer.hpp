@@ -36,8 +36,8 @@ class memory_buffer {
         data_ = (char*)malloc(capacity_);
     }
 
-    /** Start with 16kb by default */
-    memory_buffer() : memory_buffer(16384) {}
+    /** Start with 1 kB by default */
+    memory_buffer() : memory_buffer(1024) {}
 
     ~memory_buffer() {
         if (data_) {
@@ -85,7 +85,7 @@ class memory_buffer {
         data_ = new_data;
     }
 
-    std::size_t capacity_ = 0;
+    std::size_t capacity_ = 1024;
     std::size_t size_ = 0;
     char* data_ = nullptr;
 };
