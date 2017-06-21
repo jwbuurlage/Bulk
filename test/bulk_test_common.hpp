@@ -32,7 +32,6 @@ extern int total, success, cur_failed;
             world.log("  FAILED: *did not* %s", error);                        \
         } else {                                                               \
             ++success;                                                         \
-            world.log("  SUCCESS: %s", error);                                 \
         }                                                                      \
     }
 

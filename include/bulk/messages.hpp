@@ -64,23 +64,29 @@ class queue_base {
 template <typename T, typename... Ts>
 class queue {
   public:
-    using message_wrapper = message<T, Ts...>;
-    using message_type = decltype(message_wrapper::content);
+    using message_type = decltype(message<T, Ts...>::content);
     using iterator = typename std::vector<message_type>::iterator;
 
     /**
      * A queue is a mailbox for messages of a given type.
-     * They allow a convenient syntax for message passing:
+     * They allow for a convenient message passing syntax:
      *
      *     q(processor).send(content...);
      */
     class sender {
       public:
+        /** Send multiple messages over the queue. */
+        void send(std::vector<message_type> msgs) {
+            // FIXME implement this as a single internal primitive
+            for (auto msg : msgs) {
+                q_.impl_->send_(t_, msg);
+            }
+        }
+
         /** Send a message over the queue. */
         template <typename... Us>
         void send(Us... args) {
-            message_wrapper msg;
-            msg.content = {args...};
+            message_type msg = {args...};
             q_.impl_->send_(t_, msg);
         }
 
@@ -147,7 +153,6 @@ class queue {
     bulk::world& world() { return impl_->world_; }
 
   private:
-
     class impl : public queue_base {
       public:
         impl(bulk::world& world) : world_(world) {
@@ -161,8 +166,8 @@ class queue {
         void operator=(impl& other) = delete;
         void operator=(impl&& other) = delete;
 
-        void send_(int t, message_wrapper m) {
-            world_.send_(t, id_, &m.content, sizeof(m.content));
+        void send_(int t, message_type m) {
+            world_.send_(t, id_, &m, sizeof(m));
         }
 
         void* get_buffer_(int size_in_bytes) override {
@@ -171,8 +176,7 @@ class queue {
         }
 
         void unsafe_push_back(void* msg) override {
-            data_.push_back(
-                *static_cast<message_type*>(msg));
+            data_.push_back(*static_cast<message_type*>(msg));
         }
 
         void clear_() override { data_.clear(); }

@@ -351,7 +351,7 @@ void test_communication() {
             bulk::queue<int, int> q(world);
             q(world.next_processor()).send(123, 1337);
             world.sync();
-            for (auto[tag, content] : q) {
+            for (auto [tag, content] : q) {
                 BULK_CHECK(tag == 123 && content == 1337,
                            "message passed succesfully");
             }
@@ -364,7 +364,7 @@ void test_communication() {
             world.sync();
             int tag = 0;
             int content = 0;
-            for (auto[x, y] : q) {
+            for (auto [x, y] : q) {
                 tag = x;
                 content = y;
             }
@@ -379,7 +379,7 @@ void test_communication() {
             world.sync();
             int tag = 0;
             int content = 0;
-            for (auto[x, y] : q) {
+            for (auto [x, y] : q) {
                 tag = x;
                 content = y;
             }
@@ -399,7 +399,7 @@ void test_communication() {
 
             int k = 0;
             BULK_CHECK(!q.empty(), "multiple messages arrived");
-            for (auto[tag, content] : q) {
+            for (auto [tag, content] : q) {
                 BULK_CHECK(tag == world.prev_processor() &&
                                content == contents[k++],
                            "multiple messages passed succesfully");
@@ -436,7 +436,7 @@ void test_communication() {
             BULK_CHECK(q2.size() == contents2.size(),
                        "second queue correct number of messages");
 
-            for (auto[tag, content] : q2) {
+            for (auto [tag, content] : q2) {
                 BULK_CHECK(tag == world.prev_processor() &&
                                content == contents2[l++],
                            "received correct result on q2");
@@ -446,6 +446,23 @@ void test_communication() {
 
             BULK_CHECK(q.empty(), "first queue gets emptied");
             BULK_CHECK(q2.empty(), "second queue gets emptied");
+        }
+
+        BULK_SECTION("Send many messages") {
+            bulk::queue<int> q(world);
+            q(world.next_processor()).send({1, 2, 3, 4});
+            world.sync();
+            BULK_CHECK(q.size() == 4,
+                       "get correct number of messages when sending many");
+            bool flag = true;
+            int i = 1;
+            for (auto x : q) {
+                if (x != i++) {
+                    flag = false;
+                    break;
+                }
+            }
+            BULK_CHECK(flag, "can send many");
         }
     });
 }

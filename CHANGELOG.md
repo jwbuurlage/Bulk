@@ -6,7 +6,7 @@ Unreleased
 
 ### Added
 
-- ...
+- Add a 'send many' primitive
 
 ### Fixed
 
