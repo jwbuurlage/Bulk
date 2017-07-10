@@ -129,26 +129,29 @@ class world {
     friend class queue;
 
     // Returns the id of the registered location
-    virtual int register_location_(void* location, std::size_t size) = 0;
+    virtual int register_location_(void* location, size_t size) = 0;
     virtual void unregister_location_(int id) = 0;
 
-    virtual void put_(int processor, const void* value, std::size_t size,
+    virtual void put_(int processor, const void* value, size_t size,
                       int var_id) = 0;
     // size is per element
-    virtual void put_(int processor, const void* values, std::size_t size, int var_id,
-                      std::size_t offset, std::size_t count) = 0;
+    virtual void put_(int processor, const void* values, size_t size,
+                      int var_id, size_t offset, size_t count) = 0;
 
-    virtual void get_(int processor, int var_id, std::size_t size, void* target) = 0;
+    virtual void get_(int processor, int var_id, size_t size, void* target) = 0;
     // size is per element
-    virtual void get_(int processor, int var_id, std::size_t size, void* target,
-                      std::size_t offset, std::size_t count) = 0;
+    virtual void get_(int processor, int var_id, size_t size, void* target,
+                      size_t offset, size_t count) = 0;
 
     virtual int register_queue_(class queue_base* q) = 0;
     virtual void unregister_queue_(int id) = 0;
 
-    // data consists of both tag and content. size is total size.
+    // data consists of a complete message. size is total size.
     virtual void send_(int processor, int queue_id, const void* data,
-                       std::size_t size) = 0;
+                       size_t size) = 0;
+    virtual void send_many_(int processor, int queue_id, const void* data,
+                            size_t size, int count, const void* other,
+                            size_t size_of_other) = 0;
 
     virtual void log_(std::string message) = 0;
 };

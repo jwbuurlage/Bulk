@@ -464,5 +464,35 @@ void test_communication() {
             }
             BULK_CHECK(flag, "can send many");
         }
+
+        BULK_SECTION("Messages with arrays") {
+            auto q = bulk::queue<int[]>(world);
+            q(world.next_processor()).send_many({1, 2, 3, 4});
+            world.sync();
+            BULK_CHECK(q.size() == 1, "send many is one message");
+            for (auto msg : q) {
+                BULK_CHECK((msg == std::vector<int>{1, 2, 3, 4}),
+                           "send many correct content");
+            }
+        }
+
+        BULK_SECTION("Messages with arrays and normal") {
+            auto q = bulk::queue<int[], int>(world);
+            q(world.next_processor()).send_many({1, 2, 3, 4}, 1);
+            q(world.next_processor()).send_many({2, 3, 4, 5}, 2);
+            world.sync();
+            BULK_CHECK(q.size() == 2, "send many with two messages");
+            for (auto [xs, x] : q) {
+                BULK_CHECK(x == 1 || x == 2, "right 'tag'");
+                if (x == 1) {
+                    BULK_CHECK((xs == std::vector<int>{1, 2, 3, 4}),
+                               "send many correct content #1");
+                } else {
+                    BULK_CHECK((xs == std::vector<int>{2, 3, 4, 5}),
+                               "send many correct content #2");
+                }
+            }
+        }
+
     });
 }

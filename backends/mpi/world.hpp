@@ -13,7 +13,7 @@
 
 namespace bulk::mpi {
 
-enum class message_t : int { put, get_request, get_response, send };
+enum class message_t : int { put, get_request, get_response, send, send_many };
 
 enum class put_t : int { single, multiple };
 
@@ -61,6 +61,7 @@ class world : public bulk::world {
         get_request_buffers_.resize(active_processors_);
         get_response_buffers_.resize(active_processors_);
         message_buffers_.resize(active_processors_);
+        array_message_buffers_.resize(active_processors_);
 
         ones_.resize(active_processors_);
         std::fill(ones_.begin(), ones_.end(), 1);
@@ -78,11 +79,13 @@ class world : public bulk::world {
         int remote_get_requests = 0;
         int remote_get_responses = 0;
         int remote_messages = 0;
+        int remote_array_messages = 0;
 
         std::vector<int> put_to_proc(active_processors_);
         std::vector<int> get_request_to_proc(active_processors_);
         std::vector<int> get_response_to_proc(active_processors_);
         std::vector<int> messages_to_proc(active_processors_);
+        std::vector<int> array_messages_to_proc(active_processors_);
 
         // handle puts
         send_buffers_(put_buffers_, message_t::put, put_to_proc);
@@ -122,6 +125,16 @@ class world : public bulk::world {
         receive_buffer_for_tag_(message_buffer_, message_t::send,
                                 remote_messages);
         process_messages_(message_buffer_);
+
+        // handle array messages
+        send_buffers_(array_message_buffers_, message_t::send_many,
+                      array_messages_to_proc);
+        MPI_Reduce_scatter(array_messages_to_proc.data(),
+                           &remote_array_messages, ones_.data(), MPI_INT,
+                           MPI_SUM, MPI_COMM_WORLD);
+        receive_buffer_for_tag_(array_message_buffer_, message_t::send_many,
+                                remote_array_messages);
+        process_array_messages_(array_message_buffer_);
 
         barrier();
     }
@@ -214,6 +227,18 @@ class world : public bulk::world {
         message_buffers_[processor] << queue_id;
         message_buffers_[processor] << size;
         message_buffers_[processor].push(size, data);
+    }
+
+    // data consists of both tag and content. size is total size.
+    void send_many_(int processor, int queue_id, const void* data, size_t size,
+                    int count, const void* other,
+                    size_t size_of_other) override {
+        array_message_buffers_[processor] << queue_id;
+        array_message_buffers_[processor] << count;
+        array_message_buffers_[processor] << size;
+        array_message_buffers_[processor] << size_of_other;
+        array_message_buffers_[processor].push(size * count, data);
+        array_message_buffers_[processor].push(size_of_other, other);
     }
 
     void log_(std::string message) override final {
@@ -356,8 +381,8 @@ class world : public bulk::world {
     void process_get_responses_(memory_buffer& buf) {
         auto reader = buf.reader();
         while (!reader.empty()) {
-            void* target = 0;
-            size_t size = 0;
+            void* target = {};
+            size_t size = {};
             reader >> target;
             reader >> size;
             reader.copy(size, target);
@@ -367,18 +392,44 @@ class world : public bulk::world {
 
     void process_messages_(memory_buffer& buf) {
         auto reader = buf.reader();
-        int queue_id;
-        size_t size;
+        int queue_id = {};
+        size_t size = {};
 
         while (!reader.empty()) {
             reader >> queue_id;
             reader >> size;
             if (!queues_[queue_id]) {
-              // queue already deleted
-              continue;
+                // queue already deleted
+                continue;
             }
             queues_[queue_id]->unsafe_push_back(reader.current_location());
             reader.update(size);
+        }
+        buf.clear();
+    }
+
+    void process_array_messages_(memory_buffer& buf) {
+        auto reader = buf.reader();
+        int queue_id = {};
+        int count = {};
+        size_t size = {};
+        size_t size_of_other = {};
+
+        while (!reader.empty()) {
+            reader >> queue_id;
+            reader >> count;
+            reader >> size;
+            reader >> size_of_other;
+            if (!queues_[queue_id]) {
+                // queue already deleted
+                // FIXME shouldnt we move queue pointer here?
+                continue;
+            }
+            queues_[queue_id]->unsafe_push_array(
+                count, size, reader.current_location(), size_of_other,
+                reader.current_location() + size * count);
+            reader.update(size * count);
+            reader.update(size_of_other);
         }
         buf.clear();
     }
@@ -412,6 +463,8 @@ class world : public bulk::world {
     memory_buffer get_response_buffer_;
     std::vector<memory_buffer> message_buffers_;
     memory_buffer message_buffer_;
+    std::vector<memory_buffer> array_message_buffers_;
+    memory_buffer array_message_buffer_;
 };
 
 } // namespace bulk::mpi
