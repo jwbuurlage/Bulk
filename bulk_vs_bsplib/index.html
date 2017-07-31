@@ -1460,14 +1460,14 @@ Bulk. Compare:</p>
 <p>Also, multiple queues can be constructed, which eliminates a common use case for using tags.</p>
 <h2 id="other">Other<a class="headerlink" href="#other" title="Permanent link">&para;</a></h2>
 <p>The algorithmic skeletons in Bulk allow common patterns to be implemented in
-fewer lines compared to BSPlib. For example, we show how to find the maximum
+fewer lines compared to BSPlib. As an example, we show how to find the maximum
 element over all processors.</p>
 <div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">maxs</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">gather_all</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">max</span><span class="p">);</span>
 <span class="n">max</span> <span class="o">=</span> <span class="o">*</span><span class="n">std</span><span class="o">::</span><span class="n">max_element</span><span class="p">(</span><span class="n">maxs</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">maxs</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
 </pre></div>
 
 
-<p>Compare this to the way this is done using e.g. BSPlib:</p>
+<p>Compare this to the way this is done when using BSPlib:</p>
 <div class="codehilite"><pre><span></span><span class="kt">int</span><span class="o">*</span> <span class="n">global_max</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="o">*</span> <span class="n">bsp_nprocs</span><span class="p">());</span>
 <span class="n">bsp_push_reg</span><span class="p">(</span><span class="n">global_max</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="o">*</span> <span class="n">bsp_nprocs</span><span class="p">());</span>
 
