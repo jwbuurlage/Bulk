@@ -1279,7 +1279,7 @@ library, and to give an impression of the overall syntax.</p>
 <p>We start out with the obligatory Hello World! in Bulk , and subsequently
 explain the code line-by-line. In this code we will use the <em>MPI</em>
 backend, but everything written here is completely general, and
-guarenteed to work on top of any conforming Bulk backend.</p>
+guaranteed to work on top of any conforming Bulk backend.</p>
 <div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;bulk/bulk.hpp&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;bulk/backends/mpi/mpi.hpp&gt;</span><span class="cp"></span>
 
@@ -1360,7 +1360,7 @@ initialized and used as follows:</p>
 <code>1</code> to the element with local index <code>2</code> on
 processor with index <code>3</code>.</p>
 <h2 id="algorithmic-skeletons">Algorithmic skeletons<a class="headerlink" href="#algorithmic-skeletons" title="Permanent link">&para;</a></h2>
-<p>comes equipped with a number of higher-level functions, also known as
+<p>Bulk comes equipped with a number of higher-level functions, also known as
 <em>algorithmic skeletons</em>. For example, say we want to compute the
 dot-product of two coarrays, then we write this as:</p>
 <div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
@@ -1384,26 +1384,6 @@ result.</p>
 max is the maximum value found locally:</p>
 <div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">maxs</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">gather_all</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">max</span><span class="p">);</span>
 <span class="n">max</span> <span class="o">=</span> <span class="o">*</span><span class="n">std</span><span class="o">::</span><span class="n">max_element</span><span class="p">(</span><span class="n">maxs</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">maxs</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
-</pre></div>
-
-
-<p>Compare this to the way this is done using e.g. BSPlib:</p>
-<div class="codehilite"><pre><span></span><span class="kt">int</span><span class="o">*</span> <span class="n">global_max</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="o">*</span> <span class="n">bsp_nprocs</span><span class="p">());</span>
-<span class="n">bsp_push_reg</span><span class="p">(</span><span class="n">global_max</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="o">*</span> <span class="n">bsp_nprocs</span><span class="p">());</span>
-
-<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">;</span> <span class="o">++</span><span class="n">t</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">bsp_put</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">max</span><span class="p">,</span> <span class="n">global_max</span><span class="p">,</span> <span class="n">bsp_pid</span><span class="p">(),</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
-<span class="p">}</span>
-<span class="n">bsp_sync</span><span class="p">();</span>
-
-<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">;</span> <span class="o">++</span><span class="n">t</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">max</span> <span class="o">&lt;</span> <span class="n">global_max</span><span class="p">[</span><span class="n">t</span><span class="p">])</span> <span class="p">{</span>
-        <span class="n">max</span> <span class="o">=</span> <span class="n">global_max</span><span class="p">[</span><span class="n">t</span><span class="p">];</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="n">bsp_pop_reg</span><span class="p">(</span><span class="n">global_max</span><span class="p">);</span>
-<span class="n">free</span><span class="p">(</span><span class="n">global_max</span><span class="p">);</span>
 </pre></div>
                 
                   

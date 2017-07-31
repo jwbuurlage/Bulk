@@ -1234,7 +1234,7 @@ processor.</p>
 </pre></div>
 
 
-<p>It is perfectly legal, and even encouraged, to make a seperate queue for
+<p>It is perfectly legal, and even encouraged, to make a separate queue for
 different types of messages. Each message queue has its own independent
 types. In addition, you are not limited to &lsquo;tag + content&rsquo; type of messages, you can also send untagged data, or custom data such as index tuples, or even your own structs. For example:</p>
 <div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">raw_queue</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">queue</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>

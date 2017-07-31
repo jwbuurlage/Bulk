@@ -1252,15 +1252,15 @@
                 
                 <h1 id="environment-and-world">Environment and world<a class="headerlink" href="#environment-and-world" title="Permanent link">&para;</a></h1>
 <p>In the upcoming sections we will get you started with programming in Bulk. Two important concepts are that of an environment and a world.</p>
-<p>In these code examples, we will often use the short-hand <code>s</code> for the <em>local processor id</em>, and <code>p</code> for the <em>active number of processors</em>, and we will not always define these variables explicitely.</p>
+<p>In these code examples, we will often use the short-hand <code>s</code> for the <em>local processor id</em>, and <code>p</code> for the <em>active number of processors</em>, and we will not always define these variables explicitly.</p>
 <h2 id="parallel-environments">Parallel environments<a class="headerlink" href="#parallel-environments" title="Permanent link">&para;</a></h2>
 <p>A program runs in some parallel environment. For example, this
 environment could be an MPI cluster, a many-core co-processor, or simply
 threads on a multi-core computer. This environment is accessed within
 the program through a <a href="../api/environment.html">bulk::environment</a> object.
 This object is specialized for each <em>backend</em>, which is an
-implementation of the lower-level communication that reflect the actual
-environment. For example, to setup a environment on an MPI cluster, we
+implementation of the lower-level communication that reflects the actual
+environment. For example, to setup an environment on an MPI cluster, we
 would write:</p>
 <div class="codehilite"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;bulk/bulk.hpp&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;bulk/backends/mpi/mpi.hpp&gt;</span><span class="cp"></span>
@@ -1285,7 +1285,7 @@ that is used, but they are all treated in the same manner.</p>
 
 
 <p>This information can be used to <em>spawn</em> the program on the right amount
-of processors. Programs written in Bulk follow that <strong>SPMD</strong> (Single
+of processors. Programs written in Bulk follow the <strong>SPMD</strong> (Single
 Program Multiple Data) paradigm. This means that each processor executes
 the same code, but has its own (local) data that it manipulates. In
 Bulk, the SPMD section is a <em>function object</em>. This can be a C++ lambda,
@@ -1313,7 +1313,7 @@ function itself, that is run on the given number of processors.</p>
 </center></p>
 <p>Each processor can communicate to other processors using the <em>world</em>
 object of type <a href="../api/world.html">bulk::world</a>. The world object contains
-some information on the specifics of SPMD section, such as the number of
+some information on the specifics of the SPMD section, such as the number of
 processors executing the section, and its identifier (as we have seen,
 these are also provided as arguments for programmer convenience). We can
 also obtain indices of the neighbouring processors:</p>

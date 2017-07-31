@@ -1282,7 +1282,7 @@ the next logical processor, we write:</p>
 <p><center>
 <img alt="image" src="../images/variable.png" />
 </center></p>
-<p>This communication is <em>asynchronous</em>, meaning that the values are not
+<p>Initially, communication is only staged. This means that the values are not
 valid immediately after the execution of the communication primitives.
 Instead, they are available in the next &lsquo;section&rsquo; of the program, known
 as a (BSP) <strong>superstep</strong>. Supersteps can be viewed as the section of the
@@ -1291,7 +1291,7 @@ barrier synchronization asserts that all processors have reached that
 point of the program, and resolves all outstanding communication such as
 those staged by calls to put and get. After the barrier synchronization
 returns, all communication staged in the previous superstep is
-guarenteed to have occured.</p>
+guaranteed to have occurred.</p>
 <p><center>
 <img alt="The structure of a superstep. First, computations are performed.
 Optionally, communication is staged for later execution. After each core

@@ -1195,6 +1195,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#other" title="Other" class="md-nav__link">
+    Other
+  </a>
+  
+</li>
+      
       
       
     </ul>
@@ -1271,6 +1278,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#other" title="Other" class="md-nav__link">
+    Other
+  </a>
+  
+</li>
+      
       
       
     </ul>
@@ -1321,13 +1335,13 @@ the SPMD section is passed as an argument to the <code>environment::spawn</code>
 
 
 <p>When using BSPlib, all calls to the parallel system happen globally. In particular, calls such as <code>bsp_sync()</code> and
-<code>bsp_push_reg(...)</code> implicitely modify some global state.</p>
+<code>bsp_push_reg(...)</code> implicitly modify some global state.</p>
 <p>In Bulk, the state is captured in a <code>world</code> object. Besides the well-known
 reasons not to use global state, this allows for multi-layered parallelism. For
 example, one world could contain the nodes in an MPI cluster, while another
 world represents the multi-core system on such a node.</p>
 <h2 id="registration-of-variables">Registration of variables<a class="headerlink" href="#registration-of-variables" title="Permanent link">&para;</a></h2>
-<p>Variables and message queues are registered upon creation, and deregistered when
+<p>Variables and message queues are registered and initialized upon creation, and deregistered when
 they go out of scope. This means that explicit registration calls are no longer
 necessary. Compare:</p>
 <div class="codehilite"><pre><span></span><span class="c1">// BSPlib</span>
@@ -1444,6 +1458,33 @@ Bulk. Compare:</p>
 
 
 <p>Also, multiple queues can be constructed, which eliminates a common use case for using tags.</p>
+<h2 id="other">Other<a class="headerlink" href="#other" title="Permanent link">&para;</a></h2>
+<p>The algorithmic skeletons in Bulk allow common patterns to be implemented in
+fewer lines compared to BSPlib. For example, we show how to find the maximum
+element over all processors.</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">maxs</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">gather_all</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">max</span><span class="p">);</span>
+<span class="n">max</span> <span class="o">=</span> <span class="o">*</span><span class="n">std</span><span class="o">::</span><span class="n">max_element</span><span class="p">(</span><span class="n">maxs</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">maxs</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+</pre></div>
+
+
+<p>Compare this to the way this is done using e.g. BSPlib:</p>
+<div class="codehilite"><pre><span></span><span class="kt">int</span><span class="o">*</span> <span class="n">global_max</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="o">*</span> <span class="n">bsp_nprocs</span><span class="p">());</span>
+<span class="n">bsp_push_reg</span><span class="p">(</span><span class="n">global_max</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="o">*</span> <span class="n">bsp_nprocs</span><span class="p">());</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">;</span> <span class="o">++</span><span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">bsp_put</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">max</span><span class="p">,</span> <span class="n">global_max</span><span class="p">,</span> <span class="n">bsp_pid</span><span class="p">(),</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="n">bsp_sync</span><span class="p">();</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">;</span> <span class="o">++</span><span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">max</span> <span class="o">&lt;</span> <span class="n">global_max</span><span class="p">[</span><span class="n">t</span><span class="p">])</span> <span class="p">{</span>
+        <span class="n">max</span> <span class="o">=</span> <span class="n">global_max</span><span class="p">[</span><span class="n">t</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">bsp_pop_reg</span><span class="p">(</span><span class="n">global_max</span><span class="p">);</span>
+<span class="n">free</span><span class="p">(</span><span class="n">global_max</span><span class="p">);</span>
+</pre></div>
                 
                   
                 
