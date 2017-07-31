@@ -41,7 +41,7 @@ for (auto [tag, content] : queue) {
 };
 ```
 
-It is perfectly legal, and even encouraged, to make a seperate queue for
+It is perfectly legal, and even encouraged, to make a separate queue for
 different types of messages. Each message queue has its own independent
 types. In addition, you are not limited to 'tag + content' type of messages, you can also send untagged data, or custom data such as index tuples, or even your own structs. For example:
 

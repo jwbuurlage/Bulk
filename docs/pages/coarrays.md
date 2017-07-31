@@ -22,7 +22,7 @@ xs(3)[2] = 1;
 ```
 
 This writes the value `1` to the element with local index
-`2` on processor with index `3`. The local
+`2` on the processor with index `3`. The local
 image of an array is iterable, so we can write for example:
 
 ```cpp
@@ -32,7 +32,7 @@ for (auto x : xs) {
 }
 ```
 
-To compute the local sum of the numbers in the coarray image.
+to compute the local sum of the numbers in the coarray image.
 
 ## Slices
 

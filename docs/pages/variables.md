@@ -53,7 +53,7 @@ auto y = bulk::get(world.next_processor(), x);
 ![image](images/variable.png)
 </center>
 
-This communication is *asynchronous*, meaning that the values are not
+Initially, communication is only staged. This means that the values are not
 valid immediately after the execution of the communication primitives.
 Instead, they are available in the next 'section' of the program, known
 as a (BSP) **superstep**. Supersteps can be viewed as the section of the
@@ -62,7 +62,7 @@ barrier synchronization asserts that all processors have reached that
 point of the program, and resolves all outstanding communication such as
 those staged by calls to put and get. After the barrier synchronization
 returns, all communication staged in the previous superstep is
-guarenteed to have occured.
+guaranteed to have occurred.
 
 <center>
 ![The structure of a superstep. First, computations are performed.

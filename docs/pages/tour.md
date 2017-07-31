@@ -10,7 +10,7 @@ Hello `bulk::world`!
 We start out with the obligatory Hello World! in Bulk , and subsequently
 explain the code line-by-line. In this code we will use the *MPI*
 backend, but everything written here is completely general, and
-guarenteed to work on top of any conforming Bulk backend.
+guaranteed to work on top of any conforming Bulk backend.
 
 ```cpp
 #include <bulk/bulk.hpp>
@@ -107,7 +107,7 @@ processor with index `3`.
 Algorithmic skeletons
 ---------------------
 
-comes equipped with a number of higher-level functions, also known as
+Bulk comes equipped with a number of higher-level functions, also known as
 *algorithmic skeletons*. For example, say we want to compute the
 dot-product of two coarrays, then we write this as:
 
@@ -135,25 +135,4 @@ max is the maximum value found locally:
 ```cpp
 auto maxs = bulk::gather_all(world, max);
 max = *std::max_element(maxs.begin(), maxs.end());
-```
-
-Compare this to the way this is done using e.g. BSPlib:
-
-```cpp
-int* global_max = malloc(sizeof(int) * bsp_nprocs());
-bsp_push_reg(global_max, sizeof(int) * bsp_nprocs());
-
-for (int t = 0; t < p; ++t) {
-    bsp_put(t, &max, global_max, bsp_pid(), sizeof(int));
-}
-bsp_sync();
-
-for (int t = 0; t < p; ++t) {
-    if (max < global_max[t]) {
-        max = global_max[t];
-    }
-}
-
-bsp_pop_reg(global_max);
-free(global_max);
 ```

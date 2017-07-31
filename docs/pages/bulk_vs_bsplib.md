@@ -37,7 +37,7 @@ int main() {
 ```
 
 When using BSPlib, all calls to the parallel system happen globally. In particular, calls such as `bsp_sync()` and
-`bsp_push_reg(...)` implicitely modify some global state.
+`bsp_push_reg(...)` implicitly modify some global state.
 
 In Bulk, the state is captured in a `world` object. Besides the well-known
 reasons not to use global state, this allows for multi-layered parallelism. For
@@ -46,7 +46,7 @@ world represents the multi-core system on such a node.
 
 ## Registration of variables
 
-Variables and message queues are registered upon creation, and deregistered when
+Variables and message queues are registered and initialized upon creation, and deregistered when
 they go out of scope. This means that explicit registration calls are no longer
 necessary. Compare:
 
@@ -168,3 +168,35 @@ for (auto [i, j, k, value] : queue) {
 ```
 
 Also, multiple queues can be constructed, which eliminates a common use case for using tags.
+
+## Other
+
+The algorithmic skeletons in Bulk allow common patterns to be implemented in
+fewer lines compared to BSPlib. As an example, we show how to find the maximum
+element over all processors.
+
+```cpp
+auto maxs = bulk::gather_all(world, max);
+max = *std::max_element(maxs.begin(), maxs.end());
+```
+
+Compare this to the way this is done when using BSPlib:
+
+```cpp
+int* global_max = malloc(sizeof(int) * bsp_nprocs());
+bsp_push_reg(global_max, sizeof(int) * bsp_nprocs());
+
+for (int t = 0; t < p; ++t) {
+    bsp_put(t, &max, global_max, bsp_pid(), sizeof(int));
+}
+bsp_sync();
+
+for (int t = 0; t < p; ++t) {
+    if (max < global_max[t]) {
+        max = global_max[t];
+    }
+}
+
+bsp_pop_reg(global_max);
+free(global_max);
+```

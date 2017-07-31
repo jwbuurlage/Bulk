@@ -4,7 +4,7 @@ The bulk synchronous parallel (BSP) model was developed by Leslie Valiant in the
 
 The BSP model is defined on an abstract computer called a BSP computer. This computer has three important requirements.
 
-1. It has \(n\) processors capable of computation and communication, i.e. it allows for local memory transactions.
+1. It has \(p\) processors capable of computation and communication, i.e. it allows for local memory transactions.
 2. It has a network in place that allows the different processors to send and receive data.
 3. It has a mechanism that allows for the synchronisation of these processors, e.g. by means of a blocking barrier.
 
@@ -12,11 +12,11 @@ A BSP program consists of a number of distinct blocks of computation and communi
 
 An important part of a BSP algorithm is the associated cost function. To this end we introduce two important concepts: namely an \(h\)-relation, and a notion of the *work* done by a processor. Furthermore we introduce two parameters that define a BSP computer: \(g\) and \(l\).
 
-An \(h\)-relation is a superstep in which each processor sends or receives a maximum of \(h\) words of data. We commonly denote with \(p\) the id of a processor such that we can write for the \(h\)-relation:
+An \(h\)-relation is a superstep in which each processor sends or receives a maximum of \(h\) words of data. We commonly denote with \(s\) the id of a processor such that we can write for the \(h\)-relation:
 
-$$h = \max_p \left\{ \max \{ (h_p)_\text{sent}, (h_p)_\text{received} \}~|~\text{processors } p \right\}$$
+$$h = \max_s \left\{ \max \{ (h_s)_\text{sent}, (h_s)_\text{received} \}~|~\text{processors } s \right\}$$
 
-Where \(h_p\) denotes the number of words received or sent by processor \(p\). Similarly we define the work \(w\) done in a superstep as the maximum number of flops, floating point operations, performed by all processors. Finally we define the latency \(l\) of a superstep as the fixed constant overhead, used primarily to account for the barrier synchronisation. The values for \(g\) and \(l\) are platform-specific constants that are found emperically. The values for \(w\) and \(h\) are superstep specific and commonly obtained analytically. The total BSP cost associated to a BSP algorithm is:
+Where \(h_s\) denotes the number of words received or sent by processor \(s\). Similarly we define the work \(w\) done in a superstep as the maximum number of flops, floating point operations, performed by all processors. Finally we define the latency \(l\) of a superstep as the fixed constant overhead, used primarily to account for the barrier synchronisation. The values for \(g\) and \(l\) are platform-specific constants that are found emperically. The values for \(w\) and \(h\) are superstep specific and commonly obtained analytically. The total BSP cost associated to a BSP algorithm is:
 
 $$T = \sum_{\text{supersteps } i} (w_i + g \cdot h_i + l)$$
 

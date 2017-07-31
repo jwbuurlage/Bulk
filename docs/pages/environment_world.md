@@ -3,7 +3,7 @@ Environment and world
 
 In the upcoming sections we will get you started with programming in Bulk. Two important concepts are that of an environment and a world.
 
-In these code examples, we will often use the short-hand `s` for the _local processor id_, and `p` for the _active number of processors_, and we will not always define these variables explicitely.
+In these code examples, we will often use the short-hand `s` for the _local processor id_, and `p` for the _active number of processors_, and we will not always define these variables explicitly.
 
 Parallel environments
 ---------------------
@@ -13,8 +13,8 @@ environment could be an MPI cluster, a many-core co-processor, or simply
 threads on a multi-core computer. This environment is accessed within
 the program through a [bulk::environment](api/environment.html) object.
 This object is specialized for each *backend*, which is an
-implementation of the lower-level communication that reflect the actual
-environment. For example, to setup a environment on an MPI cluster, we
+implementation of the lower-level communication that reflects the actual
+environment. For example, to setup an environment on an MPI cluster, we
 would write:
 
 ```cpp
@@ -43,7 +43,7 @@ auto processor_count = env.available_processors();
 ```
 
 This information can be used to *spawn* the program on the right amount
-of processors. Programs written in Bulk follow that **SPMD** (Single
+of processors. Programs written in Bulk follow the **SPMD** (Single
 Program Multiple Data) paradigm. This means that each processor executes
 the same code, but has its own (local) data that it manipulates. In
 Bulk, the SPMD section is a *function object*. This can be a C++ lambda,
@@ -77,7 +77,7 @@ The world of a processor
 
 Each processor can communicate to other processors using the *world*
 object of type [bulk::world](api/world.html). The world object contains
-some information on the specifics of SPMD section, such as the number of
+some information on the specifics of the SPMD section, such as the number of
 processors executing the section, and its identifier (as we have seen,
 these are also provided as arguments for programmer convenience). We can
 also obtain indices of the neighbouring processors:
