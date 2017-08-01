@@ -12,10 +12,6 @@ Unreleased
 
 - Fixed bug in MPI backend where messages could get truncated
 
-### Removed
-
-- ...
-
 ## 0.1.0
 
 2017-06-01
