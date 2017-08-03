@@ -7,12 +7,9 @@ int main() {
 
     env.spawn(env.available_processors(), [](bulk::world& world) {
         int s = world.processor_id();
-        int p = world.active_processors();
 
         bulk::queue<int, int> q(world);
-        for (int t = 0; t < p; ++t) {
-            q(t).send(s, s);
-        }
+        q(world.next_processor()).send(s, s + 1);
 
         world.sync();
 

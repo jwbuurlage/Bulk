@@ -140,9 +140,9 @@ class queue {
         void operator=(impl&& other) = delete;
 
         template <typename Buffer, typename U, typename... Us>
-        void fill(Buffer& buf, U& elem, Us... other) {
+        void fill(Buffer& buf, U& elem, Us&&... other) {
             buf | elem;
-            fill(buf, other...);
+            fill(buf, std::forward<Us>(other)...);
         }
 
         template <typename Buffer>
@@ -176,6 +176,7 @@ class queue {
         }
 
         void deserialize_push(size_t size, char* data) {
+            bulk::detail::scale ruler;
             auto membuf = bulk::detail::memory_buffer(size, data);
             data_.push_back(message_type{});
             auto obuf = bulk::detail::omembuf(membuf);
