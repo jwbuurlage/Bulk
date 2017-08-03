@@ -36,7 +36,7 @@ to compute the local sum of the numbers in the coarray image.
 
 ## Slices
 
-Often, you need to deal with multiple elements of a coarray iamge at once. For
+Often, you need to deal with multiple elements of a coarray image at once. For
 this, Bulk supports for slices. For example, to write to a range of elements at
 once:
 
