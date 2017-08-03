@@ -19,11 +19,6 @@ namespace bulk {
 
 using namespace bulk::meta;
 
-/**
- * This object contains a message for or from another processor.
- */
-
-
 // queue::impl subclasses queue_base
 // The reason that this is seperate is:
 // queue::impl has template Tag,Content
