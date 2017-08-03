@@ -117,7 +117,7 @@
         },
         {
             "location": "/coarrays/",
-            "text": "Coarrays\n\u00b6\n\n\nCoarrays are a convenient way to store, and manipulate distributed\narrays. These \ndistributed arrays\n can be seen as distributed variables,\nwhose images are a local array. With Bulk, we provide a coarray that is\nmodeled after \nCoarray Fortran\n.\n\n\nauto\n \nxs\n \n=\n \nbulk\n::\ncoarray\n<\nint\n>\n(\nworld\n,\n \n5\n);\n\n\n\n\n\n\nHere, we create a coarray with local size equal to \n5\n. The total\nnumber of elements in the coarray is therefore \n5 * p\n. We\nuse a constant size here, but this is not required as the local size is\nallowed to vary over the processors. Coarrays provide syntactic sugar\nto make manipulating distributed arrays as easy as possible. For\nexample, we can write:\n\n\nxs\n(\n3\n)[\n2\n]\n \n=\n \n1\n;\n\n\n\n\n\n\nThis writes the value \n1\n to the element with local index\n\n2\n on the processor with index \n3\n. The local\nimage of an array is iterable, so we can write for example:\n\n\nint\n \nresult\n \n=\n \n0\n;\n\n\nfor\n \n(\nauto\n \nx\n \n:\n \nxs\n)\n \n{\n\n    \nresult\n \n+=\n \nx\n;\n\n\n}\n\n\n\n\n\n\nto compute the local sum of the numbers in the coarray image.\n\n\nSlices\n\u00b6\n\n\nOften, you need to deal with multiple elements of a coarray iamge at once. For\nthis, Bulk supports for slices. For example, to write to a range of elements at\nonce:\n\n\nauto\n \nxs\n \n=\n \nbulk\n::\ncoarray\n<\nint\n>\n(\nworld\n,\n \n10\n);\n\n\nxs\n(\nworld\n.\nnext_processor\n())[{\n2\n,\n \n5\n}]\n \n=\n \n{\n2\n,\n \n3\n,\n \n4\n};\n\n\n\n\n\n\nOr to get a range of elements:\n\n\nauto\n \nxs\n \n=\n \nbulk\n::\ncoarray\n<\nint\n>\n(\nworld\n,\n \n10\n);\n\n\nauto\n \nys\n \n=\n \nxs\n(\nworld\n.\nnext_processor\n())[{\n2\n,\n \n5\n}].\nget\n();\n\n\nworld\n.\nsync\n();\n\n\n// ys[0], ys[1], ys[2] are now available;",
+            "text": "Coarrays\n\u00b6\n\n\nCoarrays are a convenient way to store, and manipulate distributed\narrays. These \ndistributed arrays\n can be seen as distributed variables,\nwhose images are a local array. With Bulk, we provide a coarray that is\nmodeled after \nCoarray Fortran\n.\n\n\nauto\n \nxs\n \n=\n \nbulk\n::\ncoarray\n<\nint\n>\n(\nworld\n,\n \n5\n);\n\n\n\n\n\n\nHere, we create a coarray with local size equal to \n5\n. The total\nnumber of elements in the coarray is therefore \n5 * p\n. We\nuse a constant size here, but this is not required as the local size is\nallowed to vary over the processors. Coarrays provide syntactic sugar\nto make manipulating distributed arrays as easy as possible. For\nexample, we can write:\n\n\nxs\n(\n3\n)[\n2\n]\n \n=\n \n1\n;\n\n\n\n\n\n\nThis writes the value \n1\n to the element with local index\n\n2\n on the processor with index \n3\n. The local\nimage of an array is iterable, so we can write for example:\n\n\nint\n \nresult\n \n=\n \n0\n;\n\n\nfor\n \n(\nauto\n \nx\n \n:\n \nxs\n)\n \n{\n\n    \nresult\n \n+=\n \nx\n;\n\n\n}\n\n\n\n\n\n\nto compute the local sum of the numbers in the coarray image.\n\n\nSlices\n\u00b6\n\n\nOften, you need to deal with multiple elements of a coarray image at once. For\nthis, Bulk supports for slices. For example, to write to a range of elements at\nonce:\n\n\nauto\n \nxs\n \n=\n \nbulk\n::\ncoarray\n<\nint\n>\n(\nworld\n,\n \n10\n);\n\n\nxs\n(\nworld\n.\nnext_processor\n())[{\n2\n,\n \n5\n}]\n \n=\n \n{\n2\n,\n \n3\n,\n \n4\n};\n\n\n\n\n\n\nOr to get a range of elements:\n\n\nauto\n \nxs\n \n=\n \nbulk\n::\ncoarray\n<\nint\n>\n(\nworld\n,\n \n10\n);\n\n\nauto\n \nys\n \n=\n \nxs\n(\nworld\n.\nnext_processor\n())[{\n2\n,\n \n5\n}].\nget\n();\n\n\nworld\n.\nsync\n();\n\n\n// ys[0], ys[1], ys[2] are now available;",
             "title": "Coarrays"
         },
         {
@@ -127,7 +127,7 @@
         },
         {
             "location": "/coarrays/#slices",
-            "text": "Often, you need to deal with multiple elements of a coarray iamge at once. For\nthis, Bulk supports for slices. For example, to write to a range of elements at\nonce:  auto   xs   =   bulk :: coarray < int > ( world ,   10 );  xs ( world . next_processor ())[{ 2 ,   5 }]   =   { 2 ,   3 ,   4 };   Or to get a range of elements:  auto   xs   =   bulk :: coarray < int > ( world ,   10 );  auto   ys   =   xs ( world . next_processor ())[{ 2 ,   5 }]. get ();  world . sync ();  // ys[0], ys[1], ys[2] are now available;",
+            "text": "Often, you need to deal with multiple elements of a coarray image at once. For\nthis, Bulk supports for slices. For example, to write to a range of elements at\nonce:  auto   xs   =   bulk :: coarray < int > ( world ,   10 );  xs ( world . next_processor ())[{ 2 ,   5 }]   =   { 2 ,   3 ,   4 };   Or to get a range of elements:  auto   xs   =   bulk :: coarray < int > ( world ,   10 );  auto   ys   =   xs ( world . next_processor ())[{ 2 ,   5 }]. get ();  world . sync ();  // ys[0], ys[1], ys[2] are now available;",
             "title": "Slices"
         },
         {
@@ -1202,7 +1202,7 @@
         },
         {
             "location": "/CHANGELOG/",
-            "text": "Changelog\n\u00b6\n\n\n0.2.0\n\u00b6\n\n\nUnreleased\n\n\nAdded\n\u00b6\n\n\n\n\nAdd a \u2018send many\u2019 primitive\n\n\n\n\nFixed\n\u00b6\n\n\n\n\nFixed bug in MPI backend where messages could get truncated\n\n\n\n\nRemoved\n\u00b6\n\n\n\n\n\u2026\n\n\n\n\n0.1.0\n\u00b6\n\n\n2017-06-01\n\n\n\n\nInitial release. A complete modern replacement for BSPlib.",
+            "text": "Changelog\n\u00b6\n\n\n0.2.0\n\u00b6\n\n\nUnreleased\n\n\nAdded\n\u00b6\n\n\n\n\nAdd a \u2018send many\u2019 primitive\n\n\nAdd support for array components in messages, i.e. \nqueue<T[], U, V, ...>\n\n\n\n\nFixed\n\u00b6\n\n\n\n\nFixed bug in MPI backend where messages could get truncated\n\n\n\n\n0.1.0\n\u00b6\n\n\n2017-06-01\n\n\n\n\nInitial release. A complete modern replacement for BSPlib.",
             "title": "Release Notes"
         },
         {
@@ -1217,18 +1217,13 @@
         },
         {
             "location": "/CHANGELOG/#added",
-            "text": "Add a \u2018send many\u2019 primitive",
+            "text": "Add a \u2018send many\u2019 primitive  Add support for array components in messages, i.e.  queue<T[], U, V, ...>",
             "title": "Added"
         },
         {
             "location": "/CHANGELOG/#fixed",
             "text": "Fixed bug in MPI backend where messages could get truncated",
             "title": "Fixed"
-        },
-        {
-            "location": "/CHANGELOG/#removed",
-            "text": "\u2026",
-            "title": "Removed"
         },
         {
             "location": "/CHANGELOG/#010",
