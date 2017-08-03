@@ -352,6 +352,7 @@ void test_communication() {
             q(world.next_processor()).send(123, 1337);
             world.sync();
             for (auto [tag, content] : q) {
+                world.log("received: %i, %i", tag, content);
                 BULK_CHECK(tag == 123 && content == 1337,
                            "message passed succesfully");
             }
@@ -448,26 +449,26 @@ void test_communication() {
             BULK_CHECK(q2.empty(), "second queue gets emptied");
         }
 
-        BULK_SECTION("Send many messages") {
-            bulk::queue<int> q(world);
-            q(world.next_processor()).send({1, 2, 3, 4});
-            world.sync();
-            BULK_CHECK(q.size() == 4,
-                       "get correct number of messages when sending many");
-            bool flag = true;
-            int i = 1;
-            for (auto x : q) {
-                if (x != i++) {
-                    flag = false;
-                    break;
-                }
-            }
-            BULK_CHECK(flag, "can send many");
-        }
+//        BULK_SECTION("Send many messages") {
+//            bulk::queue<int> q(world);
+//            q(world.next_processor()).send({1, 2, 3, 4});
+//            world.sync();
+//            BULK_CHECK(q.size() == 4,
+//                       "get correct number of messages when sending many");
+//            bool flag = true;
+//            int i = 1;
+//            for (auto x : q) {
+//                if (x != i++) {
+//                    flag = false;
+//                    break;
+//                }
+//            }
+//            BULK_CHECK(flag, "can send many");
+//        }
 
         BULK_SECTION("Messages with arrays") {
             auto q = bulk::queue<int[]>(world);
-            q(world.next_processor()).send_many({1, 2, 3, 4});
+            q(world.next_processor()).send({1, 2, 3, 4});
             world.sync();
             BULK_CHECK(q.size() == 1, "send many is one message");
             for (auto msg : q) {
@@ -478,8 +479,8 @@ void test_communication() {
 
         BULK_SECTION("Messages with arrays and normal") {
             auto q = bulk::queue<int[], int>(world);
-            q(world.next_processor()).send_many({1, 2, 3, 4}, 1);
-            q(world.next_processor()).send_many({2, 3, 4, 5}, 2);
+            q(world.next_processor()).send({1, 2, 3, 4}, 1);
+            q(world.next_processor()).send({2, 3, 4, 5}, 2);
             world.sync();
             BULK_CHECK(q.size() == 2, "send many with two messages");
             for (auto [xs, x] : q) {

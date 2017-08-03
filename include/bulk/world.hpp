@@ -125,7 +125,7 @@ class world {
     template <typename T>
     friend class coarray;
 
-    template <typename T, typename... Ts>
+    template <typename... Ts>
     friend class queue;
 
     // Returns the id of the registered location
@@ -147,11 +147,7 @@ class world {
     virtual void unregister_queue_(int id) = 0;
 
     // data consists of a complete message. size is total size.
-    virtual void send_(int processor, int queue_id, const void* data,
-                       size_t size) = 0;
-    virtual void send_many_(int processor, int queue_id, const void* data,
-                            size_t size, int count, const void* other,
-                            size_t size_of_other) = 0;
+    virtual char* send_buffer_(int target, int queue_id, size_t buffer_size) = 0;
 
     virtual void log_(std::string message) = 0;
 };

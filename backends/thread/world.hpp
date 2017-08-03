@@ -309,6 +309,18 @@ class world : public bulk::world {
         return;
     }
 
+    // data consists of both tag and content. size is total size.
+    void send_many_(int processor, int queue_id, const void* data, size_t size,
+                    int count, const void* other,
+                    size_t size_of_other) override {
+        static_assert(false, "`send_many_` not implemented in thread backend");
+    }
+
+    char* send_buffer_(int target, int queue_id, size_t buffer_size) override {
+        static_assert(false, "`send_buffer_` not implemented in thread backend");
+        return nullptr;
+    }
+
   private:
     // This should be a reference but we can not assign it in the constructor
     // because `world` does not have a constructor. FIXME: Change this ?

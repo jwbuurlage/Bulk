@@ -6,8 +6,9 @@
 #include <tuple>
 #include <vector>
 
-#include "world.hpp"
 #include "util/meta_helpers.hpp"
+#include "util/serialize.hpp"
+#include "world.hpp"
 
 /**
  * \file messages.hpp
@@ -34,9 +35,7 @@ class queue_base {
     virtual void* get_buffer_(int size_in_bytes) = 0;
     virtual void clear_() = 0;
 
-    virtual void unsafe_push_back(void* msg) = 0;
-    virtual void unsafe_push_array(int count, size_t size, void* msg,
-                                   size_t size_of_other, void* other) = 0;
+    virtual void deserialize_push(size_t size, char* data) = 0;
 };
 
 /**
@@ -45,15 +44,11 @@ class queue_base {
  * \tparam Tag the type to use for the message tag
  * \tparam Content the type to use for the message content
  */
-template <typename T, typename... Ts>
+template <typename... Ts>
 class queue {
   public:
-    using message_type = decltype(message<T, Ts...>::content);
+    using message_type = decltype(message<Ts...>::content);
     using iterator = typename std::vector<message_type>::iterator;
-
-    // If T = E[] is an array type, then element_type is E, otherwise it is T
-    using element_type =
-        typename std::remove_pointer<typename std::decay<T>::type>::type;
 
     /**
      * A queue is a mailbox for messages of a given type.
@@ -63,39 +58,9 @@ class queue {
      */
     class sender {
       public:
-        /** Send multiple messages over the queue. */
-        void send(std::vector<message_type> msgs) {
-            // FIXME implement this as a single internal primitive
-            for (auto msg : msgs) {
-                q_.impl_->send_(t_, msg);
-            }
-        }
-
         /** Send a message over the queue. */
-        template <typename... Us>
-        void send(Us... args) {
-            message_type msg = {args...};
-            q_.impl_->send_(t_, msg);
-        }
-
-        /* Enabled if first content type is an array. */
-        // We have to let this depend on its own template parameter to allow
-        // SFINAE to kick in
-        template <typename U = T,
-                  typename = typename std::enable_if_t<
-                      std::is_array<U>::value && (sizeof...(Ts) == 0)>>
-        void send_many(std::vector<element_type> msgs) {
-            q_.impl_->send_many_(t_, msgs.size(), msgs.data(), nullptr, 0);
-        }
-
-        template <typename U = T,
-                  typename = typename std::enable_if_t<
-                      std::is_array<U>::value && (sizeof...(Ts) > 0)>>
-        void send_many(std::vector<element_type> msgs, Ts... args,
-                       void* = nullptr) {
-            message_type msg = {std::vector<element_type>{}, args...};
-            q_.impl_->send_many_(t_, msgs.size(), msgs.data(), &msg,
-                                 sizeof(message_type));
+        void send(typename representation<Ts>::type... args) {
+            q_.impl_->send_(t_, args...);
         }
 
       private:
@@ -174,14 +139,35 @@ class queue {
         void operator=(impl& other) = delete;
         void operator=(impl&& other) = delete;
 
-        void send_(int t, message_type m) {
-            world_.send_(t, id_, &m, sizeof(m));
+        template <typename Buffer, typename U, typename... Us>
+        void fill(Buffer& buf, U& elem, Us... other) {
+            buf | elem;
+            fill(buf, other...);
         }
 
-        void send_many_(int t, int count, element_type* m, void* other,
-                        size_t size_of_other) {
-            world_.send_many_(t, id_, m, sizeof(element_type), count, other,
-                              size_of_other);
+        template <typename Buffer>
+        void fill(Buffer&) {}
+
+        template <typename Buffer, typename Tuple,
+                  typename Is =
+                      std::make_index_sequence<std::tuple_size<Tuple>::value>>
+        void fill(Buffer& buf, Tuple& xs) {
+            fill_tuple_(buf, xs, Is{});
+        }
+
+        template <typename Buffer, typename Tuple, size_t... Is>
+        void fill_tuple_(Buffer& buf, Tuple& xs, std::index_sequence<Is...>) {
+            fill(buf, std::get<Is>(xs)...);
+        }
+
+        void send_(int t, typename representation<Ts>::type... args) {
+            bulk::detail::scale ruler;
+            fill(ruler, args...);
+            auto target_buffer = world_.send_buffer_(t, id_, ruler.size);
+            auto membuf = bulk::detail::memory_buffer(ruler.size);
+            auto ibuf = bulk::detail::imembuf(membuf);
+            fill(ibuf, args...);
+            memcpy(target_buffer, membuf.buffer.get(), ruler.size);
         }
 
         void* get_buffer_(int size_in_bytes) override {
@@ -189,26 +175,11 @@ class queue {
             return &data_[0];
         }
 
-        void unsafe_push_back(void* msg) override {
-            data_.push_back(*static_cast<message_type*>(msg));
-        }
-
-        void unsafe_push_array(int count, size_t size, void* data,
-                               size_t size_of_other, void* other) override {
-            if (size_of_other == 0) {
-                data_.push_back(message_type{});
-                auto& msg =
-                    *((std::vector<element_type>*)(&(data_[data_.size() - 1])));
-                msg.resize(count);
-                memcpy(msg.data(), data, size * count);
-            } else {
-                data_.push_back(*static_cast<message_type*>(other));
-                using real_type = std::tuple<std::vector<element_type>, Ts...>;
-                auto& msg = *((std::vector<element_type>*)(&(
-                    std::get<0>(*(real_type*)&data_[data_.size() - 1]))));
-                msg.resize(count);
-                memcpy(msg.data(), data, size * count);
-            }
+        void deserialize_push(size_t size, char* data) {
+            auto membuf = bulk::detail::memory_buffer(size, data);
+            data_.push_back(message_type{});
+            auto obuf = bulk::detail::omembuf(membuf);
+            fill(obuf, data_[data_.size() - 1]);
         }
 
         void clear_() override { data_.clear(); }

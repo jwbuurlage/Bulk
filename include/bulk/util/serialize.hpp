@@ -48,7 +48,8 @@ struct memory_buffer {
     }
 
     void operator<<(std::string& str) {
-        for (auto c : str) (*this) << c;
+        for (auto c : str)
+            (*this) << c;
         (*this) << '\0';
     }
 
@@ -75,7 +76,6 @@ struct memory_buffer {
     }
 };
 
-
 struct omembuf {
     omembuf(memory_buffer& membuf_) : membuf(membuf_) {}
 
@@ -98,4 +98,4 @@ struct imembuf {
     memory_buffer& membuf;
 };
 
-}  // namespace bulk::detail
+} // namespace bulk::detail
