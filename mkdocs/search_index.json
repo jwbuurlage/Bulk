@@ -1132,12 +1132,12 @@
         },
         {
             "location": "/backends/mpi/",
-            "text": "MPI\n\u00b6\n\n\nIf you choose to use the MPI backend, then simply include the Bulk headers, and set up your project build as though it is an MPI project. We suggest to use the OpenMPI implementation, since is the implemnetation we test against.",
+            "text": "MPI\n\u00b6\n\n\nIf you choose to use the MPI backend, then simply include the Bulk headers, and set up your project build as though it is an MPI project. We suggest to use the OpenMPI implementation, since is the implementation we test against.",
             "title": "MPI"
         },
         {
             "location": "/backends/mpi/#mpi",
-            "text": "If you choose to use the MPI backend, then simply include the Bulk headers, and set up your project build as though it is an MPI project. We suggest to use the OpenMPI implementation, since is the implemnetation we test against.",
+            "text": "If you choose to use the MPI backend, then simply include the Bulk headers, and set up your project build as though it is an MPI project. We suggest to use the OpenMPI implementation, since is the implementation we test against.",
             "title": "MPI"
         },
         {
