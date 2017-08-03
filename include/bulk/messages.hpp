@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "world.hpp"
+#include "util/meta_helpers.hpp"
 
 /**
  * \file messages.hpp
@@ -16,37 +17,12 @@
 
 namespace bulk {
 
+using namespace bulk::meta;
+
 /**
  * This object contains a message for or from another processor.
  */
 
-// Partial specialization of alias templates is not allowed, so we need this
-// indirection
-template <typename T, typename Enable, typename... Ts>
-struct message_t;
-
-template <typename T, typename... Ts>
-struct message_t<T, typename std::enable_if_t<(sizeof...(Ts) > 0)>, Ts...> {
-    std::tuple<T, Ts...> content;
-};
-
-template <typename T, typename... Ts>
-struct message_t<T, typename std::enable_if_t<(sizeof...(Ts) == 0)>, Ts...> {
-    T content;
-};
-
-template <typename T>
-struct message_t<T[], void> {
-    std::vector<T> content;
-};
-
-template <typename T, typename... Ts>
-struct message_t<T[], typename std::enable_if_t<(sizeof...(Ts) > 0)>, Ts...> {
-    std::tuple<std::vector<T>, Ts...> content;
-};
-
-template <typename T, typename... Ts>
-struct message : public message_t<T, void, Ts...> {};
 
 // queue::impl subclasses queue_base
 // The reason that this is seperate is:
