@@ -351,7 +351,7 @@ void test_communication() {
             bulk::queue<int, int> q(world);
             q(world.next_rank()).send(123, 1337);
             world.sync();
-            for (auto [tag, content] : q) {
+            for (auto[tag, content] : q) {
                 BULK_CHECK(tag == 123 && content == 1337,
                            "message passed succesfully");
             }
@@ -364,7 +364,7 @@ void test_communication() {
             world.sync();
             int tag = 0;
             int content = 0;
-            for (auto [x, y] : q) {
+            for (auto[x, y] : q) {
                 tag = x;
                 content = y;
             }
@@ -379,7 +379,7 @@ void test_communication() {
             world.sync();
             int tag = 0;
             int content = 0;
-            for (auto [x, y] : q) {
+            for (auto[x, y] : q) {
                 tag = x;
                 content = y;
             }
@@ -399,9 +399,8 @@ void test_communication() {
 
             int k = 0;
             BULK_CHECK(!q.empty(), "multiple messages arrived");
-            for (auto [tag, content] : q) {
-                BULK_CHECK(tag == world.prev_rank() &&
-                               content == contents[k++],
+            for (auto[tag, content] : q) {
+                BULK_CHECK(tag == world.prev_rank() && content == contents[k++],
                            "multiple messages passed succesfully");
             }
         }
@@ -436,7 +435,7 @@ void test_communication() {
             BULK_CHECK(q2.size() == contents2.size(),
                        "second queue correct number of messages");
 
-            for (auto [tag, content] : q2) {
+            for (auto[tag, content] : q2) {
                 BULK_CHECK(tag == world.prev_rank() &&
                                content == contents2[l++],
                            "received correct result on q2");
@@ -464,7 +463,7 @@ void test_communication() {
             q(world.next_rank()).send({1, 2, 3, 4}, {1.0f, 2.0f});
             world.sync();
             BULK_CHECK(q.size() == 1, "send many is one message");
-            for (auto [xs, fs] : q) {
+            for (auto[xs, fs] : q) {
                 BULK_CHECK((xs == std::vector<int>{1, 2, 3, 4}),
                            "send many first content");
                 BULK_CHECK((fs == std::vector<float>{1.0f, 2.0f}),
@@ -478,7 +477,7 @@ void test_communication() {
             q(world.next_rank()).send({2, 3, 4, 5}, 2);
             world.sync();
             BULK_CHECK(q.size() == 2, "send many with two messages");
-            for (auto [xs, x] : q) {
+            for (auto[xs, x] : q) {
                 BULK_CHECK(x == 1 || x == 2, "right 'tag'");
                 if (x == 1) {
                     BULK_CHECK((xs == std::vector<int>{1, 2, 3, 4}),
@@ -490,5 +489,14 @@ void test_communication() {
             }
         }
 
+        BULK_SECTION("Messages with strings") {
+            auto q = bulk::queue<int, std::string>(world);
+            q(world.next_rank()).send(5, "string");
+            world.sync();
+            BULK_CHECK(q.size() == 1, "string message received");
+            for (auto [size, str] : q) {
+                BULK_CHECK(str == "string" && size == 5, "can send string");
+            }
+        }
     });
 }

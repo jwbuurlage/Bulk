@@ -19,6 +19,11 @@ struct representation<T[]> {
     using type = std::vector<T>;
 };
 
+template <>
+struct representation<std::string> {
+    using type = std::string;
+};
+
 // Partial specialization of alias templates is not allowed, so we need this
 // indirection
 template <typename Enable, typename... Ts>
