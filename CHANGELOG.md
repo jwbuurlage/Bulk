@@ -6,6 +6,7 @@ Unreleased
 
 ### Added
 
+- Add support for `std::string` variables and queues
 - Add support for array components in messages, i.e. `queue<T[], U, V, ...>`
 - Deprecate `processor_id` in favor of `rank`, renamed `{next,prev}_processor`
   to `{next, prev}_rank`

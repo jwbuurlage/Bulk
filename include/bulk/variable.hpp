@@ -165,7 +165,11 @@ class var {
             id_ = world.register_location_(&value_, sizeof(value_type));
             world.register_variable_(this);
         }
-        virtual ~var_impl() { world_.unregister_location_(id_); }
+
+        virtual ~var_impl() {
+            world_.unregister_location_(id_);
+            world_.unregister_variable_(id_);
+        }
 
         // No copies or moves
         var_impl(var_impl& other) = delete;

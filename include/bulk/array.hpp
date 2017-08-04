@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <iostream>
 #include <memory>
+#include <type_traits>
 
 #include "future.hpp"
 #include "variable.hpp"
@@ -22,6 +23,8 @@ namespace bulk {
  */
 template <typename T>
 class array : var_base {
+    static_assert(std::is_pod<T>::value, "(Co)arrays only support POD types");
+
   public:
     /**
      * Construct an array, and register it with `world`.

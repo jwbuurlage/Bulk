@@ -182,6 +182,9 @@ class world : public bulk::world {
 
     void unregister_location_(int id) override final {
         locations_[id] = nullptr;
+    }
+
+    void unregister_variable_(int id) override final {
         vars_[id] = nullptr;
     }
 
