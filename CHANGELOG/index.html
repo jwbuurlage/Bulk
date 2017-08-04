@@ -644,8 +644,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/world/processor_id/" title="world::processor_id" class="md-nav__link">
-      world::processor_id
+    <a href="../api/world/rank/" title="world::rank" class="md-nav__link">
+      world::rank
     </a>
   </li>
 
@@ -668,8 +668,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/world/next_processor/" title="world::next_processor" class="md-nav__link">
-      world::next_processor
+    <a href="../api/world/next_rank/" title="world::next_rank" class="md-nav__link">
+      world::next_rank
     </a>
   </li>
 
@@ -680,8 +680,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/world/prev_processor/" title="world::prev_processor" class="md-nav__link">
-      world::prev_processor
+    <a href="../api/world/prev_rank/" title="world::prev_rank" class="md-nav__link">
+      world::prev_rank
     </a>
   </li>
 
@@ -1289,8 +1289,9 @@
 <p>Unreleased</p>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Add a &lsquo;send many&rsquo; primitive</li>
 <li>Add support for array components in messages, i.e. <code>queue&lt;T[], U, V, ...&gt;</code></li>
+<li>Deprecate <code>processor_id</code> in favor of <code>rank</code>, renamed <code>{next,prev}_processor</code>
+  to <code>{next, prev}_rank</code></li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>

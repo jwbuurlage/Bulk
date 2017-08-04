@@ -715,8 +715,8 @@
 
 
   <li class="md-nav__item">
-    <a href="api/world/processor_id/" title="world::processor_id" class="md-nav__link">
-      world::processor_id
+    <a href="api/world/rank/" title="world::rank" class="md-nav__link">
+      world::rank
     </a>
   </li>
 
@@ -739,8 +739,8 @@
 
 
   <li class="md-nav__item">
-    <a href="api/world/next_processor/" title="world::next_processor" class="md-nav__link">
-      world::next_processor
+    <a href="api/world/next_rank/" title="world::next_rank" class="md-nav__link">
+      world::next_rank
     </a>
   </li>
 
@@ -751,8 +751,8 @@
 
 
   <li class="md-nav__item">
-    <a href="api/world/prev_processor/" title="world::prev_processor" class="md-nav__link">
-      world::prev_processor
+    <a href="api/world/prev_rank/" title="world::prev_rank" class="md-nav__link">
+      world::prev_rank
     </a>
   </li>
 
@@ -1324,7 +1324,7 @@
 <p>Hello world!</p>
 <div class="codehilite"><pre><span></span><span class="n">bulk</span><span class="o">::</span><span class="kr">thread</span><span class="o">::</span><span class="n">environment</span> <span class="n">env</span><span class="p">;</span>
 <span class="n">env</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">available_processors</span><span class="p">(),</span> <span class="p">[](</span><span class="k">auto</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">auto</span> <span class="n">s</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">processor_id</span><span class="p">();</span>
+    <span class="k">auto</span> <span class="n">s</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">rank</span><span class="p">();</span>
     <span class="k">auto</span> <span class="n">p</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">active_processors</span><span class="p">();</span>
 
     <span class="n">world</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&quot;Hello world from processor %d / %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
@@ -1334,11 +1334,11 @@
 
 <p>Distributed variables are the easiest way to communicate.</p>
 <div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">a</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">var</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
-<span class="n">a</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">())</span> <span class="o">=</span> <span class="n">s</span><span class="p">;</span>
+<span class="n">a</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">())</span> <span class="o">=</span> <span class="n">s</span><span class="p">;</span>
 <span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
 <span class="c1">// ... a is now updated</span>
 
-<span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">()).</span><span class="n">get</span><span class="p">();</span>
+<span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">()).</span><span class="n">get</span><span class="p">();</span>
 <span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
 <span class="c1">// ... b.value() is now available</span>
 </pre></div>
@@ -1346,7 +1346,7 @@
 
 <p>Coarrays provide a convenient syntax for working with distributed arrays.</p>
 <div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
-<span class="n">xs</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">())[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">;</span>
+<span class="n">xs</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">())[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">;</span>
 </pre></div>
 
 

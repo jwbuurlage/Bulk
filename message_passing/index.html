@@ -659,8 +659,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/world/processor_id/" title="world::processor_id" class="md-nav__link">
-      world::processor_id
+    <a href="../api/world/rank/" title="world::rank" class="md-nav__link">
+      world::rank
     </a>
   </li>
 
@@ -683,8 +683,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/world/next_processor/" title="world::next_processor" class="md-nav__link">
-      world::next_processor
+    <a href="../api/world/next_rank/" title="world::next_rank" class="md-nav__link">
+      world::next_rank
     </a>
   </li>
 
@@ -695,8 +695,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/world/prev_processor/" title="world::prev_processor" class="md-nav__link">
-      world::prev_processor
+    <a href="../api/world/prev_rank/" title="world::prev_rank" class="md-nav__link">
+      world::prev_rank
     </a>
   </li>
 
@@ -1210,8 +1210,8 @@ write:</p>
 <em>float</em> content. For example, a message can correspond to a component of
 a vector of floats. To put a message into a remote queue, we use
 <code>queue(pid).send</code>:</p>
-<div class="codehilite"><pre><span></span><span class="n">queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">);</span>
-<span class="n">queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">5.0f</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="n">queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">);</span>
+<span class="n">queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">5.0f</span><span class="p">);</span>
 </pre></div>
 
 
@@ -1238,13 +1238,13 @@ processor.</p>
 different types of messages. Each message queue has its own independent
 types. In addition, you are not limited to &lsquo;tag + content&rsquo; type of messages, you can also send untagged data, or custom data such as index tuples, or even your own structs. For example:</p>
 <div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">raw_queue</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">queue</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
-<span class="n">raw_queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-<span class="n">raw_queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
-<span class="n">raw_queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span>
+<span class="n">raw_queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">raw_queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">raw_queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span>
 
 <span class="k">auto</span> <span class="n">tuple_queue</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">queue</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
-<span class="n">tuple_queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-<span class="n">tuple_queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">);</span>
+<span class="n">tuple_queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+<span class="n">tuple_queue</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">()).</span><span class="n">send</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">);</span>
 
 <span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
 

@@ -701,8 +701,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/world/processor_id/" title="world::processor_id" class="md-nav__link">
-      world::processor_id
+    <a href="../api/world/rank/" title="world::rank" class="md-nav__link">
+      world::rank
     </a>
   </li>
 
@@ -725,8 +725,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/world/next_processor/" title="world::next_processor" class="md-nav__link">
-      world::next_processor
+    <a href="../api/world/next_rank/" title="world::next_rank" class="md-nav__link">
+      world::next_rank
     </a>
   </li>
 
@@ -737,8 +737,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/world/prev_processor/" title="world::prev_processor" class="md-nav__link">
-      world::prev_processor
+    <a href="../api/world/prev_rank/" title="world::prev_rank" class="md-nav__link">
+      world::prev_rank
     </a>
   </li>
 
@@ -1286,7 +1286,7 @@ guaranteed to work on top of any conforming Bulk backend.</p>
 <span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">bulk</span><span class="o">::</span><span class="n">mpi</span><span class="o">::</span><span class="n">environment</span> <span class="n">env</span><span class="p">;</span>
     <span class="n">env</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">available_processors</span><span class="p">(),</span> <span class="p">[](</span><span class="k">auto</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">auto</span> <span class="n">s</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">processor_id</span><span class="p">();</span>
+        <span class="k">auto</span> <span class="n">s</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">rank</span><span class="p">();</span>
         <span class="k">auto</span> <span class="n">p</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">active_processors</span><span class="p">();</span>
 
         <span class="n">world</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&quot;Hello world from processor %d / %d!&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
@@ -1307,7 +1307,7 @@ the requested number of processors. This function obtains a
 processors, for programmer convenience its identifier <code>s</code>
 and the total number of processes that are spawned <code>p</code> are
 passed as well. These can alternatively be obtained from world using
-<code>world.processor_id()</code> and
+<code>world.rank()</code> and
 <code>world.active_processors()</code> respectively.</p>
 <h2 id="communication-between-processors">Communication between processors<a class="headerlink" href="#communication-between-processors" title="Permanent link">&para;</a></h2>
 <p>Next, we look at some basic forms of communication between processors.
@@ -1325,14 +1325,14 @@ variable is created as follows:</p>
 
 <p>The reason to use a variable, is that a processor can <em>write</em> to a
 remote <strong>image</strong> of a variable.</p>
-<div class="codehilite"><pre><span></span><span class="n">bulk</span><span class="o">::</span><span class="n">put</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">(),</span> <span class="mi">4</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="n">bulk</span><span class="o">::</span><span class="n">put</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">(),</span> <span class="mi">4</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
 </pre></div>
 
 
 <p>This will overwrite the value of the variable <code>x</code> on the
 next logical processor (i.e. processor <code>s + 1 % p</code>) with
 <code>4</code>. We can obtain the value of a remote image using:</p>
-<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">y</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">get</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_processor</span><span class="p">(),</span> <span class="n">x</span><span class="p">);</span>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">y</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">get</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">(),</span> <span class="n">x</span><span class="p">);</span>
 </pre></div>
 
 
