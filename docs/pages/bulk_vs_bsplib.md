@@ -28,7 +28,7 @@ int main() {
 int main() {
     bulk::mpi::environment env;
     env.spawn(env.available_processors(), [](auto& world) {
-	auto s = world.processor_id();
+	auto s = world.rank();
 	auto p = world.active_processors();
 
 	world.log("Hello world from processor %d / %d!", s, p);
@@ -78,8 +78,8 @@ bsp_get((s + 1) % p, &x, 0, &c, sizeof(int));
 bsp_sync();
 
 // Bulk
-x(world.next_processor()) = 3;
-auto c = x(world.next_processor()).get();
+x(world.next_rank()) = 3;
+auto c = x(world.next_rank()).get();
 
 world.sync();
 ```
@@ -107,8 +107,8 @@ free(xs);
 
 // Bulk
 auto xs = bulk::coarray<int>(world, 10);
-xs(world.next_processor())[{2, 5}] = {2, 3, 4};
-xs(world.next_processor())[0] = 5;
+xs(world.next_rank())[{2, 5}] = {2, 3, 4};
+xs(world.next_rank())[0] = 5;
 
 world.sync();
 ```
@@ -145,11 +145,11 @@ for (int i = 0; i < packets; ++i) {
 }
 
 // Bulk
-auto s = world.processor_id();
+auto s = world.rank();
 auto p = world.active_processors();
 
 auto q = bulk::queue<int, int>(world);
-q(world.next_processor()).send(1, 42 + s);
+q(world.next_rank()).send(1, 42 + s);
 world.sync();
 
 for (auto [tag, content] : queue) {
@@ -159,7 +159,7 @@ for (auto [tag, content] : queue) {
 In addition, Bulk supports sending arbitrary data either using custom structs, or by composing messages on the fly. For example, to send a 3D tensor element with indices and its value, we can write:
 ```cpp
 auto q = bulk::queue<int, int, int, float>(world);
-q(world.next_processor()).send(1, 2, 3, 4.0f);
+q(world.next_rank()).send(1, 2, 3, 4.0f);
 world.sync();
 
 for (auto [i, j, k, value] : queue) {

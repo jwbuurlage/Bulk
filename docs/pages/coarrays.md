@@ -42,14 +42,14 @@ once:
 
 ```cpp
 auto xs = bulk::coarray<int>(world, 10);
-xs(world.next_processor())[{2, 5}] = {2, 3, 4};
+xs(world.next_rank())[{2, 5}] = {2, 3, 4};
 ```
 
 Or to get a range of elements:
 
 ```cpp
 auto xs = bulk::coarray<int>(world, 10);
-auto ys = xs(world.next_processor())[{2, 5}].get();
+auto ys = xs(world.next_rank())[{2, 5}].get();
 world.sync();
 // ys[0], ys[1], ys[2] are now available;
 ```

@@ -37,7 +37,7 @@ Hello world!
 ```cpp
 bulk::thread::environment env;
 env.spawn(env.available_processors(), [](auto& world) {
-    auto s = world.processor_id();
+    auto s = world.rank();
     auto p = world.active_processors();
 
     world.log("Hello world from processor %d / %d\n", s, p);
@@ -48,11 +48,11 @@ Distributed variables are the easiest way to communicate.
 
 ```cpp
 auto a = bulk::var<int>(world);
-a(world.next_processor()) = s;
+a(world.next_rank()) = s;
 world.sync();
 // ... a is now updated
 
-auto b = a(world.next_processor()).get();
+auto b = a(world.next_rank()).get();
 world.sync();
 // ... b.value() is now available
 ```
@@ -61,7 +61,7 @@ Coarrays provide a convenient syntax for working with distributed arrays.
 
 ```cpp
 auto xs = bulk::coarray<int>(world, 10);
-xs(world.next_processor())[3] = s;
+xs(world.next_rank())[3] = s;
 ```
 
 Message passing can be used for more flexible communication.

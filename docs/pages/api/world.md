@@ -14,9 +14,9 @@ class world;
 |---------------------------------------------------|--------------------------------------------------|
 | **System information**                            |                                                  |
 | [`active_processors`](world/active_processors.md) | returns the number of active processors          |
-| [`processor_id`](world/processor_id.md)           | returns the id of the local processor            |
-| [`next_processor`](world/next_processor.md)       | returns the id of the next logical processor     |
-| [`prev_processor`](world/prev_processor.md)       | returns the id of the previous logical processor |
+| [`rank`](world/rank.md)                           | returns the id of the local processor            |
+| [`next_rank`](world/next_rank.md)                 | returns the id of the next logical processor     |
+| [`prev_rank`](world/prev_rank.md)                 | returns the id of the previous logical processor |
 | **Communication and coordination**                |                                                  |
 | [`sync`](world/sync.md)                           | performs a bulk synchronization                  |
 | [`barrier`](world/barrier.md)                     | performs a bulk barrier                          |
@@ -32,10 +32,10 @@ int main() {
     environment env;
 
     env.spawn(env.available_processors(), [](bulk::world& world) {
-        int s = world.processor_id();
+        int s = world.rank();
         int p = world.active_processors();
 
-        world.log("Hello, world %d/%d", s, p);
+        world.log("Hello, world! %d/%d", s, p);
     });
 
     return 0;

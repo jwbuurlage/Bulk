@@ -3,7 +3,7 @@ Environment and world
 
 In the upcoming sections we will get you started with programming in Bulk. Two important concepts are that of an environment and a world.
 
-In these code examples, we will often use the short-hand `s` for the _local processor id_, and `p` for the _active number of processors_, and we will not always define these variables explicitly.
+In these code examples, we will often use the short-hand `s` for the _local processor id_ which is referred to as its _rank_, and `p` for the _active number of processors_, and we will not always define these variables explicitly.
 
 Parallel environments
 ---------------------
@@ -57,7 +57,7 @@ in the following way:
 
 ```cpp
 env.spawn(env.available_processors(), [](auto& world) {
-    auto s = world.processor_id();
+    auto s = world.rank();
     auto p = world.available_proecssors();
     world.log("Hello world from processor %d / %d!", s, p);
 }
@@ -83,8 +83,8 @@ these are also provided as arguments for programmer convenience). We can
 also obtain indices of the neighbouring processors:
 
 ```cpp
-auto next = world.next_processor();
-auto previous = world.prev_processor();
+auto next = world.next_rank();
+auto previous = world.prev_rank();
 ```
 
 The next and previous processor can also be computed manually using:

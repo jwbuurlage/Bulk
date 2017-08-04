@@ -19,7 +19,7 @@ guaranteed to work on top of any conforming Bulk backend.
 int main() {
     bulk::mpi::environment env;
     env.spawn(env.available_processors(), [](auto& world) {
-        auto s = world.processor_id();
+        auto s = world.rank();
         auto p = world.active_processors();
 
         world.log("Hello world from processor %d / %d!", s, p);
@@ -40,7 +40,7 @@ the requested number of processors. This function obtains a
 processors, for programmer convenience its identifier `s`
 and the total number of processes that are spawned `p` are
 passed as well. These can alternatively be obtained from world using
-`world.processor_id()` and
+`world.rank()` and
 `world.active_processors()` respectively.
 
 Communication between processors
@@ -65,7 +65,7 @@ The reason to use a variable, is that a processor can *write* to a
 remote **image** of a variable.
 
 ```cpp
-bulk::put(world.next_processor(), 4, x);
+bulk::put(world.next_rank(), 4, x);
 ```
 
 This will overwrite the value of the variable `x` on the
@@ -73,7 +73,7 @@ next logical processor (i.e. processor `s + 1 % p`) with
 `4`. We can obtain the value of a remote image using:
 
 ```cpp
-auto y = bulk::get(world.next_processor(), x);
+auto y = bulk::get(world.next_rank(), x);
 ```
 
 Here, `y` is a `bulk::future` object. A future

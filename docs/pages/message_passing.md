@@ -18,8 +18,8 @@ a vector of floats. To put a message into a remote queue, we use
 `queue(pid).send`:
 
 ```cpp
-queue(world.next_processor()).send(1, 1.0f);
-queue(world.next_processor()).send(2, 5.0f);
+queue(world.next_rank()).send(1, 1.0f);
+queue(world.next_rank()).send(2, 5.0f);
 ```
 
 This will send two messages to the next logical processor, with tags 1
@@ -47,13 +47,13 @@ types. In addition, you are not limited to 'tag + content' type of messages, you
 
 ```cpp
 auto raw_queue = bulk::queue<int>(world);
-raw_queue(world.next_processor()).send(1);
-raw_queue(world.next_processor()).send(2);
-raw_queue(world.next_processor()).send(123);
+raw_queue(world.next_rank()).send(1);
+raw_queue(world.next_rank()).send(2);
+raw_queue(world.next_rank()).send(123);
 
 auto tuple_queue = bulk::queue<int, int, int>(world);
-tuple_queue(world.next_processor()).send(1, 2, 3);
-tuple_queue(world.next_processor()).send(4, 5, 6);
+tuple_queue(world.next_rank()).send(1, 2, 3);
+tuple_queue(world.next_rank()).send(4, 5, 6);
 
 world.sync();
 

@@ -37,17 +37,17 @@ example, to write the value `1` to the remote image held by
 the next logical processor, we write:
 
 ``` 
-bulk::put(world.next_processor(), 1, x);
+bulk::put(world.next_rank(), 1, x);
 ```
 
 To obtain the value of a remote image we write:
 
 ``` 
-auto y = bulk::get(world.next_processor(), x);
+auto y = bulk::get(world.next_rank(), x);
 ```
 
 !!! note
-    Equivalently, we can use the short-hand syntax: `x(world.next_processor()) = 1` for putting, and `auto y = x(world.next_processor()).get()` for getting.
+    Equivalently, we can use the short-hand syntax: `x(world.next_rank()) = 1` for putting, and `auto y = x(world.next_rank()).get()` for getting.
 
 <center>
 ![image](images/variable.png)

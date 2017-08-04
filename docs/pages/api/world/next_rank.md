@@ -1,7 +1,7 @@
-# `bulk::world::next_processor`
+# `bulk::world::next_rank`
 
 ```cpp
-int next_processor() const;
+int next_rank() const;
 ```
 
 Returns the id of the next logical processor.

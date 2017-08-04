@@ -1,7 +1,7 @@
-# `bulk::world::prev_processor`
+# `bulk::world::prev_rank`
 
 ```cpp
-int prev_processor() const;
+int prev_rank() const;
 ```
 
 Returns the id of the previous logical processor.

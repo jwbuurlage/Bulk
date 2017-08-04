@@ -54,10 +54,10 @@ pages:
     - Member functions:
         - 'environment::spawn': 'api/environment/spawn.md'
         - 'environment::available_processors': 'api/environment/available_processors.md'
-        - 'world::processor_id': 'api/world/processor_id.md'
+        - 'world::rank': 'api/world/rank.md'
         - 'world::active_processors': 'api/world/active_processors.md'
-        - 'world::next_processor': 'api/world/next_processor.md'
-        - 'world::prev_processor': 'api/world/prev_processor.md'
+        - 'world::next_rank': 'api/world/next_rank.md'
+        - 'world::prev_rank': 'api/world/prev_rank.md'
         - 'world::sync': 'api/world/sync.md'
         - 'world::barrier': 'api/world/barrier.md'
         - 'var::constructor': 'api/var/constructor.md'

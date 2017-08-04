@@ -1,7 +1,7 @@
-# `bulk::world::processor_id`
+# `bulk::world::rank`
 
 ```cpp
-int processor_id() const;
+int rank() const;
 ```
 
 Returns the local processor id
