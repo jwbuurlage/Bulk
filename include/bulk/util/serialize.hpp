@@ -1,5 +1,6 @@
 #pragma once
 
+#include <type_traits>
 #include <cstring>
 #include <memory>
 
@@ -35,7 +36,7 @@ struct memory_buffer {
     std::unique_ptr<char[]> buffer;
     std::size_t index = 0;
 
-    template <typename T>
+    template <typename T, typename = std::enable_if_t<std::is_pod<T>::value>>
     void operator<<(const T& value) {
         memcpy(buffer.get() + index, &value, sizeof(T));
         index += sizeof(T);
@@ -47,7 +48,7 @@ struct memory_buffer {
         index += sizeof(T);
     }
 
-    void operator<<(std::string& str) {
+    void operator<<(const std::string& str) {
         for (auto c : str)
             (*this) << c;
         (*this) << '\0';
@@ -97,5 +98,26 @@ struct imembuf {
 
     memory_buffer& membuf;
 };
+
+template <typename Buffer, typename U, typename... Us>
+void fill(Buffer& buf, U& elem, Us&&... other) {
+    buf | elem;
+    fill(buf, std::forward<Us>(other)...);
+}
+
+template <typename Buffer>
+void fill(Buffer&) {}
+
+template <typename Buffer, typename Tuple,
+          typename Is =
+              std::make_index_sequence<std::tuple_size<Tuple>::value>>
+void fill(Buffer& buf, Tuple& xs) {
+    fill_tuple_(buf, xs, Is{});
+}
+
+template <typename Buffer, typename Tuple, size_t... Is>
+void fill_tuple_(Buffer& buf, Tuple& xs, std::index_sequence<Is...>) {
+    fill(buf, std::get<Is>(xs)...);
+}
 
 } // namespace bulk::detail

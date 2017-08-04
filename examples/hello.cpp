@@ -15,6 +15,7 @@ int main() {
         a(world.next_rank()) = s;
         world.sync();
         // ... the local a is now updated
+        world.log("%d got put %d", s, a.value());
 
         auto b = a(world.next_rank()).get();
         world.sync();

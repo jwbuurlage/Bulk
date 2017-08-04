@@ -24,7 +24,9 @@ class memory_buffer {
             location_ += size;
         }
 
-        char* current_location() { return buf_.data() + location_; }
+        char* current_location() {
+            return buf_.data() + location_;
+        }
 
         void update(std::size_t size) { location_ += size; }
 

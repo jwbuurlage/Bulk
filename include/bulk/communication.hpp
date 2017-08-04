@@ -23,7 +23,7 @@ namespace bulk {
  * \param x the variable to put the value into
  */
 template <typename T>
-void put(int processor, T value, var<T>& x) {
+void put(int processor, const T& value, var<T>& x) {
     x(processor) = value;
 }
 

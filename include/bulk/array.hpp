@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "future.hpp"
+#include "variable.hpp"
 
 /**
  * \file array.hpp
@@ -20,7 +21,7 @@ namespace bulk {
  * This object is the default implementation of a distributed _array_.
  */
 template <typename T>
-class array {
+class array : var_base {
   public:
     /**
      * Construct an array, and register it with `world`.
@@ -31,6 +32,7 @@ class array {
     array(bulk::world& world, std::size_t size) : world_(world), size_(size) {
         data_ = std::unique_ptr<T[]>(new T[size]);
         id_ = world_.register_location_(data_.get(), size * sizeof(T));
+        id_ = world_.register_variable_(this);
     }
 
     /**
@@ -128,6 +130,11 @@ class array {
         future<T[]> result(world_, count);
         world_.get_(processor, id_, sizeof(T), result.buffer(), offset, count);
         return result;
+    }
+
+    void deserialize_put(size_t size, char* data) {
+        (void)size;
+        (void)data;
     }
 
     /**

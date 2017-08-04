@@ -146,9 +146,11 @@ class world {
     friend class queue;
 
     // Returns the id of the registered location
+    virtual int register_variable_(class var_base* location) = 0;
     virtual int register_location_(void* location, size_t size) = 0;
     virtual void unregister_location_(int id) = 0;
 
+    virtual char* put_buffer_(int processor, int var_id, size_t size) = 0;
     virtual void put_(int processor, const void* value, size_t size,
                       int var_id) = 0;
     // size is per element

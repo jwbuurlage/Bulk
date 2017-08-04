@@ -4,6 +4,7 @@
 
 #include "future.hpp"
 #include "util/meta_helpers.hpp"
+#include "util/serialize.hpp"
 #include "world.hpp"
 
 /**
@@ -17,6 +18,11 @@ namespace bulk {
 
 template <typename T>
 class future;
+
+class var_base {
+  public:
+    virtual void deserialize_put(size_t size, char* data) = 0;
+};
 
 /**
  * Represents a distributed object with an image for each processor, that is
@@ -139,7 +145,7 @@ class var {
      *
      * \returns a reference to the value held by the local image
      */
-    T& value() { return impl_->value_; }
+    value_type& value() { return impl_->value_; }
 
     /**
      * Retrieve the world to which this var is registed.
@@ -152,11 +158,12 @@ class var {
     // Default implementation is a value, world and id.
     // Backends can subclass bulk::var<T>::var_impl to add more.
     // Backends can overload var_impl::put and var_impl::get.
-    class var_impl {
+    class var_impl : var_base {
       public:
         var_impl(bulk::world& world) : world_(world), value_{} {
             // register_location_ can include a barrier in certain backends
             id_ = world.register_location_(&value_, sizeof(value_type));
+            world.register_variable_(this);
         }
         virtual ~var_impl() { world_.unregister_location_(id_); }
 
@@ -166,14 +173,26 @@ class var {
         void operator=(var_impl& other) = delete;
         void operator=(var_impl&& other) = delete;
 
-        virtual void put(int processor, const value_type& source) {
-            world_.put_(processor, &source, sizeof(value_type), id_);
+        virtual void put(int t, const value_type& source) {
+            bulk::detail::scale ruler;
+            bulk::detail::fill(ruler, source);
+            auto target_buffer = world_.put_buffer_(t, id_, ruler.size);
+            auto membuf = bulk::detail::memory_buffer(ruler.size);
+            auto ibuf = bulk::detail::imembuf(membuf);
+            bulk::detail::fill(ibuf, source);
+            memcpy(target_buffer, membuf.buffer.get(), ruler.size);
         }
 
         virtual future<T> get(int processor) const {
             future<T> result(world_);
             world_.get_(processor, id_, sizeof(value_type), &result.value());
             return result;
+        }
+
+        void deserialize_put(size_t size, char* data) override {
+            auto membuf = bulk::detail::memory_buffer(size, data);
+            auto obuf = bulk::detail::omembuf(membuf);
+            bulk::detail::fill(obuf, value_);
         }
 
         bulk::world& world_;

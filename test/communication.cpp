@@ -122,11 +122,21 @@ void test_communication() {
             };
             bulk::var<custom_struct> a(world, {4, 8.0f});
 
-            bulk::put(world.next_rank(), {3, 2.0f}, a);
+            a(world.next_rank()) = {3, 2.0f};
             world.sync();
 
             BULK_CHECK(a.value().x == 3 && a.value().y == 2.0f,
                        "receive correct value after putting custom struct");
+        }
+
+        BULK_SECTION("Put a string") {
+            // test `put` to single variable
+            bulk::var<std::string> a(world);
+
+            a(world.next_rank()) = "test";
+            world.sync();
+
+            BULK_CHECK(a.value() == "test", "can put a string");
         }
 
         BULK_SECTION("Put multiple") {
@@ -494,7 +504,7 @@ void test_communication() {
             q(world.next_rank()).send(5, "string");
             world.sync();
             BULK_CHECK(q.size() == 1, "string message received");
-            for (auto [size, str] : q) {
+            for (auto[size, str] : q) {
                 BULK_CHECK(str == "string" && size == 5, "can send string");
             }
         }

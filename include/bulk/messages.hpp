@@ -139,34 +139,13 @@ class queue {
         void operator=(impl& other) = delete;
         void operator=(impl&& other) = delete;
 
-        template <typename Buffer, typename U, typename... Us>
-        void fill(Buffer& buf, U& elem, Us&&... other) {
-            buf | elem;
-            fill(buf, std::forward<Us>(other)...);
-        }
-
-        template <typename Buffer>
-        void fill(Buffer&) {}
-
-        template <typename Buffer, typename Tuple,
-                  typename Is =
-                      std::make_index_sequence<std::tuple_size<Tuple>::value>>
-        void fill(Buffer& buf, Tuple& xs) {
-            fill_tuple_(buf, xs, Is{});
-        }
-
-        template <typename Buffer, typename Tuple, size_t... Is>
-        void fill_tuple_(Buffer& buf, Tuple& xs, std::index_sequence<Is...>) {
-            fill(buf, std::get<Is>(xs)...);
-        }
-
         void send_(int t, typename representation<Ts>::type... args) {
             bulk::detail::scale ruler;
-            fill(ruler, args...);
+            bulk::detail::fill(ruler, args...);
             auto target_buffer = world_.send_buffer_(t, id_, ruler.size);
             auto membuf = bulk::detail::memory_buffer(ruler.size);
             auto ibuf = bulk::detail::imembuf(membuf);
-            fill(ibuf, args...);
+            bulk::detail::fill(ibuf, args...);
             memcpy(target_buffer, membuf.buffer.get(), ruler.size);
         }
 
@@ -179,7 +158,7 @@ class queue {
             auto membuf = bulk::detail::memory_buffer(size, data);
             data_.push_back(message_type{});
             auto obuf = bulk::detail::omembuf(membuf);
-            fill(obuf, data_[data_.size() - 1]);
+            bulk::detail::fill(obuf, data_[data_.size() - 1]);
         }
 
         void clear_() override { data_.clear(); }
