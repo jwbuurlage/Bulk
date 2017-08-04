@@ -1,3 +1,5 @@
+#pragma once
+
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -5,7 +7,10 @@
 namespace bulk::meta {
 
 template <typename T>
-struct representation{
+struct representation {
+    static_assert(std::is_pod<T>::value, "Only POD types are supported as `T` "
+                                         "for distributed variables and "
+                                         "queues");
     using type = T;
 };
 

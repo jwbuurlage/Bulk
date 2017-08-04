@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util/meta_helpers.hpp"
+
 #include <bulk/world.hpp>
 #include <memory>
 
@@ -17,6 +19,8 @@ namespace bulk {
  */
 template <typename T>
 class future {
+    using value_type = typename bulk::meta::representation<T>::type;
+
   public:
     /**
      * Initialize the future.
@@ -40,16 +44,14 @@ class future {
     /**
      * Move a future.
      */
-    void operator=(future<T>&& other) {
-        buffer_ = std::move(other.buffer_);
-    }
+    void operator=(future<T>&& other) { buffer_ = std::move(other.buffer_); }
 
     /**
      * Get a reference to the value held by the future.
      *
      * \returns a reference to the value
      */
-    T& value() { return *buffer_.get(); }
+    value_type& value() { return *buffer_.get(); }
 
     /**
      * Get a reference to the world of the future.
@@ -59,13 +61,13 @@ class future {
     bulk::world& world() { return world_; }
 
   private:
-    std::unique_ptr<T> buffer_;
+    std::unique_ptr<value_type> buffer_;
     bulk::world& world_;
 };
 
 template <typename T>
 class future<T[]> {
-    public:
+  public:
     /**
      * Initialize the future.
      */
@@ -85,9 +87,7 @@ class future<T[]> {
         *this = std::move(other);
     }
 
-    void operator=(future<T[]>&& other) {
-        buffer_ = std::move(other.buffer_);
-    }
+    void operator=(future<T[]>&& other) { buffer_ = std::move(other.buffer_); }
 
     /**
      * ...

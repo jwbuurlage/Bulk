@@ -1,8 +1,10 @@
 #pragma once
 
-#include <bulk/future.hpp>
-#include <bulk/world.hpp>
 #include <memory>
+
+#include "future.hpp"
+#include "util/meta_helpers.hpp"
+#include "world.hpp"
 
 /**
  * \file variable.hpp
@@ -23,6 +25,8 @@ class future;
 template <typename T>
 class var {
   public:
+    using value_type = typename bulk::meta::representation<T>::type;
+
     class image {
       public:
         /**
@@ -30,7 +34,7 @@ class var {
          *
          * \param value the new value of the image
          */
-        var<T>& operator=(const T& value) {
+        var<T>& operator=(const value_type& value) {
             var_.impl_->put(t_, value);
             return var_;
         }
@@ -49,13 +53,9 @@ class var {
         int t_;
     };
 
-    using value_type = T;
-
     /**
      * Initialize and registers the variable with the world
      */
-    template <
-        typename = std::enable_if_t<std::is_trivially_constructible<T>::value>>
     var(bulk::world& world) {
         // TODO: Here we should ask world to create the appropriate
         // subclass of var_impl
@@ -67,7 +67,7 @@ class var {
      * Initialize and registers the variable with the world, and sets its value
      * to `value`.
      */
-    var(bulk::world& world, T value) : var(world) { *this = value; }
+    var(bulk::world& world, value_type value) : var(world) { *this = value; }
 
     /**
      * Deconstructs and deregisters the variable with the world
@@ -110,7 +110,7 @@ class var {
     /**
      * Broadcast a value to all images.
      */
-    void broadcast(T x) {
+    void broadcast(value_type x) {
         for (int t = 0; t < world().active_processors(); ++t) {
             impl_->put(t, x);
         }
@@ -121,15 +121,15 @@ class var {
      *
      * \note This is for code like `myint = myvar + 5;`.
      */
-    operator T&() { return impl_->value_; }
-    operator const T&() const { return impl_->value_; }
+    operator value_type&() { return impl_->value_; }
+    operator const value_type&() const { return impl_->value_; }
 
     /**
      * Write to the local image
      *
      * \note This is for code like `myvar = 5;`.
      */
-    var<T>& operator=(const T& rhs) {
+    var<T>& operator=(const value_type& rhs) {
         impl_->value_ = rhs;
         return *this;
     }
@@ -156,7 +156,7 @@ class var {
       public:
         var_impl(bulk::world& world) : world_(world), value_{} {
             // register_location_ can include a barrier in certain backends
-            id_ = world.register_location_(&value_, sizeof(T));
+            id_ = world.register_location_(&value_, sizeof(value_type));
         }
         virtual ~var_impl() { world_.unregister_location_(id_); }
 
@@ -166,18 +166,18 @@ class var {
         void operator=(var_impl& other) = delete;
         void operator=(var_impl&& other) = delete;
 
-        virtual void put(int processor, const T& source) {
-            world_.put_(processor, &source, sizeof(T), id_);
+        virtual void put(int processor, const value_type& source) {
+            world_.put_(processor, &source, sizeof(value_type), id_);
         }
 
         virtual future<T> get(int processor) const {
             future<T> result(world_);
-            world_.get_(processor, id_, sizeof(T), &result.value());
+            world_.get_(processor, id_, sizeof(value_type), &result.value());
             return result;
         }
 
         bulk::world& world_;
-        T value_;
+        value_type value_;
         int id_;
     };
     std::unique_ptr<var_impl> impl_;
