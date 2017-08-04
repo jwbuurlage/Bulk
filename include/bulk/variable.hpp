@@ -22,6 +22,8 @@ class future;
 class var_base {
   public:
     virtual void deserialize_put(size_t size, char* data) = 0;
+    virtual size_t serialized_size() = 0;
+    virtual void serialize(void* buffer) = 0;
 };
 
 /**
@@ -180,16 +182,17 @@ class var {
         virtual void put(int t, const value_type& source) {
             bulk::detail::scale ruler;
             bulk::detail::fill(ruler, source);
-            auto target_buffer = world_.put_buffer_(t, id_, ruler.size);
-            auto membuf = bulk::detail::memory_buffer(ruler.size);
+            auto size = ruler.size;
+            auto target_buffer = world_.put_buffer_(t, id_, size);
+            auto membuf = bulk::detail::memory_buffer(size);
             auto ibuf = bulk::detail::imembuf(membuf);
             bulk::detail::fill(ibuf, source);
-            memcpy(target_buffer, membuf.buffer.get(), ruler.size);
+            memcpy(target_buffer, membuf.buffer.get(), size);
         }
 
         virtual future<T> get(int processor) const {
             future<T> result(world_);
-            world_.get_(processor, id_, sizeof(value_type), &result.value());
+            world_.get_buffer_(processor, id_, result.id());
             return result;
         }
 
@@ -197,6 +200,19 @@ class var {
             auto membuf = bulk::detail::memory_buffer(size, data);
             auto obuf = bulk::detail::omembuf(membuf);
             bulk::detail::fill(obuf, value_);
+        }
+
+        size_t serialized_size() override final {
+            bulk::detail::scale ruler;
+            bulk::detail::fill(ruler, value_);
+            return ruler.size;
+        }
+
+        void serialize(void* buffer) override final {
+            auto membuf = bulk::detail::memory_buffer(serialized_size());
+            auto ibuf = bulk::detail::imembuf(membuf);
+            bulk::detail::fill(ibuf, value_);
+            memcpy(buffer, membuf.buffer.get(), serialized_size());
         }
 
         bulk::world& world_;

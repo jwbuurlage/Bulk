@@ -1,6 +1,7 @@
 #pragma once
 
 #include "util/meta_helpers.hpp"
+#include "util/serialize.hpp"
 
 #include <bulk/world.hpp>
 #include <memory>
@@ -14,25 +15,35 @@
 
 namespace bulk {
 
+class future_base {
+  public:
+    virtual void deserialize_get(size_t size, char* data) = 0;
+};
+
 /**
  * Represents a value that will become known in the upcoming superstep
  */
 template <typename T>
-class future {
+class future : future_base {
+  public:
     using value_type = typename bulk::meta::representation<T>::type;
 
-  public:
     /**
      * Initialize the future.
      */
     future(bulk::world& world) : world_(world) {
         buffer_ = std::make_unique<T>();
+        id_ = world_.register_future_(this);
     }
 
     /**
      * Deconstruct the future.
      */
-    ~future() {}
+    ~future() {
+        if (id_ >= 0) {
+            world_.unregister_future_(id_);
+        }
+    }
 
     future(const future<T>& other) = delete;
     void operator=(const future<T>& other) = delete;
@@ -44,15 +55,20 @@ class future {
     /**
      * Move a future.
      */
-    void operator=(future<T>&& other) { buffer_ = std::move(other.buffer_); }
+    void operator=(future<T>&& other) {
+        buffer_ = std::move(other.buffer_);
+        id_ = other.id_;
+        other.id_ = -1;
+        world_.move_future_location_(id_, this);
+    }
 
     /**
      * Get a reference to the value held by the future.
      *
      * \returns a reference to the value
      */
-    value_type& value() { return *buffer_.get(); }
-    const value_type& value() const { return *buffer_.get(); }
+    value_type& value() { return *buffer_; }
+    const value_type& value() const { return *buffer_; }
 
     /**
      * Implicitly get the value held by the future
@@ -70,6 +86,18 @@ class future {
     bulk::world& world() { return world_; }
 
   private:
+    template <typename U>
+    friend class var;
+
+    void deserialize_get(size_t size, char* data) override final {
+        auto membuf = bulk::detail::memory_buffer(size, data);
+        auto obuf = bulk::detail::omembuf(membuf);
+        bulk::detail::fill(obuf, *buffer_);
+    }
+
+    int id() const { return id_; }
+
+    int id_ = -1;
     std::unique_ptr<value_type> buffer_;
     bulk::world& world_;
 };

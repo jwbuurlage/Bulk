@@ -5,10 +5,12 @@
 #include <string>
 #include <vector>
 
+#include <mpi.h>
+
+#include <bulk/future.hpp>
 #include <bulk/messages.hpp>
 #include <bulk/variable.hpp>
 #include <bulk/world.hpp>
-#include <mpi.h>
 
 #include "memory_buffer.hpp"
 
@@ -16,9 +18,11 @@ namespace bulk::mpi {
 
 enum class message_t : int {
     put,
-    put_custom,
+    custom_put,
     get_request,
     get_response,
+    custom_get_request,
+    custom_get_response,
     send_custom
 };
 
@@ -51,7 +55,7 @@ enum class put_t : int { single, multiple };
 //   * [x] put
 //   * [x] get_request
 //   * [x] get_response
-//   * [ ] message
+//   * [x] message
 // - [ ] Try to extract 'readers' and 'writers', and see if we can get better
 // code reuse and modularity here
 
@@ -67,6 +71,8 @@ class world : public bulk::world {
         get_request_buffers_.resize(active_processors_);
         get_response_buffers_.resize(active_processors_);
         custom_message_buffers_.resize(active_processors_);
+        custom_get_request_buffers_.resize(active_processors_);
+        custom_get_response_buffers_.resize(active_processors_);
 
         ones_.resize(active_processors_);
         std::fill(ones_.begin(), ones_.end(), 1);
@@ -85,13 +91,16 @@ class world : public bulk::world {
         int remote_get_requests = 0;
         int remote_get_responses = 0;
         int remote_custom_messages = 0;
+        int remote_custom_get_requests = 0;
+        int remote_custom_get_responses = 0;
 
         std::vector<int> put_to_proc(active_processors_);
         std::vector<int> get_request_to_proc(active_processors_);
         std::vector<int> get_response_to_proc(active_processors_);
         std::vector<int> custom_put_to_proc(active_processors_);
         std::vector<int> custom_messages_to_proc(active_processors_);
-
+        std::vector<int> custom_get_request_to_proc(active_processors_);
+        std::vector<int> custom_get_response_to_proc(active_processors_);
         // handle puts
         // exchange puts, implicit barrier
         send_buffers_(put_buffers_, message_t::put, put_to_proc);
@@ -104,12 +113,12 @@ class world : public bulk::world {
 
         // handle custom puts
         // exchange puts, implicit barrier
-        send_buffers_(custom_put_buffers_, message_t::put_custom,
+        send_buffers_(custom_put_buffers_, message_t::custom_put,
                       custom_put_to_proc);
         MPI_Reduce_scatter(custom_put_to_proc.data(), &remote_custom_puts,
                            ones_.data(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
         receive_buffer_for_tag_(custom_put_receive_buffer_,
-                                message_t::put_custom, remote_custom_puts);
+                                message_t::custom_put, remote_custom_puts);
         process_custom_puts_(custom_put_receive_buffer_);
 
         // handle gets
@@ -130,6 +139,31 @@ class world : public bulk::world {
         receive_buffer_for_tag_(get_response_buffer_, message_t::get_response,
                                 remote_get_responses);
         process_get_responses_(get_response_buffer_);
+
+        // handle custom_gets
+        // exchange gets, implicit barrier
+        send_buffers_(custom_get_request_buffers_,
+                      message_t::custom_get_request,
+                      custom_get_request_to_proc);
+        MPI_Reduce_scatter(custom_get_request_to_proc.data(),
+                           &remote_custom_get_requests, ones_.data(), MPI_INT,
+                           MPI_SUM, MPI_COMM_WORLD);
+
+        receive_buffer_for_tag_(custom_get_request_buffer_,
+                                message_t::custom_get_request,
+                                remote_custom_get_requests);
+        send_custom_get_responses_(custom_get_request_buffer_,
+                                   custom_get_response_to_proc);
+
+        // exchange gets, implicit barrier
+        MPI_Reduce_scatter(custom_get_response_to_proc.data(),
+                           &remote_custom_get_responses, ones_.data(), MPI_INT,
+                           MPI_SUM, MPI_COMM_WORLD);
+
+        receive_buffer_for_tag_(custom_get_response_buffer_,
+                                message_t::custom_get_response,
+                                remote_custom_get_responses);
+        process_custom_gets_(custom_get_response_buffer_);
 
         // handle custom messages
         send_buffers_(custom_message_buffers_, message_t::send_custom,
@@ -164,6 +198,25 @@ class world : public bulk::world {
         return idx;
     }
 
+    int register_future_(class future_base* location) override final {
+        auto idx = 0u;
+        for (; idx < futures_.size(); ++idx) {
+            if (futures_[idx] == nullptr) {
+                break;
+            }
+        }
+        if (idx == futures_.size()) {
+            futures_.push_back(nullptr);
+        }
+        futures_[idx] = location;
+        return idx;
+    }
+
+    void move_future_location_(int id,
+                               class future_base* location) override final {
+        futures_[id] = location;
+    }
+
     // Returns the id of the registered location
     int register_location_(void* location,
                            [[maybe_unused]] size_t size) override final {
@@ -185,6 +238,7 @@ class world : public bulk::world {
     }
 
     void unregister_variable_(int id) override final { vars_[id] = nullptr; }
+    void unregister_future_(int id) override final { futures_[id] = nullptr; }
 
     void put_(int processor, const void* value, size_t size,
               int var_id) override final {
@@ -215,10 +269,11 @@ class world : public bulk::world {
         put_buffers_[processor].push(size * count, values);
     }
 
-    void get_buffer_(int target, int var_id) override final {
-        auto& buffer = custom_get_buffers_[target];
-        buffer << target;
+    void get_buffer_(int target, int var_id, int future_id) override final {
+        auto& buffer = custom_get_request_buffers_[target];
+        buffer << processor_id_;
         buffer << var_id;
+        buffer << future_id;
     }
 
     // Size is per element
@@ -343,22 +398,33 @@ class world : public bulk::world {
         buf.clear();
     }
 
-    void send_custom_get_responses_(memory_buffer& buf, std::vector<int>& got_sent) {
+    void send_custom_get_responses_(memory_buffer& buf,
+                                    std::vector<int>& got_sent) {
         auto reader = buf.reader();
         while (!reader.empty()) {
-            int target = 0;
-            int processor = 0;
+            int target = -1;
+            int var_id = -1;
+            int future_id = -1;
 
             reader >> target;
             reader >> var_id;
+            reader >> future_id;
 
-            get_response_buffers_[target] << var_id;
-            // serialize local var[var_id]
-            // FIXME
+            auto& buffer = custom_get_response_buffers_[target];
+
+            auto size = vars_[var_id]->serialized_size();
+
+            buffer << future_id;
+            buffer << size;
+            buffer.ensure_room(size);
+            auto loc = buffer.buffer();
+            vars_[var_id]->serialize(loc);
+            buffer.update(size);
         }
         buf.clear();
 
-        send_buffers_(get_custom_response_buffers_, message_t::get_response_custom, got_sent);
+        send_buffers_(custom_get_response_buffers_,
+                      message_t::custom_get_response, got_sent);
     }
 
     void send_get_responses_(memory_buffer& buf, std::vector<int>& got_sent) {
@@ -412,6 +478,21 @@ class world : public bulk::world {
         buf.clear();
     }
 
+    void process_custom_gets_(memory_buffer& buf) {
+        auto reader = buf.reader();
+        int future_id = {};
+        size_t size = {};
+
+        while (!reader.empty()) {
+            reader >> future_id;
+            reader >> size;
+            futures_[future_id]->deserialize_get(size,
+                                                 reader.current_location());
+            reader.update(size);
+        }
+        buf.clear();
+    }
+
     void process_custom_messages_(memory_buffer& buf) {
         auto reader = buf.reader();
         int queue_id = {};
@@ -444,6 +525,7 @@ class world : public bulk::world {
     std::vector<void*> locations_;
     std::vector<queue_base*> queues_;
     std::vector<var_base*> vars_;
+    std::vector<future_base*> futures_;
 
     // see how many puts and gets each processor receives
     std::vector<int> ones_;
@@ -458,6 +540,12 @@ class world : public bulk::world {
     memory_buffer get_request_buffer_;
     std::vector<memory_buffer> get_response_buffers_;
     memory_buffer get_response_buffer_;
+
+    std::vector<memory_buffer> custom_get_request_buffers_;
+    memory_buffer custom_get_request_buffer_;
+    std::vector<memory_buffer> custom_get_response_buffers_;
+    memory_buffer custom_get_response_buffer_;
+
     std::vector<memory_buffer> custom_message_buffers_;
     memory_buffer custom_message_buffer_;
 };

@@ -31,7 +31,7 @@ int main() {
     environment env;
 
     env.spawn(env.available_processors(), [](bulk::world& world) {
-        int s = world.processor_id();
+        int s = world.rank();
         int p = world.active_processors();
 
         // about 4 MB
@@ -54,7 +54,7 @@ int main() {
             double total = 0.0f;
             int sample_size = p > 4 ? 4 : p - 1;
             for (auto k = 0; k < sample_size; ++k) {
-                auto t = (world.next_processor() + k * (p / sample_size)) % p;
+                auto t = (world.next_rank() + k * (p / sample_size)) % p;
 
                 auto clock = bulk::util::timer();
                 target.put(t, dummy_data.begin(),

@@ -44,6 +44,7 @@ class array : var_base {
     ~array() {
         if (data_) {
             world_.unregister_location_(id_);
+            world_.unregister_variable_(id_);
         }
     }
 
@@ -135,10 +136,11 @@ class array : var_base {
         return result;
     }
 
-    void deserialize_put(size_t size, char* data) {
-        (void)size;
-        (void)data;
-    }
+    // FIXME: These are unusued..., once we use 'backend buffers' for arrays we
+    // can redo this
+    void deserialize_put(size_t, char*) override final {}
+    void serialize(void*) {}
+    size_t serialized_size() override final { return 0; }
 
     /**
      * Get the local size of the array
