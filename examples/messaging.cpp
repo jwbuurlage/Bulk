@@ -6,10 +6,10 @@ int main() {
     environment env;
 
     env.spawn(env.available_processors(), [](bulk::world& world) {
-        int s = world.processor_id();
+        int s = world.rank();
 
         bulk::queue<int, int> q(world);
-        q(world.next_processor()).send(s, s + 1);
+        q(world.next_rank()).send(s, s + 1);
 
         world.sync();
 

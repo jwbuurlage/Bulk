@@ -9,7 +9,7 @@ extern environment env;
 
 void test_communication() {
     env.spawn(env.available_processors(), [](auto& world) {
-        int s = world.processor_id();
+        int s = world.rank();
         int p = world.active_processors();
 
         BULK_SKIP_SECTION_IF("Communication", p <= 1);
@@ -20,7 +20,7 @@ void test_communication() {
 
             BULK_CHECK(a.value() == 3, "correct initial value for variable");
 
-            bulk::put(world.next_processor(), s, a);
+            bulk::put(world.next_rank(), s, a);
             world.sync();
 
             BULK_CHECK(a.value() == ((s + p - 1) % p),
@@ -31,7 +31,7 @@ void test_communication() {
             // test `put` to single variable
             bulk::var<int> a(world, 3);
 
-            if (world.processor_id() == 1) {
+            if (world.rank() == 1) {
                 a.broadcast(2);
             }
             world.sync();
@@ -46,7 +46,7 @@ void test_communication() {
             // test `put` to single variable
             bulk::var<int> a(world, s);
 
-            bulk::put(world.next_processor(), s, a);
+            bulk::put(world.next_rank(), s, a);
 
             // sleep
             std::this_thread::sleep_for(20ms);
@@ -55,14 +55,14 @@ void test_communication() {
 
             world.sync();
 
-            BULK_CHECK(a.value() == world.prev_processor(),
+            BULK_CHECK(a.value() == world.prev_rank(),
                        "receive data after sync");
 
             a.value() = 42;
 
             world.sync();
 
-            auto b = bulk::get(world.next_processor(), a);
+            auto b = bulk::get(world.next_rank(), a);
 
             std::this_thread::sleep_for(20ms);
 
@@ -77,7 +77,7 @@ void test_communication() {
             // test `put` to single variable
             bulk::var<int> a(world);
 
-            a(world.next_processor()) = s;
+            a(world.next_rank()) = s;
             world.sync();
 
             BULK_CHECK(a.value() == ((s + p - 1) % p),
@@ -108,7 +108,7 @@ void test_communication() {
             // test `put` float to single variable
             bulk::var<float> a(world, 5.0f);
 
-            bulk::put(world.next_processor(), 1.0f, a);
+            bulk::put(world.next_rank(), 1.0f, a);
             world.sync();
 
             BULK_CHECK(a.value() == 1.0f,
@@ -122,7 +122,7 @@ void test_communication() {
             };
             bulk::var<custom_struct> a(world, {4, 8.0f});
 
-            bulk::put(world.next_processor(), {3, 2.0f}, a);
+            bulk::put(world.next_rank(), {3, 2.0f}, a);
             world.sync();
 
             BULK_CHECK(a.value().x == 3 && a.value().y == 2.0f,
@@ -138,7 +138,7 @@ void test_communication() {
                 xs.emplace_back(world);
 
             for (int i = 0; i < size; ++i) {
-                bulk::put(world.next_processor(), s + i, xs[i]);
+                bulk::put(world.next_rank(), s + i, xs[i]);
             }
 
             world.sync();
@@ -185,10 +185,10 @@ void test_communication() {
             b.value() = s;
             world.sync();
 
-            auto c = bulk::get(world.next_processor(), b);
+            auto c = bulk::get(world.next_rank(), b);
             world.sync();
 
-            BULK_CHECK(c.value() == world.next_processor(),
+            BULK_CHECK(c.value() == world.next_rank(),
                        "receive correct value after getting");
         }
 
@@ -197,10 +197,10 @@ void test_communication() {
             b.value() = s;
             world.sync();
 
-            auto c = b(world.next_processor()).get();
+            auto c = b(world.next_rank()).get();
             world.sync();
 
-            BULK_CHECK(c.value() == world.next_processor(),
+            BULK_CHECK(c.value() == world.next_rank(),
                        "receive correct value after sugarized getting");
         }
 
@@ -213,13 +213,13 @@ void test_communication() {
 
             std::vector<bulk::future<int>> ys;
             for (int i = 0; i < size; ++i) {
-                ys.push_back(bulk::get(world.next_processor(), x));
+                ys.push_back(bulk::get(world.next_rank(), x));
             }
 
             world.sync();
 
             for (auto& y : ys) {
-                BULK_CHECK(y.value() == world.next_processor(),
+                BULK_CHECK(y.value() == world.next_rank(),
                            "receive correct value after getting multiple");
             }
         }
@@ -229,7 +229,7 @@ void test_communication() {
             std::iota(test.begin(), test.end(), 1);
 
             bulk::coarray<int> xs(world, 10, 5);
-            xs.put(world.next_processor(), test.begin(), test.end());
+            xs.put(world.next_rank(), test.begin(), test.end());
             world.sync();
 
             BULK_CHECK(xs[5] == 6, "put iterator range");
@@ -241,11 +241,11 @@ void test_communication() {
             BULK_CHECK(zs.size() == 10, "can obtain the size of a coarray");
             BULK_CHECK(zs.empty() == false, "can check for emptyness");
 
-            zs(world.next_processor())[1] = s;
+            zs(world.next_rank())[1] = s;
 
             world.sync();
 
-            BULK_CHECK(zs[1] == world.prev_processor(),
+            BULK_CHECK(zs[1] == world.prev_rank(),
                        "putting to remote coarray image gives correct result");
 
             zs[3] = 2;
@@ -274,19 +274,19 @@ void test_communication() {
 
         BULK_SECTION("Coarray slicing") {
             bulk::coarray<int> zs(world, 10, 0);
-            zs(world.next_processor())[{2, 5}] = s;
-            zs(world.next_processor())[{0, 2}] = {s - 1, s - 2};
+            zs(world.next_rank())[{2, 5}] = s;
+            zs(world.next_rank())[{0, 2}] = {s - 1, s - 2};
 
             world.sync();
 
             for (int i = 2; i < 5; ++i) {
-                BULK_CHECK(zs[i] == world.prev_processor(),
+                BULK_CHECK(zs[i] == world.prev_rank(),
                            "setting slice to constant");
             }
             BULK_CHECK(zs[5] == 0, "outside the slice values are untouched");
-            BULK_CHECK(zs[0] == world.prev_processor() - 1,
+            BULK_CHECK(zs[0] == world.prev_rank() - 1,
                        "individual slice setting");
-            BULK_CHECK(zs[1] == world.prev_processor() - 2,
+            BULK_CHECK(zs[1] == world.prev_rank() - 2,
                        "individual slice setting");
         }
 
@@ -349,7 +349,7 @@ void test_communication() {
 
         BULK_SECTION("Single message passing") {
             bulk::queue<int, int> q(world);
-            q(world.next_processor()).send(123, 1337);
+            q(world.next_rank()).send(123, 1337);
             world.sync();
             for (auto [tag, content] : q) {
                 BULK_CHECK(tag == 123 && content == 1337,
@@ -360,7 +360,7 @@ void test_communication() {
         BULK_SECTION("Message to self") {
             bulk::queue<int, int> q(world);
 
-            q(world.processor_id()).send(123, 1337);
+            q(world.rank()).send(123, 1337);
             world.sync();
             int tag = 0;
             int content = 0;
@@ -375,7 +375,7 @@ void test_communication() {
         BULK_SECTION("Multiple messages to self") {
             auto q = bulk::queue<int, int>(world);
 
-            q(world.processor_id()).send(123, 1337);
+            q(world.rank()).send(123, 1337);
             world.sync();
             int tag = 0;
             int content = 0;
@@ -392,7 +392,7 @@ void test_communication() {
 
             bulk::queue<int, int> q(world);
             for (size_t i = 0; i < contents.size(); ++i) {
-                q(world.next_processor()).send(s, contents[i]);
+                q(world.next_rank()).send(s, contents[i]);
             }
 
             world.sync();
@@ -400,7 +400,7 @@ void test_communication() {
             int k = 0;
             BULK_CHECK(!q.empty(), "multiple messages arrived");
             for (auto [tag, content] : q) {
-                BULK_CHECK(tag == world.prev_processor() &&
+                BULK_CHECK(tag == world.prev_rank() &&
                                content == contents[k++],
                            "multiple messages passed succesfully");
             }
@@ -414,10 +414,10 @@ void test_communication() {
             bulk::queue<int, float> q2(world);
 
             for (size_t i = 0; i < contents.size(); ++i) {
-                q(world.next_processor()).send(contents[i]);
+                q(world.next_rank()).send(contents[i]);
             }
             for (size_t i = 0; i < contents2.size(); ++i) {
-                q2(world.next_processor()).send(s, contents2[i]);
+                q2(world.next_rank()).send(s, contents2[i]);
             }
 
             world.sync();
@@ -437,7 +437,7 @@ void test_communication() {
                        "second queue correct number of messages");
 
             for (auto [tag, content] : q2) {
-                BULK_CHECK(tag == world.prev_processor() &&
+                BULK_CHECK(tag == world.prev_rank() &&
                                content == contents2[l++],
                            "received correct result on q2");
             }
@@ -450,7 +450,7 @@ void test_communication() {
 
         BULK_SECTION("Messages with arrays") {
             auto q = bulk::queue<int[]>(world);
-            q(world.next_processor()).send({1, 2, 3, 4});
+            q(world.next_rank()).send({1, 2, 3, 4});
             world.sync();
             BULK_CHECK(q.size() == 1, "send many is one message");
             for (auto msg : q) {
@@ -461,7 +461,7 @@ void test_communication() {
 
         BULK_SECTION("Messages with multiple arrays") {
             auto q = bulk::queue<int[], float[]>(world);
-            q(world.next_processor()).send({1, 2, 3, 4}, {1.0f, 2.0f});
+            q(world.next_rank()).send({1, 2, 3, 4}, {1.0f, 2.0f});
             world.sync();
             BULK_CHECK(q.size() == 1, "send many is one message");
             for (auto [xs, fs] : q) {
@@ -474,8 +474,8 @@ void test_communication() {
 
         BULK_SECTION("Messages with arrays and normal") {
             auto q = bulk::queue<int[], int>(world);
-            q(world.next_processor()).send({1, 2, 3, 4}, 1);
-            q(world.next_processor()).send({2, 3, 4, 5}, 2);
+            q(world.next_rank()).send({1, 2, 3, 4}, 1);
+            q(world.next_rank()).send({2, 3, 4, 5}, 2);
             world.sync();
             BULK_CHECK(q.size() == 2, "send many with two messages");
             for (auto [xs, x] : q) {

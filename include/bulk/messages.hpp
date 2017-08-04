@@ -176,7 +176,6 @@ class queue {
         }
 
         void deserialize_push(size_t size, char* data) {
-            bulk::detail::scale ruler;
             auto membuf = bulk::detail::memory_buffer(size, data);
             data_.push_back(message_type{});
             auto obuf = bulk::detail::omembuf(membuf);

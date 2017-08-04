@@ -6,12 +6,12 @@ extern environment env;
 
 void test_initialization() {
     env.spawn(env.available_processors(), [](auto& world) {
-        int s = world.processor_id();
+        int s = world.rank();
         int p = world.active_processors();
 
 
         BULK_SECTION("Init") {
-            BULK_CHECK(s == world.processor_id(),
+            BULK_CHECK(s == world.rank(),
                             "correct processor id");
             BULK_CHECK(p == world.active_processors(),
                             "correct number of processors");

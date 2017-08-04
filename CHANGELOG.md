@@ -6,8 +6,9 @@ Unreleased
 
 ### Added
 
-- Add a 'send many' primitive
 - Add support for array components in messages, i.e. `queue<T[], U, V, ...>`
+- Deprecate `processor_id` in favor of `rank`, renamed `{next,prev}_processor`
+  to `{next, prev}_rank`
 
 ### Fixed
 

@@ -6,17 +6,17 @@ int main() {
     environment env;
 
     env.spawn(env.available_processors(), [](bulk::world& world) {
-        int s = world.processor_id();
+        int s = world.rank();
         int p = world.active_processors();
 
         bulk::var<int> a(world);
 
-        a(world.next_processor()) = s;
+        a(world.next_rank()) = s;
         world.sync();
 
         world.log("%d/%d <- %d", s, p, a.value());
 
-        auto b = a(world.next_processor()).get();
+        auto b = a(world.next_rank()).get();
 
         world.sync();
 

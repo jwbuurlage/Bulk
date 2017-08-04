@@ -14,7 +14,7 @@ void test_partitioning() {
 
     auto N = (int)sqrt(env.available_processors());
     env.spawn(N * N, [](auto& world) {
-        int s = world.processor_id();
+        int s = world.rank();
         int p = world.active_processors();
 
         auto N = (int)sqrt(p);

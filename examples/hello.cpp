@@ -6,24 +6,24 @@ int main() {
     environment env;
 
     env.spawn(env.available_processors(), [](bulk::world& world) {
-        int s = world.processor_id();
+        int s = world.rank();
         int p = world.active_processors();
 
         world.log("Hello, world %d/%d", s, p);
 
         auto a = bulk::var<int>(world);
-        a(world.next_processor()) = s;
+        a(world.next_rank()) = s;
         world.sync();
         // ... the local a is now updated
 
-        auto b = a(world.next_processor()).get();
+        auto b = a(world.next_rank()).get();
         world.sync();
         // ... b.value() is now available
 
         // coarrays are distributed arrays, each processor has an array to which
         // other processors can write
         auto xs = bulk::coarray<int>(world, 10);
-        xs(world.next_processor())[3] = s;
+        xs(world.next_rank())[3] = s;
 
         // messages can be passed to queues that specify a tag type, and a
         // content type

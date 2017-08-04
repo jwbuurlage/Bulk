@@ -9,7 +9,7 @@ int main() {
     environment env;
 
     env.spawn(env.available_processors(), [](bulk::world& world) {
-        int s = world.processor_id();
+        int s = world.rank();
         int p = world.active_processors();
         
         // block distribution

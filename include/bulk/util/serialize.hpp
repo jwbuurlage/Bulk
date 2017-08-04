@@ -28,7 +28,7 @@ struct memory_buffer {
 
     memory_buffer(std::size_t size, char* data) {
         buffer = std::make_unique<char[]>(size);
-        // double buffer is kind of a waste
+        // FIXME double buffer is kind of a waste
         memcpy(buffer.get(), data, size);
     }
 

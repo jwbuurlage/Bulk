@@ -5,7 +5,7 @@ int main() {
     bulk::thread::environment env;
 
     env.spawn(env.available_processors(), [](bulk::world& world) {
-        int s = world.processor_id();
+        int s = world.rank();
         int p = world.active_processors();
 
         // hello world
@@ -18,11 +18,11 @@ int main() {
         // writing to variables
         bulk::var<int> a(world);
         bulk::var<int> b(world);
-        a(world.next_processor()) = s;
+        a(world.next_rank()) = s;
         b = 5 + s;
         world.sync();
 
-        b(world.next_processor()) = 5;
+        b(world.next_rank()) = 5;
         world.sync();
 
         world.log("%d <- %d\n", s, a.value());
@@ -30,8 +30,8 @@ int main() {
 
         // coarrays
         bulk::coarray<int> xs(world, 5);
-        xs(world.next_processor())[0] = s;
-        xs(world.next_processor())[2] = s;
+        xs(world.next_rank())[0] = s;
+        xs(world.next_rank())[2] = s;
         xs[1] = s;
         world.sync();
 

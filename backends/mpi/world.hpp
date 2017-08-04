@@ -69,7 +69,7 @@ class world : public bulk::world {
     virtual ~world() {}
 
     int active_processors() const override final { return active_processors_; }
-    int processor_id() const override final { return processor_id_; }
+    int rank() const override final { return processor_id_; }
 
     void sync() override final {
         clear_messages_();

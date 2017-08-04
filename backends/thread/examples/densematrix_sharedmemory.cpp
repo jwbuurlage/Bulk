@@ -45,7 +45,7 @@ int main() {
     using clock = high_resolution_clock;
     auto spawn_begin = clock::now();
     env.spawn(env.available_processors(), [&times_ms](bulk::world& world) {
-        int s = world.processor_id();
+        int s = world.rank();
         int p = world.active_processors();
 
         int N = (int)std::sqrt(p);

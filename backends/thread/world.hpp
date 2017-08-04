@@ -82,7 +82,7 @@ class world : public bulk::world {
     }
 
     int active_processors() const override { return nprocs_; }
-    int processor_id() const override { return pid_; }
+    int rank() const override { return pid_; }
 
     void barrier() override { state_->sync_barrier.wait(); }
 

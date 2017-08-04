@@ -31,34 +31,51 @@ class world {
     virtual int active_processors() const = 0;
 
     /**
-     * Get the local processor id
+     * Get the local rank
      *
-     * \returns an integer containing the id of the local processor
+     * \returns an integer containing the rank of the local processor
      */
-    virtual int processor_id() const = 0;
+    virtual int rank() const = 0;
+
+    [[deprecated("`world::processor_id` was renamed to `world::rank`")]] int
+    processor_id() const {
+        return this->rank();
+    }
 
     /**
-     * Get the id of the next logical processor
+     * Get the rank of the next logical processor
      *
-     * \returns an integer containing the id of the next processor
+     * \returns an integer containing the rank of the next processor
      */
-    int next_processor() const {
-        auto next = processor_id() + 1;
+    int next_rank() const {
+        auto next = rank() + 1;
         if (next >= active_processors())
             next -= active_processors();
         return next;
     }
 
+    [[deprecated(
+        "`world::next_processor` was renamed to `world::next_rank`")]] int
+    next_processor() const {
+        return this->next_rank();
+    }
+
     /**
-     * Get the id of the previous logical processor
+     * Get the rank of the previous logical processor
      *
-     * \returns an integer containing the id of the previous processor
+     * \returns an integer containing the rank of the previous processor
      */
-    int prev_processor() const {
-        auto prev = processor_id() + active_processors() - 1;
+    int prev_rank() const {
+        auto prev = rank() + active_processors() - 1;
         if (prev >= active_processors())
             prev -= active_processors();
         return prev;
+    }
+
+    [[deprecated(
+        "`world::prev_processor` was renamed to `world::prev_rank`")]] int
+    prev_processor() const {
+        return prev_rank();
     }
 
     /**
@@ -85,7 +102,7 @@ class world {
      *
      * The syntax is printf style.
      *
-     * The logs are sorted by processor id before being printed at the next
+     * The logs are sorted by processor rank before being printed at the next
      * call to `sync`.
      *
      * At the next call to `sync`, the logs of all processors are sent
@@ -147,7 +164,8 @@ class world {
     virtual void unregister_queue_(int id) = 0;
 
     // data consists of a complete message. size is total size.
-    virtual char* send_buffer_(int target, int queue_id, size_t buffer_size) = 0;
+    virtual char* send_buffer_(int target, int queue_id,
+                               size_t buffer_size) = 0;
 
     virtual void log_(std::string message) = 0;
 };
