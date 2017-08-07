@@ -130,7 +130,6 @@ void test_communication() {
         }
 
         BULK_SECTION("Put a string") {
-            // test `put` to single variable
             bulk::var<std::string> a(world);
 
             a(world.next_rank()) = "test";
@@ -140,13 +139,12 @@ void test_communication() {
         }
 
         BULK_SECTION("Get a string") {
-            // test `put` to single variable
-            bulk::var<std::string> a(world, "test");
+            bulk::var<std::string> a(world, "test" + std::to_string(s));
 
             auto b = a(world.next_rank()).get();
             world.sync();
 
-            BULK_CHECK(b.value() == "test", "can get a string");
+            BULK_CHECK(b.value() == "test" + std::to_string(world.next_rank()), "can get a string");
         }
 
         BULK_SECTION("Put multiple") {
