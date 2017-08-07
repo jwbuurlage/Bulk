@@ -53,7 +53,7 @@ int main() {
 
         // We send the results back to the master
         auto report = bulk::queue<std::string, int>(world);
-        for (auto[word, count] : counts) {
+        for (auto [word, count] : counts) {
             report(0).send(word, count);
         }
 
@@ -65,7 +65,7 @@ int main() {
             return std::get<1>(lhs) < std::get<1>(rhs);
         });
 
-        for (auto[word, count] : report) {
+        for (auto [word, count] : report) {
             world.log("%s: %d", word.c_str(), count);
         }
     });
