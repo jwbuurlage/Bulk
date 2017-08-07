@@ -23,7 +23,6 @@ enum class message_t : int {
 };
 
 enum class put_t : int { single, multiple };
-enum class get_t : int { request_single, request_multiple };
 
 // different approach
 // -> buffers should be some kind of memory pool
@@ -105,7 +104,8 @@ class world : public bulk::world {
 
         // handle custom puts
         // exchange puts, implicit barrier
-        send_buffers_(custom_put_buffers_, message_t::put_custom, custom_put_to_proc);
+        send_buffers_(custom_put_buffers_, message_t::put_custom,
+                      custom_put_to_proc);
         MPI_Reduce_scatter(custom_put_to_proc.data(), &remote_custom_puts,
                            ones_.data(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
         receive_buffer_for_tag_(custom_put_receive_buffer_,
@@ -184,9 +184,7 @@ class world : public bulk::world {
         locations_[id] = nullptr;
     }
 
-    void unregister_variable_(int id) override final {
-        vars_[id] = nullptr;
-    }
+    void unregister_variable_(int id) override final { vars_[id] = nullptr; }
 
     void put_(int processor, const void* value, size_t size,
               int var_id) override final {
@@ -196,7 +194,7 @@ class world : public bulk::world {
         put_buffers_[processor].push(size, value);
     }
 
-    char* put_buffer_(int target, int var_id, size_t size) override {
+    char* put_buffer_(int target, int var_id, size_t size) override final {
         auto& buffer = custom_put_buffers_[target];
         buffer << var_id;
         buffer << size;
@@ -217,19 +215,15 @@ class world : public bulk::world {
         put_buffers_[processor].push(size * count, values);
     }
 
-    void get_(int processor, int var_id, size_t size,
-              void* target) override final {
-        get_request_buffers_[processor] << get_t::request_single;
-        get_request_buffers_[processor] << var_id;
-        get_request_buffers_[processor] << size;
-        get_request_buffers_[processor] << target;
-        get_request_buffers_[processor] << processor_id_;
+    void get_buffer_(int target, int var_id) override final {
+        auto& buffer = custom_get_buffers_[target];
+        buffer << target;
+        buffer << var_id;
     }
 
     // Size is per element
     void get_(int processor, int var_id, size_t size, void* target,
               size_t offset, size_t count) override final {
-        get_request_buffers_[processor] << get_t::request_multiple;
         get_request_buffers_[processor] << var_id;
         size_t total_offset = offset * size;
         get_request_buffers_[processor] << total_offset;
@@ -349,6 +343,24 @@ class world : public bulk::world {
         buf.clear();
     }
 
+    void send_custom_get_responses_(memory_buffer& buf, std::vector<int>& got_sent) {
+        auto reader = buf.reader();
+        while (!reader.empty()) {
+            int target = 0;
+            int processor = 0;
+
+            reader >> target;
+            reader >> var_id;
+
+            get_response_buffers_[target] << var_id;
+            // serialize local var[var_id]
+            // FIXME
+        }
+        buf.clear();
+
+        send_buffers_(get_custom_response_buffers_, message_t::get_response_custom, got_sent);
+    }
+
     void send_get_responses_(memory_buffer& buf, std::vector<int>& got_sent) {
         auto reader = buf.reader();
         while (!reader.empty()) {
@@ -358,44 +370,16 @@ class world : public bulk::world {
             size_t offset = 0;
             size_t size = 0;
 
-            get_t get_type;
-            reader >> get_type;
+            reader >> var_id;
+            reader >> offset;
+            reader >> size;
+            reader >> target;
+            reader >> processor;
 
-            switch (get_type) {
-            case get_t::request_single: {
-                reader >> var_id;
-                reader >> size;
-                reader >> target;
-                reader >> processor;
-
-                get_response_buffers_[processor] << target;
-                get_response_buffers_[processor] << size;
-                get_response_buffers_[processor].push(size, locations_[var_id]);
-
-                break;
-            }
-
-            case get_t::request_multiple: {
-                reader >> var_id;
-                reader >> offset;
-                reader >> size;
-                reader >> target;
-                reader >> processor;
-
-                get_response_buffers_[processor] << target;
-                get_response_buffers_[processor] << size;
-                get_response_buffers_[processor].push(
-                    size, (char*)locations_[var_id] + offset);
-
-                break;
-            }
-
-            default: {
-                log("ERROR: Unknown type of get message");
-                abort();
-                break;
-            }
-            }
+            get_response_buffers_[processor] << target;
+            get_response_buffers_[processor] << size;
+            get_response_buffers_[processor].push(
+                size, (char*)locations_[var_id] + offset);
         }
         buf.clear();
 

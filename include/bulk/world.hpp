@@ -158,8 +158,7 @@ class world {
     virtual void put_(int processor, const void* values, size_t size,
                       int var_id, size_t offset, size_t count) = 0;
 
-    virtual void get_(int processor, int var_id, size_t size, void* target) = 0;
-    // size is per element
+    virtual void get_buffer_(int processor, int var_id) = 0;
     virtual void get_(int processor, int var_id, size_t size, void* target,
                       size_t offset, size_t count) = 0;
 
