@@ -144,7 +144,8 @@ void test_communication() {
             auto b = a(world.next_rank()).get();
             world.sync();
 
-            BULK_CHECK(b.value() == "test" + std::to_string(world.next_rank()), "can get a string");
+            BULK_CHECK(b.value() == "test" + std::to_string(world.next_rank()),
+                       "can get a string");
         }
 
         BULK_SECTION("Put multiple") {
