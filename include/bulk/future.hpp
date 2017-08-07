@@ -52,6 +52,15 @@ class future {
      * \returns a reference to the value
      */
     value_type& value() { return *buffer_.get(); }
+    const value_type& value() const { return *buffer_.get(); }
+
+    /**
+     * Implicitly get the value held by the future
+     *
+     * \note This is for code like `myint = myfuture + 5;`.
+     */
+    operator value_type&() { return this->value(); }
+    operator const value_type&() const { return this->value(); }
 
     /**
      * Get a reference to the world of the future.
