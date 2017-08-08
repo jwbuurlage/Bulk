@@ -3,7 +3,7 @@ Bulk
 
 ![](docs/pages/images/logo-square.png)
 
-Bulk is a new interface for writing parallel programs in C++. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range based for loops and anonymous functions, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.
+Bulk is a new interface for writing parallel programs in C++. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features, enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.
 
 About BSP
 ---------
