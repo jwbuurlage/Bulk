@@ -175,7 +175,9 @@ class world : public bulk::world {
     }
 
   protected:
-    int register_location_(void* location, std::size_t size) override {
+    int register_variable_(class var_base* varbase) override {
+        auto[location, size] = varbase->location_and_size();
+
         auto& vars = state_->variables_;
         int id = -1;
         {
@@ -203,7 +205,7 @@ class world : public bulk::world {
         return id;
     }
 
-    void unregister_location_(int id) override {
+    void unregister_variable_(int id) override {
         // No mutex needed because each thread sets a different value to zero
         // and other than that, the vector is not modified
         auto& var = state_->variables_[id + pid_];
@@ -222,16 +224,14 @@ class world : public bulk::world {
         return state_->variables_[id + pid].buffer;
     }
 
-    void put_(int processor, const void* value, std::size_t size,
-              int var_id) override {
+    char* put_buffer_(int processor, int var_id, size_t size) override {
         auto& v = get_var_(var_id, processor);
         if (size != v.size) {
             log("BULK ERROR: put out of bounds");
             return;
         }
-        memcpy(v.receiveBuffer, value, size);
         put_tasks_.push_back({v.buffer, v.receiveBuffer, size});
-        return;
+        return v.receiveBuffer;
     }
 
     // Offset and count are number of elements
@@ -249,6 +249,8 @@ class world : public bulk::world {
         return;
     }
 
+    // TODO:
+    //void get_buffer_(int processor, int var_id, int future_id) override {
     void get_(int processor, int var_id, std::size_t size,
               void* target) override {
         get_tasks_.push_back({target, get_location_(var_id, processor), size});
