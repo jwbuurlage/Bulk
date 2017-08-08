@@ -24,6 +24,7 @@ class var_base {
     virtual void deserialize_put(size_t size, char* data) = 0;
     virtual size_t serialized_size() = 0;
     virtual void serialize(void* buffer) = 0;
+    virtual std::pair<void*, size_t> location_and_size() = 0;
 };
 
 /**
@@ -164,12 +165,10 @@ class var {
       public:
         var_impl(bulk::world& world) : world_(world), value_{} {
             // register_location_ can include a barrier in certain backends
-            id_ = world.register_location_(&value_, sizeof(value_type));
-            world.register_variable_(this);
+            id_ = world.register_variable_(this);
         }
 
         virtual ~var_impl() {
-            world_.unregister_location_(id_);
             world_.unregister_variable_(id_);
         }
 
@@ -213,6 +212,10 @@ class var {
             auto ibuf = bulk::detail::imembuf(membuf);
             bulk::detail::fill(ibuf, value_);
             memcpy(buffer, membuf.buffer.get(), serialized_size());
+        }
+
+        std::pair<void*, size_t> location_and_size() override final {
+            return {&value_, sizeof(value_type)};
         }
 
         bulk::world& world_;

@@ -26,8 +26,6 @@ enum class message_t : int {
     send_custom
 };
 
-enum class put_t : int { single, multiple };
-
 // different approach
 // -> buffers should be some kind of memory pool
 //
@@ -193,8 +191,10 @@ class world : public bulk::world {
         }
         if (idx == vars_.size()) {
             vars_.push_back(nullptr);
+            locations_.push_back(nullptr);
         }
         vars_[idx] = var;
+        locations_[idx] = var->location_and_size().first;
         return idx;
     }
 
@@ -217,36 +217,11 @@ class world : public bulk::world {
         futures_[id] = location;
     }
 
-    // Returns the id of the registered location
-    int register_location_(void* location,
-                           [[maybe_unused]] size_t size) override final {
-        auto idx = 0u;
-        for (; idx < locations_.size(); ++idx) {
-            if (locations_[idx] == nullptr) {
-                break;
-            }
-        }
-        if (idx == locations_.size()) {
-            locations_.push_back(nullptr);
-        }
-        locations_[idx] = location;
-        return idx;
-    }
-
-    void unregister_location_(int id) override final {
+    void unregister_variable_(int id) override final {
+        vars_[id] = nullptr;
         locations_[id] = nullptr;
     }
-
-    void unregister_variable_(int id) override final { vars_[id] = nullptr; }
     void unregister_future_(int id) override final { futures_[id] = nullptr; }
-
-    void put_(int processor, const void* value, size_t size,
-              int var_id) override final {
-        put_buffers_[processor] << put_t::single;
-        put_buffers_[processor] << var_id;
-        put_buffers_[processor] << size;
-        put_buffers_[processor].push(size, value);
-    }
 
     char* put_buffer_(int target, int var_id, size_t size) override final {
         auto& buffer = custom_put_buffers_[target];
@@ -261,7 +236,6 @@ class world : public bulk::world {
     // Size is per element
     void put_(int processor, const void* values, size_t size, int var_id,
               size_t offset, size_t count) override final {
-        put_buffers_[processor] << put_t::multiple;
         put_buffers_[processor] << var_id;
         size_t total_offset = offset * size;
         put_buffers_[processor] << total_offset;
@@ -366,34 +340,12 @@ class world : public bulk::world {
             size_t offset = 0;
             size_t size = 0;
 
-            put_t put_type;
-            reader >> put_type;
+            reader >> var_id;
+            reader >> offset;
+            reader >> size;
 
-            switch (put_type) {
-            case put_t::single: {
-                reader >> var_id;
-                reader >> size;
-                reader.copy(size, locations_[var_id]);
-                break;
-            }
-
-            case put_t::multiple: {
-                reader >> var_id;
-                reader >> offset;
-                reader >> size;
-
-                auto write_location = (char*)locations_[var_id] + offset;
-                reader.copy(size, write_location);
-
-                break;
-            }
-
-            default: {
-                log("ERROR: Unknown type of put message");
-                abort();
-                break;
-            }
-            }
+            auto write_location = (char*)locations_[var_id] + offset;
+            reader.copy(size, write_location);
         }
         buf.clear();
     }

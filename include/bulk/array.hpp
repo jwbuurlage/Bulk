@@ -34,7 +34,6 @@ class array : var_base {
      */
     array(bulk::world& world, std::size_t size) : world_(world), size_(size) {
         data_ = std::unique_ptr<T[]>(new T[size]);
-        id_ = world_.register_location_(data_.get(), size * sizeof(T));
         id_ = world_.register_variable_(this);
     }
 
@@ -43,7 +42,6 @@ class array : var_base {
      */
     ~array() {
         if (data_) {
-            world_.unregister_location_(id_);
             world_.unregister_variable_(id_);
         }
     }
@@ -141,6 +139,9 @@ class array : var_base {
     void deserialize_put(size_t, char*) override final {}
     void serialize(void*) {}
     size_t serialized_size() override final { return 0; }
+    std::pair<void*, size_t> location_and_size() override final {
+        return {data_.get(), size_ * sizeof(T)};
+    }
 
     /**
      * Get the local size of the array
