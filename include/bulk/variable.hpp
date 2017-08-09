@@ -191,7 +191,7 @@ class var {
 
         virtual future<T> get(int processor) const {
             future<T> result(world_);
-            world_.get_buffer_(processor, id_, result.id());
+            world_.get_buffer_(processor, id_, result);
             return result;
         }
 

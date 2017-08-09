@@ -18,57 +18,43 @@ namespace bulk {
 class future_base {
   public:
     virtual void deserialize_get(size_t size, char* data) = 0;
+    virtual int id() const = 0;
 };
 
 /**
  * Represents a value that will become known in the upcoming superstep
  */
 template <typename T>
-class future : future_base {
+class future {
   public:
     using value_type = typename bulk::meta::representation<T>::type;
 
     /**
      * Initialize the future.
      */
-    future(bulk::world& world) : world_(world) {
-        buffer_ = std::make_unique<T>();
-        id_ = world_.register_future_(this);
-    }
+    future(bulk::world& world) { impl_ = std::make_unique<impl>(world); }
 
     /**
      * Deconstruct the future.
      */
-    ~future() {
-        if (id_ >= 0) {
-            world_.unregister_future_(id_);
-        }
-    }
+    ~future() {}
 
     future(const future<T>& other) = delete;
     void operator=(const future<T>& other) = delete;
 
-    future(future<T>&& other) : world_(other.world_) {
-        *this = std::move(other);
-    }
-
     /**
      * Move a future.
      */
-    void operator=(future<T>&& other) {
-        buffer_ = std::move(other.buffer_);
-        id_ = other.id_;
-        other.id_ = -1;
-        world_.move_future_location_(id_, this);
-    }
+    future(future<T>&& other) { impl_ = std::move(other.impl_); }
+    void operator=(future<T>&& other) { impl_ = std::move(other.impl_); }
 
     /**
      * Get a reference to the value held by the future.
      *
      * \returns a reference to the value
      */
-    value_type& value() { return *buffer_; }
-    const value_type& value() const { return *buffer_; }
+    value_type& value() { return impl_->buffer_; }
+    const value_type& value() const { return impl_->buffer_; }
 
     /**
      * Implicitly get the value held by the future
@@ -83,23 +69,39 @@ class future : future_base {
      *
      * \returns a reference to the world of the future
      */
-    bulk::world& world() { return world_; }
+    bulk::world& world() { return impl_->world_; }
 
   private:
+    class impl : public future_base {
+      public:
+        impl(bulk::world& world) : buffer_{}, world_(world) {
+            id_ = world_.register_future_(this);
+        }
+        ~impl() { world_.unregister_future_(this); }
+
+        // No copies or moves
+        impl(impl& other) = delete;
+        impl(impl&& other) = delete;
+        void operator=(impl& other) = delete;
+        void operator=(impl&& other) = delete;
+
+        void deserialize_get(size_t size, char* data) override final {
+            auto membuf = bulk::detail::memory_buffer(size, data);
+            auto obuf = bulk::detail::omembuf(membuf);
+            bulk::detail::fill(obuf, buffer_);
+        }
+
+        int id() const override final { return id_; }
+
+        value_type buffer_;
+        bulk::world& world_;
+        int id_;
+    };
+    std::unique_ptr<impl> impl_;
+
     template <typename U>
     friend class var;
-
-    void deserialize_get(size_t size, char* data) override final {
-        auto membuf = bulk::detail::memory_buffer(size, data);
-        auto obuf = bulk::detail::omembuf(membuf);
-        bulk::detail::fill(obuf, *buffer_);
-    }
-
-    int id() const { return id_; }
-
-    int id_ = -1;
-    std::unique_ptr<value_type> buffer_;
-    bulk::world& world_;
+    operator future_base*() { return impl_.get(); }
 };
 
 template <typename T>

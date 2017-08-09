@@ -13,7 +13,9 @@
 #include <vector>
 
 #include "barrier.hpp"
+#include <bulk/future.hpp>
 #include <bulk/messages.hpp>
+#include <bulk/variable.hpp>
 #include <bulk/world.hpp>
 
 // Mutexes need to be shared, i.e. single instance of the class
@@ -27,21 +29,25 @@ namespace bulk::thread {
 // FIXME: receive buffer could be only partially written to
 // i.e. sliced write in a coarray
 struct registered_variable {
-    registered_variable() : buffer(0), receiveBuffer(0), size(0) {}
+    registered_variable() : base(0), buffer(0), receiveBuffer(0), size(0) {}
     ~registered_variable() {}
 
+    class var_base* base;
     void* buffer;        // Local copy, stored in var::impl
     char* receiveBuffer; // Fixed size receive buffer, allocated by world
-    size_t size;         // Size of the allocated receive buffer
+    size_t capacity;     // Size of the allocated receive buffer, can change
+    size_t size;         // Current filling of receiveBuffer
 };
+
+typedef std::pair<char*, size_t> sized_buffer;
 
 struct registered_queue {
     registered_queue() : base(0), mutex(new std::mutex()) {}
     ~registered_queue() { delete mutex; }
 
-    class queue_base* base;          // Local queue, stored in queue::impl
-    std::vector<char> receiveBuffer; // Dynamic sized receive buffer
-    std::mutex* mutex;                // Sending mutex
+    class queue_base* base; // Local queue, stored in queue::impl
+    std::vector<sized_buffer> receiveBuffers; // Dynamic sized receive buffer
+    std::mutex* mutex;                        // Mutex on receiveBuffers
 };
 
 // single `world_state` instance shared by every thread
@@ -77,8 +83,10 @@ class world : public bulk::world {
         state_ = other.state_;
         pid_ = other.pid_;
         nprocs_ = other.nprocs_;
-        get_tasks_ = std::move(other.get_tasks_);
-        put_tasks_ = std::move(other.put_tasks_);
+        var_get_tasks_ = std::move(other.var_get_tasks_);
+        var_put_tasks_ = std::move(other.var_put_tasks_);
+        coarray_get_tasks_ = std::move(other.coarray_get_tasks_);
+        coarray_put_tasks_ = std::move(other.coarray_put_tasks_);
     }
 
     int active_processors() const override { return nprocs_; }
@@ -98,30 +106,47 @@ class world : public bulk::world {
         // puts when the get is performed?
 
         // Gets to this processor
-        for (auto& t : get_tasks_) {
+        for (auto& t : coarray_get_tasks_) {
             memcpy(t.dst, t.src, t.size);
         }
-        get_tasks_.clear();
+        coarray_get_tasks_.clear();
+
+        // TODO: optimize the redundant buffer away
+        for (auto& t : var_get_tasks_) {
+            auto size = t.var->serialized_size();
+            char* buffer = new char[size];
+            t.var->serialize(buffer);
+            t.future->deserialize_get(size, buffer);
+            delete[] buffer;
+        }
+        var_get_tasks_.clear();
 
         barrier();
 
         // Puts from this processor
-        for (auto& t : put_tasks_) {
+        for (auto& t : coarray_put_tasks_) {
             memcpy(t.dst, t.src, t.size);
         }
-        put_tasks_.clear();
+        coarray_put_tasks_.clear();
+
+        for (auto& t : var_put_tasks_) {
+            // we have written something to receiveBuffer earlier
+            // now copy it to the var itself
+            t->base->deserialize_put(t->size, t->receiveBuffer);
+        }
+        var_put_tasks_.clear();
 
         // Queue messages to this processor
         auto& qs = state_->queues_;
         for (auto i = 0u; i < qs.size(); i += nprocs_) {
             auto& rq = qs[i + pid_];
             if (rq.base) { // If this is a registered queue
-                // If size is 0 then get_buffer_ will clear the queue
-                // automatically
-                auto size = rq.receiveBuffer.size();
-                void* dest = rq.base->get_buffer_(size);
-                memcpy(dest, rq.receiveBuffer.data(), size);
-                rq.receiveBuffer.clear();
+                rq.base->clear_();
+                for (auto& p : rq.receiveBuffers) {
+                    rq.base->deserialize_push(p.second, p.first);
+                    delete[] p.first;
+                }
+                rq.receiveBuffers.clear();
             }
         }
 
@@ -198,9 +223,11 @@ class world : public bulk::world {
                 vars.resize(vars.size() + nprocs_);
             }
         }
+        vars[id + pid_].base = varbase;
         vars[id + pid_].buffer = location;
         vars[id + pid_].receiveBuffer = new char[size];
-        vars[id + pid_].size = size;
+        vars[id + pid_].capacity = size;
+        vars[id + pid_].size = 0;
         barrier();
         return id;
     }
@@ -211,11 +238,16 @@ class world : public bulk::world {
         auto& var = state_->variables_[id + pid_];
         if (var.receiveBuffer)
             delete[] var.receiveBuffer;
+        var.base = 0;
         var.buffer = 0;
         var.receiveBuffer = 0;
+        var.capacity = 0;
         var.size = 0;
         return;
     }
+
+    int register_future_(class future_base*) override { return 0; }
+    void unregister_future_(class future_base*) override {}
 
     registered_variable& get_var_(int id, int pid) const {
         return state_->variables_[id + pid];
@@ -226,11 +258,14 @@ class world : public bulk::world {
 
     char* put_buffer_(int processor, int var_id, size_t size) override {
         auto& v = get_var_(var_id, processor);
-        if (size != v.size) {
-            log("BULK ERROR: put out of bounds");
-            return;
+        // reallocate if buffer is not the right size
+        if (size > v.capacity) {
+            delete[] v.receiveBuffer;
+            v.receiveBuffer = new char[size];
+            v.capacity = size;
         }
-        put_tasks_.push_back({v.buffer, v.receiveBuffer, size});
+        v.size = size;
+        var_put_tasks_.push_back(&v);
         return v.receiveBuffer;
     }
 
@@ -239,27 +274,24 @@ class world : public bulk::world {
     void put_(int processor, const void* values, std::size_t size, int var_id,
               std::size_t offset, std::size_t count) override {
         auto& v = get_var_(var_id, processor);
-        if (size * (offset + count) > v.size) {
+        if (size * (offset + count) > v.capacity) {
             log("BULK ERROR: array put out of bounds");
             return;
         }
         memcpy(v.receiveBuffer + size * offset, values, size * count);
-        put_tasks_.push_back({(char*)v.buffer + size * offset,
+        coarray_put_tasks_.push_back({(char*)v.buffer + size * offset,
                               v.receiveBuffer + size * offset, size * count});
         return;
     }
 
-    // TODO:
-    //void get_buffer_(int processor, int var_id, int future_id) override {
-    void get_(int processor, int var_id, std::size_t size,
-              void* target) override {
-        get_tasks_.push_back({target, get_location_(var_id, processor), size});
+    void get_buffer_(int processor, int var_id, class future_base* future) override {
+        var_get_tasks_.push_back({future, get_var_(var_id, processor).base});
         return;
     }
     // Size is per element
     void get_(int processor, int var_id, std::size_t size, void* target,
               std::size_t offset, std::size_t count) override {
-        get_tasks_.push_back(
+        coarray_get_tasks_.push_back(
             {target, (char*)get_location_(var_id, processor) + size * offset,
              size * count});
         return;
@@ -298,29 +330,22 @@ class world : public bulk::world {
     void unregister_queue_(int id) override {
         auto& q = get_queue_(id, pid_);
         q.base = 0;
-        q.receiveBuffer.clear();
+        for (auto& p : q.receiveBuffers) {
+            delete[] p.first;
+        }
+        q.receiveBuffers.clear();
         return;
     }
 
-    void send_(int processor, int queue_id, const void* data,
-               std::size_t size) override {
+    char* send_buffer_(int processor, int queue_id, size_t size) override {
+        char* buffer = new char[size];
+        // Lock mutex only to append the pointer to vector
         auto& q = get_queue_(queue_id, processor);
-        std::lock_guard<std::mutex> lock{*q.mutex};
-        auto& vec = q.receiveBuffer;
-        vec.insert(vec.end(), (const char*)data, (const char*)data + size);
-        return;
-    }
-
-    // data consists of both tag and content. size is total size.
-    void send_many_(int processor, int queue_id, const void* data, size_t size,
-                    int count, const void* other,
-                    size_t size_of_other) override {
-        static_assert(false, "`send_many_` not implemented in thread backend");
-    }
-
-    char* send_buffer_(int target, int queue_id, size_t buffer_size) override {
-        static_assert(false, "`send_buffer_` not implemented in thread backend");
-        return nullptr;
+        {
+            std::lock_guard<std::mutex> lock{*q.mutex};
+            q.receiveBuffers.push_back(std::make_pair(buffer, size));
+        }
+        return buffer;
     }
 
   private:
@@ -330,13 +355,22 @@ class world : public bulk::world {
     int pid_;
     int nprocs_;
 
+    // Task for data that needs no serialization
     struct copy_task {
         void* dst;
         void* src;
         size_t size;
     };
-    std::vector<copy_task> get_tasks_;
-    std::vector<copy_task> put_tasks_;
+    // Task for data that needs serialization
+    struct get_task {
+        class future_base* future; // dst
+        class var_base* var;       // src
+    };
+
+    std::vector<get_task> var_get_tasks_;
+    std::vector<registered_variable*> var_put_tasks_;
+    std::vector<copy_task> coarray_get_tasks_;
+    std::vector<copy_task> coarray_put_tasks_;
 };
 
 } // namespace bulk::thread

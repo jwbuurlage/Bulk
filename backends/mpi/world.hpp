@@ -200,7 +200,7 @@ class world : public bulk::world {
         return idx;
     }
 
-    int register_future_(class future_base* location) override final {
+    int register_future_(class future_base* future) override final {
         auto idx = 0u;
         for (; idx < futures_.size(); ++idx) {
             if (futures_[idx] == nullptr) {
@@ -210,20 +210,15 @@ class world : public bulk::world {
         if (idx == futures_.size()) {
             futures_.push_back(nullptr);
         }
-        futures_[idx] = location;
+        futures_[idx] = future;
         return idx;
-    }
-
-    void move_future_location_(int id,
-                               class future_base* location) override final {
-        futures_[id] = location;
     }
 
     void unregister_variable_(int id) override final {
         vars_[id] = nullptr;
         locations_[id] = nullptr;
     }
-    void unregister_future_(int id) override final { futures_[id] = nullptr; }
+    void unregister_future_(class future_base* future) override final { futures_[future->id()] = nullptr; }
 
     char* put_buffer_(int target, int var_id, size_t size) override final {
         auto& buffer = custom_put_buffers_[target];
@@ -245,11 +240,11 @@ class world : public bulk::world {
         put_buffers_[processor].push(size * count, values);
     }
 
-    void get_buffer_(int target, int var_id, int future_id) override final {
+    void get_buffer_(int target, int var_id, class future_base* future) override final {
         auto& buffer = custom_get_request_buffers_[target];
         buffer << processor_id_;
         buffer << var_id;
-        buffer << future_id;
+        buffer << future->id();
     }
 
     // Size is per element

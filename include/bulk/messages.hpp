@@ -30,11 +30,7 @@ class queue_base {
     queue_base(){};
     virtual ~queue_base(){};
 
-    // These are called by world during a sync
-    // It resizes an internal buffer and returns a pointer to it
-    virtual void* get_buffer_(int size_in_bytes) = 0;
     virtual void clear_() = 0;
-
     virtual void deserialize_push(size_t size, char* data) = 0;
 };
 
@@ -147,11 +143,6 @@ class queue {
             auto ibuf = bulk::detail::imembuf(membuf);
             bulk::detail::fill(ibuf, args...);
             memcpy(target_buffer, membuf.buffer.get(), ruler.size);
-        }
-
-        void* get_buffer_(int size_in_bytes) override {
-            data_.resize(size_in_bytes / sizeof(message_type));
-            return &data_[0];
         }
 
         void deserialize_push(size_t size, char* data) {

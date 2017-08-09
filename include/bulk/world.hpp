@@ -151,18 +151,15 @@ class world {
     virtual void unregister_variable_(int id) = 0;
 
     // Futures
-    virtual int register_future_(class future_base* location) = 0;
-    virtual void unregister_future_(int id) = 0;
-    // necessary because futures can move, retaining their id but changing their
-    // location. the list of futures in world should reflect this
-    virtual void move_future_location_(int id, class future_base* location) = 0;
+    virtual int register_future_(class future_base* future) = 0;
+    virtual void unregister_future_(class future_base* future) = 0;
 
     virtual char* put_buffer_(int processor, int var_id, size_t size) = 0;
     // size is per element
     virtual void put_(int processor, const void* values, size_t size,
                       int var_id, size_t offset, size_t count) = 0;
 
-    virtual void get_buffer_(int processor, int var_id, int future_id) = 0;
+    virtual void get_buffer_(int processor, int var_id, class future_base* future) = 0;
     virtual void get_(int processor, int var_id, size_t size, void* target,
                       size_t offset, size_t count) = 0;
 
