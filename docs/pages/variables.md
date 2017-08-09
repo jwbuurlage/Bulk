@@ -86,5 +86,5 @@ auto value = y.value();
 
 This way of communicating is particularly useful when dealing with
 simple data objects. If instead we deal with distributed array-like
-objects, we recommend using *co-arrays*, which are introduced in the
+objects, we recommend using *coarrays*, which are introduced in the
 next section.

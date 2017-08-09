@@ -37,11 +37,9 @@ want to run the section on, while the second argument provides a
 function-like object (here a C++ lambda function) that is executed on
 the requested number of processors. This function obtains a
 **bulk::world** object, which it can use to communicate with other
-processors, for programmer convenience its identifier `s`
-and the total number of processes that are spawned `p` are
-passed as well. These can alternatively be obtained from world using
-`world.rank()` and
-`world.active_processors()` respectively.
+processors. For convenience we suggest to alias the processor identifier (or rank) to `s`
+and the total number of processes that are spawned to `p`. As shown in the example, these can be obtained from world using
+`world.rank()` and `world.active_processors()` respectively.
 
 Communication between processors
 --------------------------------
@@ -61,19 +59,23 @@ Here, `T` is the type of the variable, for example an
 x = 5;
 ```
 
-The reason to use a variable, is that a processor can *write* to a
+The reason to use such a distributed variable, is that a processor can *write* to a
 remote **image** of a variable.
 
 ```cpp
 bulk::put(world.next_rank(), 4, x);
+// or the short-hand:
+x(world.next_rank()) = 4;
 ```
 
 This will overwrite the value of the variable `x` on the
-next logical processor (i.e. processor `s + 1 % p`) with
+next logical processor (i.e. processor `(s + 1) % p`) with
 `4`. We can obtain the value of a remote image using:
 
 ```cpp
 auto y = bulk::get(world.next_rank(), x);
+// or the short-hand:
+auto y = x(world.next_rank()).get();
 ```
 
 Here, `y` is a `bulk::future` object. A future
@@ -90,7 +92,7 @@ Coarrays
 ---------
 
 Coarrays are a convenient way to store, and manipulate distributed
-data. We provide a co-array that is modeled after [Coarray
+data. We provide a coarray that is modeled after [Coarray
 Fortran](https://en.wikipedia.org/wiki/Coarray_Fortran). Arrays are
 initialized and used as follows:
 
@@ -99,7 +101,7 @@ auto xs = bulk::coarray<int>(world, s);
 xs(3)[2] = 1;
 ```
 
-Here, we create a co-array of varying local size (each processor holds
+Here, we create a coarray of varying local size (each processor holds
 `s` many elements). Next we write the value
 `1` to the element with local index `2` on
 processor with index `3`.
