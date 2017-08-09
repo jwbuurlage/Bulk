@@ -99,25 +99,7 @@ class world : public bulk::world {
         std::vector<int> custom_messages_to_proc(active_processors_);
         std::vector<int> custom_get_request_to_proc(active_processors_);
         std::vector<int> custom_get_response_to_proc(active_processors_);
-        // handle puts
-        // exchange puts, implicit barrier
-        send_buffers_(put_buffers_, message_t::put, put_to_proc);
-        MPI_Reduce_scatter(put_to_proc.data(), &remote_puts, ones_.data(),
-                           MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
-        receive_buffer_for_tag_(put_receive_buffer_, message_t::put,
-                                remote_puts);
-        process_put_buffer_(put_receive_buffer_);
-
-        // handle custom puts
-        // exchange puts, implicit barrier
-        send_buffers_(custom_put_buffers_, message_t::custom_put,
-                      custom_put_to_proc);
-        MPI_Reduce_scatter(custom_put_to_proc.data(), &remote_custom_puts,
-                           ones_.data(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-        receive_buffer_for_tag_(custom_put_receive_buffer_,
-                                message_t::custom_put, remote_custom_puts);
-        process_custom_puts_(custom_put_receive_buffer_);
 
         // handle gets
         // exchange gets, implicit barrier
@@ -162,6 +144,26 @@ class world : public bulk::world {
                                 message_t::custom_get_response,
                                 remote_custom_get_responses);
         process_custom_gets_(custom_get_response_buffer_);
+
+        // handle puts
+        // exchange puts, implicit barrier
+        send_buffers_(put_buffers_, message_t::put, put_to_proc);
+        MPI_Reduce_scatter(put_to_proc.data(), &remote_puts, ones_.data(),
+                           MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+
+        receive_buffer_for_tag_(put_receive_buffer_, message_t::put,
+                                remote_puts);
+        process_put_buffer_(put_receive_buffer_);
+
+        // handle custom puts
+        // exchange puts, implicit barrier
+        send_buffers_(custom_put_buffers_, message_t::custom_put,
+                      custom_put_to_proc);
+        MPI_Reduce_scatter(custom_put_to_proc.data(), &remote_custom_puts,
+                           ones_.data(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+        receive_buffer_for_tag_(custom_put_receive_buffer_,
+                                message_t::custom_put, remote_custom_puts);
+        process_custom_puts_(custom_put_receive_buffer_);
 
         // handle custom messages
         send_buffers_(custom_message_buffers_, message_t::send_custom,
