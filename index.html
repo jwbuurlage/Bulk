@@ -5,14 +5,13 @@
     
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
-      <meta http-equiv="x-ua-compatible" content="ie=edge">
       
       
       
       
         <link rel="shortcut icon" href="./assets/images/favicon.png">
       
-      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.8.1">
+      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.6.4">
     
     
       
@@ -23,9 +22,9 @@
       <script src="./assets/javascripts/modernizr-1df76c4e58.js"></script>
     
     
-      <link rel="stylesheet" href="./assets/stylesheets/application-bfecc7305d.css">
+      <link rel="stylesheet" href="./assets/stylesheets/application-e2807e330f.css">
       
-        <link rel="stylesheet" href="./assets/stylesheets/application-02c2a4388f.palette.css">
+        <link rel="stylesheet" href="./assets/stylesheets/application-f78e5cb881.palette.css">
       
     
     
@@ -86,17 +85,17 @@
         
           <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
           
-<div class="md-search" data-md-component="search" role="dialog">
+<div class="md-search" data-md-component="search">
   <label class="md-search__overlay" for="search"></label>
   <div class="md-search__inner">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <input type="text" class="md-search__input" name="query" required placeholder="Search" accesskey="s" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
       <label class="md-icon md-search__icon" for="search"></label>
       <button type="reset" class="md-icon md-search__icon" data-md-component="reset">close</button>
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
+        <div class="md-search-result" data-md-component="result">
           <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
             Type to start searching
           </div>
@@ -108,9 +107,9 @@
 </div>
         
       </div>
-      
-        <div class="md-flex__cell md-flex__cell--shrink">
-          <div class="md-header-nav__source">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <div class="md-header-nav__source">
+          
             
 
 
@@ -130,9 +129,9 @@
     </div>
   </a>
 
-          </div>
+          
         </div>
-      
+      </div>
     </div>
   </nav>
 </header>
@@ -1305,7 +1304,16 @@
 <p><center></p>
 <p><img alt="image" src="./images/logo.svg" /></p>
 <p></center></p>
-<p>Bulk is a new interface for writing parallel programs in C++. The library does away with the unnecessary boilerplate and ubiquitous pointer arithmetic that is found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of modern C++ features such as smart pointers, range-based for-loops, anonymous functions, and structured bindings enabling safer and more efficient distributed programming. The flexible backend architecture ensures the portability of parallel programs written with Bulk.</p>
+<p>Bulk is a new interface for writing parallel programs in C++. It uses explicit
+processes that all run the same program, but on different and mutually exclusive data (SPMD). This is
+different from common parallel programming paradigms based on independent threads
+that are performing (usually heterogeneous) tasks together with guarding mechanisms to prevent
+concurrent access to shared resources. Programs written in Bulk work both for shared
+memory systems, as well as for distributed memory systems (e.g. an MPI cluster).</p>
+<p>Compared to other SPMD libraries, Bulk does away with unnecessary boilerplate code and ubiquitous pointer arithmetic that is
+found in libraries based on for example MPI, or the BSPlib standard. Our BSP interface supports and encourages the use of
+modern C++ features, enabling safer and more efficient distributed programming.
+The flexible backend architecture ensures the portability of parallel programs written with Bulk.</p>
 <h2 id="about-bsp">About BSP<a class="headerlink" href="#about-bsp" title="Permanent link">&para;</a></h2>
 <p>The bulk synchronous parallel (BSP) programming model, is a way of writing parallel and distributed programs. BSP is the underlying model for Bulk. Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed <em>synchronization points</em>. These synchronizations delimit so-called <em>supersteps</em>. This way of writing parallel programs has a number of advantages over competing models:</p>
 <ul>
@@ -1449,9 +1457,7 @@
       
     </div>
     
-      <script src="./assets/javascripts/application-6940329b9f.js"></script>
-      
-      
+      <script src="./assets/javascripts/application-06a3e72efd.js"></script>
       <script>app.initialize({url:{base:"."}})</script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>

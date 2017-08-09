@@ -5,14 +5,13 @@
     
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
-      <meta http-equiv="x-ua-compatible" content="ie=edge">
       
       
       
       
         <link rel="shortcut icon" href="../assets/images/favicon.png">
       
-      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.8.1">
+      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.6.4">
     
     
       
@@ -23,9 +22,9 @@
       <script src="../assets/javascripts/modernizr-1df76c4e58.js"></script>
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application-bfecc7305d.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application-e2807e330f.css">
       
-        <link rel="stylesheet" href="../assets/stylesheets/application-02c2a4388f.palette.css">
+        <link rel="stylesheet" href="../assets/stylesheets/application-f78e5cb881.palette.css">
       
     
     
@@ -86,17 +85,17 @@
         
           <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
           
-<div class="md-search" data-md-component="search" role="dialog">
+<div class="md-search" data-md-component="search">
   <label class="md-search__overlay" for="search"></label>
   <div class="md-search__inner">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <input type="text" class="md-search__input" name="query" required placeholder="Search" accesskey="s" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
       <label class="md-icon md-search__icon" for="search"></label>
       <button type="reset" class="md-icon md-search__icon" data-md-component="reset">close</button>
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
+        <div class="md-search-result" data-md-component="result">
           <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
             Type to start searching
           </div>
@@ -108,9 +107,9 @@
 </div>
         
       </div>
-      
-        <div class="md-flex__cell md-flex__cell--shrink">
-          <div class="md-header-nav__source">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <div class="md-header-nav__source">
+          
             
 
 
@@ -130,9 +129,9 @@
     </div>
   </a>
 
-          </div>
+          
         </div>
-      
+      </div>
     </div>
   </nav>
 </header>
@@ -1305,11 +1304,9 @@ want to run the section on, while the second argument provides a
 function-like object (here a C++ lambda function) that is executed on
 the requested number of processors. This function obtains a
 <strong>bulk::world</strong> object, which it can use to communicate with other
-processors, for programmer convenience its identifier <code>s</code>
-and the total number of processes that are spawned <code>p</code> are
-passed as well. These can alternatively be obtained from world using
-<code>world.rank()</code> and
-<code>world.active_processors()</code> respectively.</p>
+processors. For convenience we suggest to alias the processor identifier (or rank) to <code>s</code>
+and the total number of processes that are spawned to <code>p</code>. As shown in the example, these can be obtained from world using
+<code>world.rank()</code> and <code>world.active_processors()</code> respectively.</p>
 <h2 id="communication-between-processors">Communication between processors<a class="headerlink" href="#communication-between-processors" title="Permanent link">&para;</a></h2>
 <p>Next, we look at some basic forms of communication between processors.
 The main way to <em>talk</em> to other processors, is by using variables. A
@@ -1324,16 +1321,20 @@ variable is created as follows:</p>
 </pre></div>
 
 
-<p>The reason to use a variable, is that a processor can <em>write</em> to a
+<p>The reason to use such a distributed variable, is that a processor can <em>write</em> to a
 remote <strong>image</strong> of a variable.</p>
 <div class="codehilite"><pre><span></span><span class="n">bulk</span><span class="o">::</span><span class="n">put</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">(),</span> <span class="mi">4</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+<span class="c1">// or the short-hand:</span>
+<span class="n">x</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">())</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
 </pre></div>
 
 
 <p>This will overwrite the value of the variable <code>x</code> on the
-next logical processor (i.e. processor <code>s + 1 % p</code>) with
+next logical processor (i.e. processor <code>(s + 1) % p</code>) with
 <code>4</code>. We can obtain the value of a remote image using:</p>
 <div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">y</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">get</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">(),</span> <span class="n">x</span><span class="p">);</span>
+<span class="c1">// or the short-hand:</span>
+<span class="k">auto</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">()).</span><span class="n">get</span><span class="p">();</span>
 </pre></div>
 
 
@@ -1348,7 +1349,7 @@ the remote value out of <code>y</code>.</p>
 
 <h2 id="coarrays">Coarrays<a class="headerlink" href="#coarrays" title="Permanent link">&para;</a></h2>
 <p>Coarrays are a convenient way to store, and manipulate distributed
-data. We provide a co-array that is modeled after <a href="https://en.wikipedia.org/wiki/Coarray_Fortran">Coarray
+data. We provide a coarray that is modeled after <a href="https://en.wikipedia.org/wiki/Coarray_Fortran">Coarray
 Fortran</a>. Arrays are
 initialized and used as follows:</p>
 <div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
@@ -1356,7 +1357,7 @@ initialized and used as follows:</p>
 </pre></div>
 
 
-<p>Here, we create a co-array of varying local size (each processor holds
+<p>Here, we create a coarray of varying local size (each processor holds
 <code>s</code> many elements). Next we write the value
 <code>1</code> to the element with local index <code>2</code> on
 processor with index <code>3</code>.</p>
@@ -1469,9 +1470,7 @@ max is the maximum value found locally:</p>
       
     </div>
     
-      <script src="../assets/javascripts/application-6940329b9f.js"></script>
-      
-      
+      <script src="../assets/javascripts/application-06a3e72efd.js"></script>
       <script>app.initialize({url:{base:".."}})</script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
