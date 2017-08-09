@@ -94,6 +94,17 @@ void test_communication() {
                        "receive correct value after putting to self");
         }
 
+        BULK_SECTION("Get and put play nice together") {
+            bulk::var<int> a(world, 15);
+
+            a(0) = 5;
+            auto b = a(0).get();
+
+            world.sync();
+
+            BULK_CHECK(b == 15, "gets before puts");
+        }
+
         BULK_SECTION("Get from self") {
             bulk::var<int> a(world);
             a = s;
