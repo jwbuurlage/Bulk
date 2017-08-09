@@ -116,3 +116,6 @@ Contributing
 ------------
 
 We welcome contributions. Please submit pull requests against the develop branch.
+
+If you have any issues, questions or remarks; either open an issue on GitHub, or
+join us in the `##bulk` IRC channel on `irc.freenode.net`.
