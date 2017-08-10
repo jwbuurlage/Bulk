@@ -1,6 +1,6 @@
 The easiest way to get started using Bulk is to download the source code from [GitHub](https://www.github.com/jwbuurlage/bulk). If you use Bulk in a project we suggest to add Bulk as a submodule, since it is in active development.
 
-Bulk requires an up-to-date compiler, that supports C++17, e.g. GCC >= 7.0, or Clang >= 4.0. As of now, we only provide support for Linux, but there is, and will not be, any platform specific code in the library.
+Bulk requires an up-to-date compiler, that supports C++17, e.g. GCC >= 7.0, or Clang >= 4.0. Currently we only actively support Linux, but we avoid platform specific code in the library, so building on other platforms should be possible.
 
 Bulk supports a number of different *backends*, allowing the programs to run in parallel using:
 
