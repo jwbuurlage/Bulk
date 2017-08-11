@@ -24,9 +24,7 @@ class memory_buffer {
             location_ += size;
         }
 
-        char* current_location() {
-            return buf_.data() + location_;
-        }
+        char* current_location() { return buf_.data() + location_; }
 
         void update(std::size_t size) { location_ += size; }
 
@@ -77,14 +75,8 @@ class memory_buffer {
   private:
     void enlarge_() {
         int factor = 2;
-
-        char* new_data = (char*)malloc(capacity_ * factor);
-        memcpy(new_data, data_, size_);
-
-        free(data_);
         capacity_ *= factor;
-
-        data_ = new_data;
+        data_ = (char*)realloc(data_, capacity_);
     }
 
     std::size_t capacity_ = 1024;
