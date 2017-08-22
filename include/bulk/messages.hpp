@@ -27,9 +27,6 @@ using namespace bulk::meta;
 // in a virtual function in `world`.
 class queue_base {
   public:
-    queue_base(){};
-    virtual ~queue_base(){};
-
     virtual void clear_() = 0;
     virtual void deserialize_push(size_t size, char* data) = 0;
 };

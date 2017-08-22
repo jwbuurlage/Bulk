@@ -46,10 +46,10 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
             int depth = 0;
             while (node) {
                 if (proc & (1 << depth)) {
-                    left_bound[node->value.d] = node->value.a;
+                    left_bound[node->value.d] = node->value.a + 1;
                     node = node->right.get();
                 } else {
-                    right_bound[node->value.d] = node->value.a;
+                    right_bound[node->value.d] = node->value.a + 1;
                     node = node->left.get();
                 }
                 ++depth;
@@ -83,7 +83,7 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
         int proc = 0;
         int depth = 0;
         while (node) {
-            if (xs[node->value.d] < node->value.a) {
+            if (xs[node->value.d] <= node->value.a) {
                 node = node->left.get();
             } else {
                 proc += 1 << depth;

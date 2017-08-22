@@ -91,10 +91,10 @@ void test_partitioning() {
         BULK_SECTION("Binary-split-partitioning") {
             using dir = bulk::util::binary_tree<bulk::util::split>::dir;
             auto tree = bulk::util::binary_tree<bulk::util::split>(
-                bulk::util::split{0, 5});
+                bulk::util::split{0, 4});
             auto root = tree.root.get();
-            tree.add(root, dir::left, bulk::util::split{1, 5});
-            tree.add(root, dir::right, bulk::util::split{1, 5});
+            tree.add(root, dir::left, bulk::util::split{1, 4});
+            tree.add(root, dir::right, bulk::util::split{1, 4});
 
             auto part =
                 bulk::tree_partitioning<2>({10, 10}, 4, std::move(tree));
