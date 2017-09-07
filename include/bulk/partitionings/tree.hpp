@@ -96,6 +96,8 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
 
     index_type<D> origin(int t) const override { return origins_[t]; }
 
+    const auto& splits() const { return splits_; }
+
   private:
     util::binary_tree<util::split> splits_;
     std::vector<index_type<D>> origins_;
