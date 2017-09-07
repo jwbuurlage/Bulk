@@ -9,7 +9,8 @@
 #include "../util/binary_tree.hpp"
 #include "../util/indices.hpp"
 
-namespace bulk::experimental {
+namespace bulk {
+namespace experimental {
 
 template <int D>
 using index_type = std::array<int, D>;
@@ -115,4 +116,5 @@ class rectangular_partitioning : public multi_partitioning<D, G> {
     }
 };
 
+}
 }  // namespace bulk::experimental

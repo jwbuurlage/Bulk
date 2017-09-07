@@ -1,6 +1,7 @@
 #pragma once
 
-namespace bulk::util {
+namespace bulk {
+namespace util {
 
 struct split {
     // dimension of the split
@@ -62,4 +63,5 @@ struct binary_tree {
     std::unique_ptr<node> root;
 };
 
+}
 }  // namespace bulk::util

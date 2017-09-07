@@ -4,7 +4,8 @@
 #include <cstring>
 #include <memory>
 
-namespace bulk::detail {
+namespace bulk {
+namespace detail {
 
 struct scale {
     std::size_t size = 0;
@@ -120,4 +121,5 @@ void fill_tuple_(Buffer& buf, Tuple& xs, std::index_sequence<Is...>) {
     fill(buf, std::get<Is>(xs)...);
 }
 
+}
 } // namespace bulk::detail

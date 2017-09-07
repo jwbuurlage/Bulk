@@ -2,9 +2,14 @@
 
 #include <cassert>
 #include <vector>
+
 #include <optional>
 
-namespace bulk::util {
+template <typename T>
+using optional = std::optional<T>;
+
+namespace bulk {
+namespace util {
 
 /** Find the average of an iterable container. */
 template <typename Iterable>
@@ -38,11 +43,11 @@ std::vector<std::pair<T, U>> zip(std::vector<T> xs, std::vector<U> ys) {
  *
  * g = (sum x * (y - l)) / (sum x * x)
  */
-inline std::optional<double> fit_slope(const std::vector<size_t>& xs,
+inline optional<double> fit_slope(const std::vector<size_t>& xs,
                                        const std::vector<double>& ys,
                                        float offset) {
     if (xs.size() < 2 || ys.size() != xs.size()) {
-        return std::optional<double>();
+        return optional<double>();
     }
 
     auto points = zip(xs, ys);
@@ -67,10 +72,10 @@ inline std::optional<double> fit_slope(const std::vector<size_t>& xs,
  *
  * The result is an optional pair given as (offset, slope).
  */
-inline std::optional<std::pair<double, double>>
+inline optional<std::pair<double, double>>
 fit(const std::vector<size_t>& xs, const std::vector<double>& ys) {
     if (xs.size() < 2 || ys.size() != xs.size()) {
-        return std::optional<std::pair<double, double>>();
+        return optional<std::pair<double, double>>();
     }
 
     auto avg_x = std::accumulate(xs.begin(), xs.end(), 0u) / (double)xs.size();
@@ -90,7 +95,8 @@ fit(const std::vector<size_t>& xs, const std::vector<double>& ys) {
     auto g = num / denum;
     auto l = avg_y - g * avg_x;
 
-    return std::optional<std::pair<double, double>>({l, g});
+    return optional<std::pair<double, double>>({l, g});
 }
 
+}
 } // namespace bulk::util

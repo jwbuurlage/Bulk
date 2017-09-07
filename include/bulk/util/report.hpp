@@ -7,7 +7,8 @@
 #include <string>
 #include <vector>
 
-namespace bulk::util {
+namespace bulk {
+namespace util {
 
 class table {
   public:
@@ -91,4 +92,5 @@ class table {
     std::vector<unsigned int> column_width_;
 };
 
+}
 } // namespace bulk::util
