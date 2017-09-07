@@ -7,7 +7,8 @@
 
 #include "world.hpp"
 
-namespace bulk::mpi {
+namespace bulk {
+namespace mpi {
 
 /**
  * This class defines the outer layer of the MPI backend. Within a single run,
@@ -43,4 +44,5 @@ class environment : public bulk::environment {
     }
 };
 
+}
 }  // namespace bulk::mpi

@@ -2,7 +2,8 @@
 
 #include <cstring>
 
-namespace bulk::mpi {
+namespace bulk {
+namespace mpi {
 
 class memory_buffer {
   public:
@@ -84,4 +85,5 @@ class memory_buffer {
     char* data_ = nullptr;
 };
 
+}
 } // namespace bulk::mpi

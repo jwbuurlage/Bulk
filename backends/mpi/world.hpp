@@ -14,7 +14,8 @@
 
 #include "memory_buffer.hpp"
 
-namespace bulk::mpi {
+namespace bulk {
+namespace mpi {
 
 enum class message_t : int {
     put,
@@ -499,4 +500,5 @@ class world : public bulk::world {
     memory_buffer custom_message_buffer_;
 };
 
+}
 } // namespace bulk::mpi
