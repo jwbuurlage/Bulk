@@ -65,7 +65,7 @@ class multi_partitioning : public partitioning<D> {
     /** Get the local and global sizes. */
     virtual index_type<D> local_size(index_type<G> processor) = 0;
     index_type<D> local_size(int processor) override {
-        return local_size(util::unflatten<G>(grid_size_, processor));
+        return this->local_size(util::unflatten<G>(grid_size_, processor));
     };
 
     /** Get the multi-dimensional owner of a global index. */
@@ -99,11 +99,11 @@ class rectangular_partitioning : public multi_partitioning<D, G> {
 
     /** Support origin queries by flattened, or multi-index */
     virtual index_type<D> origin(index_type<G> processor) const {
-        return origin(util::flatten<G>(this->grid_size_, processor));
+        return this->origin(util::flatten<G>(this->grid_size_, processor));
     }
 
     virtual index_type<D> origin(int processor) const {
-        return origin(util::unflatten<G>(this->grid_size_, processor));
+        return this->origin(util::unflatten<G>(this->grid_size_, processor));
     }
 
     virtual index_type<D> local_to_global(index_type<D> xs,
