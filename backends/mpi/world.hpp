@@ -177,6 +177,8 @@ class world : public bulk::world {
         process_custom_messages_(custom_message_buffer_);
 
         barrier();
+
+        clear_();
     }
 
     void barrier() override final { MPI_Barrier(MPI_COMM_WORLD); }
@@ -462,6 +464,23 @@ class world : public bulk::world {
         for (auto q : queues_) {
             if (q) {
                 q->clear_();
+            }
+        }
+    }
+
+    void clear_() {
+        std::vector<std::vector<memory_buffer>*> buffers = {
+            &put_buffers_,
+            &custom_put_buffers_,
+            &get_request_buffers_,
+            &get_response_buffers_,
+            &custom_get_request_buffers_,
+            &custom_get_response_buffers_,
+            &custom_message_buffers_};
+
+        for (auto& buf : buffers) {
+            for (auto& t : *buf) {
+                t.reset_buffer();
             }
         }
     }
