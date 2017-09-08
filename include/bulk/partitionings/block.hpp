@@ -61,7 +61,7 @@ class block_partitioning : public rectangular_partitioning<D, G> {
             auto dim = axes_[i];
 
             size[dim] = (this->global_size_[dim] + this->grid_size_[i] -
-                         idxs[dim] - 1) /
+                         idxs[i] - 1) /
                         this->grid_size_[i];
         }
         return size;
