@@ -71,15 +71,20 @@ class memory_buffer {
     std::size_t size() { return size_; }
     void update(std::size_t pushed) { size_ += pushed; }
 
+    auto capacity() const { return capacity_; }
+
     memory_reader reader() { return memory_reader(*this); }
 
     void reset_buffer(size_t capacity = 1024) {
+        size_ = 0;
+        if (capacity_ <= capacity) {
+            return;
+        }
         if (data_) {
             free(data_);
         }
         capacity_ = capacity;
         data_ = (char*)malloc(capacity_);
-        size_ = 0;
     }
 
   private:
