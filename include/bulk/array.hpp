@@ -23,7 +23,7 @@ namespace bulk {
  */
 template <typename T>
 class array : var_base {
-    static_assert(std::is_pod<T>::value, "(Co)arrays only support POD types");
+    static_assert(std::is_trivially_copyable<T>::value, "(Co)arrays only support trivially-copyable types");
 
   public:
     /**
