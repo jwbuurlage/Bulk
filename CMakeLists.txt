@@ -8,12 +8,13 @@ set(EXAMPLE_DIR "../../../examples/")
 
 set(
     EXAMPLE_SOURCES
-    "word_count.cpp"
     "communication.cpp"
     "dot_product.cpp"
+    "fft.cpp"
     "hello.cpp"
     "messaging.cpp"
     "partitioning.cpp"
+    "word_count.cpp"
     )
 
 set(TEST_DIR "../../../test")
