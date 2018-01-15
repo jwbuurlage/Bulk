@@ -119,8 +119,6 @@ class coarray {
         writer operator[](int i) { return writer(parent_, t_, i); }
 
         slice_writer operator[](slice s) {
-            assert(s.first >= 0 && s.first < (int)parent_.size());
-            assert(s.last >= s.first && s.last <= (int)parent_.size());
             return slice_writer(parent_, t_, s);
         }
 
