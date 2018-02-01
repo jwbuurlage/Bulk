@@ -8,22 +8,74 @@
 #include "bulk/util/timer.hpp"
 #include <cmath>
 #include <complex>
+#include <fftw3.h>
 
 #include "set_backend.hpp"
 
+using NumType = std::complex<double>;
+
+// Perform NITERS forward and backward transforms.
+// A large NITERS helps to obtain accurate timings.
+constexpr int NITERS = 20;
+// Print NPRINT values per processor
+constexpr int NPRINT = 3;
+constexpr double MEGA = 1000000.0;
+
+
+void fftw_sequential_test(int n);
 void bspfft_test(bulk::world& world, int n);
 
 int main() {
-    environment env;
+    constexpr int power = 20;
+    constexpr int n = 1 << power;
+    printf("Benchmarking FFTs of size 2^%d = %d\n", power, n);
 
+    fftw_sequential_test(n);
+
+    environment env;
     env.spawn(env.available_processors(),
-              [](bulk::world& world) { bspfft_test(world, 128 * 4096); });
+              [](bulk::world& world) { bspfft_test(world, n); });
+
     return 0;
 }
 
-// Taken from bspedupack and updated to C++
-using NumType = std::complex<double>;
+void fftw_sequential_test(int n) {
+    printf("Sequential FFT of length %d using FFTW, doing %d benchmark iterations.\n", n, NITERS);
 
+    std::vector<NumType> xs(n);
+
+    fftw_complex* xs_fftw = (fftw_complex*)&xs[0];
+    auto plan_fwd = fftw_plan_dft_1d(n, xs_fftw, xs_fftw, FFTW_FORWARD, FFTW_PATIENT);
+    auto plan_bwd = fftw_plan_dft_1d(n, xs_fftw, xs_fftw, FFTW_BACKWARD, FFTW_PATIENT);
+
+    // Initialize array
+    using namespace std::complex_literals;
+    for (int j = 0; j < n; ++j) {
+        xs[j] = (double)j + 1i;
+    }
+
+    // Compute the fft
+    // Perform and time the FFTs
+    bulk::util::timer timer1;
+    for (int it = 0; it < NITERS; it++) {
+        fftw_execute(plan_fwd);
+        fftw_execute(plan_bwd);
+        double ninv = 1.0 / (double)n;
+        for (auto& x : xs)
+            x *= ninv;
+    }
+    double ffttime = timer1.get<std::ratio<1>>();
+
+    fftw_destroy_plan(plan_fwd);
+    fftw_destroy_plan(plan_bwd);
+
+    ffttime = ffttime / (2.0 * NITERS);
+    printf("Time per FFT = %lf sec\n", ffttime);
+}
+
+
+// Taken from bspedupack and updated to C++
+template<bool useFFTW = false>
 class BulkFFT {
   public:
     BulkFFT(bulk::world& world, int n_) {
@@ -34,14 +86,64 @@ class BulkFFT {
             world.log("ERROR: BulkFFT requires n and p to be powers of 2.");
             world.abort();
         }
+        fftw_xs = nullptr;
         bspfft_init();
     }
-    ~BulkFFT() {}
+    ~BulkFFT() {
+        if (useFFTW) {
+            fftw_destroy_plan(plan_consec_fwd);
+            fftw_destroy_plan(plan_consec_bwd);
+            fftw_destroy_plan(plan_np_fwd);
+            fftw_destroy_plan(plan_np_bwd);
+        }
+    }
 
     // Re-initialize to a different size
     void reinitialize(int n_) {
         n = n_;
         bspfft_init();
+    }
+
+    // THIS WILL OVERWRITE THE CONTENTS OF xs !
+    void fftw_initialize(int n_, bulk::coarray<NumType>& xs) {
+        reinitialize(n_);
+        // Parameters to fftw plan
+        // int rank,            -- 1D fft
+        // const int *n,        -- lengths of each fft: {k1, k1, ... }
+        // int howmany,         -- number of ffts
+        // fftw_complex *in,    -- input array
+        // const int *inembed,  -- n.a.
+        // int istride,         -- j-th element is at in[ j * istride ]
+        // int idist,           -- j-th FFT starts at in[ j * idist ]
+        // fftw_complex *out,   -- output array, can be equal to input
+        // const int *onembed,  -- n.a.
+        // int ostride,         -- output stride
+        // int odist,           -- output dist
+        // int sign,            -- FFTW_FORWARD
+        // unsigned flags       -- whether to time different methods
+
+        int np = n / p;
+
+        int howmany = np / k1;
+        std::vector<int> sizes(howmany, k1);
+        fftw_xs = (fftw_complex*)&xs[0];
+
+        // FFTW plan creation is NOT thread safe!!
+        for (int i = 0; i < p; ++i) {
+            if (i == s) {
+                plan_consec_fwd = fftw_plan_many_dft(
+                    1, &sizes[0], howmany, fftw_xs, NULL, 1, k1, fftw_xs, NULL,
+                    1, k1, FFTW_FORWARD, FFTW_PATIENT);
+                plan_np_fwd = fftw_plan_dft_1d(np, fftw_xs, fftw_xs,
+                                               FFTW_FORWARD, FFTW_PATIENT);
+                plan_consec_bwd = fftw_plan_many_dft(
+                    1, &sizes[0], howmany, fftw_xs, NULL, 1, k1, fftw_xs, NULL,
+                    1, k1, FFTW_BACKWARD, FFTW_PATIENT);
+                plan_np_bwd = fftw_plan_dft_1d(np, fftw_xs, fftw_xs,
+                                               FFTW_BACKWARD, FFTW_PATIENT);
+            }
+            xs.world().sync();
+        }
     }
 
     // Fast Fourier Transform
@@ -53,9 +155,16 @@ class BulkFFT {
     void fft(bulk::coarray<NumType>& xs) {
         if ((int)xs.size() != n / p) {
             xs.world().log(
-                "ERROR: BulkFFT:fft called on coarray of invalid size.");
+                "ERROR: BulkFFT::fft called on coarray of invalid size.");
             xs.world().abort();
             return;
+        }
+        if (useFFTW) {
+            if (fftw_xs != (fftw_complex*)&xs[0]) {
+                xs.world().log("ERROR: BulkFFT::fft called with FFTW without first calling fftw_initialize.");
+                xs.world().abort();
+                return;
+            }
         }
         bspfft<Forward>(xs);
     }
@@ -192,12 +301,8 @@ class BulkFFT {
     // by the permutation sigma: xs[j] <- xs[sigma[j]]
     // This is *NOT* for general permutations sigma,
     // only for the ones generated by the bitrev_init functions
-    static void permute(bulk::coarray<NumType>& xs,
-                        const std::vector<unsigned int>& sigma) {
-        if (xs.size() != sigma.size())
-            return;
-
-        for (auto j = 0u; j < xs.size(); ++j) {
+    static void permute(NumType* xs, const std::vector<unsigned int>& sigma) {
+        for (auto j = 0u; j < sigma.size(); ++j) {
             auto sj = sigma[j];
             if (j < sj) {
                 std::swap(xs[j], xs[sj]);
@@ -271,9 +376,21 @@ class BulkFFT {
         // Here, i=sqrt(-1). The output vector y overwrites xs.
 
         int np = n / p;
-        permute(xs, rho_np);
-        for (int r = 0; r < np / k1; r++)
-            ufft<Forward>(k1, xs.begin() + r * k1, w0);
+        permute(xs.begin(), rho_np);
+
+        if (useFFTW) {
+            // Taken from Yzelman bsp paper
+            // Partially undo the permutation
+            for (int r = 0; r < np / k1; r++)
+                permute(xs.begin() + r * k1, rho_p);
+            if (Forward)
+                fftw_execute(plan_consec_fwd);
+            else
+                fftw_execute(plan_consec_bwd);
+        } else {
+            for (int r = 0; r < np / k1; r++)
+                ufft<Forward>(k1, xs.begin() + r * k1, w0);
+        }
 
         int c0 = 1;
         bool rev = true;
@@ -286,7 +403,16 @@ class BulkFFT {
             twiddle<Forward>(xs, tw_cur);
             tw_cur += np;
 
-            ufft<Forward>(np, xs.begin(), w);
+            if (useFFTW) {
+                // Undo permutation
+                permute(xs.begin(), rho_np);
+                if (Forward)
+                    fftw_execute(plan_np_fwd);
+                else
+                    fftw_execute(plan_np_bwd);
+            } else {
+                ufft<Forward>(np, xs.begin(), w);
+            }
         }
 
         if (Forward == false) {
@@ -313,6 +439,12 @@ class BulkFFT {
     // Permutations
     std::vector<unsigned int> rho_np;
     std::vector<unsigned int> rho_p;
+    // FFTW
+    fftw_plan plan_consec_fwd;
+    fftw_plan plan_np_fwd;
+    fftw_plan plan_consec_bwd;
+    fftw_plan plan_np_bwd;
+    fftw_complex* fftw_xs;
 };
 
 //  A Fast Fourier Transform and its inverse.
@@ -326,36 +458,48 @@ class BulkFFT {
 //  Warning: don't rely on this test alone to check correctness.
 //  (After all, deleting the main loop will give similar results ;)
 
-// Perform NITERS forward and backward transforms.
-// A large NITERS helps to obtain accurate timings.
-constexpr int NITERS = 10;
-// Print NPRINT values per processor
-constexpr int NPRINT = 3;
-constexpr double MEGA = 1000000.0;
-
-void bspfft_test(bulk::world& world, int n) {
+template<bool useFFTW = false>
+void bspfft_test_internal(bulk::world& world, int n) {
     int s = world.rank();
     int p = world.active_processors();
 
     if (s == 0) {
-        world.log("FFT of vector of length %d using %d processors", n, p);
-        world.log("performing %d forward and %d backward transforms", NITERS,
-                  NITERS);
+        if (useFFTW)
+            world.log("Parallel FFT with FFTW kernels of length %d using %d "
+                      "processors, doing %d benchmark iterations",
+                      n, p, NITERS);
+        else
+            world.log("Parallel FFT without FFTW kernels of length %d using %d "
+                      "processors, doing %d benchmark iterations",
+                      n, p, NITERS);
     }
 
-    BulkFFT bulkfft(world, n);
+    int np = n / p;
+    bulk::coarray<NumType> xs(world, np, 0.0);
 
-    // First time the initialization
+    BulkFFT<useFFTW> bulkfft(world, n);
+
+    if (useFFTW) {
+        if (s == 0)
+            world.log("Initializing FFTW.");
+        world.sync();
+
+        bulkfft.fftw_initialize(n, xs); // This overwrites contents of xs !
+
+        if (s == 0)
+            world.log("FFTW initialized.");
+        world.sync();
+    }
+
+    // Time the normal initialization
     bulk::util::timer timer0;
     for (int it = 0; it < NITERS; it++) {
         bulkfft.reinitialize(n);
     }
     world.sync();
-    double init_time = timer0.get();
+    double init_time = timer0.get<std::ratio<1>>();
 
     // Initialize the coarray
-    int np = n / p;
-    bulk::coarray<NumType> xs(world, np, 0.0);
     using namespace std::complex_literals;
     for (int j = 0; j < np; j++) {
         int jglob = j * p + s;
@@ -366,11 +510,11 @@ void bspfft_test(bulk::world& world, int n) {
     // Perform and time the FFTs
     bulk::util::timer timer1;
     for (int it = 0; it < NITERS; it++) {
-        bulkfft.fft<true>(xs);
-        bulkfft.fft<false>(xs);
+        bulkfft.template fft<true> (xs);
+        bulkfft.template fft<false> (xs);
     }
     world.sync();
-    double ffttime = timer1.get();
+    double ffttime = timer1.get<std::ratio<1>>();
 
     // Compute the accuracy
     double max_error = 0.0;
@@ -415,3 +559,7 @@ void bspfft_test(bulk::world& world, int n) {
     world.sync();
 }
 
+void bspfft_test(bulk::world& world, int n) {
+    bspfft_test_internal<false>(world, n);
+    bspfft_test_internal<true>(world, n);
+}

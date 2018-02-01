@@ -17,7 +17,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -Wall -Wfatal-errors -Wextra 
 foreach(source_file ${EXAMPLE_SOURCES})
     string(REPLACE ".cpp" "" source_name ${source_file})
     add_executable(${BACKEND_NAME}_${source_name} ${EXAMPLE_DIR}${source_file})
-    target_link_libraries(${BACKEND_NAME}_${source_name} )
+    target_link_libraries(${BACKEND_NAME}_${source_name} fftw3 )
     add_dependencies(${BACKEND_NAME} ${BACKEND_NAME}_${source_name})
 endforeach(source_file)
 
