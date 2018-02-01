@@ -21,12 +21,15 @@ constexpr int NITERS = 20;
 constexpr int NPRINT = 3;
 constexpr double MEGA = 1000000.0;
 
+// estimate, measure or patient
+constexpr auto FFTW_PLAN_MODE = FFTW_ESTIMATE; // 30-minute benchmark mode: FFTW_PATIENT
+
 
 void fftw_sequential_test(int n);
 void bspfft_test(bulk::world& world, int n);
 
 int main() {
-    constexpr int power = 20;
+    constexpr int power = 23;
     constexpr int n = 1 << power;
     printf("Benchmarking FFTs of size 2^%d = %d\n", power, n);
 
@@ -44,9 +47,11 @@ void fftw_sequential_test(int n) {
 
     std::vector<NumType> xs(n);
 
+    printf("Initializing FFTW.\n");
     fftw_complex* xs_fftw = (fftw_complex*)&xs[0];
-    auto plan_fwd = fftw_plan_dft_1d(n, xs_fftw, xs_fftw, FFTW_FORWARD, FFTW_PATIENT);
-    auto plan_bwd = fftw_plan_dft_1d(n, xs_fftw, xs_fftw, FFTW_BACKWARD, FFTW_PATIENT);
+    auto plan_fwd = fftw_plan_dft_1d(n, xs_fftw, xs_fftw, FFTW_FORWARD, FFTW_PLAN_MODE);
+    auto plan_bwd = fftw_plan_dft_1d(n, xs_fftw, xs_fftw, FFTW_BACKWARD, FFTW_PLAN_MODE);
+    printf("Initializing done.\n");
 
     // Initialize array
     using namespace std::complex_literals;
@@ -133,14 +138,14 @@ class BulkFFT {
             if (i == s) {
                 plan_consec_fwd = fftw_plan_many_dft(
                     1, &sizes[0], howmany, fftw_xs, NULL, 1, k1, fftw_xs, NULL,
-                    1, k1, FFTW_FORWARD, FFTW_PATIENT);
+                    1, k1, FFTW_FORWARD, FFTW_PLAN_MODE);
                 plan_np_fwd = fftw_plan_dft_1d(np, fftw_xs, fftw_xs,
-                                               FFTW_FORWARD, FFTW_PATIENT);
+                                               FFTW_FORWARD, FFTW_PLAN_MODE);
                 plan_consec_bwd = fftw_plan_many_dft(
                     1, &sizes[0], howmany, fftw_xs, NULL, 1, k1, fftw_xs, NULL,
-                    1, k1, FFTW_BACKWARD, FFTW_PATIENT);
+                    1, k1, FFTW_BACKWARD, FFTW_PLAN_MODE);
                 plan_np_bwd = fftw_plan_dft_1d(np, fftw_xs, fftw_xs,
-                                               FFTW_BACKWARD, FFTW_PATIENT);
+                                               FFTW_BACKWARD, FFTW_PLAN_MODE);
             }
             xs.world().sync();
         }
