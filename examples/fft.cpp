@@ -18,7 +18,7 @@ using NumType = std::complex<double>;
 // A large NITERS helps to obtain accurate timings.
 constexpr int NITERS = 20;
 // Print NPRINT values per processor
-constexpr int NPRINT = 3;
+constexpr int NPRINT = 2;
 constexpr double MEGA = 1000000.0;
 
 // estimate, measure or patient
@@ -29,9 +29,9 @@ void fftw_sequential_test(int n);
 void bspfft_test(bulk::world& world, int n);
 
 int main() {
-    constexpr int power = 23;
+    constexpr int power = 22;
     constexpr int n = 1 << power;
-    printf("Benchmarking FFTs of size 2^%d = %d\n", power, n);
+    printf("Benchmarking FFTs of 2^%d = %d complex numbers (2 doubles each).\n", power, n);
 
     fftw_sequential_test(n);
 
@@ -170,6 +170,7 @@ class BulkFFT {
                 xs.world().abort();
                 return;
             }
+            return bspfft_paper<Forward>(xs);
         }
         bspfft<Forward>(xs);
     }
@@ -214,6 +215,67 @@ class BulkFFT {
             double theta = -2.0 * M_PI * alpha / double(np);
             for (auto rho : rho_np) {
                 *tw_cur++ = std::polar(1.0, rho * theta);
+            }
+        }
+        
+        // Compute the book-edition weights
+        {
+            // First a dry-run to get the size
+            auto c = 1;
+            auto k = 2;
+            auto start = 0;
+            while (c <= p) {
+                while (k <= np * c) {
+                    start += k / (2 * c);
+                    k *= 2;
+                }
+                if (c < p)
+                    c = p;
+                else
+                    c = 2 * p;
+            }
+
+            wbook.resize( start );
+            c = 1;
+            k = 2;
+            start = 0;
+            while (c <= p) {
+                auto j0 = s % c;
+                while (k <= np * c) {
+                    double theta = -2.0 * M_PI / double(k);
+                    for (auto j = 0; j < k / (2 * c); j++) {
+                        double jtheta = (j0 + j * c) * theta;
+                        wbook[start++] = std::polar(1.0, jtheta);
+                    }
+                    k *= 2;
+                }
+                if (c < p)
+                    c = p;
+                else
+                    c = 2 * p;
+            }
+        }
+        // Compute the paper-edition weights
+        {
+            // Dry-run for size
+            auto size = 0u;
+            for (int k = 2 * np; k <= n; k *= 2) {
+                size += n / (2 * p); // = b * k2p;
+            }
+            wpaper.resize(size);
+
+            auto start = 0u;
+            for (int k = 2 * np; k <= n; k *= 2) {
+                int b = n / k;
+                auto k2p = k / 2 / p;
+                for (auto r = 0; r < b; ++r) {
+                    double theta = -2.0 * M_PI / double(k);
+                    for (auto jprime = 0; jprime < k2p; ++jprime) {
+                        // exp(-2pi i * j/k)
+                        auto j = s + jprime * p;
+                        wpaper[start++] = std::polar(1.0, j * theta);
+                    }
+                }
             }
         }
     }
@@ -380,12 +442,45 @@ class BulkFFT {
         //   y[k] = (1/n)sum j=0 to n-1 exp(+2*pi*i*k*j/n)*x[j], for 0 <= k < n.
         // Here, i=sqrt(-1). The output vector y overwrites xs.
 
+        // Benchmark result on n=2^22, all times in seconds
+        // Sequential FFTW time: 0.24; 0.22; 0.23
+        // With p=4, time of everything up to and including:
+        // - permute -> 0.056 ; 0.057
+        // - ufft    -> 0.073 ; 0.080 (no fftw)
+        // - ufft    -> 0.086 ; 0.086 (fftw)  !! permute is expensive
+        // - redistr -> 0.167 ; 0.164 (no fftw)
+        // - redistr -> 0.187 ; 0.179 (fftw)
+        // - twiddle -> 0.187 ; 0.209 ; 0.186 (no fftw)
+        // - twiddle -> 0.202 ; 0.199 ; 0.199 (fftw)
+        // - ufft2   -> 0.771 ; 0.794 (no fftw)
+        // - ufft2   -> 0.372 ; 0.358 (fftw)
+        //
+        // all steps but  without redistr:
+        // no fftw: 0.686
+        // fftw: 0.266 <-- so even permute+fftw kernels and NO communication is slower than sequential FFTW
+        //
+        // all steps but no redistr and no twiddle
+        // no fftw: 0.657
+        // fftw: 0.255
+        //
+        // n=2^25, p=4:
+        // - sequential: 2.53
+        // - no fftw: 7.57
+        // - fftw: 3.11
+        //
+        // n=2^26, p=4:
+        // - sequential: 5.73
+        // - no fftw: 20.74
+        // - fftw: 8.64
+
         int np = n / p;
         permute(xs.begin(), rho_np);
 
         if (useFFTW) {
             // Taken from Yzelman bsp paper
             // Partially undo the permutation
+            // Can not easiliy combine the rho_np permutation
+            // with this one because it will no longer be swaps
             for (int r = 0; r < np / k1; r++)
                 permute(xs.begin() + r * k1, rho_p);
             if (Forward)
@@ -427,6 +522,80 @@ class BulkFFT {
         }
     }
 
+    // ONLY WORKS FOR n > p^2 !!
+    template <bool Forward>
+    void bspfft_paper(bulk::coarray<NumType>& xs) {
+        int np = n / p;
+
+        if (Forward)
+            fftw_execute(plan_np_fwd);
+        else
+            fftw_execute(plan_np_bwd);
+
+        // n=2^22, p=4. (sequential 0.23 sec)
+        // Time till here: 0.10 sec
+
+        bspredistr(xs, 1, p, true);
+
+        // Time till here: 0.195 sec
+
+#if 1
+        // From paper: (s0 = s, s1 = 0)
+        // Weights have been precomputed such that we need all of them only once
+        auto curWeight = wpaper.begin();
+        for (int k = 2*np; k <= n; k *= 2) {
+            // Compute butterfly k
+            for (auto r = 0; r < (n / k); ++r) {
+                auto rkp = r * k / p;
+                auto k2p = k / 2 / p;
+                for (auto j = s; j < s + (k/2); j += p) { // from paper
+                    auto w = *curWeight++;
+                    if (Forward == false)
+                        w = std::conj(w);
+                    auto j0 = rkp + j;
+                    auto j2 = j0 + k2p;;
+                    auto tau = w * xs[j2];
+                    xs[j2] = xs[j0] - tau;
+                    xs[j0] += tau;
+                }
+            }
+        }
+#else
+        // From book: inner j index is different from paper version
+        auto start = np - 1;
+        for (int k = 2*np; k <= n; k *= 2) {
+            //butterfly_stage(xs, np, k/p, forward, &wbook[start]);
+            {
+                auto k2p = k/2/p;
+                // np / (k/p) = n/k
+                for (auto r = 0; r < n/k; ++r) {
+                    auto rkp = r * k / p;
+                    for (auto j = 0; j < k2p; j++) {
+                        auto w = wbook[start+j];
+                        if (Forward == false)
+                            w = std::conj(w);
+                        auto j0 = rkp + j;
+                        auto j2 = j0 + k2p;
+                        auto tau = w * xs[j2];
+                        xs[j2] = xs[j0] - tau;
+                        xs[j0] += tau;
+                    }
+                }
+
+            }
+            start += k/(2*c);
+        }
+#endif
+
+        if (Forward == false) {
+            double ninv = 1 / (double)n;
+            for (auto& x : xs)
+                x *= ninv;
+        }
+
+        // Total time: crashed
+    }
+
     //
     // Internal variables
     //
@@ -441,6 +610,8 @@ class BulkFFT {
     std::vector<NumType> w0;
     std::vector<NumType> w;
     std::vector<NumType> tw;
+    std::vector<NumType> wbook;
+    std::vector<NumType> wpaper;
     // Permutations
     std::vector<unsigned int> rho_np;
     std::vector<unsigned int> rho_p;
