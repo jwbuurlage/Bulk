@@ -22,14 +22,14 @@ constexpr int NPRINT = 2;
 constexpr double MEGA = 1000000.0;
 
 // estimate, measure or patient
-constexpr auto FFTW_PLAN_MODE = FFTW_ESTIMATE; // 30-minute benchmark mode: FFTW_PATIENT
+constexpr auto FFTW_PLAN_MODE = FFTW_MEASURE; // 30-minute benchmark mode: FFTW_PATIENT
 
 
 void fftw_sequential_test(int n);
 void bspfft_test(bulk::world& world, int n);
 
 int main() {
-    constexpr int power = 22;
+    constexpr int power = 26;
     constexpr int n = 1 << power;
     printf("Benchmarking FFTs of 2^%d = %d complex numbers (2 doubles each).\n", power, n);
 
@@ -170,7 +170,7 @@ class BulkFFT {
                 xs.world().abort();
                 return;
             }
-            return bspfft_paper<Forward>(xs);
+            //return bspfft_paper<Forward>(xs);
         }
         bspfft<Forward>(xs);
     }
@@ -357,10 +357,15 @@ class BulkFFT {
     // depending on the template parameter.
     // The result overwrites xs
     template <bool Forward>
-    static void twiddle(bulk::coarray<NumType>& xs, NumType* ws) {
-        for (auto& x : xs) {
-            x = x * (Forward ? (*ws) : std::conj(*ws));
-            ws++;
+    static void twiddle(bulk::coarray<NumType> &xs, NumType *ws) {
+        if (Forward) {
+            for (auto &x : xs) {
+                x *= *ws++;
+            }
+        } else {
+            for (auto &x : xs) {
+                x *= std::conj(*ws++);
+            }
         }
     }
 
