@@ -97,7 +97,7 @@ void fftw_sequential_test(int n) {
 
 
 // Taken from bspedupack and updated to C++
-template<bool useFFTW = false>
+template<bool useFFTW = false, bool bookVersion = false>
 class BulkFFT {
   public:
     BulkFFT(bulk::world& world, int n_) {
@@ -187,9 +187,11 @@ class BulkFFT {
                 xs.world().abort();
                 return;
             }
-            return bspfft_paper<Forward>(xs);
         }
-        bspfft<Forward>(xs);
+        if (bookVersion)
+            return bspfft_paper<Forward>(xs);
+        else
+            bspfft<Forward>(xs);
     }
 
   private:
@@ -657,26 +659,31 @@ class BulkFFT {
 //  Warning: don't rely on this test alone to check correctness.
 //  (After all, deleting the main loop will give similar results ;)
 
-template<bool useFFTW = false>
+template<bool useFFTW = false, bool bookVersion = false>
 void bspfft_test_internal(bulk::world& world, int n) {
     int s = world.rank();
     int p = world.active_processors();
 
     if (s == 0) {
         if (useFFTW)
-            world.log("Parallel FFT with FFTW kernels of length %d using %d "
-                      "processors, doing %d benchmark iterations",
-                      n, p, NITERS);
+            if(bookVersion)
+                world.log("Parallel FFT, book version, with FFTW kernels, "
+                          "using %d processors, doing %d benchmark iterations",
+                          p, NITERS);
+            else
+                world.log("Parallel FFT, Yzelman version, with FFTW kernels, "
+                          "using %d processors, doing %d benchmark iterations",
+                          p, NITERS);
         else
-            world.log("Parallel FFT without FFTW kernels of length %d using %d "
-                      "processors, doing %d benchmark iterations",
-                      n, p, NITERS);
+            world.log("Parallel FFT, Yzelman version, without FFTW kernels, "
+                      "using %d processors, doing %d benchmark iterations",
+                      p, NITERS);
     }
 
     int np = n / p;
     bulk::coarray<NumType> xs(world, np, 0.0);
 
-    BulkFFT<useFFTW> bulkfft(world, n);
+    BulkFFT<useFFTW, bookVersion> bulkfft(world, n);
 
     if (useFFTW) {
         if (s == 0)
@@ -762,6 +769,7 @@ void bspfft_test_internal(bulk::world& world, int n) {
 }
 
 void bspfft_test(bulk::world& world, int n) {
-    bspfft_test_internal<false>(world, n);
-    bspfft_test_internal<true>(world, n);
+    bspfft_test_internal<false,false>(world, n);
+    bspfft_test_internal<true, false>(world, n);
+    bspfft_test_internal<true, true>(world, n);
 }
