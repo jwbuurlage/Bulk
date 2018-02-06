@@ -16,34 +16,47 @@ using NumType = std::complex<double>;
 
 // Perform NITERS forward and backward transforms.
 // A large NITERS helps to obtain accurate timings.
-constexpr int NITERS = 20;
+constexpr int NITERS = 40;
 // Print NPRINT values per processor
-constexpr int NPRINT = 2;
+constexpr int NPRINT = 0;
 constexpr double MEGA = 1000000.0;
 
 // estimate, measure or patient
 constexpr auto FFTW_PLAN_MODE = FFTW_MEASURE; // 30-minute benchmark mode: FFTW_PATIENT
 
 
-void fftw_sequential_test(int n);
-void bspfft_test(bulk::world& world, int n);
+double fftw_sequential_test(int n);
+std::pair<double, double> bspfft_test(bulk::world &world, int n);
 
 int main() {
-    constexpr int power = 26;
-    constexpr int n = 1 << power;
-    printf("Benchmarking FFTs of 2^%d = %d complex numbers (2 doubles each).\n", power, n);
+    auto report = bulk::util::table("FFT time", "size");
+    report.columns("p", "method", "time");
 
-    fftw_sequential_test(n);
+    for (int power = 23; power <= 26; ++power) {
+        int n = 1 << power;
+        double time = fftw_sequential_test(n);
+        report.row(std::to_string(n), 1, "FFTW sequential", time);
 
-    environment env;
-    env.spawn(env.available_processors(),
-              [](bulk::world& world) { bspfft_test(world, n); });
+        environment env;
+        for (int p = 1; p <= env.available_processors(); p *= 2) {
+            env.spawn(p, [&report, n, p](bulk::world &world) {
+                auto times = bspfft_test(world, n);
+                if (world.rank() == 0) {
+                    report.row(std::to_string(n), p, "Yzelman", times.first);
+                    report.row(std::to_string(n), p, "Paper", times.second);
+                }
+            });
+        }
+    }
+
+    printf("\n\n Results:\n\n");
+    std::cout << report.print() << std::endl;
 
     return 0;
 }
 
-void fftw_sequential_test(int n) {
-    printf("Sequential FFT of length %d using FFTW, doing %d benchmark iterations.\n", n, NITERS);
+double fftw_sequential_test(int n) {
+    printf("Sequential FFT  of length %d using FFTW, doing %d benchmark iterations.\n", n, NITERS);
 
     std::vector<NumType> xs(n);
 
@@ -75,7 +88,7 @@ void fftw_sequential_test(int n) {
 
     
     // For debug purposes: execute FFT once to check numbers
-    {
+    if (NPRINT) {
         fftw_execute(plan_fwd);
         printf("After forward FFT, first 4 components are:\n");
         printf("j = 0   Re = %f Im = %f\n", xs[0].real(), xs[0].imag());
@@ -84,7 +97,7 @@ void fftw_sequential_test(int n) {
         printf("j = 3   Re = %f Im = %f\n", xs[3].real(), xs[3].imag());
         fftw_execute(plan_bwd);
         double ninv = 1.0 / (double)n;
-        for (auto& x : xs)
+        for (auto &x : xs)
             x *= ninv;
     }
 
@@ -93,6 +106,7 @@ void fftw_sequential_test(int n) {
 
     ffttime = ffttime / (2.0 * NITERS);
     printf("Time per FFT = %lf sec\n", ffttime);
+    return ffttime;
 }
 
 
@@ -660,7 +674,7 @@ class BulkFFT {
 //  (After all, deleting the main loop will give similar results ;)
 
 template<bool useFFTW = false, bool bookVersion = false>
-void bspfft_test_internal(bulk::world& world, int n) {
+double bspfft_test_internal(bulk::world& world, int n) {
     int s = world.rank();
     int p = world.active_processors();
 
@@ -766,10 +780,13 @@ void bspfft_test_internal(bulk::world& world, int n) {
         world.log("Relative error= %e", max_error / n);
     }
     world.sync();
+
+    return ffttime;
 }
 
-void bspfft_test(bulk::world& world, int n) {
-    bspfft_test_internal<false,false>(world, n);
-    bspfft_test_internal<true, false>(world, n);
-    bspfft_test_internal<true, true>(world, n);
+std::pair<double, double> bspfft_test(bulk::world &world, int n) {
+    //bspfft_test_internal<false,false>(world, n);
+    double t1 = bspfft_test_internal<true, false>(world, n);
+    double t2 = bspfft_test_internal<true, true>(world, n);
+    return {t1, t2};
 }
