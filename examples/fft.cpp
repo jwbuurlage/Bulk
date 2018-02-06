@@ -48,10 +48,12 @@ void fftw_sequential_test(int n) {
     std::vector<NumType> xs(n);
 
     printf("Initializing FFTW.\n");
+    bulk::util::timer timerinit;
     fftw_complex* xs_fftw = (fftw_complex*)&xs[0];
     auto plan_fwd = fftw_plan_dft_1d(n, xs_fftw, xs_fftw, FFTW_FORWARD, FFTW_PLAN_MODE);
     auto plan_bwd = fftw_plan_dft_1d(n, xs_fftw, xs_fftw, FFTW_BACKWARD, FFTW_PLAN_MODE);
-    printf("Initializing done.\n");
+    double inittime = timerinit.get<std::ratio<1>>();
+    printf("Initializing done in %f sec.\n", inittime);
 
     // Initialize array
     using namespace std::complex_literals;
@@ -70,6 +72,21 @@ void fftw_sequential_test(int n) {
             x *= ninv;
     }
     double ffttime = timer1.get<std::ratio<1>>();
+
+    
+    // For debug purposes: execute FFT once to check numbers
+    {
+        fftw_execute(plan_fwd);
+        printf("After forward FFT, first 4 components are:\n");
+        printf("j = 0   Re = %f Im = %f\n", xs[0].real(), xs[0].imag());
+        printf("j = 1   Re = %f Im = %f\n", xs[1].real(), xs[1].imag());
+        printf("j = 2   Re = %f Im = %f\n", xs[2].real(), xs[2].imag());
+        printf("j = 3   Re = %f Im = %f\n", xs[3].real(), xs[3].imag());
+        fftw_execute(plan_bwd);
+        double ninv = 1.0 / (double)n;
+        for (auto& x : xs)
+            x *= ninv;
+    }
 
     fftw_destroy_plan(plan_fwd);
     fftw_destroy_plan(plan_bwd);
@@ -170,7 +187,7 @@ class BulkFFT {
                 xs.world().abort();
                 return;
             }
-            //return bspfft_paper<Forward>(xs);
+            return bspfft_paper<Forward>(xs);
         }
         bspfft<Forward>(xs);
     }
@@ -553,7 +570,8 @@ class BulkFFT {
             for (auto r = 0; r < (n / k); ++r) {
                 auto rkp = r * k / p;
                 auto k2p = k / 2 / p;
-                for (auto j = s; j < s + (k/2); j += p) { // from paper
+                //for (auto j = s; j < s + (k/2); j += p) { // from paper
+                for (auto j = 0; j < k2p; j++) { // from book
                     auto w = *curWeight++;
                     if (Forward == false)
                         w = std::conj(w);
@@ -719,10 +737,13 @@ void bspfft_test_internal(bulk::world& world, int n) {
         }
     }
 
-    for (int j = 0; j < NPRINT && j < np; j++) {
-        int jglob = j * p + s;
-        world.log("proc=%d j=%d Re= %f Im= %f", s, jglob, xs[j].real(),
-                  xs[j].imag());
+    if (NPRINT) {
+        bulkfft.template fft<true>(xs);
+        for (int j = 0; j < NPRINT && j < np; j++) {
+            int jglob = j * p + s;
+            world.log("FFT[xs] proc=%d j=%d Re= %f Im= %f", s, jglob,
+                      xs[j].real(), xs[j].imag());
+        }
     }
     world.sync();
 
