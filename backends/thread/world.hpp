@@ -259,6 +259,9 @@ class world : public bulk::world {
     char* put_buffer_(int processor, int var_id, size_t size) override {
         auto& v = get_var_(var_id, processor);
         // reallocate if buffer is not the right size
+        // TODO: race condition !!
+        // ERROR when two threads do this at the same time
+        // this needs to be done on separate buffers!!!
         if (size > v.capacity) {
             delete[] v.receiveBuffer;
             v.receiveBuffer = new char[size];
