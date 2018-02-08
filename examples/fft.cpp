@@ -678,6 +678,12 @@ double bspfft_test_internal(bulk::world& world, int n) {
     int s = world.rank();
     int p = world.active_processors();
 
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(s, &cpuset);
+    int rc = pthread_setaffinity_np(pthread_self(),
+                                    sizeof(cpu_set_t), &cpuset);
+
     if (s == 0) {
         if (useFFTW)
             if(bookVersion)
