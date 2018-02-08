@@ -683,6 +683,9 @@ double bspfft_test_internal(bulk::world& world, int n) {
     CPU_SET(s, &cpuset);
     int rc = pthread_setaffinity_np(pthread_self(),
                                     sizeof(cpu_set_t), &cpuset);
+    if (rc != 0) {
+	world.log("Error %i on %i, %i %i %i", rc, s, EFAULT, EINVAL, ESRCH);
+    }
 
     if (s == 0) {
         if (useFFTW)
