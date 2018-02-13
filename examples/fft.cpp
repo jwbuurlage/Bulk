@@ -420,6 +420,9 @@ class BulkFFT {
     //
 
     void bspredistr(bulk::coarray<NumType>& xs, int c0, int c1, bool reversed) {
+	if (c0 == c1) {
+	    return;
+	}
 
         // This function redistributes the complex vector x of length n,
         // from group-cyclic distribution
