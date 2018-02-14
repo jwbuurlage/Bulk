@@ -1,3 +1,4 @@
+#pragma once
 /**
  * A partitioned array is a co-array with a special structure. Locally it
 * behaves like a nD array, indexable using `local`. It also knows about the

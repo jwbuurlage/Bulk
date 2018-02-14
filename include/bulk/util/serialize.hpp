@@ -4,7 +4,8 @@
 #include <cstring>
 #include <memory>
 
-namespace bulk::detail {
+namespace bulk {
+namespace detail {
 
 struct scale {
     std::size_t size = 0;
@@ -108,9 +109,17 @@ void fill(Buffer& buf, U& elem, Us&&... other) {
 template <typename Buffer>
 void fill(Buffer&) {}
 
+template <typename T>
+struct is_tuple {};
+
+template <typename... Ts>
+struct is_tuple<std::tuple<Ts...>> {
+    using type = void;
+};
+
 template <typename Buffer, typename Tuple,
-          typename Is =
-              std::make_index_sequence<std::tuple_size<Tuple>::value>>
+          typename Enable = typename is_tuple<Tuple>::type,
+          typename Is = std::make_index_sequence<std::tuple_size<Tuple>::value>>
 void fill(Buffer& buf, Tuple& xs) {
     fill_tuple_(buf, xs, Is{});
 }
@@ -120,4 +129,5 @@ void fill_tuple_(Buffer& buf, Tuple& xs, std::index_sequence<Is...>) {
     fill(buf, std::get<Is>(xs)...);
 }
 
-} // namespace bulk::detail
+} // namespace detail
+} // namespace bulk

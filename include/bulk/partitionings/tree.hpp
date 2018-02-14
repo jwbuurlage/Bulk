@@ -1,6 +1,8 @@
+#pragma once
 #include "partitioning.hpp"
 
-namespace bulk::experimental {
+namespace bulk {
+namespace experimental {
 
 /**
  * A binary-space partitioning (aptly abbreviated BSP, of course because of its
@@ -104,4 +106,5 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
     std::vector<index_type<D>> extents_;
 };
 
-} // namespace bulk::experimental
+} // namespace experimental
+} // namespace bulk

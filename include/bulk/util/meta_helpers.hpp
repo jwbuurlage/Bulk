@@ -1,10 +1,12 @@
 #pragma once
 
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace bulk::meta {
+namespace bulk {
+namespace meta {
 
 template <typename T>
 struct representation {
@@ -42,4 +44,5 @@ struct message_t<void, T> {
 template <typename... Ts>
 struct message : public message_t<void, Ts...> {};
 
-} // namespace bulk::meta
+} // namespace meta
+} // namespace bulk

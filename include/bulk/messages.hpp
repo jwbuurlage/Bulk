@@ -142,7 +142,7 @@ class queue {
             memcpy(target_buffer, membuf.buffer.get(), ruler.size);
         }
 
-        void deserialize_push(size_t size, char* data) {
+        void deserialize_push(size_t size, char* data) override {
             auto membuf = bulk::detail::memory_buffer(size, data);
             data_.push_back(message_type{});
             auto obuf = bulk::detail::omembuf(membuf);
