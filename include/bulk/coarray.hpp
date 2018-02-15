@@ -200,7 +200,7 @@ class coarray {
     /**
      * Put a range of data in a remote image.
      */
-    void put(int processor, slice s, const std::vector<T> values) {
+    void put(int processor, slice s, const std::vector<T>& values) {
         auto count = (int)values.size() < (s.last - s.first) ? values.size()
                                                         : (s.last - s.first);
         data_.put(processor, values.data(), s.first, count);

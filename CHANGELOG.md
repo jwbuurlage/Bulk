@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0
+
+??
+
+### Fixed
+
+- Let `coarray::image::put` take values by const reference
+- Allow non-uniform local array sizes in `coarray` 
+- Require `T` to satisfy `is_trivially_copyable` for `coarray<T>`
+
 ## 0.2.0
 
 2017-08-09
