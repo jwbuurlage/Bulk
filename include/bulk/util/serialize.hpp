@@ -10,7 +10,7 @@ struct scale {
     std::size_t size = 0;
 
     template <typename T, typename = std::enable_if_t<
-                              std::is_trivially_copy_constructible<T>::value>>
+                              std::is_trivially_copyable<T>::value>>
     void operator|(const T&) {
         size += sizeof(T);
     }
@@ -35,14 +35,14 @@ struct memory_buffer_base {
     std::size_t index;
 
     template <typename T, typename = std::enable_if_t<
-                              std::is_trivially_copy_constructible<T>::value>>
+                              std::is_trivially_copyable<T>::value>>
     void operator<<(const T& value) {
         memcpy(buffer + index, &value, sizeof(T));
         index += sizeof(T);
     }
 
     template <typename T, typename = std::enable_if_t<
-                              std::is_trivially_copy_constructible<T>::value>>
+                              std::is_trivially_copyable<T>::value>>
     void operator>>(T& value) {
         memcpy(&value, buffer + index, sizeof(T));
         index += sizeof(T);

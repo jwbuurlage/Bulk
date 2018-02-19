@@ -8,9 +8,9 @@ namespace bulk::meta {
 
 template <typename T>
 struct representation {
-    static_assert(std::is_trivially_copy_constructible<T>::value,
-                  "Only trivially copy constructible types are supported as "
-                  "`T` for distributed variables and queues");
+    static_assert(std::is_trivially_copyable<T>::value,
+                  "Only trivially copyable types are supported as `T` for "
+                  "distributed variables and queues");
     using type = T;
 };
 

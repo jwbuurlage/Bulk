@@ -9,6 +9,9 @@
 - Let `coarray::image::put` take values by const reference
 - Allow non-uniform local array sizes in `coarray` 
 - Require `T` to satisfy `is_trivially_copyable` for `coarray<T>`
+- Add more type safety checks to (de-)serialization 
+- (De-)serialization in `var` and `future` now avoids redundant memory
+  allocation and copying, by making the memory buffer objects non-owning
 
 ## 0.2.0
 
