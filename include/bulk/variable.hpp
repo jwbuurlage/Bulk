@@ -183,10 +183,10 @@ class var {
             bulk::detail::fill(ruler, source);
             auto size = ruler.size;
             auto target_buffer = world_.put_buffer_(t, id_, size);
-            auto membuf = bulk::detail::memory_buffer(size);
-            auto ibuf = bulk::detail::imembuf(membuf);
+            // use non-owning memory buffer
+            auto tbuf = bulk::detail::memory_buffer_base(target_buffer);
+            auto ibuf = bulk::detail::imembuf(tbuf);
             bulk::detail::fill(ibuf, source);
-            memcpy(target_buffer, membuf.buffer.get(), size);
         }
 
         virtual future<T> get(int processor) const {
@@ -195,8 +195,9 @@ class var {
             return result;
         }
 
-        void deserialize_put(size_t size, char* data) override {
-            auto membuf = bulk::detail::memory_buffer(size, data);
+        void deserialize_put(size_t, char* data) override {
+            // use non-owning memory buffer
+            auto membuf = bulk::detail::memory_buffer_base(data);
             auto obuf = bulk::detail::omembuf(membuf);
             bulk::detail::fill(obuf, value_);
         }
@@ -208,10 +209,9 @@ class var {
         }
 
         void serialize(void* buffer) override final {
-            auto membuf = bulk::detail::memory_buffer(serialized_size());
+            auto membuf = bulk::detail::memory_buffer_base(buffer);
             auto ibuf = bulk::detail::imembuf(membuf);
             bulk::detail::fill(ibuf, value_);
-            memcpy(buffer, membuf.buffer.get(), serialized_size());
         }
 
         std::pair<void*, size_t> location_and_size() override final {

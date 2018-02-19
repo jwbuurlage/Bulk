@@ -136,14 +136,13 @@ class queue {
             bulk::detail::scale ruler;
             bulk::detail::fill(ruler, args...);
             auto target_buffer = world_.send_buffer_(t, id_, ruler.size);
-            auto membuf = bulk::detail::memory_buffer(ruler.size);
+            auto membuf = bulk::detail::memory_buffer_base(target_buffer);
             auto ibuf = bulk::detail::imembuf(membuf);
             bulk::detail::fill(ibuf, args...);
-            memcpy(target_buffer, membuf.buffer.get(), ruler.size);
         }
 
-        void deserialize_push(size_t size, char* data) {
-            auto membuf = bulk::detail::memory_buffer(size, data);
+        void deserialize_push(size_t, char* data) {
+            auto membuf = bulk::detail::memory_buffer_base(data);
             data_.push_back(message_type{});
             auto obuf = bulk::detail::omembuf(membuf);
             bulk::detail::fill(obuf, data_[data_.size() - 1]);
