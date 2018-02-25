@@ -28,10 +28,10 @@ E_LIBS = \
 # no-tree-loop-distribute-patterns makes sure the compiler
 # does NOT replace loops with calls to memcpy, residing in external memory
 CFLAGS    = $(HOST_INCLUDES) $(HOST_LIBS) -std=c99 -O3 -Wall -Wfatal-errors
-CXXFLAGS  = $(HOST_INCLUDES) $(HOST_LIBS) -std=c++17 -O3 -ffast-math -Wall -Wfatal-errors
+CXXFLAGS  = $(HOST_INCLUDES) $(HOST_LIBS) -std=c++14 -O3 -ffast-math -Wall -Wfatal-errors
 E_CFLAGS  = $(E_INCLUDES)    $(E_LIBS) 	  -std=c99 -O3 -fno-strict-aliasing -ffast-math -fno-tree-loop-distribute-patterns -Wall -Wfatal-errors
 E_CXXFLAGS= $(E_INCLUDES)    $(E_LIBS) 	  -std=c++17 -Wall -Wfatal-errors -Os -fno-tree-loop-distribute-patterns -fno-exceptions -fno-rtti -fno-threadsafe-statics -freg-struct-return -fno-default-inline
-TOOL_FLAGS= $(HOST_INCLUDES) $(E_INCLUDES) -std=c++17 -O3 -Wall -Wno-missing-braces -Wno-format-security
+TOOL_FLAGS= $(HOST_INCLUDES) $(E_INCLUDES) -std=c++1z -O3 -Wall -Wno-missing-braces -Wno-format-security
 
 HOST_DEPS = $(BULK)/backends/epiphany/lib/libbulk-epiphany-host.a \
 			$(BULK)/backends/epiphany/include/environment.hpp

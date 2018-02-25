@@ -18,7 +18,8 @@ extern "C" {
 // Include the epiphany side headers to make the lambda-kernels compile
 #include "../epiphany.hpp"
 
-namespace bulk::epiphany {
+namespace bulk {
+namespace epiphany {
 
 class environment : public bulk::environment {
   public:
@@ -328,4 +329,5 @@ class environment : public bulk::environment {
     }
 };
 
+} // namespace bulk::epiphany
 } // namespace bulk::epiphany

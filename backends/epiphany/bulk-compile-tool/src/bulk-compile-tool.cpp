@@ -202,7 +202,7 @@ class MyFrontendAction : public ASTFrontendAction {
                 file << "template<typename T> void run(T f) { f(world); }\n\n";
                 file << "int main() {\n";
                 file << "    run(" << originalArg << ");\n";
-                file << "    world.sync();\n";
+                file << "    world.finalize();\n";
                 file << "    return 0;\n}\n";
                 file.close();
                 // Output kernel filenames

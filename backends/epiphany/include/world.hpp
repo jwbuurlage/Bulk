@@ -80,16 +80,7 @@ class world : public bulk::world {
     void unregister_future_(class future_base* future) override { return; }
 
     char* put_buffer_(int processor, int var_id, size_t size) override {
-        auto& v = state.get_var_(processor, var_id);
-        // reallocate if buffer is not the right size
-        if (size > v.capacity) {
-            delete[] v.receiveBuffer;
-            v.receiveBuffer = new char[size];
-            v.capacity = size;
-        }
-        v.size = size;
-        v.do_put = 1;
-        return v.receiveBuffer;
+        return state.put_buffer_(processor, var_id, size);
     }
 
     // size is per element
@@ -131,6 +122,9 @@ class world : public bulk::world {
         // Lock mutex only to append the pointer to vector
         auto& q = state.get_queue_(queue_id, processor);
         state.mutex_lock_(&q.mutex);
+        // TODO: vectors should only be accessed from the
+        // core that created it because new[]/delete[] should
+        // always be called by the same core !
         q.receiveBuffers.push_back(std::make_pair(buffer, size));
         state.mutex_unlock_(&q.mutex);
         return buffer;
@@ -140,6 +134,11 @@ class world : public bulk::world {
     // the main world::log function is overloaded
     void log_(std::string message) override {
         return;
+    }
+
+    // Explicitly send finish signal to host
+    void finalize() {
+        state.finalize();
     }
 
   private:

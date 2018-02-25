@@ -4,9 +4,9 @@
 #include "set_backend.hpp"
 #include <bulk/bulk.hpp>
 
-extern environment env;
 
 void test_communication() {
+    environment env;
     env.spawn(env.available_processors(), [](auto& world) {
         #include "bulk_test_common.hpp"
 
@@ -243,6 +243,8 @@ void test_communication() {
                        "receive correct value after sugarized getting");
         }
 
+// The vector<future> push back crashes the Epiphany
+#if 0
         BULK_SECTION("Get multiple") {
             int size = 5;
             bulk::var<int> x(world);
@@ -262,6 +264,7 @@ void test_communication() {
                            "receive correct value after getting multiple");
             }
         }
+#endif
 
 // this overflows epiphany RAM somehow
 #if 0
@@ -314,6 +317,7 @@ void test_communication() {
             }
         }
 
+// Epiphany RAM overflow
 #if 0
         BULK_SECTION("Coarray slicing") {
             bulk::coarray<int> zs(world, 10, 0);
@@ -394,14 +398,13 @@ void test_communication() {
         }
 #endif
 
-#if 0
-        // TODO TODO TODO
-
         BULK_SECTION("Single message passing") {
             bulk::queue<int, int> q(world);
             q(world.next_rank()).send(123, 1337);
             world.sync();
-            for (auto[tag, content] : q) {
+            int tag, content;
+            for (auto& m : q) {
+                std::tie(tag, content) = m;
                 BULK_CHECK(tag == 123 && content == 1337,
                            "message passed succesfully");
             }
@@ -414,7 +417,9 @@ void test_communication() {
             world.sync();
             int tag = 0;
             int content = 0;
-            for (auto[x, y] : q) {
+            int x, y;
+            for (auto& m : q) {
+                std::tie(x, y) = m;
                 tag = x;
                 content = y;
             }
@@ -429,7 +434,9 @@ void test_communication() {
             world.sync();
             int tag = 0;
             int content = 0;
-            for (auto[x, y] : q) {
+            int x, y;
+            for (auto& m : q) {
+                std::tie(x, y) = m;
                 tag = x;
                 content = y;
             }
@@ -449,12 +456,16 @@ void test_communication() {
 
             int k = 0;
             BULK_CHECK(!q.empty(), "multiple messages arrived");
-            for (auto[tag, content] : q) {
+            int tag, content;
+            for (auto& m : q) {
+                std::tie(tag, content) = m;
                 BULK_CHECK(tag == world.prev_rank() && content == contents[k++],
                            "multiple messages passed succesfully");
             }
         }
 
+// All tests below generate code that is too big to fit in Epiphany RAM
+#if 0
         BULK_SECTION("Multiple queue and types message passing") {
             std::vector<int> contents = {1337, 12345, 1230519, 5, 8};
             std::vector<float> contents2 = {1.0f, 2.0f, 3.0f, 4.0f};
@@ -485,7 +496,10 @@ void test_communication() {
             BULK_CHECK(q2.size() == contents2.size(),
                        "second queue correct number of messages");
 
-            for (auto[tag, content] : q2) {
+            int tag;
+            float content;
+            for (auto& m : q2) {
+                std::tie(tag, content) = m;
                 BULK_CHECK(tag == world.prev_rank() &&
                                content == contents2[l++],
                            "received correct result on q2");
@@ -513,7 +527,10 @@ void test_communication() {
             q(world.next_rank()).send({1, 2, 3, 4}, {1.0f, 2.0f});
             world.sync();
             BULK_CHECK(q.size() == 1, "send many is one message");
-            for (auto[xs, fs] : q) {
+            std::vector<int> xs;
+            std::vector<float> fs;
+            for (auto& msg : q) {
+                std::tie(xs,fs) = msg;
                 BULK_CHECK((xs == std::vector<int>{1, 2, 3, 4}),
                            "send many first content");
                 BULK_CHECK((fs == std::vector<float>{1.0f, 2.0f}),
@@ -544,7 +561,10 @@ void test_communication() {
             q(world.next_rank()).send(5, "string");
             world.sync();
             BULK_CHECK(q.size() == 1, "string message received");
-            for (auto[size, str] : q) {
+            int size;
+            std::string str;
+            for (auto& msg : q) {
+                std::tie(size, str) = msg;
                 BULK_CHECK(str == "string" && size == 5, "can send string");
             }
         }

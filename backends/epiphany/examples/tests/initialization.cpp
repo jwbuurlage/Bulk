@@ -1,9 +1,8 @@
 #include <bulk/bulk.hpp>
 #include "set_backend.hpp"
 
-extern environment env;
-
 void test_initialization() {
+    environment env;
     env.spawn(env.available_processors(), [](auto& world) {
         #include "bulk_test_common.hpp"
 

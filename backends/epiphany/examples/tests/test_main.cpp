@@ -4,12 +4,11 @@
 
 extern void test_initialization();
 extern void test_communication();
-extern void test_partitioning();
-
-environment env;
+//extern void test_partitioning();
 
 int main() {
     test_initialization();
     test_communication();
     //test_partitioning();
+    printf("Tests complete.\n");
 }

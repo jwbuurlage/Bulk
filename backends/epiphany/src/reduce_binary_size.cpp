@@ -31,11 +31,11 @@ THE SOFTWARE.
 #include <utility.hpp>
 
 void* operator new(std::size_t size) {
-    return bulk::epiphany::malloc(size);
+    return bulk::epiphany::ext_malloc(size);
 }
 
 void* operator new[](std::size_t size) {
-    return bulk::epiphany::malloc(size);
+    return bulk::epiphany::ext_malloc(size);
 }
 
 void operator delete(void* ptr) {
@@ -53,11 +53,11 @@ void operator delete[](void* ptr) {
  */
 
 void* operator new(std::size_t size, const std::nothrow_t&) {
-    return bulk::epiphany::malloc(size);
+    return bulk::epiphany::ext_malloc(size);
 }
 
 void* operator new[](std::size_t size, const std::nothrow_t&) {
-    return bulk::epiphany::malloc(size);
+    return bulk::epiphany::ext_malloc(size);
 }
 
 void operator delete(void* ptr, const std::nothrow_t&) {

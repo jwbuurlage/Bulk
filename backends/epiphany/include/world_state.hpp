@@ -104,6 +104,27 @@ class world_state {
         return var_list_remote[id];
     }
 
+    char* put_buffer_(int processor, int var_id, size_t size) {
+        auto& v = get_var_(processor, var_id);
+        // reallocate if buffer is not the right size
+        if (size > v.capacity) {
+            // TODO: ERROR, only `processor` can do this allocation
+            // because that is the core that will deallocate
+            // it as well
+            // Furthermore there should be a mutex here!
+            delete[] v.receiveBuffer;
+            v.receiveBuffer = new char[size];
+            v.capacity = size;
+        }
+        v.size = size;
+        v.do_put = 1;
+        // v.receiveBuffer was allocated by target processor
+        // so is in that processor's address space.
+        // We convert it to global space here
+        //return transform_address_(v.receiveBuffer, processor);;
+        return v.receiveBuffer;
+    }
+
     int register_queue_(class queue_base* q) {
         var_id_t id = VAR_INVALID;
         for (var_id_t i = 0; i < MAX_VARS; ++i) {
@@ -173,6 +194,8 @@ class world_state {
     void mutex_unlock_(MUTEXID mutex_id) {
         mutex_unlock_((int*)transform_address_local_(&mutexes_, mutex_id));
     }
+
+    void finalize() { write_syncstate_(SYNCSTATE::FINISH); }
 
   private:
     //

@@ -22,7 +22,8 @@ namespace bulk {
  */
 template <typename T>
 class array : var_base {
-    static_assert(std::is_trivially_copyable<T>::value, "(Co)arrays only support trivially-copyable types");
+    //outdated gcc on parallella
+    //static_assert(std::is_trivially_copyable<T>::value, "(Co)arrays only support trivially-copyable types");
 
   public:
     /**

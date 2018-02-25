@@ -5,6 +5,9 @@ extern "C" {
 #include <bulk/variable.hpp>
 #include <bulk/messages.hpp>
 
+// TODO: REMOVE DEBUG
+#include "utility.hpp"
+
 namespace bulk {
 namespace epiphany {
 

@@ -8,7 +8,8 @@
 #define __USE_POSIX199309 1
 #include <time.h> // clock_gettime and clock_nanosleep
 
-namespace bulk::epiphany {
+namespace bulk {
+namespace epiphany {
 
 void environment::spawn(int processors,
                      std::pair<unsigned char*, unsigned char*> file_buffer) {
@@ -376,4 +377,5 @@ void environment::ext_free_(void* ptr) {
     return _free(malloc_base_, ptr);
 }
 
+} // namespace bulk::epiphany
 } // namespace bulk::epiphany

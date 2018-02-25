@@ -58,6 +58,6 @@ int total = 0, success = 0, cur_failed = 0;
 #define BULK_FINALIZE_TESTS(name)                                                  \
     if (world.rank() == 0) {                                                   \
         world.log("-------------");                                            \
-        world.log("SECTION %s:%d test(s) of %d failed.", name, total - success, total); \
+        world.log("SECTION %s: %d test(s) of %d failed.", name, total - success, total); \
     }
 
