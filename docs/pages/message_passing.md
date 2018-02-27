@@ -66,3 +66,19 @@ for (auto [i, j, k] : tuple_queue) {
     world.log("the second queue received a tuple: (%d, %d, %d)", i, j, k);
 }
 ```
+
+It is also possible to send arrays using queues, by having a message component
+of type `T[]`.
+
+Components of queues of type `T[]`, require a `std::vector<T>` as input to `send`.
+Similarly, when iterating through the queue the `T[]` component of the message
+will be represented by a `std::vector<T>`.
+
+```cpp
+auto q = bulk::queue<int[], int>(world);
+q(world.next_rank()).send({1, 2, 3, 4}, 1);
+world.sync();
+for (auto [xs, y] : q) {
+    // ... xs is of type std::vector<int>
+}
+```

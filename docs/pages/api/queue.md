@@ -14,6 +14,9 @@ class queue;
 - `T` - the type of the message content
 - `Ts` - a parameter pack, optionally containing extra message content
 
+_Note:_ content components of array type, e.g. `T[]` are also supported. They
+are represented by a `std::vector<T>`.
+
 ## Member types
 
 - `message_type`: the underlying type used by the messages. Equal to:
