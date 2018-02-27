@@ -266,13 +266,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authors" title="Authors" class="md-nav__link">
-    Authors
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#examples" title="Examples" class="md-nav__link">
     Examples
   </a>
@@ -280,8 +273,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#api" title="API" class="md-nav__link">
-    API
+  <a href="#building" title="Building" class="md-nav__link">
+    Building
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authors" title="Authors" class="md-nav__link">
+    Authors
   </a>
   
 </li>
@@ -1299,13 +1299,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authors" title="Authors" class="md-nav__link">
-    Authors
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#examples" title="Examples" class="md-nav__link">
     Examples
   </a>
@@ -1313,8 +1306,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#api" title="API" class="md-nav__link">
-    API
+  <a href="#building" title="Building" class="md-nav__link">
+    Building
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authors" title="Authors" class="md-nav__link">
+    Authors
   </a>
   
 </li>
@@ -1358,26 +1358,20 @@
 <p></center></p>
 <p>Bulk is a new interface for writing bulk synchronous parallel programs in C++.
 It lets you implement parallel algorithms by providing common communication mechanisms
-between processing elements, no matter if these corresponds to cores in a many-core accelerator,
-threads, or nodes in a cluster.</p>
-<p>Bulk does away with unnecessary boilerplate  code and the unsafe API&rsquo;s that are found in for example MPI, or the BSPlib standard. It provides a unified syntax for parallel programming across different platforms and modalities.
+between processing elements, such as threads, MPI nodes or cores in a many-core accelerator,</p>
+<p>Bulk does away with unnecessary boilerplate code and the unsafe API&rsquo;s that are found in for example MPI, or the BSPlib standard. It provides a unified syntax for parallel programming across different platforms and modalities.
 Our BSP interface supports and encourages the use of modern C++ features, enabling safer and more efficient distributed programming. We have a flexible backend architecture,
 so that programs written with Bulk work for both shared memory, distributed memory, or mixed systems.</p>
 <h2 id="about-bsp">About BSP<a class="headerlink" href="#about-bsp" title="Permanent link">&para;</a></h2>
-<p>The bulk synchronous parallel (BSP) programming model, is a way of writing parallel and distributed programs. BSP is the underlying model for Bulk. Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed <em>synchronization points</em>. These synchronizations delimit so-called <em>supersteps</em>. This way of writing parallel programs has a number of advantages over competing models:</p>
+<p>The bulk synchronous parallel (BSP) programming model, is a way of writing parallel and distributed programs. BSP is the underlying model for Bulk.
+Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed <em>synchronization points</em>. These synchronizations delimit so-called <em>supersteps</em>.
+This way of writing parallel programs has the following benefits:</p>
 <ul>
-<li>The resulting programs are structured, easy to understand and maintain, and their performance and correctness can be reasoned about precisely.</li>
-<li>Data races are eliminated almost by construction, only have to follow a small set of simple rules which can be enforced at runtime.</li>
-<li>Scalability is easy to obtain, since programs are written in a SPMD fashion, and this scalability can be analyzed explicitely.</li>
-<li>The number of communication mechanisms required are very limited, roughly only distinguishing between anonymous (message passing) or <em>named</em> communication (through distributed variables). This makes BSP based libraries very economic (you can do much with very little).</li>
-<li>It has a low cost of entry. It is easy to write <em>correct</em> BSP programs, while it is notoriously hard to write correct asynchronous parallel programs.</li>
-</ul>
-<p>The bulk synchronous communication style does mean losing some flexibility, and comes with a (usually minor) performance penalty. This tradeoff is often well worth it.</p>
-<h2 id="authors">Authors<a class="headerlink" href="#authors" title="Permanent link">&para;</a></h2>
-<p>Bulk is developed by:</p>
-<ul>
-<li>Jan-Willem Buurlage (jwbuurlage)</li>
-<li>Tom Bannink (tombana)</li>
+<li>The resulting programs are <strong>structured</strong>, easy to understand and maintain, and their performance and correctness can be reasoned about precisely.</li>
+<li><strong>Data races</strong> are eliminated by construction, because of simple rules which can be enforced at runtime.</li>
+<li><strong>Scalability</strong> is easy to obtain, programs are written in a SPMD fashion.</li>
+<li>The number of <strong>communication mechanisms</strong> required are very limited, support for <em>message passing</em> or <em>named communication (through distributed variables)</em>. This makes BSP based libraries very economic (you can do much with very little).</li>
+<li>It has a <strong>low cost of entry</strong>. It is easy to write <em>correct</em> BSP programs (while it is notoriously hard to write correct asynchronous parallel programs).</li>
 </ul>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <p>Hello world!</p>
@@ -1386,7 +1380,7 @@ so that programs written with Bulk work for both shared memory, distributed memo
     <span class="k">auto</span> <span class="n">s</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">rank</span><span class="p">();</span>
     <span class="k">auto</span> <span class="n">p</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">active_processors</span><span class="p">();</span>
 
-    <span class="n">world</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&quot;Hello world from processor %d / %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+    <span class="n">world</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&quot;Hello world from processor %d / %d!&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
 <span class="p">});</span>
 </pre></div>
 
@@ -1403,7 +1397,7 @@ so that programs written with Bulk work for both shared memory, distributed memo
 </pre></div>
 
 
-<p>Coarrays provide a convenient syntax for working with distributed arrays.</p>
+<p>Coarrays are convenient distributed arrays.</p>
 <div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
 <span class="n">xs</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">next_rank</span><span class="p">())[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">;</span>
 </pre></div>
@@ -1423,20 +1417,40 @@ so that programs written with Bulk work for both shared memory, distributed memo
 </pre></div>
 
 
-<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
-<p>Bulk provides a modern bulk synchronous parallel API which is <a href="api/">documented in detail here</a>.</p>
+<h2 id="building">Building<a class="headerlink" href="#building" title="Permanent link">&para;</a></h2>
+<p>Bulk requires an up-to-date compiler, that supports C++17, e.g. GCC &gt;= 7.0, or Clang &gt;= 4.0.</p>
+<p>Bulk supports a number of different <em>backends</em>, allowing the programs to run in parallel using:</p>
+<ul>
+<li><code>thread</code> for multi-core systems using standard C++ <code>&lt;thread&gt;</code> threading support</li>
+<li><code>mpi</code> for distributed environments using MPI</li>
+</ul>
+<p>The examples in the <code>examples</code> directory work for every backend. To build them, do the following. The backends (e.g. <code>thread</code>, <code>mpi</code>) are built optionally, just remove or add the option if you do not require them.</p>
+<div class="codehilite"><pre><span></span>mkdir build
+cd build
+cmake ..
+make thread mpi
+</pre></div>
+
+
+<p>The examples will be compiled in the <code>bin/{backend}</code> directory, prepended with the backend name, i.e. to run the <code>hello</code> example with the <code>thread</code> backend:</p>
+<div class="codehilite"><pre><span></span>./bin/thread/thread_hello
+</pre></div>
+
+
+<p>There is also a special backend available for the <a href="https://www.parallella.org/">Epiphany coprocessor</a>, which can be
+found in the <code>epiphany</code> branch. It also has modified version of Bulk to support portability between MPI, <code>&lt;thread&gt;</code>
+and the Epiphany coprocessor. See <code>backends/epiphany/README.md</code> for more details.</p>
+<h2 id="authors">Authors<a class="headerlink" href="#authors" title="Permanent link">&para;</a></h2>
+<p>Bulk is developed at Centrum Wiskunde &amp; Informatica (CWI) in Amsterdam by:</p>
+<ul>
+<li>Jan-Willem Buurlage (@jwbuurlage)</li>
+<li>Tom Bannink (@tombana)</li>
+</ul>
 <h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
-<p>Bulk is released under the MIT license, for details see the file LICENSE.md.</p>
+<p>Bulk is released under the MIT license, see LICENSE.md.</p>
 <h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>
 <p>We welcome contributions. Please submit pull requests against the develop branch.</p>
-<div class="footnote">
-<hr />
-<ol>
-<li id="fn:1">
-<p>Single program multiple data, meaning that every processor runs the same code but on different data.&#160;<a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
-</li>
-</ol>
-</div>
+<p>If you have any issues, questions, or remarks, then please open an issue on GitHub.</p>
                 
                   
                 
