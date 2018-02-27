@@ -5,26 +5,24 @@ Bulk
 
 Bulk is a new interface for writing bulk synchronous parallel programs in C++.
 It lets you implement parallel algorithms by providing common communication mechanisms
-between processing elements, no matter if these corresponds to cores in a many-core accelerator,
-threads, or nodes in a cluster.
+between processing elements, such as threads, MPI nodes or cores in a many-core accelerator,
 
-Bulk does away with unnecessary boilerplate  code and the unsafe API's that are found in for example MPI, or the BSPlib standard. It provides a unified syntax for parallel programming across different platforms and modalities.
+Bulk does away with unnecessary boilerplate code and the unsafe API's that are found in for example MPI, or the BSPlib standard. It provides a unified syntax for parallel programming across different platforms and modalities.
 Our BSP interface supports and encourages the use of modern C++ features, enabling safer and more efficient distributed programming. We have a flexible backend architecture,
 so that programs written with Bulk work for both shared memory, distributed memory, or mixed systems.
 
 About BSP
 ---------
 
-The bulk synchronous parallel (BSP) programming model, is a way of writing parallel and distributed programs. BSP is the underlying model for Bulk. Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed _synchronization points_. These synchronizations delimit so-called _supersteps_. This way of writing parallel programs has a number of advantages over competing models:
+The bulk synchronous parallel (BSP) programming model, is a way of writing parallel and distributed programs. BSP is the underlying model for Bulk.
+Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed _synchronization points_. These synchronizations delimit so-called _supersteps_.
+This way of writing parallel programs has the following benefits:
 
 - The resulting programs are **structured**, easy to understand and maintain, and their performance and correctness can be reasoned about precisely.
-- **Data races** are eliminated almost by construction, only have to follow a small set of simple rules which can be enforced at runtime.
-- **Scalability** is easy to obtain, since programs are written in a SPMD fashion, and this scalability can be analyzed explicitely.
-- The number of **communication mechanisms** required are very limited, roughly only distinguishing between anonymous (message passing) or _named_ communication (through distributed variables). This makes BSP based libraries very economic (you can do much with very little).
-- It has a **low cost of entry**. It is easy to write _correct_ BSP programs, while it is notoriously hard to write correct asynchronous parallel programs.
-
-The bulk synchronous communication style does mean losing some flexibility, as
-asynchronous communication is not possible.
+- **Data races** are eliminated by construction, because of simple rules which can be enforced at runtime.
+- **Scalability** is easy to obtain, programs are written in a SPMD fashion.
+- The number of **communication mechanisms** required are very limited, support for _message passing_ or _named communication (through distributed variables)_. This makes BSP based libraries very economic (you can do much with very little).
+- It has a **low cost of entry**. It is easy to write _correct_ BSP programs (while it is notoriously hard to write correct asynchronous parallel programs).
 
 Examples
 -------
@@ -96,6 +94,9 @@ The examples in the `examples` directory work for every backend. To build them, 
 The examples will be compiled in the `bin/{backend}` directory, prepended with the backend name, i.e. to run the `hello` example with the `thread` backend:
 
     ./bin/thread/thread_hello
+
+There is also a special backend available for the [Epiphany coprocessor](https://www.parallella.org/), which can be
+found in the `epiphany` branch. See `backends/epiphany/README.md` for more details.
 
 Authors
 -------

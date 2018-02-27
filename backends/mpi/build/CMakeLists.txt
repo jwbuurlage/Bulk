@@ -9,7 +9,7 @@ if(MPI_CXX_FOUND)
         "../../../include"
         )
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -Wall -Wfatal-errors -Wextra -Werror -g -O3")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wfatal-errors -Wextra -Werror -g -O3")
 
     add_custom_target(${BACKEND_NAME})
     add_definitions(-DBACKEND_MPI)
