@@ -4,22 +4,17 @@
 
 #if defined BACKEND_MPI
 
-#include <bulk/backends/mpi/mpi.hpp>
+#include "bulk/backends/mpi/mpi.hpp"
 using environment = bulk::mpi::environment;
 
 #elif defined BACKEND_EPIPHANY
 
-#include <bulk/backends/epiphany/host.hpp>
+#include "bulk/backends/epiphany/host.hpp"
 using environment = bulk::epiphany::environment;
 
-#elif defined BACKEND_XEONPHI
+#elif defined BACKEND_THREAD
 
-#include <bulk/backends/xeonphi/xeonphi.hpp>
-using environment = bulk::xeonphi::environment;
-
-#else
-
-#include <bulk/backends/thread/thread.hpp>
+#include "bulk/backends/thread/thread.hpp"
 using environment = bulk::thread::environment;
 
 #endif
