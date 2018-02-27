@@ -2,7 +2,11 @@
 
 ## 1.0.0
 
-??
+2018-02-27
+
+### Added
+
+- Backend for the Epiphany coprocessor
 
 ### Fixed
 
