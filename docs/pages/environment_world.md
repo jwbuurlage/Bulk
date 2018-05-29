@@ -58,7 +58,7 @@ in the following way:
 ```cpp
 env.spawn(env.available_processors(), [](auto& world) {
     auto s = world.rank();
-    auto p = world.available_proecssors();
+    auto p = world.available_processors();
     world.log("Hello world from processor %d / %d!", s, p);
 }
 ```
