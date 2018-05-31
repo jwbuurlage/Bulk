@@ -60,10 +60,9 @@ class table {
         std::stringstream divider;
         divider << "|";
         for (auto w : column_width_) {
-            divider << " " << std::string(w, '-') << " |";
+            divider << std::string(w + 2, '-') << "|";
         }
         divider << "\n";
-        result << divider.str();
 
         auto output = [&](auto& list) {
             result << "|";
@@ -79,7 +78,6 @@ class table {
         for (auto& entry : entries_) {
             output(entry);
         }
-        result << divider.str();
 
         return result.str();
     }
