@@ -7,10 +7,10 @@
 
 double flop_rate(bulk::world& world) {
     unsigned int r_size = 1 << 23;
-    std::vector<float> xs(r_size);
+    std::vector<double> xs(r_size);
     std::iota(xs.begin(), xs.end(), 0);
-    std::vector<float> ys = xs;
-    std::vector<float> zs = xs;
+    std::vector<double> ys = xs;
+    std::vector<double> zs = xs;
 
     auto alpha = 1.0f / 3.0f;
     auto beta = 4.0f / 9.0f;
