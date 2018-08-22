@@ -8,6 +8,7 @@
 
 namespace bulk::thread {
 
+template <typename Barrier = spinning_barrier>
 class environment : public bulk::environment {
   public:
     environment() {}
@@ -20,11 +21,11 @@ class environment : public bulk::environment {
         std::vector<std::thread> threads;
 
         // Shared world_state object
-        world_state state(processors);
+        world_state<Barrier> state(processors);
         state.log_callback = log_callback;
 
         // Create the threads and thereby start them
-        std::vector<bulk::thread::world> ws;
+        std::vector<bulk::thread::world<Barrier>> ws;
         ws.reserve(processors);
         for (int i = 0; i < processors; i++) {
             ws.emplace_back(&state, i, processors);

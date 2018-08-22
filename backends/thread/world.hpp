@@ -51,6 +51,7 @@ struct registered_queue {
 };
 
 // single `world_state` instance shared by every thread
+template<typename Barrier = spinning_barrier>
 class world_state {
   public:
     explicit world_state(int processors) : sync_barrier(processors) {
@@ -58,7 +59,7 @@ class world_state {
         queues_.reserve(20 * processors);
     }
 
-    barrier sync_barrier;
+    Barrier sync_barrier;
 
     std::mutex var_mutex;
     std::vector<registered_variable> variables_;
@@ -72,9 +73,10 @@ class world_state {
 };
 
 // separate `world` instance for every thread
+template<typename Barrier = spinning_barrier>
 class world : public bulk::world {
   public:
-    world(world_state* state, int pid, int nprocs)
+    world(world_state<Barrier>* state, int pid, int nprocs)
         : state_(state), pid_(pid), nprocs_(nprocs) {}
     ~world() {}
 
@@ -351,7 +353,7 @@ class world : public bulk::world {
   private:
     // This should be a reference but we can not assign it in the constructor
     // because `world` does not have a constructor. FIXME: Change this ?
-    world_state* state_;
+    world_state<Barrier>* state_;
     int pid_;
     int nprocs_;
 

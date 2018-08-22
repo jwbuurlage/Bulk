@@ -20,6 +20,6 @@ using environment = bulk::xeonphi::environment;
 #else
 
 #include <bulk/backends/thread/thread.hpp>
-using environment = bulk::thread::environment;
+using environment = bulk::thread::environment<bulk::thread::spinning_barrier>;
 
 #endif

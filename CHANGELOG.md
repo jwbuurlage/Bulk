@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0
+
+Unreleased
+
+### Added
+
+- Added a spinlock barrier `bulk::thread::spinning_barrier` to the thread
+  backend, which is now used by default.
+
 ## 1.0.0
 
 2018-02-27
