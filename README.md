@@ -96,7 +96,7 @@ The examples will be compiled in the `bin/{backend}` directory, prepended with t
     ./bin/thread/thread_hello
 
 There is also a special backend available for the [Epiphany coprocessor](https://www.parallella.org/), which can be
-found in the `epiphany` branch. It also has modified version of Bulk to support portability between MPI, `<thread>`
+found in the `epiphany` branch. It also has a modified version of Bulk to support portability between MPI, `<thread>`
 and the Epiphany coprocessor. See `backends/epiphany/README.md` for more details.
 
 Authors
