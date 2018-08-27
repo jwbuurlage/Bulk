@@ -112,6 +112,13 @@ License
 
 Bulk is released under the MIT license, see LICENSE.md.
 
+Please Cite Us
+--------------
+
+If you have used Bulk for a scientific publication, we would appreciate citations to the following paper:
+
+[Buurlage JW., Bannink T., Bisseling R.H. (2018) Bulk: A Modern C++ Interface for Bulk-Synchronous Parallel Programs. In: Aldinucci M., Padovani L., Torquati M. (eds) Euro-Par 2018: Parallel Processing. Euro-Par 2018. Lecture Notes in Computer Science, vol 11014. Springer, Cham](https://doi.org/10.1007/978-3-319-96983-1_37)
+
 Contributing
 ------------
 

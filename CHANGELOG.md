@@ -8,6 +8,9 @@ Unreleased
 
 - Added a spinlock barrier `bulk::thread::spinning_barrier` to the thread
   backend, which is now used by default.
+- Add citation instruction to README
+
+
 
 ## 1.0.0
 
