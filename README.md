@@ -5,10 +5,10 @@ Bulk
 
 Bulk is a new interface for writing bulk synchronous parallel programs in C++.
 It lets you implement parallel algorithms by providing common communication mechanisms
-between processing elements, such as threads, MPI nodes or cores in a many-core accelerator,
+between processing elements, such as threads, MPI nodes or the cores of a many-core accelerator,
 
-Bulk does away with unnecessary boilerplate code and the unsafe API's that are found in for example MPI, or the BSPlib standard. It provides a unified syntax for parallel programming across different platforms and modalities.
-Our BSP interface supports and encourages the use of modern C++ features, enabling safer and more efficient distributed programming. We have a flexible backend architecture,
+Bulk does away with unnecessary boilerplate code and the unsafe APIs that are found in for example MPI, or the BSPlib standard. It provides a unified syntax for parallel programming across different platforms and modalities.
+Our BSP interface supports and encourages the use of modern C++ features, enabling safer and more efficient parallel programming. We have a flexible backend architecture,
 so that programs written with Bulk work for both shared memory, distributed memory, or mixed systems.
 
 About BSP
@@ -18,11 +18,11 @@ The bulk synchronous parallel (BSP) programming model, is a way of writing paral
 Instead of communicating between processors (or nodes, or cores) asynchronously, all communication is staged and resolved at fixed _synchronization points_. These synchronizations delimit so-called _supersteps_.
 This way of writing parallel programs has the following benefits:
 
-- The resulting programs are **structured**, easy to understand and maintain, and their performance and correctness can be reasoned about precisely.
-- **Data races** are eliminated by construction, because of simple rules which can be enforced at runtime.
-- **Scalability** is easy to obtain, programs are written in a SPMD fashion.
-- The number of **communication mechanisms** required are very limited, support for _message passing_ or _named communication (through distributed variables)_. This makes BSP based libraries very economic (you can do much with very little).
-- It has a **low cost of entry**. It is easy to write _correct_ BSP programs (while it is notoriously hard to write correct asynchronous parallel programs).
+- The resulting programs are **structured**, easy to understand and maintain, and their performance and correctness can be reasoned about.
+- **Data races** are eliminated almost by construction, because of simple rules which can be enforced at runtime.
+- **Scalability** is straightforward to obtain. Programs are written in a SPMD fashion.
+- There are only two types of **communication mechanisms** required, _message passing_ or _named communication (through distributed variables)_. This makes BSP based libraries very economic: you can accomplish a lot with very little.
+- It has a **gentle learning curve**. It is easy to write _correct_ BSP programs, while it is notoriously hard to write correct asynchronous parallel programs.
 
 Examples
 -------
@@ -39,7 +39,7 @@ env.spawn(env.available_processors(), [](auto& world) {
 });
 ```
 
-Distributed variables are the easiest way to communicate.
+Distributed variables are the bread and butter of communication in Bulk.
 
 ```cpp
 auto a = bulk::var<int>(world);
