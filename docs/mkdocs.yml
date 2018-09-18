@@ -22,7 +22,7 @@ extra_javascript:
 docs_dir: pages
 
 pages:
-- Home: 'index.md'
+- Home: 'README.md'
 - Getting started: 'getting_started.md'
 - Tour: 'tour.md'
 - Introduction to Bulk:
