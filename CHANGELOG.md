@@ -2,7 +2,7 @@
 
 ## 1.1.0
 
-Upcoming release, available in `<develop>`
+2018-10-10
 
 ### Added
 
