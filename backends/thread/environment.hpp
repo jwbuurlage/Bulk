@@ -9,12 +9,8 @@
 namespace bulk::thread {
 
 template <typename Barrier = spinning_barrier>
-class environment : public bulk::environment {
+class environment_ : public bulk::environment {
   public:
-    environment() {}
-
-    ~environment() {}
-
     void spawn(int processors,
                std::function<void(bulk::world&)> spmd) override {
         // Thread objects
@@ -65,5 +61,7 @@ class environment : public bulk::environment {
   protected:
     std::function<void(int, const std::string&)> log_callback;
 };
+
+using environment = environment_<>;
 
 } // namespace bulk::thread

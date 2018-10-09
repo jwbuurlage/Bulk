@@ -28,7 +28,7 @@ struct scale {
 // non-owned buffer
 struct memory_buffer_base {
     memory_buffer_base(void* const buffer_)
-        : buffer((char* const)buffer_), index(0) {}
+        : buffer((char*)buffer_), index(0) {}
     ~memory_buffer_base() {}
 
     char* const buffer;
