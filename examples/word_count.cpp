@@ -29,11 +29,9 @@ int main() {
             // We loop over all the words in the text
             std::string word;
             while (f >> word) {
-                std::cout << word << "\n";
                 // For each word, we compute a hash. This hash decides the
                 // receiving processor, who is responsible for counting the
-                // occurences of that word. This is usually called the _map_
-                // step in the MapReduce framework.
+                // occurences of that word. This is called the _map_ step
                 words(std::hash<std::string>{}(word) % p).send(word);
             }
         }
@@ -60,7 +58,6 @@ int main() {
         world.sync();
 
         // The master sorts the incoming reports, and logs the resulting counts
-        // in ascending order
         std::sort(report.begin(), report.end(), [](auto lhs, auto rhs) {
             return std::get<1>(lhs) < std::get<1>(rhs);
         });
