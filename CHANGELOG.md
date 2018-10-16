@@ -4,6 +4,10 @@
 
 Unreleased
 
+### Added
+
+- Add CMake targets `bulk` and `bulk_[backend]`
+
 ### Fixed
 
 - Remove duplicate sync from `fold`
