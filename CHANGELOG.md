@@ -7,6 +7,7 @@ Unreleased
 ### Added
 
 - Add CMake targets `bulk` and `bulk_[backend]`
+- Add partitionings: cyclic, block, tree
 
 ### Fixed
 
