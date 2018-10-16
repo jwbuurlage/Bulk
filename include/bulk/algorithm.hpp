@@ -69,7 +69,7 @@ T foldl(var<T>& x, Func f, T start_value = 0) {
     T result = start_value;
 
     auto images = bulk::gather_all(world, x.value());
-    world.sync();
+
     for (int t = 0; t < world.active_processors(); ++t) {
         // apply f iteratively to the current value, and each remote value
         f(result, images[t]);

@@ -4,6 +4,10 @@
 
 Unreleased
 
+### Fixed
+
+- Remove duplicate sync from `fold`
+
 ## 1.1.0
 
 2018-10-10
