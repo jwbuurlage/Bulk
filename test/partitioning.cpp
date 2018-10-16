@@ -4,10 +4,6 @@
 #include "set_backend.hpp"
 #include <bulk/bulk.hpp>
 
-namespace bulk {
-using namespace experimental;
-}
-
 extern environment env;
 
 void test_partitioning() {
