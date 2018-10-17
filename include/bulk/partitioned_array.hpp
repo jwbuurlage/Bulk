@@ -34,7 +34,6 @@
 #include "partitionings/partitioning.hpp"
 
 namespace bulk {
-namespace experimental {
 
 /**
  * A partitioned array is a distributed array with an associated partitioning.
@@ -91,5 +90,4 @@ class partitioned_array {
     bulk::coarray<T> data_;
 };
 
-} // namespace experimental
 } // namespace bulk
