@@ -21,13 +21,26 @@ The examples will be compiled in the `bin/{backend}` directory, prepended with t
 Using Bulk in a project
 -----------------------
 
-To use Bulk in a project managed with git, add it as a submodule:
+The easiest way to get started using Bulk is to download the source code from
+[GitHub](https://www.github.com/jwbuurlage/bulk). If you use Bulk in a project
+we suggest to add Bulk as a submodule:
 
 ```bash
 git submodule add https://www.github.com/jwbuurlage/bulk ext/bulk
-git submodule update --init --remote
+git submodule update --init
 ```
 
-And add `ext/bulk/include` as an include directory when building.
+If you use CMake for your project, adding Bulk as a dependency is
+straightforward. For this, you can use the `bulk` and `bulk_[backend]` targets.
+For example, if your CMake target is called `your_program` and it uses Bulk with
+the `thread` backend, you can use the following:
 
-The entire library is header only, but backends may have dependencies. See their documentation for details.
+```cmake
+add_subdirectory("ext/bulk")
+target_link_libraries(your_program bulk_thread)
+```
+
+If you do not use CMake, you can use the Bulk interface as a header-only
+library. Simply add `ext/bulk/include` as an include directory. Depending on the
+backend, you may have to link against addition libraries. See the backend's
+documentation for more information.
