@@ -23,6 +23,13 @@ foreach(source_file ${EXAMPLE_SOURCES})
     add_dependencies(${BACKEND_NAME} ${BACKEND_NAME}_${source_name})
 endforeach(source_file)
 
+# PSC example
+
+add_executable(${BACKEND_NAME}_psc "../../../examples/psc/psc_example.cpp")
+target_link_libraries(${BACKEND_NAME}_psc bulk_thread)
+target_include_directories(${BACKEND_NAME}_psc PRIVATE "../../../examples/psc/include")
+add_dependencies(${BACKEND_NAME} ${BACKEND_NAME}_psc)
+
 # Benchmark executable
 
 add_executable(${BACKEND_NAME}_benchmark "../../../benchmark/benchmark.cpp")
