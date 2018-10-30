@@ -1,21 +1,25 @@
 # Changelog
 
-## 1.2.0
+All notable changes to Bulk will be documented in this file.
 
-Unreleased
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic
+Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
 
 ### Added
 
 - Add CMake targets `bulk` and `bulk_[backend]`
 - Add partitionings: cyclic, block, tree
+- Add parallel scientific computing examples and documentation
+- Add `partitioned_array`
 
 ### Fixed
 
 - Remove duplicate sync from `fold`
 
-## 1.1.0
-
-2018-10-10
+## [1.1.0] - 2018-10-10
 
 ### Added
 
@@ -23,9 +27,7 @@ Unreleased
   backend, which is now used by default.
 - Add citation instruction to README
 
-## 1.0.0
-
-2018-02-27
+## [1.0.0] - 2018-02-27
 
 ### Added
 
@@ -40,9 +42,7 @@ Unreleased
 - (De-)serialization in `var` and `future` now avoids redundant memory
   allocation and copying, by making the memory buffer objects non-owning
 
-## 0.2.0
-
-2017-08-09
+## [0.2.0] - 2017-08-09
 
 ### Added
 
@@ -55,8 +55,11 @@ Unreleased
 
 - Fixed bug in MPI backend where messages could get truncated
 
-## 0.1.0
-
-2017-06-01
+## 0.1.0 - 2017-06-01
 
 - Initial release. A complete modern replacement for BSPlib.
+
+[Unreleased]: https://github.com/jwbuurlage/bulk/compare/v1.0.0...HEAD
+[1.1.0]: https://github.com/jwbuurlage/bulk/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/jwbuurlage/bulk/compare/v0.2.0...v1.0.0
+[0.2.0]: https://github.com/jwbuurlage/bulk/compare/v0.1.0...v0.2.0

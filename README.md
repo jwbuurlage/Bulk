@@ -87,27 +87,34 @@ for (auto [tag, content] : q) {
 Building
 --------
 
-Bulk requires an up-to-date compiler, that supports C++17, e.g. GCC >= 7.0, or Clang >= 4.0.
+Bulk requires Linux and an up-to-date compiler, that supports C++17, e.g. GCC >=
+7.0, or Clang >= 4.0.
 
-Bulk supports a number of different *backends*, allowing the programs to run in parallel using:
+Bulk supports a number of different *backends*, allowing the programs to run in
+parallel using:
 
 - `thread` for multi-core systems using standard C++ `<thread>` threading support
 - `mpi` for distributed environments using MPI
 
-The examples in the `examples` directory work for every backend. To build them, do the following. The backends (e.g. `thread`, `mpi`) are built optionally, just remove or add the option if you do not require them.
+The examples in the `examples` directory work for every backend. To build them,
+do the following. The backends (e.g. `thread`, `mpi`) are built optionally, just
+remove or add the option if you do not require them.
 
     mkdir build
     cd build
     cmake ..
     make thread mpi
 
-The examples will be compiled in the `bin/{backend}` directory, prepended with the backend name, i.e. to run the `hello` example with the `thread` backend:
+The examples will be compiled in the `bin/{backend}` directory, prepended with
+the backend name, i.e. to run the `hello` example with the `thread` backend:
 
     ./bin/thread/thread_hello
 
-There is also a special backend available for the [Epiphany coprocessor](https://www.parallella.org/), which can be
-found in the `epiphany` branch. It also has a modified version of Bulk to support portability between MPI, `<thread>`
-and the Epiphany coprocessor. See `backends/epiphany/README.md` for more details.
+There is also a special legacy backend available for the [Epiphany
+coprocessor](https://www.parallella.org/), which can be found in the `epiphany`
+branch. This branch has a modified version of Bulk to support portability
+between MPI, `<thread>` and the Epiphany coprocessor. See
+`backends/epiphany/README.md` for more details.
 
 Authors
 -------
@@ -125,13 +132,16 @@ Bulk is released under the MIT license, see LICENSE.md.
 Please Cite Us
 --------------
 
-If you have used Bulk for a scientific publication, we would appreciate citations to the following paper:
+If you have used Bulk for a scientific publication, we would appreciate
+citations to the following paper:
 
 [Buurlage JW., Bannink T., Bisseling R.H. (2018) Bulk: A Modern C++ Interface for Bulk-Synchronous Parallel Programs. In: Aldinucci M., Padovani L., Torquati M. (eds) Euro-Par 2018: Parallel Processing. Euro-Par 2018. Lecture Notes in Computer Science, vol 11014. Springer, Cham](https://doi.org/10.1007/978-3-319-96983-1_37)
 
 Contributing
 ------------
 
-We welcome contributions. Please submit pull requests against the develop branch.
+We welcome contributions. Please submit pull requests against the develop
+branch.
 
-If you have any issues, questions, or remarks, then please open an issue on GitHub.
+If you have any issues, questions, or remarks, then please open an issue on
+GitHub.
