@@ -10,7 +10,7 @@ for shared-memory, distributed-memory, and hybrid systems. This interface
 targets the next generation of BSP programmers who want to write fast, safe,
 clear and portable parallel programs.
 
-# About BSP
+## About BSP
 
 The bulk synchronous parallel (BSP) programming model, is a way of writing
 parallel and distributed programs. BSP is the underlying model for Bulk. Instead
@@ -32,7 +32,7 @@ parallel programs has a number of advantages:
   programs, while it is notoriously hard to write correct asynchronous parallel
   programs.
 
-# Examples
+## Examples
 
 Hello world!
 
@@ -81,13 +81,13 @@ for (auto [tag, content] : q) {
 }
 ```
 
-# Building
+## Building
 
 
 Bulk requires Linux and an up-to-date compiler, that supports C++17, e.g. GCC >=
 7.0, or Clang >= 4.0.
 
-## Backends
+### Backends
 
 Bulk supports a number of different *backends*, allowing the programs to run in
 parallel using:
@@ -101,7 +101,7 @@ branch. This branch has a modified version of Bulk to support portability
 between MPI, `<thread>` and the Epiphany coprocessor. See
 `backends/epiphany/README.md` for more details.
 
-## Examples
+### Examples
 
 The examples in the `examples` directory work for every backend. To build them,
 do the following. The backends (e.g. `thread`, `mpi`) are built optionally, just
@@ -117,7 +117,7 @@ the backend name, i.e. to run the `hello` example with the `thread` backend:
 
     ./bin/thread/thread_hello
 
-## Developing on top of Bulk 
+### Developing on top of Bulk 
 
 The easiest way to get started using Bulk is to download the source code from
 [GitHub](https://www.github.com/jwbuurlage/bulk). If you use Bulk in a project
@@ -138,25 +138,25 @@ add_subdirectory("ext/bulk")
 target_link_libraries(your_program bulk_thread)
 ```
 
-# License
+## License
 
 Bulk is released under the MIT license, see LICENSE.md.
 
-# Please Cite Us
+## Please Cite Us
 
 If you have used Bulk for a scientific publication, we would appreciate
 citations to the following paper:
 
 [Buurlage JW., Bannink T., Bisseling R.H. (2018) Bulk: A Modern C++ Interface for Bulk-Synchronous Parallel Programs. In: Aldinucci M., Padovani L., Torquati M. (eds) Euro-Par 2018: Parallel Processing. Euro-Par 2018. Lecture Notes in Computer Science, vol 11014. Springer, Cham](https://doi.org/10.1007/978-3-319-96983-1_37)
 
-# Authors
+## Authors
 
 Bulk is developed at Centrum Wiskunde & Informatica (CWI) in Amsterdam by:
 
 * Jan-Willem Buurlage (@jwbuurlage)
 * Tom Bannink (@tombana)
 
-# Contributing
+## Contributing
 
 We welcome contributions. Please submit pull requests against the develop
 branch.
