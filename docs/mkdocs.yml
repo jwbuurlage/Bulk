@@ -30,6 +30,8 @@ pages:
     - Distributed variables: 'variables.md'
     - Coarrays: 'coarrays.md'
     - Message passing: 'message_passing.md'
+- Case studies:
+  - Parallel Scientific Computing: 'psc.md'
 - API:
     - 'Index': 'api/index.md'
     - Classes:
@@ -95,6 +97,7 @@ pages:
     - thread: 'backends/thread.md'
 - BSP model: 'bsp.md'
 - Bulk vs BSPlib: 'bulk_vs_bsplib.md'
+
 - Release Notes: 'CHANGELOG.md'
 
 extra:
