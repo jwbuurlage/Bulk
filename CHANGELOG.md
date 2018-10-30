@@ -59,7 +59,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial release. A complete modern replacement for BSPlib.
 
-[Unreleased]: https://github.com/jwbuurlage/bulk/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/jwbuurlage/bulk/compare/v1.1.0...develop
 [1.1.0]: https://github.com/jwbuurlage/bulk/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/jwbuurlage/bulk/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/jwbuurlage/bulk/compare/v0.1.0...v0.2.0
