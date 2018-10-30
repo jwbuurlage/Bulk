@@ -1,0 +1,19 @@
+language: cpp
+dist: trusty
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-7
+      - g++-7
+
+install:
+  - make get-deps
+
+script:
+  - export CC=gcc-7
+  - export CXX=g++-7
+  - make
+  - make test

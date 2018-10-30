@@ -1,4 +1,4 @@
-# Bulk
+# Bulk [![Build Status](https://travis-ci.org/jwbuurlage/Bulk.svg?branch=develop)](https://travis-ci.org/jwbuurlage/Bulk)
 
 ![](docs/pages/images/logo-square.png)
 

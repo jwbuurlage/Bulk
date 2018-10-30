@@ -14,6 +14,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add partitionings: cyclic, block, tree
 - Add parallel scientific computing examples and documentation
 - Add `partitioned_array`
+- Add Travis CI support
 
 ### Fixed
 
