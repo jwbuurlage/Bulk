@@ -63,10 +63,10 @@ bulk::coarray<T> gather_all(bulk::world& world, T value) {
  *              \f[ f(f(f(f(x(0), x(1)), x(2)), ...), x(p-1)). \f]
  *          which is computed at each core.
  */
-template <typename T, typename Func>
-T foldl(var<T>& x, Func f, T start_value = {}) {
+template <typename T, typename Func, typename S = T>
+S foldl(var<T>& x, Func f, S start_value = {}) {
     auto& world = x.world();
-    T result = start_value;
+    auto result = start_value;
 
     auto images = bulk::gather_all(world, x.value());
 

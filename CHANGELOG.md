@@ -19,17 +19,21 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - Remove duplicate sync from `foldl`
+- Fix certain unittests relying on shared-memory access to `success` counter
+- Fix coarray unittest relying on `p > 2`
 
 ### Changed
 
-- Update default value for `start_value` of `foldl` to `{}` from `0` for non-numeric types.
+- Update default value for `start_value` of `foldl` to `{}` from `0` for
+  non-numeric types
+- Allow different type for accumulator of `foldl`
 
 ## [1.1.0] - 2018-10-10
 
 ### Added
 
 - Add a spinlock barrier `bulk::thread::spinning_barrier` to the thread
-  backend, which is now used by default.
+  backend, which is now used by default
 - Add citation instruction to README
 
 ## [1.0.0] - 2018-02-27

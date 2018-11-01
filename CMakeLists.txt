@@ -26,6 +26,14 @@ set(
     "${TEST_DIR}/test_main.cpp"
     )
 
+set(
+    BULK_SUGGESTED_COMPILE_OPTIONS
+    "-O3"
+    "-Wall"
+    "-Werror"
+    "-Wfatal-errors"
+    )
+
 add_library(bulk INTERFACE)
 
 target_include_directories(bulk INTERFACE "include")

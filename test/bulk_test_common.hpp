@@ -2,27 +2,21 @@
 
 extern int total, success;
 
-// The variable cur_failed is always set to zero at the end of every BULK_CHECK
-// The barrier is at the end of BULK_CHECK to interfere as little as possible
-// with the test case itself
-
 #define BULK_CHECK(body, error)                                                \
     {                                                                          \
-        ++total;                                                               \
-        auto succes = bulk::var<bool>(world, body);                            \
-        bool overall = bulk::foldl(                                            \
-            succes, [](auto lhs, auto rhs) { return lhs && rhs; });            \
-        world.sync();                                                          \
+        auto result = (bool)(body);                                            \
+        auto succes = bulk::var<bool>(world, result);                          \
+        int all_good = bulk::foldl(                                            \
+            succes, [](auto& lhs, auto rhs) { lhs += rhs ? 1 : 0; }, (int)0);  \
         if (world.rank() == 0) {                                               \
-            if (cur_failed) {                                                  \
-                world.log("  FAILED %d/%d processors *did not* %s",            \
-                          cur_failed, world.active_processors(), error);       \
+            ++total;                                                           \
+            if (all_good != world.active_processors()) {                       \
+                world.log("FAILED %s (%i / %i)", error, all_good,              \
+                          world.active_processors());                          \
             } else {                                                           \
                 ++success;                                                     \
             }                                                                  \
-            cur_failed = 0;                                                    \
         }                                                                      \
-        world.barrier();                                                       \
     }
 
 #define BULK_CHECK_ONCE(body, error)                                           \

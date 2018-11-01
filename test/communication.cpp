@@ -284,10 +284,10 @@ void test_communication() {
             BULK_CHECK(zs[3] == 2,
                        "writing to local coarray gives correct result");
 
-            auto a = zs(2)[1].get();
+            auto a = zs(0)[1].get();
             world.sync();
 
-            BULK_CHECK(a.value() == 1,
+            BULK_CHECK(a.value() == p - 1,
                        "getting from coarray gives correct result");
 
             zs(s)[3] = 1234;
@@ -453,17 +453,17 @@ void test_communication() {
             world.sync();
 
             int k = 0;
-            BULK_CHECK(!q.empty() && !q2.empty(), "queues are non-empty");
+            BULK_CHECK_ONCE(!q.empty() && !q2.empty(), "queues are non-empty");
             for (auto& msg : q) {
-                BULK_CHECK(msg == contents[k++],
+                BULK_CHECK_ONCE(msg == contents[k++],
                            "received correct result on q");
             }
 
             int l = 0;
-            BULK_CHECK(q.size() == contents.size(),
+            BULK_CHECK_ONCE(q.size() == contents.size(),
                        "first queue correct number of messages");
 
-            BULK_CHECK(q2.size() == contents2.size(),
+            BULK_CHECK_ONCE(q2.size() == contents2.size(),
                        "second queue correct number of messages");
 
             for (auto[tag, content] : q2) {

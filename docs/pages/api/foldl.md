@@ -1,8 +1,8 @@
 # `bulk::foldl`
 
 ```cpp
-template <typename T, typename Func>
-T foldl(var<T>& x, Func f, T start_value = 0)
+template <typename T, typename Func, typename S = T>
+S foldl(var<T>& x, Func f, S start_value = {})
 ```
 
 Perform a left-fold over a distributed variable.
@@ -10,13 +10,14 @@ Perform a left-fold over a distributed variable.
 ## Template parameters
 
 * `T` - the value type of the variable/array
-* `Func` - type of a binary function of the form `(T, T) -> T` that is used to fold
+* `S` - the value type of the accumulator
+* `Func` - type of a binary function of the form `(S, T) -> S` that is used to fold
 
 ## Parameters
 
 * `x` - the distributed variable
 * `f` - the folding function
-* `start_value` - the (optional) initial alue of the accumulator
+* `start_value` - the (optional) initial value of the accumulator
 
 ## Complexity and cost
 
