@@ -18,7 +18,7 @@ int flatten(std::array<int, D> volume, std::array<int, D> idxs) {
 
 template <int D>
 std::array<int, D> unflatten(std::array<int, D> volume, int flattened) {
-    std::array<int, D> unflattened;
+    std::array<int, D> unflattened = {};
     for (int d = 0; d < D; ++d) {
         unflattened[d] = flattened % volume[d];
         flattened /= volume[d];

@@ -15,6 +15,7 @@ void test_partitioning() {
 
         auto N = (int)sqrt(p);
         BULK_SKIP_SECTION_IF("Partitionings", N * N != p);
+        BULK_SKIP_SECTION_IF("Partitionings", p <= 1);
 
         BULK_SECTION("Cyclic partitioning to 1D") {
             auto part =
@@ -72,6 +73,8 @@ void test_partitioning() {
                        "compute correctly the block size [1]");
             BULK_CHECK(part.global_to_local({3, 12})[1] == 2,
                        "compute correctly the block index");
+            world.log("%i", part.origin(0)[1]);
+            world.log("%i", part.origin(0)[1]);
             BULK_CHECK(part.origin(0)[1] == 0,
                        "compute correctly the block origin (0)[1]");
             BULK_CHECK(part.origin(1)[1] == 10,

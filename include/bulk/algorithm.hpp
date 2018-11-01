@@ -64,7 +64,7 @@ bulk::coarray<T> gather_all(bulk::world& world, T value) {
  *          which is computed at each core.
  */
 template <typename T, typename Func>
-T foldl(var<T>& x, Func f, T start_value = 0) {
+T foldl(var<T>& x, Func f, T start_value = {}) {
     auto& world = x.world();
     T result = start_value;
 

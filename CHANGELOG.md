@@ -18,7 +18,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- Remove duplicate sync from `fold`
+- Remove duplicate sync from `foldl`
+
+### Changed
+
+- Update default value for `start_value` of `foldl` to `{}` from `0` for non-numeric types.
 
 ## [1.1.0] - 2018-10-10
 
