@@ -30,20 +30,20 @@ void test_partitioning() {
                        "compute correctly the extent in cyclic dim");
             BULK_CHECK(part.local_size({s})[1] == 5 * p * N,
                        "compute correctly the extent in non-cyclic dim");
-            BULK_CHECK(part.global_to_local({p + 2, 3})[0] == 1,
+            BULK_CHECK(part.local({p + 2, 3})[0] == 1,
                        "compute correctly the local index");
         }
 
         BULK_SECTION("Cyclic partitioning") {
             auto part =
                 bulk::cyclic_partitioning<2, 2>({10 * N, 10 * N}, {N, N});
-            BULK_CHECK(part.grid_owner({4, 3})[0] == 4 % N,
+            BULK_CHECK(part.multi_owner({4, 3})[0] == 4 % N,
                        "compute correctly the cyclic owner");
             BULK_CHECK(part.local_size({s % N, s / N})[0] == 10,
                        "compute correctly the cyclic size");
-            BULK_CHECK(part.global_to_local({4, 3})[0] == 4 / N,
+            BULK_CHECK(part.local({4, 3})[0] == 4 / N,
                        "compute correctly the cyclic local index");
-            BULK_CHECK(part.local_to_global({1, 1}, {s % N, s / N})[0] ==
+            BULK_CHECK(part.global({1, 1}, {s % N, s / N})[0] ==
                            N + (s % N),
                        "compute correctly the cyclic global index");
         }
@@ -51,11 +51,11 @@ void test_partitioning() {
         BULK_SECTION("Block partitioning") {
             auto part =
                 bulk::block_partitioning<2, 2>({10 * N, 10 * N}, {N, N});
-            BULK_CHECK(part.grid_owner({2 * 10 + 3, 3})[0] == 2,
+            BULK_CHECK(part.multi_owner({2 * 10 + 3, 3})[0] == 2,
                        "compute correctly the block owner");
             BULK_CHECK(part.local_size({s % N, s / N})[0] == 10,
                        "compute correctly the block extent");
-            BULK_CHECK(part.global_to_local({3, 12})[1] == 2,
+            BULK_CHECK(part.local({3, 12})[1] == 2,
                        "compute correctly the block index");
             BULK_CHECK(part.origin(0)[0] == 0,
                        "compute correctly the block origin (0)");
@@ -76,7 +76,7 @@ void test_partitioning() {
                        "compute correctly the block size [0]");
             BULK_CHECK(part.local_size(1)[1] == 10,
                        "compute correctly the block size [1]");
-            BULK_CHECK(part.global_to_local({3, 12})[1] == 2,
+            BULK_CHECK(part.local({3, 12})[1] == 2,
                        "compute correctly the block index");
             BULK_CHECK(part.origin(0)[1] == 0,
                        "compute correctly the block origin (0)[1]");
@@ -118,7 +118,7 @@ void test_partitioning() {
                        "assign correct origin bspart (3)");
 
             BULK_CHECK(
-                (part.global_to_local({6, 6}) == std::array<int, 2>{1, 1}),
+                (part.local({6, 6}) == std::array<int, 2>{1, 1}),
                 "assign correct origin bspart");
         }
 

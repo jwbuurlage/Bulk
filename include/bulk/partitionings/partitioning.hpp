@@ -41,8 +41,8 @@ class partitioning {
     virtual int owner(index_type<D> xs) = 0;
 
     /** Convert indices between global and local. */
-    virtual index_type<D> global_to_local(index_type<D> xs) = 0;
-    virtual index_type<D> local_to_global(index_type<D> xs, int processor) = 0;
+    virtual index_type<D> local(index_type<D> xs) = 0;
+    virtual index_type<D> global(index_type<D> xs, int processor) = 0;
 
   protected:
     index_type<D> global_size_;
@@ -66,19 +66,22 @@ class multi_partitioning : public partitioning<D> {
     };
 
     /** Get the multi-dimensional owner of a global index. */
-    virtual index_type<G> grid_owner(index_type<D> xs) = 0;
+    virtual index_type<G> multi_owner(index_type<D> xs) = 0;
     int owner(index_type<D> xs) override {
-        return util::flatten<G>(grid_size_, grid_owner(xs));
+        return util::flatten<G>(grid_size_, multi_owner(xs));
     }
 
     /** Convert indices between global and local. */
-    virtual index_type<D> local_to_global(index_type<D> xs,
-                                          index_type<G> processor) = 0;
-    index_type<D> local_to_global(index_type<D> xs, int processor) override {
-        return local_to_global(xs, util::unflatten<G>(grid_size_, processor));
+    virtual index_type<D> global(index_type<D> xs, index_type<G> processor) = 0;
+    index_type<D> global(index_type<D> xs, int processor) override {
+        return global(xs, util::unflatten<G>(grid_size_, processor));
     };
 
     index_type<G> grid() { return grid_size_; }
+
+    /** Convert between rank and multi rank */
+    int rank(index_type<G> t) { return util::flatten<G>(grid_size_, t); }
+    index_type<G> multi_rank(int t) { return util::unflatten<G>(grid_size_, t); }
 
   protected:
     index_type<G> grid_size_;
@@ -88,7 +91,7 @@ class multi_partitioning : public partitioning<D> {
 template <int D, int G>
 class rectangular_partitioning : public multi_partitioning<D, G> {
   public:
-    using multi_partitioning<D, G>::local_to_global;
+    using multi_partitioning<D, G>::global;
 
     rectangular_partitioning(index_type<D> global_size, index_type<G> grid_size)
         : multi_partitioning<D, G>(global_size, grid_size) {}
@@ -102,8 +105,7 @@ class rectangular_partitioning : public multi_partitioning<D, G> {
         return this->origin(util::unflatten<G>(this->grid_size_, processor));
     }
 
-    virtual index_type<D> local_to_global(index_type<D> xs,
-                                          index_type<G> processor) {
+    virtual index_type<D> global(index_type<D> xs, index_type<G> processor) {
         index_type<D> global = origin(processor);
         for (int d = 0; d < D; ++d) {
             global[d] += xs[d];

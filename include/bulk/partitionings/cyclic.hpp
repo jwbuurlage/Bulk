@@ -13,7 +13,7 @@ template <int D, int G = D>
 class cyclic_partitioning : public multi_partitioning<D, G> {
   public:
     using multi_partitioning<D, G>::local_size;
-    using multi_partitioning<D, G>::local_to_global;
+    using multi_partitioning<D, G>::global;
 
     /**
      * Constructs a cyclic partitioning in nD.
@@ -29,7 +29,7 @@ class cyclic_partitioning : public multi_partitioning<D, G> {
     }
 
     /** Compute the local indices of a element using its global indices */
-    index_type<D> global_to_local(index_type<D> index) override final {
+    index_type<D> local(index_type<D> index) override final {
         for (int d = 0; d < G; ++d) {
             index[d] = index[d] / this->grid_size_[d];
         }
@@ -37,7 +37,7 @@ class cyclic_partitioning : public multi_partitioning<D, G> {
     }
 
     /** Local to global */
-    index_type<D> local_to_global(index_type<D> xs,
+    index_type<D> global(index_type<D> xs,
                                   index_type<G> processor) override final {
         auto result = xs;
         for (int d = 0; d < G; ++d) {
@@ -62,7 +62,7 @@ class cyclic_partitioning : public multi_partitioning<D, G> {
     }
 
     /** Cyclic in first 'G' dimensions. */
-    index_type<G> grid_owner(index_type<D> xs) override final {
+    index_type<G> multi_owner(index_type<D> xs) override final {
         index_type<G> result;
         for (int d = 0; d < G; ++d) {
             result[d] = xs[d] % this->grid_size_[d];

@@ -57,7 +57,7 @@ class partitioned_array {
     /** Get an image to a (possibly remote) element using a global index. */
     auto global(index_type<D> index) {
         auto owner = partitioning_.owner(index);
-        auto local_idx = partitioning_.global_to_local(index);
+        auto local_idx = partitioning_.local(index);
         return data_(owner)[util::flatten<D>(partitioning_.local_size(owner),
                                              local_idx)];
     }

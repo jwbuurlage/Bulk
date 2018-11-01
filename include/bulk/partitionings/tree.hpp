@@ -21,7 +21,7 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
   public:
     using rectangular_partitioning<D, 1>::local_size;
     using rectangular_partitioning<D, 1>::origin;
-    using rectangular_partitioning<D, 1>::local_to_global;
+    using rectangular_partitioning<D, 1>::local;
 
     /**
      * Constructs a cyclic partitioning in nD.
@@ -62,7 +62,7 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
     }
 
     /** Compute the local indices of a element using its global indices */
-    index_type<D> global_to_local(index_type<D> index) override final {
+    index_type<D> local(index_type<D> index) override final {
         auto t = this->owner(index);
         for (int d = 0; d < D; ++d) {
             index[d] -= origins_[t][d];
@@ -76,7 +76,7 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
         return extents_[idxs[0]];
     }
 
-    index_type<1> grid_owner(index_type<D> xs) override final {
+    index_type<1> multi_owner(index_type<D> xs) override final {
         // we encode the path to the final volume as a bit pattern, that will be
         // the processor id
         auto node = splits_.root.get();

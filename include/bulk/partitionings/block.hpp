@@ -10,7 +10,7 @@ class block_partitioning : public rectangular_partitioning<D, G> {
   public:
     using rectangular_partitioning<D, G>::local_size;
     using rectangular_partitioning<D, G>::origin;
-    using rectangular_partitioning<D, G>::local_to_global;
+    using rectangular_partitioning<D, G>::global;
 
     /**
      * Constructs a block partitioning in nD.
@@ -44,7 +44,7 @@ class block_partitioning : public rectangular_partitioning<D, G> {
     }
 
     /** Compute the local indices of a element using its global indices */
-    index_type<D> global_to_local(index_type<D> index) override final {
+    index_type<D> local(index_type<D> index) override final {
         for (int d = 0; d < D; ++d) {
             index[d] = index[d] % block_size_[d];
         }
@@ -67,7 +67,7 @@ class block_partitioning : public rectangular_partitioning<D, G> {
     }
 
     /** Block in first 'G' dimensions. */
-    index_type<G> grid_owner(index_type<D> xs) override final {
+    index_type<G> multi_owner(index_type<D> xs) override final {
         index_type<G> result = {};
         for (int i = 0; i < G; ++i) {
             auto d = axes_[i];
