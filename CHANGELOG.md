@@ -21,6 +21,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Remove duplicate sync from `foldl`
 - Fix certain unittests relying on shared-memory access to `success` counter
 - Fix coarray unittest relying on `p > 2`
+- Fix `-Werror=format-security` issue in `world::log`
 
 ### Changed
 

@@ -7,7 +7,7 @@ extern int total, success;
         auto result = (bool)(body);                                            \
         auto succes = bulk::var<bool>(world, result);                          \
         int all_good = bulk::foldl(                                            \
-            succes, [](auto& lhs, auto rhs) { lhs += rhs ? 1 : 0; }, (int)0);  \
+            succes, [](auto& lhs, auto rhs) { lhs += rhs ? 1 : 0; }, 0);       \
         if (world.rank() == 0) {                                               \
             ++total;                                                           \
             if (all_good != world.active_processors()) {                       \

@@ -180,22 +180,6 @@ class world : public bulk::world {
         state_->logs.push_back(std::make_pair(pid_, message));
     }
 
-    template <typename... Ts>
-    void log_direct(const char* format, const Ts&... ts) {
-        size_t size = snprintf(0, 0, format, ts...);
-        char* buffer = new char[size + 1];
-        snprintf(buffer, size + 1, format, ts...);
-        std::string logmessage(buffer);
-        delete[] buffer;
-        {
-            std::lock_guard<std::mutex> lock{state_->log_mutex};
-            if (state_->log_callback == nullptr)
-                std::cout << logmessage << '\n' << std::flush;
-            else
-                state_->log_callback(pid_, logmessage);
-        }
-    }
-
     void abort() override {
         // TODO
         return;

@@ -110,9 +110,17 @@ class world {
      * Instead one can use `environment::set_log_callback` to intercept
      * these log messages.
      */
-    template <typename... Ts>
+    void log(const char* format) {
+        size_t size = snprintf(nullptr, 0, "%s", format);
+        char* buffer = new char[size + 1];
+        snprintf(buffer, size + 1, "%s", format);
+        log_(std::string(buffer));
+        delete[] buffer;
+    }
+
+    template <typename... Ts, std::enable_if_t<sizeof...(Ts) != 0, int> = 0>
     void log(const char* format, const Ts&... ts) {
-        size_t size = snprintf(0, 0, format, ts...);
+        size_t size = snprintf(nullptr, 0, format, ts...);
         char* buffer = new char[size + 1];
         snprintf(buffer, size + 1, format, ts...);
         log_(std::string(buffer));

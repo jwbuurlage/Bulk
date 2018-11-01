@@ -32,6 +32,8 @@ set(
     "-Wall"
     "-Werror"
     "-Wfatal-errors"
+    "-Wextra"
+    "-Wformat-security"
     )
 
 add_library(bulk INTERFACE)
