@@ -43,19 +43,19 @@ void lu(matrix<T>& mat) {
 
     auto output_array = [&](auto name, auto& xs) {
         if (world.rank() == 0) {
-          std::cout << name << " [";
+            std::cout << name << " [";
             for (auto&& x : xs) {
-              std::cout << x << " ";
+                std::cout << x << " ";
             }
             std::cout << "]\n";
         }
     };
 
     auto pivot = bulk::var<T>(world, (T)-1);
-    auto row_buffer = bulk::coarray<T>(world, n, -1);
-    auto col_buffer = bulk::coarray<T>(world, n, -1);
+    auto row_buffer = bulk::coarray<T>(world, n, 0);
+    auto col_buffer = bulk::coarray<T>(world, n, 0);
 
-    for (int k = 0; k < 3; ++k) {
+    for (int k = 0; k < n; ++k) {
         world.log("stage: %i", k);
         spy(mat);
 
@@ -103,13 +103,14 @@ void lu(matrix<T>& mat) {
         spy(mat);
 
         // (10)
-        // Horizontal
+        // Horizontal, communicate column k
         if (phi.multi_owner({0, k})[1] == t) {
             for (auto v = 0; v < phi.grid()[1]; ++v) {
                 auto target_rank = phi.rank({s, v});
                 for (auto i = 0; i < phi.local_size({s, t})[0]; ++i) {
                     auto global_row = phi.global({i, 0}, {s, t})[0];
-                    row_buffer(target_rank)[global_row] = mat.at({i, j});
+                    col_buffer(target_rank)[global_row] =
+                        mat.at({i, phi.local({i, k})[1]});
                 }
             }
         }
@@ -117,13 +118,14 @@ void lu(matrix<T>& mat) {
         world.sync();
         spy(mat);
 
-        // Vertical
+        // Vertical, communicate row k
         if (phi.multi_owner({k, 0})[0] == s) {
             for (auto u = 0; u < phi.grid()[0]; ++u) {
                 auto target_rank = phi.rank({u, t});
                 for (auto r = 0; r < phi.local_size({s, t})[1]; ++r) {
-                    auto global_col = phi.global({r, 0}, {s, t})[1];
-                    col_buffer(target_rank)[global_col] = mat.at({r, q});
+                    auto global_col = phi.global({0, r}, {s, t})[1];
+                    row_buffer(target_rank)[global_col] =
+                      mat.at({phi.local({k, r})[1], r});
                 }
             }
         }
@@ -137,8 +139,8 @@ void lu(matrix<T>& mat) {
         output_array("col", col_buffer);
 
         // (11)
-        for (auto i = q; i < phi.local_size({s, t})[0]; ++i) {
-            for (auto j = q; j < phi.local_size({s, t})[1]; ++j) {
+        for (auto i = q + 1; i < phi.local_size({s, t})[0]; ++i) {
+            for (auto j = q + 1; j < phi.local_size({s, t})[1]; ++j) {
                 auto [a, b] = phi.global({i, j}, {s, t});
                 mat.at({i, j}) -= row_buffer[a] * col_buffer[b];
             }
@@ -182,6 +184,7 @@ void spy(matrix<T>& mat) {
             }
             std::cout << "]\n";
         }
+        std::cout << "\n";
     }
 }
 

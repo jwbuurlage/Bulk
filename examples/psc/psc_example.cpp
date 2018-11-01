@@ -52,8 +52,11 @@ int main(int argc, char** argv) {
         auto phi = bulk::cyclic_partitioning<2, 2>({n, n}, {M, N});
         auto A = psc::matrix<float>(world, phi);
         for (int i = 0; i < n; ++i) {
+            if (i < n / 2 && phi.owner({n - i - 1, i}) == world.rank()) {
+                A.at(phi.local({n - i - 1, i})) = 1;
+            }
             if (phi.owner({i, i}) == world.rank()) {
-                A.at(phi.local({i, i})) = 1;
+              A.at(phi.local({i, i})) = 1;
             }
         }
 
