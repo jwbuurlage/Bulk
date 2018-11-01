@@ -6,9 +6,9 @@ project(bulk_${BACKEND_NAME})
 add_library(bulk_thread INTERFACE)
 target_include_directories(bulk_thread INTERFACE "..")
 target_link_libraries(bulk_thread INTERFACE pthread bulk)
+target_compile_definitions(bulk_thread INTERFACE BACKEND_THREAD)
 
 add_custom_target(${BACKEND_NAME})
-add_definitions(-DBACKEND_THREAD)
 
 include_directories(
     "../../../include"
