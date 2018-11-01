@@ -1,31 +1,31 @@
 /**
  * A partitioned array is a co-array with a special structure. Locally it
-* behaves like a nD array, indexable using `local`. It also knows about the
-* global structure through its associated partitioning.
-* - The data is stored linearly.
-* - A partitioning is defined in a general way, and contains functions for owner
-* and local index lookup, as well as flattening of multi-indices.
-* - convenient indexing features
-*
-* Examples of partitionings include:
-* - Block partitioning
-* - Cyclic partitioning
-* - A binary tree of splits, giving a binary (space) partitioning.
-* - A set of slices ((2,2,1,1), (3,2,1)), see
-* http://dask.pydata.org/en/latest/array-creation.html
-* - Custom partitionings, for example cartesian distributions using different
-* functions for each axis
-*
-* Some design decisions that have to be made have to do with inheritence and
-* overload functions.
-*
-* Also, we want to support multi-indices, but dont want to resort to `arrays`
-* for everything. Using parameter packs we can do this nicely for the user, but
-* internally we still resort to arrays. This leads to duplicated implementations
-* in the partitioning objects and should be fixed.
-*
-* As it is, this is probably over-engineered and will see major revisions.
-*/
+ * behaves like a nD array, indexable using `local`. It also knows about the
+ * global structure through its associated partitioning.
+ * - The data is stored linearly.
+ * - A partitioning is defined in a general way, and contains functions for
+ * owner and local index lookup, as well as flattening of multi-indices.
+ * - convenient indexing features
+ *
+ * Examples of partitionings include:
+ * - Block partitioning
+ * - Cyclic partitioning
+ * - A binary tree of splits, giving a binary (space) partitioning.
+ * - A set of slices ((2,2,1,1), (3,2,1)), see
+ * http://dask.pydata.org/en/latest/array-creation.html
+ * - Custom partitionings, for example cartesian distributions using different
+ * functions for each axis
+ *
+ * Some design decisions that have to be made have to do with inheritence and
+ * overload functions.
+ *
+ * Also, we want to support multi-indices, but dont want to resort to `arrays`
+ * for everything. Using parameter packs we can do this nicely for the user, but
+ * internally we still resort to arrays. This leads to duplicated
+ * implementations in the partitioning objects and should be fixed.
+ *
+ * As it is, this is probably over-engineered and will see major revisions.
+ */
 
 #include <array>
 

@@ -7,9 +7,9 @@
  * distributed variables.
  */
 
-#include "world.hpp"
 #include "future.hpp"
 #include "variable.hpp"
+#include "world.hpp"
 
 namespace bulk {
 
@@ -42,4 +42,4 @@ future<T> get(int processor, var<T>& x) {
     return x(processor).get();
 }
 
-}  // namespace bulk
+} // namespace bulk

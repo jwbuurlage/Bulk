@@ -6,9 +6,8 @@
 int main() {
     bulk::mpi::environment env;
 
-    env.spawn(env.available_processors(), [](auto& world) {
-        world.log("Hi!");
-    });
+    env.spawn(env.available_processors(),
+              [](auto& world) { world.log("Hi!"); });
 
     return 0;
 }

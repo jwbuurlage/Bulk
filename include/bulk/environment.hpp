@@ -34,7 +34,7 @@ class environment {
      * Get the total number of processors available on the system
      *
      * \returns the number of available processors
-    */
+     */
     virtual int available_processors() const = 0;
 
     /**

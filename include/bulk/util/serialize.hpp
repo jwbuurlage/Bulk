@@ -1,16 +1,16 @@
 #pragma once
 
-#include <type_traits>
 #include <cstring>
 #include <memory>
+#include <type_traits>
 
 namespace bulk::detail {
 
 struct scale {
     std::size_t size = 0;
 
-    template <typename T, typename = std::enable_if_t<
-                              std::is_trivially_copyable<T>::value>>
+    template <typename T,
+              typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
     void operator|(const T&) {
         size += sizeof(T);
     }
@@ -34,15 +34,15 @@ struct memory_buffer_base {
     char* const buffer;
     std::size_t index;
 
-    template <typename T, typename = std::enable_if_t<
-                              std::is_trivially_copyable<T>::value>>
+    template <typename T,
+              typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
     void operator<<(const T& value) {
         memcpy(buffer + index, &value, sizeof(T));
         index += sizeof(T);
     }
 
-    template <typename T, typename = std::enable_if_t<
-                              std::is_trivially_copyable<T>::value>>
+    template <typename T,
+              typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
     void operator>>(T& value) {
         memcpy(&value, buffer + index, sizeof(T));
         index += sizeof(T);
@@ -119,8 +119,7 @@ template <typename Buffer>
 void fill(Buffer&) {}
 
 template <typename Buffer, typename Tuple,
-          typename Is =
-              std::make_index_sequence<std::tuple_size<Tuple>::value>>
+          typename Is = std::make_index_sequence<std::tuple_size<Tuple>::value>>
 void fill(Buffer& buf, Tuple& xs) {
     fill_tuple_(buf, xs, Is{});
 }

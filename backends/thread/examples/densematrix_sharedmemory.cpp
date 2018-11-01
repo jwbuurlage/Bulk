@@ -1,7 +1,7 @@
-#include <chrono>
-#include <cmath>
 #include <bulk/backends/thread/thread.hpp>
 #include <bulk/bulk.hpp>
+#include <chrono>
+#include <cmath>
 
 using namespace std::chrono;
 
@@ -66,14 +66,16 @@ int main() {
 
         // Matrices are N*N blocks of size block_size*block_size
         // This thread computes block (I,J) of C
-        multiply_add(I,J);
+        multiply_add(I, J);
 
         auto end_time = clock::now();
 
-        times_ms[s] = duration<double, std::milli>(end_time - begin_time).count();
+        times_ms[s] =
+            duration<double, std::milli>(end_time - begin_time).count();
     });
     auto spawn_end = clock::now();
-    auto spawn_ms = duration<double, std::milli>(spawn_end - spawn_begin).count();
+    auto spawn_ms =
+        duration<double, std::milli>(spawn_end - spawn_begin).count();
     std::cout << "Entire SPMD took " << spawn_ms << " ms.\n";
 
     std::cout << "Computation was "

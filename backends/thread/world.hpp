@@ -51,7 +51,7 @@ struct registered_queue {
 };
 
 // single `world_state` instance shared by every thread
-template<typename Barrier = spinning_barrier>
+template <typename Barrier = spinning_barrier>
 class world_state {
   public:
     explicit world_state(int processors) : sync_barrier(processors) {
@@ -73,7 +73,7 @@ class world_state {
 };
 
 // separate `world` instance for every thread
-template<typename Barrier = spinning_barrier>
+template <typename Barrier = spinning_barrier>
 class world : public bulk::world {
   public:
     world(world_state<Barrier>* state, int pid, int nprocs)
@@ -187,7 +187,7 @@ class world : public bulk::world {
 
   protected:
     int register_variable_(class var_base* varbase) override {
-        auto[location, size] = varbase->location_and_size();
+        auto [location, size] = varbase->location_and_size();
 
         auto& vars = state_->variables_;
         int id = -1;
@@ -266,11 +266,13 @@ class world : public bulk::world {
         }
         memcpy(v.receiveBuffer + size * offset, values, size * count);
         coarray_put_tasks_.push_back({(char*)v.buffer + size * offset,
-                              v.receiveBuffer + size * offset, size * count});
+                                      v.receiveBuffer + size * offset,
+                                      size * count});
         return;
     }
 
-    void get_buffer_(int processor, int var_id, class future_base* future) override {
+    void get_buffer_(int processor, int var_id,
+                     class future_base* future) override {
         var_get_tasks_.push_back({future, get_var_(var_id, processor).base});
         return;
     }

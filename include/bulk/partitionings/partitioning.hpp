@@ -17,10 +17,9 @@ using index_type = std::array<int, D>;
 /** Base class for partitionings over a 1D processor grid. */
 template <int D>
 class partitioning {
-   public:
+  public:
     /** Construct a partitioning for a global size. */
-    partitioning(index_type<D> global_size)
-        : global_size_(global_size) {}
+    partitioning(index_type<D> global_size) : global_size_(global_size) {}
 
     virtual ~partitioning() = default;
 
@@ -45,18 +44,17 @@ class partitioning {
     virtual index_type<D> global_to_local(index_type<D> xs) = 0;
     virtual index_type<D> local_to_global(index_type<D> xs, int processor) = 0;
 
-   protected:
+  protected:
     index_type<D> global_size_;
 };
 
 /** Base class for partitionings over a multi-dimensional processor grid */
 template <int D, int G>
 class multi_partitioning : public partitioning<D> {
-   public:
+  public:
     using partitioning<D>::local_size;
 
-    multi_partitioning(index_type<D> global_size,
-                       index_type<G> grid_size)
+    multi_partitioning(index_type<D> global_size, index_type<G> grid_size)
         : partitioning<D>(global_size), grid_size_(grid_size) {}
 
     virtual ~multi_partitioning() = default;
@@ -82,18 +80,17 @@ class multi_partitioning : public partitioning<D> {
 
     index_type<G> grid() { return grid_size_; }
 
-   protected:
+  protected:
     index_type<G> grid_size_;
 };
 
 /** Rectanglar partitionings over a multi-dimensional processor grid */
 template <int D, int G>
 class rectangular_partitioning : public multi_partitioning<D, G> {
-   public:
+  public:
     using multi_partitioning<D, G>::local_to_global;
 
-    rectangular_partitioning(index_type<D> global_size,
-                             index_type<G> grid_size)
+    rectangular_partitioning(index_type<D> global_size, index_type<G> grid_size)
         : multi_partitioning<D, G>(global_size, grid_size) {}
 
     /** Support origin queries by flattened, or multi-index */

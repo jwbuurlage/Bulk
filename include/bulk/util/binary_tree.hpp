@@ -62,4 +62,4 @@ struct binary_tree {
     std::unique_ptr<node> root;
 };
 
-}  // namespace bulk::util
+} // namespace bulk::util

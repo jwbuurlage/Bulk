@@ -7,16 +7,6 @@
 #include <bulk/backends/mpi/mpi.hpp>
 using environment = bulk::mpi::environment;
 
-#elif defined BACKEND_EPIPHANY
-
-#include <bulk/backends/epiphany/host.hpp>
-using environment = bulk::epiphany::environment;
-
-#elif defined BACKEND_XEONPHI
-
-#include <bulk/backends/xeonphi/xeonphi.hpp>
-using environment = bulk::xeonphi::environment;
-
 #else
 
 #include <bulk/backends/thread/thread.hpp>

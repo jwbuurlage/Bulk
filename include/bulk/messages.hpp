@@ -77,8 +77,8 @@ class queue {
     void operator=(queue& other) = delete;
 
     /**
-      * Move a queue.
-      */
+     * Move a queue.
+     */
     queue(queue&& other) { impl_ = std::move(other.impl_); }
 
     /**

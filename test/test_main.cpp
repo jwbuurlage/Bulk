@@ -1,6 +1,6 @@
-#include <bulk/bulk.hpp>
 #include "bulk_test_common.hpp"
 #include "set_backend.hpp"
+#include <bulk/bulk.hpp>
 
 int total = 0;
 int success = 0;

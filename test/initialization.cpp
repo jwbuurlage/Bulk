@@ -1,6 +1,6 @@
-#include <bulk/bulk.hpp>
 #include "bulk_test_common.hpp"
 #include "set_backend.hpp"
+#include <bulk/bulk.hpp>
 
 extern environment env;
 
@@ -9,12 +9,10 @@ void test_initialization() {
         int s = world.rank();
         int p = world.active_processors();
 
-
         BULK_SECTION("Init") {
-            BULK_CHECK(s == world.rank(),
-                            "correct processor id");
+            BULK_CHECK(s == world.rank(), "correct processor id");
             BULK_CHECK(p == world.active_processors(),
-                            "correct number of processors");
+                       "correct number of processors");
 
             // we can create a variable
             bulk::var<int> x(world);

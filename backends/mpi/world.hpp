@@ -100,7 +100,6 @@ class world : public bulk::world {
         std::vector<int> custom_get_request_to_proc(active_processors_);
         std::vector<int> custom_get_response_to_proc(active_processors_);
 
-
         // handle gets
         // exchange gets, implicit barrier
         send_buffers_(get_request_buffers_, message_t::get_request,
@@ -218,7 +217,9 @@ class world : public bulk::world {
         vars_[id] = nullptr;
         locations_[id] = nullptr;
     }
-    void unregister_future_(class future_base* future) override final { futures_[future->id()] = nullptr; }
+    void unregister_future_(class future_base* future) override final {
+        futures_[future->id()] = nullptr;
+    }
 
     char* put_buffer_(int target, int var_id, size_t size) override final {
         auto& buffer = custom_put_buffers_[target];
@@ -240,7 +241,8 @@ class world : public bulk::world {
         put_buffers_[processor].push(size * count, values);
     }
 
-    void get_buffer_(int target, int var_id, class future_base* future) override final {
+    void get_buffer_(int target, int var_id,
+                     class future_base* future) override final {
         auto& buffer = custom_get_request_buffers_[target];
         buffer << processor_id_;
         buffer << var_id;

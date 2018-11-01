@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cassert>
-#include <vector>
 #include <optional>
+#include <vector>
 
 namespace bulk::util {
 

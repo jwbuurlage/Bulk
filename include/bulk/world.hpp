@@ -38,9 +38,7 @@ class world {
     virtual int rank() const = 0;
 
     [[deprecated("`world::processor_id` was renamed to `world::rank`")]] int
-    processor_id() const {
-        return this->rank();
-    }
+    processor_id() const { return this->rank(); }
 
     /**
      * Get the rank of the next logical processor
@@ -56,9 +54,7 @@ class world {
 
     [[deprecated(
         "`world::next_processor` was renamed to `world::next_rank`")]] int
-    next_processor() const {
-        return this->next_rank();
-    }
+    next_processor() const { return this->next_rank(); }
 
     /**
      * Get the rank of the previous logical processor
@@ -74,9 +70,7 @@ class world {
 
     [[deprecated(
         "`world::prev_processor` was renamed to `world::prev_rank`")]] int
-    prev_processor() const {
-        return prev_rank();
-    }
+    prev_processor() const { return prev_rank(); }
 
     /**
      * Perform a global barrier synchronization of the active processors
@@ -167,7 +161,8 @@ class world {
     virtual void put_(int processor, const void* values, size_t size,
                       int var_id, size_t offset, size_t count) = 0;
 
-    virtual void get_buffer_(int processor, int var_id, class future_base* future) = 0;
+    virtual void get_buffer_(int processor, int var_id,
+                             class future_base* future) = 0;
     virtual void get_(int processor, int var_id, size_t size, void* target,
                       size_t offset, size_t count) = 0;
 

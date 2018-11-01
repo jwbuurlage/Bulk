@@ -100,8 +100,8 @@ class var {
     void operator=(var<T>& other) = delete;
 
     /**
-      * Move from one var to another
-      */
+     * Move from one var to another
+     */
     var(var<T>&& other) { impl_ = std::move(other.impl_); }
 
     /**
@@ -168,9 +168,7 @@ class var {
             id_ = world.register_variable_(this);
         }
 
-        virtual ~var_impl() {
-            world_.unregister_variable_(id_);
-        }
+        virtual ~var_impl() { world_.unregister_variable_(id_); }
 
         // No copies or moves
         var_impl(var_impl& other) = delete;
