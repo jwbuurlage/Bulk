@@ -52,19 +52,19 @@ int main(int argc, char** argv) {
 
         world.log_once(
             "> Example 3: Computing the LU decomposition of a matrix");
-        auto n = 10;
+        auto n = 4;
         auto phi = bulk::cyclic_partitioning<2, 2>({n, n}, {M, N});
-        auto A = psc::matrix<float>(world, phi, 2.0f);
+        auto A = psc::matrix<float>(world, phi, 1.0f);
         for (int i = 0; i < n; ++i) {
             if (phi.owner({i, i}) == world.rank()) {
-                A.at(phi.local({i, i})) = 1.0f;
+                A.at(phi.local({i, i})) = 2.0f;
             }
         }
 
         world.log_once("Matrix before LU:");
         psc::spy(A);
 
-        psc::lu(A);
+        auto pi[[maybe_unused]] = psc::lu(A);
 
         world.log_once("Matrix after LU:");
         psc::spy(A);

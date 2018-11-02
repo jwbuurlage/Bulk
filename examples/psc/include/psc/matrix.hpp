@@ -17,14 +17,12 @@ class matrix {
     matrix(bulk::world& world, bulk::cartesian_partitioning<2, 2>& partitioning,
            T value = 0)
         : world_(world), partitioning_(partitioning),
-          data_(world_, partitioning.local_count(world_.rank()), value) {
-        multi_id_ =
-            bulk::util::unflatten<2>(partitioning_.grid(), world_.rank());
-    }
+          data_(world_, partitioning.local_count(world_.rank()), value) {}
 
     T& at(bulk::index_type<2> index) {
-        return data_[bulk::util::flatten<2>(partitioning_.local_size(multi_id_),
-                                            index)];
+        return data_[bulk::util::flatten<2>(
+            partitioning_.local_size(partitioning_.multi_rank(world_.rank())),
+            index)];
     }
 
     auto& partitioning() { return partitioning_; };
@@ -34,22 +32,21 @@ class matrix {
     auto cols() { return partitioning_.global_size()[1]; }
 
   private:
-    bulk::index_type<2> multi_id_;
     bulk::world& world_;
     bulk::cartesian_partitioning<2, 2>& partitioning_;
     bulk::coarray<T> data_;
 };
 
 template <typename T>
-void lu(matrix<T>& mat) {
+bulk::coarray<int> lu(matrix<T>& mat) {
     auto& world = mat.world();
     auto& psi = mat.partitioning();
     auto n = mat.rows();
     auto [s, t] = psi.multi_rank(world.rank());
 
     auto pivot = bulk::var<T>(world, (T)-1);
-    auto row_k = bulk::coarray<T>(world, n, 0);
-    auto col_k = bulk::coarray<T>(world, n, 0);
+    auto row_k = bulk::coarray<T>(world, psi.local_size(1, t), 0);
+    auto col_k = bulk::coarray<T>(world, psi.local_size(0, s), 0);
 
     auto row_swap_k = bulk::coarray<T>(world, psi.local_size(1, t), 0);
     auto row_swap_r = bulk::coarray<T>(world, psi.local_size(1, t), 0);
@@ -81,46 +78,40 @@ void lu(matrix<T>& mat) {
     auto r = bulk::var<int>(world, -1);
 
     for (auto k = 0; k < n; ++k) {
-        // (0)
-        // Find maximum local element in column k
-
         if (psi.owner(1, k) == t) {
-            auto rs = -1;
-            auto arsk = std::numeric_limits<T>::min();
+            // (0) Find maximum local element in column k
+            auto r_s = -1;
+            auto local_max = std::numeric_limits<T>::min();
             for (auto j = 0; j < psi.local_size(0, s); ++j) {
-                if (std::abs(mat.at({j, psi.local(1, k)})) > arsk) {
-                    arsk = std::abs(mat.at({j, psi.local(1, k)}));
-                    rs = psi.global(0, s, j);
+                if (std::abs(mat.at({j, psi.local(1, k)})) > local_max) {
+                    local_max = std::abs(mat.at({j, psi.local(1, k)}));
+                    r_s = psi.global(0, s, j);
                 }
             }
 
-            // (1)
-            // Communicate maximum element with local processor column
+            // (1) Communicate maximum element with local processor column
             for (auto u = 0; u < psi.grid()[0]; ++u) {
-                pivot_rows(psi.rank({u, t}))[s] = rs;
-                pivot_values(psi.rank({u, t}))[s] = arsk;
+                pivot_rows(psi.rank({u, t}))[s] = r_s;
+                pivot_values(psi.rank({u, t}))[s] = local_max;
             }
 
-            world.sync(); // (1)
+            world.sync(); // (a)
 
-            // (2)
-            // Find global maximum
+            // (2) Find global maximum
             auto best_index = std::distance(
                 pivot_values.begin(),
                 std::max_element(pivot_values.begin(), pivot_values.end()));
 
-            // (3)
-            // Communicate global maximum with local processor row
+            // (3) Communicate global maximum with local processor row
             for (auto v = 0; v < psi.grid()[1]; ++v) {
                 r(psi.rank({s, v})) = pivot_rows[best_index];
             }
         } else {
-            world.sync(); // (1)
+            world.sync(); // (a)
         }
         world.sync();
 
-        // (4)
-        // Communicate permutation update
+        // (4) Communicate permutation update
         if (psi.owner(0, k) == s) {
             pi(psi.rank({psi.owner(0, r), t}))[psi.local(0, r)] =
                 pi[psi.local(0, k)];
@@ -131,12 +122,10 @@ void lu(matrix<T>& mat) {
         }
         world.sync();
 
-        // (5)
-        // Update local permutation vector
+        // (5) Update local permutation vector
         // ... not necessary
 
-        // (6)
-        // Communicate row k and r
+        // (6) Communicate row k and r
         if (psi.owner(0, k) == s) {
             for (auto j = 0; j < psi.local_size(1, t); ++j) {
                 row_swap_k(psi.rank({psi.owner(0, r), t}))[j] =
@@ -152,9 +141,7 @@ void lu(matrix<T>& mat) {
 
         world.sync();
 
-
-        // (7)
-        // Locally swap row k and r
+        // (7) Locally swap row k and r
         if (psi.owner(0, k) == s) {
             for (auto j = 0; j < psi.local_size(1, t); ++j) {
                 mat.at({psi.local(0, k), j}) = row_swap_r[j];
@@ -165,8 +152,7 @@ void lu(matrix<T>& mat) {
                 mat.at({psi.local(0, r), j}) = row_swap_k[j];
             }
         }
-        // (8)
-        // Communicate pivot
+        // (8) Communicate pivot
         if (psi.owner({k, k}) == world.rank()) {
             for (auto u = 0; u < psi.grid()[0]; ++u) {
                 pivot(psi.rank({u, t})) = mat.at(psi.local({k, k}));
@@ -174,8 +160,7 @@ void lu(matrix<T>& mat) {
         }
         world.sync();
 
-        // (9)
-        // Scale column
+        // (9) Scale column
         if (psi.owner(1, k) == t) {
             // local row index, local col size, loop
             for (auto i = ls[k]; i < psi.local_size(0, s); ++i) {
@@ -183,43 +168,39 @@ void lu(matrix<T>& mat) {
             }
         }
 
-        // (10)
-        // Horizontal, communicate column k
+        // (10) Horizontal, communicate column k
         if (psi.owner(1, k) == t) {
             for (auto v = 0; v < psi.grid()[1]; ++v) {
                 auto target_rank = psi.rank({s, v});
                 for (auto i = 0; i < psi.local_size(0, s); ++i) {
-                    auto global_row = psi.global(0, s, i);
-                    col_k(target_rank)[global_row] =
-                        mat.at({i, psi.local(1, k)});
+                    col_k(target_rank)[i] = mat.at({i, psi.local(1, k)});
                 }
             }
         }
         world.sync();
 
-        // Vertical, communicate row k
+        // (10b) Vertical, communicate row k
         if (psi.owner(0, k) == s) {
             for (auto u = 0; u < psi.grid()[0]; ++u) {
                 auto target_rank = psi.rank({u, t});
                 for (auto j = 0; j < psi.local_size(1, t); ++j) {
-                    auto global_col = psi.global(1, t, j);
-                    row_k(target_rank)[global_col] =
-                        mat.at({psi.local(0, k), j});
+                    row_k(target_rank)[j] = mat.at({psi.local(0, k), j});
                 }
             }
         }
         world.sync();
 
-        // (11)
+        // (11) Update bottom right block
         for (auto i = ls[k]; i < psi.local_size(0, s); ++i) {
             for (auto j = qs[k]; j < psi.local_size(1, t); ++j) {
-                auto [a, b] = psi.global({i, j}, {s, t});
-                mat.at({i, j}) -= row_k[b] * col_k[a];
+                mat.at({i, j}) -= col_k[i] * row_k[j];
             }
         }
 
         world.sync();
     }
+
+    return pi;
 }
 
 template <typename T>
