@@ -25,7 +25,6 @@ class partitioning {
 
     /** Get the local and global sizes. */
     index_type<D> global_size() const { return global_size_; }
-    int global_count() { return 0; }
 
     /** of an arbitrary processor */
     virtual index_type<D> local_size(int processor) = 0;
@@ -81,13 +80,15 @@ class multi_partitioning : public partitioning<D> {
 
     /** Convert between rank and multi rank */
     int rank(index_type<G> t) { return util::flatten<G>(grid_size_, t); }
-    index_type<G> multi_rank(int t) { return util::unflatten<G>(grid_size_, t); }
+    index_type<G> multi_rank(int t) {
+        return util::unflatten<G>(grid_size_, t);
+    }
 
   protected:
     index_type<G> grid_size_;
 };
 
-/** Rectanglar partitionings over a multi-dimensional processor grid */
+/** Rectangular partitionings over a multi-dimensional processor grid */
 template <int D, int G>
 class rectangular_partitioning : public multi_partitioning<D, G> {
   public:
@@ -112,6 +113,30 @@ class rectangular_partitioning : public multi_partitioning<D, G> {
         }
         return global;
     }
+};
+
+/** Rectangular partitionings over a multi-dimensional processor grid */
+template <int D, int G>
+class cartesian_partitioning : public multi_partitioning<D, G> {
+  public:
+    cartesian_partitioning(index_type<D> global_size, index_type<G> grid_size)
+        : multi_partitioning<D, G>(global_size, grid_size) {}
+
+    /** Obtain the owner of index i for the g-th dimension */
+    using multi_partitioning<D, G>::owner;
+    virtual int owner(int g, int i) = 0;
+
+    /** Obtain the local index of global index i for the g-th dimension */
+    using multi_partitioning<D, G>::local;
+    virtual int local(int g, int i) = 0;
+
+    /** Obtain the global index of local index i for the g-th dimension */
+    using multi_partitioning<D, G>::global;
+    virtual int global(int g, int u, int i) = 0;
+
+    /** Obtain the local size for the g-th dimension */
+    using multi_partitioning<D, G>::local_size;
+    virtual int local_size(int g, int u) = 0;
 };
 
 } // namespace bulk

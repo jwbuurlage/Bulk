@@ -48,15 +48,12 @@ int main(int argc, char** argv) {
         world.log("%i / %i", sorted_x[sorted_x.size() / 2],
                   sorted_x[sorted_x.size() / 2 + 1]);
 
-        auto n = 10;
+        auto n = 4;
         auto phi = bulk::cyclic_partitioning<2, 2>({n, n}, {M, N});
-        auto A = psc::matrix<float>(world, phi);
+        auto A = psc::matrix<float>(world, phi, 2.0f);
         for (int i = 0; i < n; ++i) {
-            if (i < n / 2 && phi.owner({n - i - 1, i}) == world.rank()) {
-                A.at(phi.local({n - i - 1, i})) = 1;
-            }
             if (phi.owner({i, i}) == world.rank()) {
-              A.at(phi.local({i, i})) = 1;
+              A.at(phi.local({i, i})) = 1.0f;
             }
         }
 
