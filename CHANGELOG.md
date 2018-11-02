@@ -11,7 +11,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Add CMake targets `bulk` and `bulk_[backend]`
-- Add partitionings: cyclic, block, tree
+- Add partitionings: cyclic, block, tree, rectangular, Cartesian
 - Add parallel scientific computing examples and documentation
 - Add `partitioned_array`
 - Add Travis CI support

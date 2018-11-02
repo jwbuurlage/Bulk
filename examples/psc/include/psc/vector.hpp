@@ -11,9 +11,9 @@ class vector {
            bulk::coarray<T>&& data)
         : world_(world), partitioning_(partitioning), data_(std::move(data)) {}
 
-    vector(bulk::world& world, bulk::partitioning<1>& partitioning)
+    vector(bulk::world& world, bulk::partitioning<1>& partitioning, T value = 0)
         : world_(world), partitioning_(partitioning),
-          data_(world_, partitioning.local_count(world_.rank()), (T)0) {}
+          data_(world_, partitioning.local_count(world_.rank()), value) {}
 
     T& operator[](int k) { return data_[k]; }
     const T& operator[](int k) const { return data_[k]; }
@@ -73,7 +73,7 @@ T dot(const vector<T>& x, const vector<T>& y) {
         result += x[i] * y[i];
     }
 
-    auto alpha = bulk::foldl(result, std::plus<T>{});
+    auto alpha = bulk::foldl(result, [](auto& lhs, auto rhs) { lhs += rhs; });
     return alpha;
 }
 

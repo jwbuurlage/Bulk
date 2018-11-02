@@ -7,6 +7,8 @@
 
 #include "bulk/bulk.hpp"
 
+#include "vector.hpp"
+
 namespace psc {
 
 template <typename T>
@@ -45,18 +47,6 @@ void lu(matrix<T>& mat) {
     auto n = mat.rows();
     auto [s, t] = psi.multi_rank(world.rank());
 
-    auto output_array[[maybe_unused]] = [&](auto name, auto& xs) {
-        auto ss = std::stringstream("");
-        auto sep = std::string("");
-        ss << "[";
-        for (auto&& x : xs) {
-            ss << sep << x;
-            sep = " ";
-        }
-        ss << "]";
-        world.log("(%i, %i): %s %s", s, t, name, ss.str().c_str());
-    };
-
     auto pivot = bulk::var<T>(world, (T)-1);
     auto row_k = bulk::coarray<T>(world, n, 0);
     auto col_k = bulk::coarray<T>(world, n, 0);
@@ -91,9 +81,6 @@ void lu(matrix<T>& mat) {
     auto r = bulk::var<int>(world, -1);
 
     for (auto k = 0; k < n; ++k) {
-        world.log_once("stage: %i", k);
-        spy(mat);
-
         // (0)
         // Find maximum local element in column k
 
@@ -178,14 +165,6 @@ void lu(matrix<T>& mat) {
                 mat.at({psi.local(0, r), j}) = row_swap_k[j];
             }
         }
-        ////// OUTPUT
-        world.log_once("after (7)");
-        world.sync();
-        spy(mat);
-        ////// OUTPUT
-
-
-
         // (8)
         // Communicate pivot
         if (psi.owner({k, k}) == world.rank()) {
@@ -203,12 +182,6 @@ void lu(matrix<T>& mat) {
                 mat.at({i, psi.local(1, k)}) /= pivot;
             }
         }
-
-        ////// OUTPUT
-        world.log_once("after (9)");
-        world.sync();
-        spy(mat);
-        ////// OUTPUT
 
         // (10)
         // Horizontal, communicate column k
@@ -245,16 +218,9 @@ void lu(matrix<T>& mat) {
             }
         }
 
-        ////// OUTPUT
-        world.log_once("after (11)");
         world.sync();
-        spy(mat);
-        ////// OUTPUT
-
-        world.sync();
-        world.log_once("-----");
     }
-} // namespace psc
+}
 
 template <typename T>
 void spy(matrix<T>& mat) {
@@ -289,34 +255,6 @@ void spy(matrix<T>& mat) {
             std::cout << "]\n";
         }
         std::cout << "\n";
-    }
-}
-
-template <typename T>
-void verify(matrix<T>& mat) {
-    auto& world = mat.world();
-    auto& phi = mat.partitioning();
-    auto [s, t] = phi.multi_rank(world.rank());
-
-    auto xs = bulk::coarray<T>(world,
-                               world.rank() == 0 ? mat.cols() * mat.rows() : 0);
-
-    auto x = phi.local_size(world.rank())[0];
-    auto y = phi.local_size(world.rank())[1];
-
-    for (auto i = 0; i < x; ++i) {
-        for (auto j = 0; j < y; ++j) {
-            xs(0)[bulk::util::flatten<2>(phi.global_size(),
-                                         phi.global({i, j}, {s, t}))] =
-                mat.at({i, j});
-        }
-    }
-
-    world.sync();
-
-    if (world.rank() == 0) {
-        // multiply L * U
-        // check the L2 distance or something
     }
 }
 
