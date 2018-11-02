@@ -17,7 +17,7 @@ The algorithms we will implement are (in order):
 
 Our intentions are educational, we will strive to design simple implementations of the algorithm and will not optimize for specific hardware, or e.g. exploit hybrid systems. Although we do not develop the algorithms for maximum performance, we will make sure that all our algorithms exhibit good scaling behavior.
 
-In the source code examples, we always assume that we have the following aliases:
+In most source code examples, we assume that we have the following aliases:
 
 ```cpp
 auto s = world.rank();
@@ -304,6 +304,14 @@ Now that we have a distributed matrix class, we are ready to implement a paralle
     2.  **Scale column**.
     3.  **Communicate row k and column k**.
     4.  **Update bottom right block**.
+
+We will use a two-dimensional processor numbering, obtained as follows:
+
+```cpp
+auto [s, t] = psi.multi_rank(world.rank());
+```
+
+Here, `psi` is a `cartesian_partitioning`.
 
 We will not discuss the majority of sequential computations here, but they are given in the full example source code. We will show the body of the loop over `k`, which ranges from `0` to `n - 1` where `n` is the matrix size. We assume the local maximum in column `k` is at row `r_s` and has value `local_max`. Then communicating with the local processor column can be done as follows:
 

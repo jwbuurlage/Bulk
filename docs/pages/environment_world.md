@@ -11,7 +11,7 @@ Parallel environments
 A program runs in some parallel environment. For example, this
 environment could be an MPI cluster, a many-core co-processor, or simply
 threads on a multi-core computer. This environment is accessed within
-the program through a [bulk::environment](api/environment.html) object.
+the program through a [bulk::environment](/api/environment/) object.
 This object is specialized for each *backend*, which is an
 implementation of the lower-level communication that reflects the actual
 environment. For example, to setup an environment on an MPI cluster, we
@@ -76,7 +76,7 @@ The world of a processor
 </center>
 
 Each processor can communicate to other processors using the *world*
-object of type [bulk::world](api/world.html). The world object contains
+object of type [bulk::world](/api/world/). The world object contains
 some information on the specifics of the SPMD section, such as the number of
 processors executing the section, and its identifier (as we have seen,
 these are also provided as arguments for programmer convenience). We can

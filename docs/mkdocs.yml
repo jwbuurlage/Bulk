@@ -21,7 +21,7 @@ extra_javascript:
 
 docs_dir: pages
 
-pages:
+nav:
 - Home: 'index.md'
 - Getting started: 'getting_started.md'
 - Tour: 'tour.md'
@@ -42,6 +42,7 @@ pages:
         - 'coarray': 'api/coarray.md'
         - 'queue': 'api/queue.md'
         - 'timer': 'api/timer.md'
+        - 'partitioning': 'api/partitioning.md'
     - Functions:
         - 'foldl': 'api/foldl.md'
         - 'gather_all': 'api/gather_all.md'

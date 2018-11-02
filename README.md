@@ -1,6 +1,6 @@
 # Bulk [![Build Status](https://travis-ci.org/jwbuurlage/Bulk.svg?branch=develop)](https://travis-ci.org/jwbuurlage/Bulk)
 
-![](docs/pages/images/logo-square.png)
+![](https://raw.githubusercontent.com/jwbuurlage/Bulk/master/docs/pages/images/logo-square.png)
 
 The bulk-synchronous parallel (BSP) programming model gives a powerful method
 for implementing and describing parallel programs. Bulk is a novel interface for

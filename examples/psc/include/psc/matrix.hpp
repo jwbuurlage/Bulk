@@ -3,7 +3,6 @@
 #include <cmath>
 #include <iomanip>
 #include <numeric>
-#include <sstream>
 
 #include "bulk/bulk.hpp"
 

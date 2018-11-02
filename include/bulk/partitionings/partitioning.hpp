@@ -106,7 +106,7 @@ class rectangular_partitioning : public multi_partitioning<D, G> {
         return this->origin(util::unflatten<G>(this->grid_size_, processor));
     }
 
-    virtual index_type<D> global(index_type<D> xs, index_type<G> processor) {
+    index_type<D> global(index_type<D> xs, index_type<G> processor) override {
         index_type<D> global = origin(processor);
         for (int d = 0; d < D; ++d) {
             global[d] += xs[d];
@@ -115,9 +115,10 @@ class rectangular_partitioning : public multi_partitioning<D, G> {
     }
 };
 
-/** Rectangular partitionings over a multi-dimensional processor grid */
-template <int D, int G>
+/** Cartesian partitionings over a multi-dimensional processor grid */
+template <int D, int G = D>
 class cartesian_partitioning : public multi_partitioning<D, G> {
+  static_assert(G == D, "Cartesian partitionings require D = G");
   public:
     cartesian_partitioning(index_type<D> global_size, index_type<G> grid_size)
         : multi_partitioning<D, G>(global_size, grid_size) {}
