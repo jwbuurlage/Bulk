@@ -121,6 +121,14 @@ class world {
         delete[] buffer;
     }
 
+    /** Log only with the first logical processor */
+    template <typename... Ts>
+    void log_once(const char* format, const Ts&... ts) {
+        if (rank() == 0) {
+            log(format, ts...);
+        }
+    }
+
     /**
      * Terminate the spmd program on all processors.
      *

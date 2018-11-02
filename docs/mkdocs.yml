@@ -62,6 +62,8 @@ pages:
         - 'world::next_rank': 'api/world/next_rank.md'
         - 'world::prev_rank': 'api/world/prev_rank.md'
         - 'world::sync': 'api/world/sync.md'
+        - 'world::log': 'api/world/log.md'
+        - 'world::log_once': 'api/world/log_once.md'
         - 'world::barrier': 'api/world/barrier.md'
         - 'var::constructor': 'api/var/constructor.md'
         - 'var::deconstructor': 'api/var/deconstructor.md'

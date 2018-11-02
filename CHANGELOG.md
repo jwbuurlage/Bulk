@@ -15,6 +15,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add parallel scientific computing examples and documentation
 - Add `partitioned_array`
 - Add Travis CI support
+- Add `world::log_once`
 
 ### Fixed
 
