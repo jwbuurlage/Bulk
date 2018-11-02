@@ -11,7 +11,7 @@ int main() {
     env.spawn(env.available_processors(), [](bulk::world& world) {
         int s = world.rank();
         int p = world.active_processors();
-        
+
         // block distribution
         int size = 1000;
         int local_size = size / p;
