@@ -1,0 +1,1843 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.0.6">
+    
+    
+      
+        <title>Parallel Scientific Computing - Bulk</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
+      
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="__github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#introduction" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="Bulk" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                Bulk
+              </span>
+              <span class="md-header-nav__topic">
+                Parallel Scientific Computing
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+            
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+
+  <a href="https://github.com/jwbuurlage/Bulk/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#__github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      jwbuurlage/bulk
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href=".." title="Bulk" class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </a>
+    Bulk
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/jwbuurlage/Bulk/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#__github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      jwbuurlage/bulk
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../getting_started/" title="Getting started" class="md-nav__link">
+      Getting started
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../tour/" title="Tour" class="md-nav__link">
+      Tour
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      Introduction to Bulk
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        Introduction to Bulk
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../environment_world/" title="Environment and world" class="md-nav__link">
+      Environment and world
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../variables/" title="Distributed variables" class="md-nav__link">
+      Distributed variables
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../coarrays/" title="Coarrays" class="md-nav__link">
+      Coarrays
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../message_passing/" title="Message passing" class="md-nav__link">
+      Message passing
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5" checked>
+    
+    <label class="md-nav__link" for="nav-5">
+      Case studies
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        Case studies
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+    <a href="./" title="Parallel Scientific Computing" class="md-nav__link md-nav__link--active">
+      Parallel Scientific Computing
+    </a>
+    
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+    
+    <label class="md-nav__link" for="nav-6">
+      API
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-6">
+        API
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/" title="Index" class="md-nav__link">
+      Index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6-2" type="checkbox" id="nav-6-2">
+    
+    <label class="md-nav__link" for="nav-6-2">
+      Classes
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="2">
+      <label class="md-nav__title" for="nav-6-2">
+        Classes
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/environment/" title="environment" class="md-nav__link">
+      environment
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/world/" title="world" class="md-nav__link">
+      world
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/" title="var" class="md-nav__link">
+      var
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/" title="future" class="md-nav__link">
+      future
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/" title="coarray" class="md-nav__link">
+      coarray
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/queue/" title="queue" class="md-nav__link">
+      queue
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/timer/" title="timer" class="md-nav__link">
+      timer
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/partitioning/" title="partitioning" class="md-nav__link">
+      partitioning
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6-3" type="checkbox" id="nav-6-3">
+    
+    <label class="md-nav__link" for="nav-6-3">
+      Functions
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="2">
+      <label class="md-nav__title" for="nav-6-3">
+        Functions
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/foldl/" title="foldl" class="md-nav__link">
+      foldl
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/gather_all/" title="gather_all" class="md-nav__link">
+      gather_all
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/flatten/" title="flatten" class="md-nav__link">
+      flatten
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/unflatten/" title="unflatten" class="md-nav__link">
+      unflatten
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6-4" type="checkbox" id="nav-6-4">
+    
+    <label class="md-nav__link" for="nav-6-4">
+      Nested classes
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="2">
+      <label class="md-nav__title" for="nav-6-4">
+        Nested classes
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/image/" title="var::image" class="md-nav__link">
+      var::image
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/image/" title="coarray::image" class="md-nav__link">
+      coarray::image
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/writer/" title="coarray::writer" class="md-nav__link">
+      coarray::writer
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/slice/" title="coarray::slice" class="md-nav__link">
+      coarray::slice
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/slice_writer/" title="coarray::slice_writer" class="md-nav__link">
+      coarray::slice_writer
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/queue/sender/" title="queue::sender" class="md-nav__link">
+      queue::sender
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6-5" type="checkbox" id="nav-6-5">
+    
+    <label class="md-nav__link" for="nav-6-5">
+      Member functions
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="2">
+      <label class="md-nav__title" for="nav-6-5">
+        Member functions
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/environment/spawn/" title="environment::spawn" class="md-nav__link">
+      environment::spawn
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/environment/available_processors/" title="environment::available_processors" class="md-nav__link">
+      environment::available_processors
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/world/rank/" title="world::rank" class="md-nav__link">
+      world::rank
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/world/active_processors/" title="world::active_processors" class="md-nav__link">
+      world::active_processors
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/world/next_rank/" title="world::next_rank" class="md-nav__link">
+      world::next_rank
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/world/prev_rank/" title="world::prev_rank" class="md-nav__link">
+      world::prev_rank
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/world/sync/" title="world::sync" class="md-nav__link">
+      world::sync
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/world/log/" title="world::log" class="md-nav__link">
+      world::log
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/world/log_once/" title="world::log_once" class="md-nav__link">
+      world::log_once
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/world/barrier/" title="world::barrier" class="md-nav__link">
+      world::barrier
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/constructor/" title="var::constructor" class="md-nav__link">
+      var::constructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/deconstructor/" title="var::deconstructor" class="md-nav__link">
+      var::deconstructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/assignment_operator/" title="var::operator=" class="md-nav__link">
+      var::operator=
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/value/" title="var::value" class="md-nav__link">
+      var::value
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/T_operator/" title="var::operator T" class="md-nav__link">
+      var::operator T
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/paren_operator/" title="var::operator()" class="md-nav__link">
+      var::operator()
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/broadcast/" title="var::broadcast" class="md-nav__link">
+      var::broadcast
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/world/" title="var::world" class="md-nav__link">
+      var::world
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/image/assignment_operator/" title="var::image::operator=" class="md-nav__link">
+      var::image::operator=
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/var/image/get/" title="var::image::get" class="md-nav__link">
+      var::image::get
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/constructor/" title="future::constructor" class="md-nav__link">
+      future::constructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/deconstructor/" title="future::deconstructor" class="md-nav__link">
+      future::deconstructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/assignment_operator/" title="future::operator=" class="md-nav__link">
+      future::operator=
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/value/" title="future::value" class="md-nav__link">
+      future::value
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/world/" title="future::world" class="md-nav__link">
+      future::world
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/future/bracket_operator/" title="future::operator[]" class="md-nav__link">
+      future::operator[]
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/constructor/" title="coarray::constructor" class="md-nav__link">
+      coarray::constructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/deconstructor/" title="coarray::deconstructor" class="md-nav__link">
+      coarray::deconstructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/parentheses_operator/" title="coarray::operator()" class="md-nav__link">
+      coarray::operator()
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/square_brackets_operator/" title="coarray::operator[]" class="md-nav__link">
+      coarray::operator[]
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/coarray/world/" title="coarray::world" class="md-nav__link">
+      coarray::world
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/queue/constructor/" title="queue::constructor" class="md-nav__link">
+      queue::constructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/queue/deconstructor/" title="queue::deconstructor" class="md-nav__link">
+      queue::deconstructor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/queue/begin/" title="queue::begin" class="md-nav__link">
+      queue::begin
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/queue/end/" title="queue::end" class="md-nav__link">
+      queue::end
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/queue/size/" title="queue::size" class="md-nav__link">
+      queue::size
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/queue/empty/" title="queue::empty" class="md-nav__link">
+      queue::empty
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/queue/world/" title="queue::world" class="md-nav__link">
+      queue::world
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api/queue/sender/send/" title="queue::sender::send" class="md-nav__link">
+      queue::sender::send
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      Backends
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        Backends
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../backends/mpi/" title="MPI" class="md-nav__link">
+      MPI
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../backends/thread/" title="thread" class="md-nav__link">
+      thread
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../bsp/" title="BSP model" class="md-nav__link">
+      BSP model
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../bulk_vs_bsplib/" title="Bulk vs BSPlib" class="md-nav__link">
+      Bulk vs BSPlib
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../CHANGELOG/" title="Release Notes" class="md-nav__link">
+      Release Notes
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/jwbuurlage/Bulk/edit/master/docs/psc.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="introduction">Introduction<a id="sec-1"></a></h1>
+<p>Large scale problems are common in scientific computing. For example, in the simulation of physical systems typically the grid size is chosen as fine as computational considerations allow for, and linear systems containing millions of equations and unknowns are solved routinely.</p>
+<p>In this tutorial, we will discuss the implementation of a number of important parallel algorithms in scientific computing. The algorithms we consider are those explained in <a href="http://www.staff.science.uu.nl/~bisse101/">Parallel Scientific Computing by Rob Bisseling</a>. Implementations of these algorithms in BSPlib can be found in <a href="http://www.staff.science.uu.nl/~bisse101/Software/software.html">BSPedupack</a>.</p>
+<p>Our discussion is stand-alone, however the focus is on the implementation of these algorithms in Bulk, and not the derivation or detailed description of the algorithms. The result of our efforts will be a library that contains support for important objects in parallel scientific computing:</p>
+<ol>
+<li>Distributed vector</li>
+<li>Distributed matrix (dense and sparse)</li>
+</ol>
+<p>The algorithms we will implement are (in order):</p>
+<ol>
+<li>Computing the <em>inner product</em> of two vectors</li>
+<li><em>Sorting</em> a vector</li>
+<li>Computing the <em>LU decomposition</em> of a matrix</li>
+</ol>
+<p>Our intentions are educational, we will strive to design simple implementations of the algorithm and will not optimize for specific hardware, or e.g. exploit hybrid systems. Although we do not develop the algorithms for maximum performance, we will make sure that all our algorithms exhibit good scaling behavior.</p>
+<p>In most source code examples, we assume that we have the following aliases:</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">s</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">rank</span><span class="p">();</span>
+<span class="k">auto</span> <span class="n">p</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">active_processors</span><span class="p">();</span>
+</pre></div>
+
+
+<p>The full source code is available in <code>examples/psc</code> starting from Bulk version v1.2.0. Note that this code may be slightly different from what we discuss here, for clarity of presentation, or because it has been updated.</p>
+<h1 id="the-pscvector-class-the-humble-beginnings-of-our-library">the <code>psc::vector</code> class: the humble beginnings of our library<a id="sec-2"></a></h1>
+<p>Before we are ready to describe and implement our first BSP algorithm, we will first define a distributed vector object. Since we will require multiple data distributions for the various algorithms we will implement, we will not assume any fixed one. The design of the vector object should be clear from the following example:</p>
+<div class="codehilite"><pre><span></span><span class="n">env</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">available_processors</span><span class="p">(),</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="n">bulk</span><span class="o">::</span><span class="n">world</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">auto</span> <span class="n">s</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">rank</span><span class="p">();</span>
+    <span class="k">auto</span> <span class="n">p</span> <span class="o">=</span> <span class="n">world</span><span class="p">.</span><span class="n">active_processors</span><span class="p">();</span>
+
+    <span class="c1">// we choose n = 1e6</span>
+    <span class="k">auto</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">;</span>
+    <span class="c1">// as an example, we take a cyclic partitioning</span>
+    <span class="k">auto</span> <span class="n">pi</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">cyclic_partitioning</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">({</span><span class="n">size</span><span class="p">},</span> <span class="p">{</span><span class="n">p</span><span class="p">});</span>
+
+    <span class="k">auto</span> <span class="n">v</span> <span class="o">=</span> <span class="n">psc</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">pi</span><span class="p">);</span>
+    <span class="k">auto</span> <span class="n">w</span> <span class="o">=</span> <span class="n">psc</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">pi</span><span class="p">);</span>
+    <span class="c1">// ... fill with data</span>
+
+    <span class="c1">// compute the inner product</span>
+    <span class="k">auto</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">psc</span><span class="o">::</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">);</span>
+
+    <span class="c1">// we output the result</span>
+    <span class="n">world</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="s">&quot;%i&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<p>A partitioning <code>pi</code> is associated to a distributed vector. In this case, the components of the vector are integers. A <code>psc::vector</code> is defined as follows.</p>
+<div class="codehilite"><pre><span></span><span class="k">namespace</span> <span class="n">psc</span> <span class="p">{</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">vector</span> <span class="p">{</span>
+  <span class="c1">//...</span>
+</pre></div>
+
+
+<p>Everything we define will be in a <em>parallel scientific computing</em> (<code>psc</code>) namespace. We make a generic implementation, that works for any <code>T</code>. A constructor for the vector class can look something like the following.</p>
+<div class="codehilite"><pre><span></span><span class="k">private</span><span class="o">:</span>
+  <span class="n">bulk</span><span class="o">::</span><span class="n">world</span><span class="o">&amp;</span> <span class="n">world_</span><span class="p">;</span>
+  <span class="n">bulk</span><span class="o">::</span><span class="n">partitioning</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;&amp;</span> <span class="n">partitioning_</span><span class="p">;</span>
+  <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">data_</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+  <span class="n">vector</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">world</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">bulk</span><span class="o">::</span><span class="n">partitioning</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;&amp;</span> <span class="n">partitioning</span><span class="p">)</span>
+      <span class="o">:</span> <span class="n">world_</span><span class="p">(</span><span class="n">world</span><span class="p">),</span> <span class="n">partitioning_</span><span class="p">(</span><span class="n">partitioning</span><span class="p">),</span>
+        <span class="n">data_</span><span class="p">(</span><span class="n">world_</span><span class="p">,</span> <span class="n">partitioning</span><span class="p">.</span><span class="n">local_count</span><span class="p">(</span><span class="n">world_</span><span class="p">.</span><span class="n">rank</span><span class="p">()),</span> <span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="mi">0</span><span class="p">)</span> <span class="p">{}</span>
+<span class="c1">// ...</span>
+</pre></div>
+
+
+<p>A vector object has three member objects; a reference to the world, a reference to the partitioning, and a <code>coarray</code> object in which is stores the data. The local size of this coarray is the number of local elements that we have been assigned according to the partitioning; as obtained by <code>local_count</code>. With this constructor, all elements are default initialized to zero.</p>
+<p>For completeness, we add some accessors and utility functions to our vector class:</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="nf">size</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">data_</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="p">}</span>
+<span class="k">auto</span> <span class="nf">global_size</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">partitioning_</span><span class="p">.</span><span class="n">global_size</span><span class="p">();</span> <span class="p">}</span>
+
+<span class="n">bulk</span><span class="o">::</span><span class="n">world</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">world_</span><span class="p">;</span> <span class="p">}</span>
+<span class="n">bulk</span><span class="o">::</span><span class="n">partitioning</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;&amp;</span> <span class="n">partitioning</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">partitioning_</span><span class="p">;</span> <span class="p">}</span>
+
+<span class="k">auto</span> <span class="n">begin</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">data_</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="p">}</span>
+<span class="k">auto</span> <span class="n">end</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">data_</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="p">}</span>
+</pre></div>
+
+
+<p>This allows us to query the size of the vector, to obtain the communication world in which it is defined, the partitioning, and to use it as a generic container.</p>
+<p>With the vector object in place, we are ready to define our first BSP algorithm; the inner product computation.</p>
+<h1 id="pscdot-the-inner-product-of-two-vectors"><code>psc::dot</code>: the inner product of two vectors<a id="sec-3"></a></h1>
+<p>Computing the inner product is fairly straightforward. We assume that the vectors are partitioned in the same manner. The algorithm proceeds in two steps. First, every processor computes the inner product of its local elements. Second, the local results are shared with an all-to-all broadcast and then accumulated resulting in the global result. There are multiple ways to achieve this using Bulk, but an elegent way is to use <code>bulk::foldl</code> over a <code>bulk::var</code>, which works as follows.</p>
+<p>Consider a distributed variable <code>x</code>. We can interpret <code>x</code> as a virtual 1D array, where the index in the index into the array corresponds to a processor id.</p>
+<table>
+<thead>
+<tr>
+<th><span><span class="MathJax_Preview">s</span><script type="math/tex">s</script></span></th>
+<th><span><span class="MathJax_Preview">0</span><script type="math/tex">0</script></span></th>
+<th><span><span class="MathJax_Preview">1</span><script type="math/tex">1</script></span></th>
+<th><span><span class="MathJax_Preview">2</span><script type="math/tex">2</script></span></th>
+<th>&#x2026;</th>
+<th><span><span class="MathJax_Preview">p - 1</span><script type="math/tex">p - 1</script></span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x</code></td>
+<td><code>x(0)</code></td>
+<td><code>x(1)</code></td>
+<td><code>x(2)</code></td>
+<td>&#x2026;</td>
+<td><code>x(p - 1)</code></td>
+</tr>
+</tbody>
+</table>
+<p>A <em>left fold</em> over a 1D array takes some binary operation <code>+</code>, and computes the reduction of the array using this operation:</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">foldl</span> <span class="o">=</span> <span class="p">((((</span><span class="n">x</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="p">...)</span> <span class="o">+</span> <span class="n">x</span><span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+</pre></div>
+
+
+<p>For the inner product, we actually want to use the sum as the binary operation, but if <code>T</code> would be for example a <code>bool</code>, we can also use an AND operation <code>&amp;</code>, and a left fold would check if all local values are set to <code>true</code>.</p>
+<p>With the definition of a left fold in place, we are ready to describe the inner product algorithm.</p>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">dot</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">x</span><span class="p">,</span> <span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">bulk</span><span class="o">::</span><span class="n">var</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">result</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">world</span><span class="p">());</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0u</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">x</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="k">auto</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">foldl</span><span class="p">(</span><span class="n">result</span><span class="p">,</span>
+      <span class="p">[](</span><span class="k">auto</span><span class="o">&amp;</span> <span class="n">lhs</span><span class="p">,</span> <span class="k">auto</span> <span class="n">rhs</span><span class="p">)</span> <span class="p">{</span> <span class="n">lhs</span> <span class="o">+=</span> <span class="n">rhs</span><span class="p">;</span> <span class="p">});</span>
+
+    <span class="k">return</span> <span class="n">alpha</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Our template function <code>dot</code> takes two vectors, <code>x</code> and <code>y</code>, as input. The local results are stored in a distributed variable <code>result</code>, defined in the same world as the vectors. By a local computation, we set the local image of <code>result</code> to the correct value. Next, we call <code>foldl</code> on the distributed array <code>result</code>, and as binary operation we use a anonymous function that adds a value to another one. Finally, we return the result of this computation.</p>
+<p>There are other ways in which we could have implemented this algorithm. The communication pattern used (an all-to-all broadcast followed by a reduction) is so common that has a special implementation in Bulk, but the communication could also have been done manually. In any case, the end result is a generic parallel inner product that works on a vector regardless of its element type <code>T</code>, its size, or the partitioning that is employed.</p>
+<h1 id="pscsort-sorting-a-vector"><code>psc::sort</code>: sorting a vector<a id="sec-4"></a></h1>
+<p>Next, we consider an example that is much more involved &#x2013; sorting a vector. While for the inner product algorithm we did not need to assume a specific partitioning (only that both vectors involved employed the same one), we <em>will</em> choose a specific partitioning for sorting: a block partitioning. The following example shows how the parallel sorting algorithm is called by a user.</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="n">pi</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">block_partitioning</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">({</span><span class="n">size</span><span class="p">},</span> <span class="p">{</span><span class="n">p</span><span class="p">});</span>
+<span class="k">auto</span> <span class="n">v</span> <span class="o">=</span> <span class="n">psc</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">pi</span><span class="p">);</span>
+<span class="n">psc</span><span class="o">::</span><span class="n">sort</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
+</pre></div>
+
+
+<p>The parallel sorting algorithm we will implement is a distributed version of regular sample sorting. When the algorithm terminates, the result is a coarray where each element has roughly the same number of elements, every local array is sorted, and all elements on processor <span><span class="MathJax_Preview">s &gt; t</span><script type="math/tex">s > t</script></span> are bigger than those on <span><span class="MathJax_Preview">t</span><script type="math/tex">t</script></span>. The algorithm consists of the following steps.</p>
+<ol>
+<li><strong>Sorting the local vector</strong>. First, the local elements are sorted using any sequential sorting algorithm.</li>
+<li><strong>Choosing and communicating <code>p</code> samples</strong>. Next, we identify <span><span class="MathJax_Preview">p</span><script type="math/tex">p</script></span> equidistant samples. These <span><span class="MathJax_Preview">p</span><script type="math/tex">p</script></span> elements are broadcast to all other processors.</li>
+<li><strong>Finding global splitters</strong>. Every processor now has <span><span class="MathJax_Preview">p^2</span><script type="math/tex">p^2</script></span> samples, which are sorted sequentially. From these samples, <span><span class="MathJax_Preview">p</span><script type="math/tex">p</script></span> <em>global</em> equidistant samples are taken. These global samples define the <em>splitters</em>. A processor <span><span class="MathJax_Preview">s</span><script type="math/tex">s</script></span> is responsible for a chunk of elements <span><span class="MathJax_Preview">S_s \leq x &lt; S_{s + 1}</span><script type="math/tex">S_s \leq x < S_{s + 1}</script></span>, where <span><span class="MathJax_Preview">S_i</span><script type="math/tex">S_i</script></span> are the splitters.</li>
+<li><strong>Identify local blocks</strong>. For all the local elements, the responsible processor is identified. Because the local array is sorted, the elements that have to be sent to a fixed processor <span><span class="MathJax_Preview">t</span><script type="math/tex">t</script></span> are a consecutive block of the local array.</li>
+<li><strong>Communicate blocks</strong>. Every block is sent to the appropriate processor.</li>
+<li><strong>Merge the (individually sorted) blocks</strong>. Each processor now has <span><span class="MathJax_Preview">p</span><script type="math/tex">p</script></span> blocks, which are all individually sorted. Using a merge sort routine the resulting sorted block can be computed efficiently.</li>
+</ol>
+<p>These steps can be implemented in Bulk as follows. First, sorting the local vector can be done simply by using the sorting routine from the standard library.</p>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">sort</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// 1. Sorting the local vector</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">sort</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">x</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+  <span class="c1">// ...</span>
+</pre></div>
+
+
+<p>Next, we identify and communicate the local samples. Here, <code>sample</code> is a sequential routine that simply returns a number equidistant samples from an array. Also, <code>blocked_merge</code> takes an array consisting of a number of blocks that are individually sorted, and an array containing the sizes of the blocks, and sorts them together. In this case, after communicating, each processor has <span><span class="MathJax_Preview">p</span><script type="math/tex">p</script></span> sorted blocks that are all of size <span><span class="MathJax_Preview">p</span><script type="math/tex">p</script></span>.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// 2. Choosing and communicating samples</span>
+<span class="k">auto</span> <span class="n">local_samples</span> <span class="o">=</span> <span class="n">sample</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">samples</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">t</span> <span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">;</span> <span class="o">++</span><span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">samples</span><span class="p">(</span><span class="n">t</span><span class="p">)[{</span><span class="n">s</span> <span class="o">*</span> <span class="n">p</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">p</span><span class="p">}]</span> <span class="o">=</span> <span class="n">local_samples</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+<span class="n">blocked_merge</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="p">));</span>
+</pre></div>
+
+
+<p>Now each processor has the same <span><span class="MathJax_Preview">p^2</span><script type="math/tex">p^2</script></span> sorted samples, and we use it to compute the splitters. We set the upper limit for the final processor to <span><span class="MathJax_Preview">\infty</span><script type="math/tex">\infty</script></span>.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// 3. Finding global splitters</span>
+<span class="k">auto</span> <span class="n">splitters</span> <span class="o">=</span> <span class="n">sample</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+<span class="n">splitters</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">max</span><span class="p">());</span>
+</pre></div>
+
+
+<p>Next we want to split our local data up into chunks that each go to a different processor. We can write a simple sequential routine that does this, for example:</p>
+<div class="codehilite"><pre><span></span><span class="c1">// 4. Identify local blocks</span>
+<span class="kt">int</span> <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">previous</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">block_sizes</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">;</span> <span class="o">++</span><span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">idx</span> <span class="o">&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">x</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">splitters</span><span class="p">[</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="p">{</span>
+        <span class="o">++</span><span class="n">idx</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">block_sizes</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">-</span> <span class="n">previous</span><span class="p">;</span>
+    <span class="n">previous</span> <span class="o">=</span> <span class="n">idx</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Now, <code>block_sizes(t)</code> is the size of the local chunk that is to be sent to processor <code>t</code>. Next, we communicate the chunks.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// 5. Communicate chunks</span>
+<span class="k">auto</span> <span class="n">block_starts</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">partial_sum</span><span class="p">(</span><span class="n">block_sizes</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">block_sizes</span><span class="p">.</span><span class="n">end</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="n">block_starts</span><span class="p">.</span><span class="n">begin</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+
+<span class="k">auto</span> <span class="n">q</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">queue</span><span class="o">&lt;</span><span class="n">T</span><span class="p">[]</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">;</span> <span class="o">++</span><span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">q</span><span class="p">(</span><span class="n">t</span><span class="p">).</span><span class="n">send</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">begin</span><span class="p">()</span> <span class="o">+</span> <span class="n">block_starts</span><span class="p">[</span><span class="n">t</span><span class="p">],</span>
+                          <span class="n">x</span><span class="p">.</span><span class="n">begin</span><span class="p">()</span> <span class="o">+</span> <span class="n">block_starts</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="n">block_sizes</span><span class="p">[</span><span class="n">t</span><span class="p">]));</span>
+<span class="p">}</span>
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+</pre></div>
+
+
+<p>Next, we first compute some information about the blocks: their sizes, and where they start. We define a coarray with the appropriate local size, and copy the chunks in to it. Finally, we perform a <code>blocked_merge</code> on the received chunks, and return the resulting coarray.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// 6. Merge the (individually sorted) blocks</span>
+<span class="k">auto</span> <span class="n">receive_sizes</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">transform</span><span class="p">(</span><span class="n">q</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">q</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">receive_sizes</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span>
+               <span class="p">[](</span><span class="k">const</span> <span class="k">auto</span><span class="o">&amp;</span> <span class="n">chunk</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">chunk</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="p">});</span>
+<span class="k">auto</span> <span class="n">receive_starts</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+<span class="n">std</span><span class="o">::</span><span class="n">partial_sum</span><span class="p">(</span><span class="n">receive_sizes</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">receive_sizes</span><span class="p">.</span><span class="n">end</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="n">receive_starts</span><span class="p">.</span><span class="n">begin</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">total</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">accumulate</span><span class="p">(</span><span class="n">receive_sizes</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">receive_sizes</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="mi">0</span><span class="p">);</span>
+
+<span class="k">auto</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">total</span><span class="p">);</span>
+
+<span class="k">auto</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">0u</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span><span class="o">&amp;</span> <span class="nl">chunk</span> <span class="p">:</span> <span class="n">q</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">copy</span><span class="p">(</span><span class="n">chunk</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">chunk</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">ys</span><span class="p">.</span><span class="n">begin</span><span class="p">()</span> <span class="o">+</span> <span class="n">receive_starts</span><span class="p">[</span><span class="n">t</span><span class="o">++</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="n">blocked_merge</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">receive_sizes</span><span class="p">);</span>
+
+<span class="k">return</span> <span class="n">ys</span><span class="p">;</span>
+</pre></div>
+
+
+<p>Instead of a coarray, we could also return a vector with an <em>irregular block partitioning</em>, where the resulting sizes of the local array define the partitioning.</p>
+<h1 id="pscmatrix-class-distributed-dense-matrix"><code>psc::matrix</code> class: distributed dense matrix<a id="sec-5"></a></h1>
+<p>Our class for a distributed dense matrix is a lot like the class we defined for a distributed dense vector. The main difference is in the data, which is now two-dimensional instead of one-dimensional. We will also choose a associate a Cartesian partitioning, and assume our <span><span class="MathJax_Preview">p</span><script type="math/tex">p</script></span> processors are virtually laid out in a grid of size <span><span class="MathJax_Preview">N \times M</span><script type="math/tex">N \times M</script></span>. The head of the class looks as follows:</p>
+<div class="codehilite"><pre><span></span><span class="k">namespace</span> <span class="n">psc</span> <span class="p">{</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">matrix</span> <span class="p">{</span>
+  <span class="c1">//...</span>
+</pre></div>
+
+
+<p>We construct the matrix as follows:</p>
+<div class="codehilite"><pre><span></span><span class="k">private</span><span class="o">:</span>
+  <span class="n">bulk</span><span class="o">::</span><span class="n">world</span><span class="o">&amp;</span> <span class="n">world_</span><span class="p">;</span>
+  <span class="n">bulk</span><span class="o">::</span><span class="n">cartesian_partitioning</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="o">&gt;&amp;</span> <span class="n">partitioning_</span><span class="p">;</span>
+  <span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">data_</span><span class="p">;</span>
+
+<span class="k">public</span><span class="o">:</span>
+  <span class="n">matrix</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">world</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">bulk</span><span class="o">::</span><span class="n">cartesian_partitioning</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="o">&gt;&amp;</span> <span class="n">partitioning</span><span class="p">,</span>
+         <span class="n">T</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="o">:</span> <span class="n">world_</span><span class="p">(</span><span class="n">world</span><span class="p">),</span> <span class="n">partitioning_</span><span class="p">(</span><span class="n">partitioning</span><span class="p">),</span>
+        <span class="n">data_</span><span class="p">(</span><span class="n">world_</span><span class="p">,</span> <span class="n">partitioning</span><span class="p">.</span><span class="n">local_count</span><span class="p">(</span><span class="n">world_</span><span class="p">.</span><span class="n">rank</span><span class="p">()),</span> <span class="n">value</span><span class="p">)</span> <span class="p">{}</span>
+<span class="c1">// ...</span>
+</pre></div>
+
+
+<p>Note the Cartesian partitioning which has a <code>2</code> dimensional data space as well as a <code>2</code> dimensional grid space. Next, we provide a limited number of member functions:</p>
+<div class="codehilite"><pre><span></span><span class="n">T</span><span class="o">&amp;</span> <span class="n">at</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">index_type</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span> <span class="n">index</span><span class="p">);</span>
+
+<span class="k">auto</span><span class="o">&amp;</span> <span class="n">partitioning</span><span class="p">();</span>
+<span class="k">auto</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">();</span>
+
+<span class="k">auto</span> <span class="nf">rows</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">partitioning_</span><span class="p">.</span><span class="n">global_size</span><span class="p">()[</span><span class="mi">0</span><span class="p">];</span> <span class="p">}</span>
+<span class="k">auto</span> <span class="nf">cols</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">partitioning_</span><span class="p">.</span><span class="n">global_size</span><span class="p">()[</span><span class="mi">1</span><span class="p">];</span> <span class="p">}</span>
+</pre></div>
+
+
+<p>Here, <code>at</code> provides a reference to the matrix element with local index <code>index</code>. We provide <code>rows</code> and <code>cols</code> function for convenience, which forward the information from the partitioning.</p>
+<h1 id="psclu-parallel-in-place-lu-decomposition"><code>psc::lu</code>: parallel in-place LU decomposition<a id="sec-6"></a></h1>
+<p>Now that we have a distributed matrix class, we are ready to implement a parallel LU decomposition routine. The parallel LU algorithm consists of the following steps.</p>
+<ol>
+<li>Find pivot<ol>
+<li><strong>Find, and communicate local maximum with processor column</strong>.</li>
+<li><strong>Find global maximum element</strong>.</li>
+<li><strong>Communicate global maximum with processor row</strong>.</li>
+</ol>
+</li>
+<li>Swap rows<ol>
+<li><strong>Communicate permutation update</strong>.</li>
+<li><strong>Update permutation vector</strong>.</li>
+<li><strong>Communicate rows r and k</strong>.</li>
+<li><strong>Swap rows r and k</strong>.</li>
+</ol>
+</li>
+<li>Matrix update<ol>
+<li><strong>Communicate pivot</strong>.</li>
+<li><strong>Scale column</strong>.</li>
+<li><strong>Communicate row k and column k</strong>.</li>
+<li><strong>Update bottom right block</strong>.</li>
+</ol>
+</li>
+</ol>
+<p>We will use a two-dimensional processor numbering, obtained as follows:</p>
+<div class="codehilite"><pre><span></span><span class="k">auto</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">psi</span><span class="p">.</span><span class="n">multi_rank</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">rank</span><span class="p">());</span>
+</pre></div>
+
+
+<p>Here, <code>psi</code> is a <code>cartesian_partitioning</code>.</p>
+<p>We will not discuss the majority of sequential computations here, but they are given in the full example source code. We will show the body of the loop over <code>k</code>, which ranges from <code>0</code> to <code>n - 1</code> where <code>n</code> is the matrix size. We assume the local maximum in column <code>k</code> is at row <code>r_s</code> and has value <code>local_max</code>. Then communicating with the local processor column can be done as follows:</p>
+<div class="codehilite"><pre><span></span><span class="c1">// (1) Communicate maximum element with local processor column</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">u</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">grid</span><span class="p">()[</span><span class="mi">0</span><span class="p">];</span> <span class="o">++</span><span class="n">u</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">pivot_rows</span><span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">rank</span><span class="p">({</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">}))[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">r_s</span><span class="p">;</span>
+        <span class="n">pivot_values</span><span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">rank</span><span class="p">({</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">}))[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_max</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Here, <code>pivot_rows</code> and <code>pivot_cols</code> are two coarrays that are used to store all the local values. From these local maximums, the global maximums are found, and these can be communicated to the local processor <em>row</em> as follows. Afterwards, all processors know the pivot row <code>r</code> (stored inside a <code>bulk::var&lt;int&gt;</code>).</p>
+<div class="codehilite"><pre><span></span><span class="c1">// (3) Communicate global maximum with local processor row</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">v</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">grid</span><span class="p">()[</span><span class="mi">1</span><span class="p">];</span> <span class="o">++</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">r</span><span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">rank</span><span class="p">({</span><span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">}))</span> <span class="o">=</span> <span class="n">pivot_rows</span><span class="p">[</span><span class="n">best_index</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+</pre></div>
+
+
+<p>We now want to swap rows <code>k</code> and <code>r</code>. First, we want to make sure our bookkeeping is up to date, and swap the components <span><span class="MathJax_Preview">\pi_r</span><script type="math/tex">\pi_r</script></span> and <span><span class="MathJax_Preview">\pi_k</span><script type="math/tex">\pi_k</script></span> of the permutation vector <span><span class="MathJax_Preview">\pi</span><script type="math/tex">\pi</script></span>. We assume <span><span class="MathJax_Preview">\pi</span><script type="math/tex">\pi</script></span> is stored in a coarray that is distributed according to the distribution function of the <span><span class="MathJax_Preview">0\text{-th}</span><script type="math/tex">0\text{-th}</script></span> axis.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// (4) Communicate permutation update</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">pi</span><span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">rank</span><span class="p">({</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">),</span> <span class="n">t</span><span class="p">}))[</span><span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">)]</span> <span class="o">=</span>
+        <span class="n">pi</span><span class="p">[</span><span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">)];</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">pi</span><span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">rank</span><span class="p">({</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">t</span><span class="p">}))[</span><span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span>
+        <span class="n">pi</span><span class="p">[</span><span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">)];</span>
+<span class="p">}</span>
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+</pre></div>
+
+
+<p>Now that the permutation bookkeeping is done, we swap rows <code>r</code> and <code>k</code>. For this, we have two coarrays, which use local indices, that act as a buffer.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// (6) Communicate row k and r</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">local_size</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">row_swap_k</span><span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">rank</span><span class="p">({</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">),</span> <span class="n">t</span><span class="p">}))[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span>
+            <span class="n">mat</span><span class="p">.</span><span class="n">at</span><span class="p">({</span><span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">j</span><span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">local_size</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">row_swap_r</span><span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">rank</span><span class="p">({</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">t</span><span class="p">}))[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span>
+            <span class="n">mat</span><span class="p">.</span><span class="n">at</span><span class="p">({</span><span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">),</span> <span class="n">j</span><span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>We then swap the rows locally.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// (7) Locally swap row k and r</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">local_size</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">mat</span><span class="p">.</span><span class="n">at</span><span class="p">({</span><span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">j</span><span class="p">})</span> <span class="o">=</span> <span class="n">row_swap_r</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">local_size</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">mat</span><span class="p">.</span><span class="n">at</span><span class="p">({</span><span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">),</span> <span class="n">j</span><span class="p">})</span> <span class="o">=</span> <span class="n">row_swap_k</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>After swapping, we know the pivot element. This element is used to scale column <code>k</code>, so the processor that owns it should communicate it to its processor column.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// (8) Communicate pivot</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">({</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">})</span> <span class="o">==</span> <span class="n">world</span><span class="p">.</span><span class="n">rank</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">u</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">grid</span><span class="p">()[</span><span class="mi">0</span><span class="p">];</span> <span class="o">++</span><span class="n">u</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">pivot</span><span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">rank</span><span class="p">({</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">}))</span> <span class="o">=</span> <span class="n">mat</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">({</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">}));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+</pre></div>
+
+
+<p>Next, the column is scaled.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// (9) Scale column</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// local row index, local col size, loop</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="n">ls</span><span class="p">[</span><span class="n">k</span><span class="p">];</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">local_size</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">mat</span><span class="p">.</span><span class="n">at</span><span class="p">({</span><span class="n">i</span><span class="p">,</span> <span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">)})</span> <span class="o">/=</span> <span class="n">pivot</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>For the matrix update, the row <code>k</code> and column <code>k</code>, to the right of and below the diagonal, should be communicated to the processors that require it. This is done using horizontal and vertical communication. Here, <code>col_k</code> and <code>row_k</code> are two coarrays that act as a buffer.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// (10)</span>
+<span class="c1">// Horizontal, communicate column k</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">v</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">grid</span><span class="p">()[</span><span class="mi">1</span><span class="p">];</span> <span class="o">++</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">auto</span> <span class="n">target_rank</span> <span class="o">=</span> <span class="n">psi</span><span class="p">.</span><span class="n">rank</span><span class="p">({</span><span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">});</span>
+        <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">local_size</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">auto</span> <span class="n">global_row</span> <span class="o">=</span> <span class="n">psi</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+            <span class="n">col_k</span><span class="p">(</span><span class="n">target_rank</span><span class="p">)[</span><span class="n">global_row</span><span class="p">]</span> <span class="o">=</span>
+                <span class="n">mat</span><span class="p">.</span><span class="n">at</span><span class="p">({</span><span class="n">i</span><span class="p">,</span> <span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">)});</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+
+<span class="c1">// Vertical, communicate row k</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">psi</span><span class="p">.</span><span class="n">owner</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">u</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">grid</span><span class="p">()[</span><span class="mi">0</span><span class="p">];</span> <span class="o">++</span><span class="n">u</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">auto</span> <span class="n">target_rank</span> <span class="o">=</span> <span class="n">psi</span><span class="p">.</span><span class="n">rank</span><span class="p">({</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">});</span>
+        <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">local_size</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">auto</span> <span class="n">global_col</span> <span class="o">=</span> <span class="n">psi</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">j</span><span class="p">);</span>
+            <span class="n">row_k</span><span class="p">(</span><span class="n">target_rank</span><span class="p">)[</span><span class="n">global_col</span><span class="p">]</span> <span class="o">=</span>
+                <span class="n">mat</span><span class="p">.</span><span class="n">at</span><span class="p">({</span><span class="n">psi</span><span class="p">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">j</span><span class="p">});</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+</pre></div>
+
+
+<p>Finally, we finish our matrix update.</p>
+<div class="codehilite"><pre><span></span><span class="c1">// (11)</span>
+<span class="c1">// Update bottom right block</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="n">ls</span><span class="p">[</span><span class="n">k</span><span class="p">];</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">local_size</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">j</span> <span class="o">=</span> <span class="n">qs</span><span class="p">[</span><span class="n">k</span><span class="p">];</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">psi</span><span class="p">.</span><span class="n">local_size</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">auto</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">psi</span><span class="p">.</span><span class="n">global</span><span class="p">({</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">},</span> <span class="p">{</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">});</span>
+        <span class="n">mat</span><span class="p">.</span><span class="n">at</span><span class="p">({</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">})</span> <span class="o">-=</span> <span class="n">row_k</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">*</span> <span class="n">col_k</span><span class="p">[</span><span class="n">a</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">world</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+</pre></div>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../message_passing/" title="Message passing" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Message passing
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../api/" title="Index" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Index
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Bulk is licensed under the <a href='https://github.com/jwbuurlage/bulk/blob/master/LICENSE.md'>MIT license</a>
+          </div>
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+        
+  <div class="md-footer-social">
+    <link rel="stylesheet" href="../assets/fonts/font-awesome.css">
+    
+      <a href="https://github.com/jwbuurlage" class="md-footer-social__link fa fa-github-alt"></a>
+    
+      <a href="https://twitter.com/jwbuurlage" class="md-footer-social__link fa fa-twitter"></a>
+    
+  </div>
+
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.5e60981f.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+      
+    
+    
+      
+        <script>!function(e,a,t,n,o,c,i){e.GoogleAnalyticsObject=o,e.ga=e.ga||function(){(e.ga.q=e.ga.q||[]).push(arguments)},e.ga.l=1*new Date,c=a.createElement(t),i=a.getElementsByTagName(t)[0],c.async=1,c.src="https://www.google-analytics.com/analytics.js",i.parentNode.insertBefore(c,i)}(window,document,"script",0,"ga"),ga("create","UA-59249373-1","http://codu.in/bulk/docs"),ga("set","anonymizeIp",!0),ga("send","pageview");var links=document.getElementsByTagName("a");if(Array.prototype.map.call(links,function(e){e.host!=document.location.host&&e.addEventListener("click",function(){var a=e.getAttribute("data-md-action")||"follow";ga("send","event","outbound",a,e.href)})}),document.forms.search){var query=document.forms.search.query;query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}</script>
+      
+    
+  </body>
+</html>
