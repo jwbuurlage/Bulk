@@ -412,28 +412,23 @@ if (psi.owner(1, k) == t) {
 For the matrix update, the row `k` and column `k`, to the right of and below the diagonal, should be communicated to the processors that require it. This is done using horizontal and vertical communication. Here, `col_k` and `row_k` are two coarrays that act as a buffer.
 
 ```cpp
-// (10)
-// Horizontal, communicate column k
+// (10) Horizontal, communicate column k
 if (psi.owner(1, k) == t) {
     for (auto v = 0; v < psi.grid()[1]; ++v) {
         auto target_rank = psi.rank({s, v});
         for (auto i = 0; i < psi.local_size(0, s); ++i) {
-            auto global_row = psi.global(0, s, i);
-            col_k(target_rank)[global_row] =
-                mat.at({i, psi.local(1, k)});
+            col_k(target_rank)[i] = mat.at({i, psi.local(1, k)});
         }
     }
 }
 world.sync();
 
-// Vertical, communicate row k
+// (10b) Vertical, communicate row k
 if (psi.owner(0, k) == s) {
     for (auto u = 0; u < psi.grid()[0]; ++u) {
         auto target_rank = psi.rank({u, t});
         for (auto j = 0; j < psi.local_size(1, t); ++j) {
-            auto global_col = psi.global(1, t, j);
-            row_k(target_rank)[global_col] =
-                mat.at({psi.local(0, k), j});
+            row_k(target_rank)[j] = mat.at({psi.local(0, k), j});
         }
     }
 }
@@ -443,14 +438,10 @@ world.sync();
 Finally, we finish our matrix update.
 
 ```cpp
-// (11)
-// Update bottom right block
+// (11) Update bottom right block
 for (auto i = ls[k]; i < psi.local_size(0, s); ++i) {
     for (auto j = qs[k]; j < psi.local_size(1, t); ++j) {
-        auto [a, b] = psi.global({i, j}, {s, t});
-        mat.at({i, j}) -= row_k[b] * col_k[a];
+        mat.at({i, j}) -= col_k[i] * row_k[j];
     }
 }
-
-world.sync();
 ```
