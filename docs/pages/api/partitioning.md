@@ -103,8 +103,7 @@ class cartesian_partitioning : public multi_partitioning<D, G>;
 ```
 
 Base class for partitionings over a processor grid of dimension `G`, where the
-each axis is partitioned independently. It is required that `G == D`, which is
-checked statically. The grid template parameter is kept for consistency.
+each axis is partitioned independently.
 
 ### Template parameters
 

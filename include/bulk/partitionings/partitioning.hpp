@@ -118,7 +118,6 @@ class rectangular_partitioning : public multi_partitioning<D, G> {
 /** Cartesian partitionings over a multi-dimensional processor grid */
 template <int D, int G = D>
 class cartesian_partitioning : public multi_partitioning<D, G> {
-  static_assert(G == D, "Cartesian partitionings require D = G");
   public:
     cartesian_partitioning(index_type<D> global_size, index_type<G> grid_size)
         : multi_partitioning<D, G>(global_size, grid_size) {}

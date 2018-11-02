@@ -61,8 +61,10 @@ void test_partitioning() {
                        "compute correctly the block origin (0)");
             BULK_CHECK(part.origin(1)[0] == 10,
                        "compute correctly the block origin (1)");
-            BULK_CHECK(part.origin(2)[1] == 10,
+            BULK_CHECK(part.origin(p - 1)[0] == 10 * (N - 1),
                        "compute correctly the block origin (2)");
+            BULK_CHECK(part.origin(p - 1)[1] == 10 * (N - 1),
+                       "compute correctly the block origin (3)");
         }
 
         BULK_SECTION("Block partitioning custom axes") {
