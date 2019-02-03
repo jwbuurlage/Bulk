@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 
         world.log_once("> Example 2: Sorting a random vector");
         auto block = bulk::block_partitioning<1>({size}, {p});
-        auto x = psc::vector<int>(world, partitioning);
+        auto x = psc::vector<int>(world, block);
         for (auto i = 0; i < (int)x.size(); ++i) {
             x[i] = rand();
         }
