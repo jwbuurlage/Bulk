@@ -2,22 +2,19 @@
 
 ![](https://raw.githubusercontent.com/jwbuurlage/Bulk/master/docs/pages/images/logo-square.png)
 
-The bulk-synchronous parallel (BSP) programming model gives a powerful method
-for implementing and describing parallel programs. Bulk is a novel interface for
-writing BSP programs in the C++ programming language that leverages modern C++
-features to allow for the implementation of safe and generic parallel algorithms
-for shared-memory, distributed-memory, and hybrid systems. This interface
-targets the next generation of BSP programmers who want to write fast, safe,
-clear and portable parallel programs.
+The bulk-synchronous parallel (BSP) paradigm is an effective framework for parallel programs.
+Bulk is a modern interface for writing BSP programs in C++. Modern programming language features
+allow for the implementation of safe and generic parallel algorithms
+for shared-memory, distributed-memory, and hybrid systems. Our interface
+should appeal to BSP programmers who want to write fast, safe, clear, and portable parallel programs.
 
 ## About BSP
 
-The bulk synchronous parallel (BSP) programming model, is a way of writing
-parallel and distributed programs. BSP is the underlying model for Bulk. Instead
-of communicating between processors (or nodes, or cores) asynchronously, all
-communication is staged and resolved at fixed _synchronization points_. These
-synchronizations delimit so-called _supersteps_. This way of structuring
-parallel programs has a number of advantages:
+In the bulk synchronous parallel (BSP) programming model, communication between processors
+(or nodes, or cores) does not happen asynchronously. Instead, all communication is staged and
+resolved at fixed _synchronization points_. These synchronizations delimit so-called _supersteps_.
+Although this means the implementation is not as free to overlap communication and computation,
+this way of structuring parallel programs has a number of advantages.
 
 - The resulting programs are **structured**, easy to understand and maintain,
   and their performance and correctness can be reasoned about.
@@ -27,12 +24,12 @@ parallel programs has a number of advantages:
   fashion.
 - There are only two types of **communication mechanisms**, _message passing_
   and _named communication (through distributed variables)_. This makes BSP
-  based libraries very economic: you can accomplish a lot with very little.
+  based libraries very economic: you can accomplish a lot with little.
 - It has a **gentle learning curve**. It is easy to write _correct_ BSP
   programs, while it is notoriously hard to write correct asynchronous parallel
   programs.
 
-## Examples
+## Code examples
 
 Hello world!
 
@@ -83,9 +80,8 @@ for (auto [tag, content] : q) {
 
 ## Building
 
-
-Bulk requires Linux and an up-to-date compiler, that supports C++17, e.g. GCC >=
-7.0, or Clang >= 4.0.
+Bulk is test on Fedora, and should work on all major Linux distributions.
+It requires an up-to-date compiler that supports C++17, e.g. GCC >= 7.0, or Clang >= 4.0.
 
 ### Backends
 
@@ -158,8 +154,6 @@ Bulk is developed at Centrum Wiskunde & Informatica (CWI) in Amsterdam by:
 
 ## Contributing
 
-We welcome contributions. Please submit pull requests against the develop
-branch.
+We welcome contributions. Please submit pull requests against the develop branch.
 
-If you have any issues, questions, or remarks, then please open an issue on
-GitHub.
+If you have any issues, questions, or remarks, then please open an issue on GitHub.
