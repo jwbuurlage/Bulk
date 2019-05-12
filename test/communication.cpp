@@ -7,16 +7,14 @@
 
 extern environment env;
 
-void test_communication()
-{
+void test_communication() {
     env.spawn(env.available_processors(), [](auto& world) {
         int s = world.rank();
         int p = world.active_processors();
 
         BULK_SKIP_SECTION_IF("Communication", p <= 1);
 
-        BULK_SECTION("Put")
-        {
+        BULK_SECTION("Put") {
             // test `put` to single variable
             bulk::var<int> a(world, 3);
 
@@ -29,8 +27,7 @@ void test_communication()
                        "receive correct value after putting");
         }
 
-        BULK_SECTION("Broadcast")
-        {
+        BULK_SECTION("Broadcast") {
             // test `put` to single variable
             bulk::var<int> a(world, 3);
 
@@ -43,8 +40,7 @@ void test_communication()
                        "receive correct value after broadcasting");
         }
 
-        BULK_SECTION("Put and get delayed")
-        {
+        BULK_SECTION("Put and get delayed") {
             using namespace std::chrono_literals;
 
             // test `put` to single variable
@@ -77,8 +73,7 @@ void test_communication()
             BULK_CHECK(b.value() == 45, "receive correct value after get");
         }
 
-        BULK_SECTION("Sugarized put")
-        {
+        BULK_SECTION("Sugarized put") {
             // test `put` to single variable
             bulk::var<int> a(world);
 
@@ -89,8 +84,7 @@ void test_communication()
                        "receive correct value after sugarized putting");
         }
 
-        BULK_SECTION("Put to self")
-        {
+        BULK_SECTION("Put to self") {
             bulk::var<int> a(world);
 
             bulk::put(s, s, a);
@@ -100,8 +94,7 @@ void test_communication()
                        "receive correct value after putting to self");
         }
 
-        BULK_SECTION("Get and put play nice together")
-        {
+        BULK_SECTION("Get and put play nice together") {
             bulk::var<int> a(world, 15);
 
             a(0) = 5;
@@ -112,8 +105,7 @@ void test_communication()
             BULK_CHECK(b == 15, "gets before puts");
         }
 
-        BULK_SECTION("Get from self")
-        {
+        BULK_SECTION("Get from self") {
             bulk::var<int> a(world);
             a = s;
             auto b = bulk::get(s, a);
@@ -123,8 +115,7 @@ void test_communication()
                        "receive correct value after getting from self");
         }
 
-        BULK_SECTION("Put non-int")
-        {
+        BULK_SECTION("Put non-int") {
             // test `put` float to single variable
             bulk::var<float> a(world, 5.0f);
 
@@ -135,8 +126,7 @@ void test_communication()
                        "receive correct value after putting float");
         }
 
-        BULK_SECTION("Put custom struct")
-        {
+        BULK_SECTION("Put custom struct") {
             struct custom_struct {
                 int x;
                 float y;
@@ -150,8 +140,7 @@ void test_communication()
                        "receive correct value after putting custom struct");
         }
 
-        BULK_SECTION("Put a string")
-        {
+        BULK_SECTION("Put a string") {
             bulk::var<std::string> a(world);
 
             a(world.next_rank()) = "test";
@@ -160,8 +149,7 @@ void test_communication()
             BULK_CHECK(a.value() == "test", "can put a string ");
         }
 
-        BULK_SECTION("Get a string")
-        {
+        BULK_SECTION("Get a string") {
             bulk::var<std::string> a(world, "test" + std::to_string(s));
 
             auto b = a(world.next_rank()).get();
@@ -171,8 +159,7 @@ void test_communication()
                        "can get a string");
         }
 
-        BULK_SECTION("Put multiple")
-        {
+        BULK_SECTION("Put multiple") {
             int size = 5;
 
             // test `put` to multiple variables
@@ -194,8 +181,7 @@ void test_communication()
             }
         }
 
-        BULK_SECTION("Put unequal")
-        {
+        BULK_SECTION("Put unequal") {
             int size = 5;
 
             // test `put` to multiple variables
@@ -225,8 +211,7 @@ void test_communication()
                             "receive correct value after getting");
         }
 
-        BULK_SECTION("Get")
-        {
+        BULK_SECTION("Get") {
             bulk::var<int> b(world);
             b.value() = s;
             world.sync();
@@ -238,8 +223,7 @@ void test_communication()
                        "receive correct value after getting");
         }
 
-        BULK_SECTION("Sugarized get")
-        {
+        BULK_SECTION("Sugarized get") {
             bulk::var<int> b(world);
             b.value() = s;
             world.sync();
@@ -251,8 +235,7 @@ void test_communication()
                        "receive correct value after sugarized getting");
         }
 
-        BULK_SECTION("Get multiple")
-        {
+        BULK_SECTION("Get multiple") {
             int size = 5;
             bulk::var<int> x(world);
             x.value() = s;
@@ -272,8 +255,7 @@ void test_communication()
             }
         }
 
-        BULK_SECTION("Put array")
-        {
+        BULK_SECTION("Put array") {
             std::vector<int> test(10);
             std::iota(test.begin(), test.end(), 1);
 
@@ -284,8 +266,7 @@ void test_communication()
             BULK_CHECK(xs[5] == 6, "put iterator range");
         }
 
-        BULK_SECTION("Coarray")
-        {
+        BULK_SECTION("Coarray") {
             bulk::coarray<int> zs(world, 10);
 
             BULK_CHECK(zs.size() == 10, "can obtain the size of a coarray");
@@ -314,8 +295,7 @@ void test_communication()
             BULK_CHECK(zs[3] == 1234, "put to self with coarray");
         }
 
-        BULK_SECTION("Coarray iteration")
-        {
+        BULK_SECTION("Coarray iteration") {
             auto xs = bulk::gather_all(world, s);
             int t = 0;
             for (auto x : xs) {
@@ -323,8 +303,7 @@ void test_communication()
             }
         }
 
-        BULK_SECTION("Coarray slicing")
-        {
+        BULK_SECTION("Coarray slicing") {
             bulk::coarray<int> zs(world, 10, 0);
             zs(world.next_rank())[{2, 5}] = s;
             zs(world.next_rank())[{0, 2}] = {s - 1, s - 2};
@@ -342,8 +321,7 @@ void test_communication()
                        "individual slice setting");
         }
 
-        BULK_SECTION("Coarray slicing with spans")
-        {
+        BULK_SECTION("Coarray slicing with spans") {
             auto data = std::vector<int>(10);
             std::iota(data.begin(), data.end(), 0);
 
@@ -358,8 +336,7 @@ void test_communication()
             }
         }
 
-        BULK_SECTION("All-to-all coarray slicing")
-        {
+        BULK_SECTION("All-to-all coarray slicing") {
             auto local = std::vector<int>(p);
             std::iota(local.begin(), local.end(), s * p);
 
@@ -399,8 +376,7 @@ void test_communication()
             BULK_CHECK(large_flag, "all-to-all slicing with unequal blocks");
         }
 
-        BULK_SECTION("Get slice")
-        {
+        BULK_SECTION("Get slice") {
             bulk::coarray<int> zs(world, 10, 0);
             std::iota(zs.begin(), zs.end(), 0);
 
@@ -416,8 +392,7 @@ void test_communication()
             BULK_CHECK(flag, "getting slices");
         }
 
-        BULK_SECTION("Single message passing")
-        {
+        BULK_SECTION("Single message passing") {
             bulk::queue<int, int> q(world);
             q(world.next_rank()).send(123, 1337);
             world.sync();
@@ -427,8 +402,7 @@ void test_communication()
             }
         }
 
-        BULK_SECTION("Message to self")
-        {
+        BULK_SECTION("Message to self") {
             bulk::queue<int, int> q(world);
 
             q(world.rank()).send(123, 1337);
@@ -443,8 +417,7 @@ void test_communication()
                        "message passed succesfully");
         }
 
-        BULK_SECTION("Multiple messages to self")
-        {
+        BULK_SECTION("Multiple messages to self") {
             auto q = bulk::queue<int, int>(world);
 
             q(world.rank()).send(123, 1337);
@@ -459,8 +432,7 @@ void test_communication()
                        "message passed succesfully");
         }
 
-        BULK_SECTION("Multiple message passing")
-        {
+        BULK_SECTION("Multiple message passing") {
             std::vector<int> contents = {1337, 12345, 1230519, 5, 8};
 
             bulk::queue<int, int> q(world);
@@ -478,8 +450,7 @@ void test_communication()
             }
         }
 
-        BULK_SECTION("Multiple queue and types message passing")
-        {
+        BULK_SECTION("Multiple queue and types message passing") {
             std::vector<int> contents = {1337, 12345, 1230519, 5, 8};
             std::vector<float> contents2 = {1.0f, 2.0f, 3.0f, 4.0f};
 
@@ -520,8 +491,7 @@ void test_communication()
             BULK_CHECK(q2.empty(), "second queue gets emptied");
         }
 
-        BULK_SECTION("Messages with arrays")
-        {
+        BULK_SECTION("Messages with arrays") {
             auto q = bulk::queue<int[]>(world);
             q(world.next_rank()).send({1, 2, 3, 4});
             world.sync();
@@ -532,8 +502,7 @@ void test_communication()
             }
         }
 
-        BULK_SECTION("Messages with multiple arrays")
-        {
+        BULK_SECTION("Messages with multiple arrays") {
             auto q = bulk::queue<int[], float[]>(world);
             q(world.next_rank()).send({1, 2, 3, 4}, {1.0f, 2.0f});
             world.sync();
@@ -546,8 +515,7 @@ void test_communication()
             }
         }
 
-        BULK_SECTION("Messages with arrays and normal")
-        {
+        BULK_SECTION("Messages with arrays and normal") {
             auto q = bulk::queue<int[], int>(world);
             q(world.next_rank()).send({1, 2, 3, 4}, 1);
             q(world.next_rank()).send({2, 3, 4, 5}, 2);
@@ -558,16 +526,14 @@ void test_communication()
                 if (x == 1) {
                     BULK_CHECK((xs == std::vector<int>{1, 2, 3, 4}),
                                "send many correct content #1");
-                }
-                else {
+                } else {
                     BULK_CHECK((xs == std::vector<int>{2, 3, 4, 5}),
                                "send many correct content #2");
                 }
             }
         }
 
-        BULK_SECTION("Messages with strings")
-        {
+        BULK_SECTION("Messages with strings") {
             auto q = bulk::queue<int, std::string>(world);
             q(world.next_rank()).send(5, "string");
             world.sync();

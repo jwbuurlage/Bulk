@@ -19,7 +19,7 @@ class block_partitioning : public rectangular_partitioning<D, G> {
      * `data_size`: the global number of processors along each axis
      */
     block_partitioning(index_type<D> data_size, index_type<G> grid)
-        : block_partitioning(data_size, grid, iota_()) {}
+    : block_partitioning(data_size, grid, iota_()) {}
 
     /**
      * Constructs a block partitioning in nD.
@@ -29,9 +29,8 @@ class block_partitioning : public rectangular_partitioning<D, G> {
      * `axes`: an array of size `G` that indicates the axes over which to
      * partition
      */
-    block_partitioning(index_type<D> data_size, index_type<G> grid,
-                       index_type<G> axes)
-        : rectangular_partitioning<D, G>(data_size, grid), axes_(axes) {
+    block_partitioning(index_type<D> data_size, index_type<G> grid, index_type<G> axes)
+    : rectangular_partitioning<D, G>(data_size, grid), axes_(axes) {
         static_assert(G <= D,
                       "Dimensionality of the data should be larger or equal to "
                       "that of the processor grid.");
@@ -59,9 +58,8 @@ class block_partitioning : public rectangular_partitioning<D, G> {
         for (int i = 0; i < G; ++i) {
             auto dim = axes_[i];
 
-            size[dim] =
-                (this->global_size_[dim] + this->grid_size_[i] - idxs[i] - 1) /
-                this->grid_size_[i];
+            size[dim] = (this->global_size_[dim] + this->grid_size_[i] - idxs[i] - 1) /
+                        this->grid_size_[i];
         }
         return size;
     }

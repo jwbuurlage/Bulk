@@ -21,7 +21,7 @@ class cyclic_partitioning : public cartesian_partitioning<D, G> {
      * `data_size`: the global number of processors along each axis
      */
     cyclic_partitioning(index_type<D> data_size, index_type<G> grid)
-        : cartesian_partitioning<D, G>(data_size, grid) {
+    : cartesian_partitioning<D, G>(data_size, grid) {
         static_assert(G <= D,
                       "Dimensionality of the data should be larger or equal to "
                       "that of the processor grid.");
@@ -36,8 +36,7 @@ class cyclic_partitioning : public cartesian_partitioning<D, G> {
     }
 
     /** Local to global */
-    index_type<D> global(index_type<D> xs,
-                         index_type<G> processor) override final {
+    index_type<D> global(index_type<D> xs, index_type<G> processor) override final {
         auto result = xs;
         for (int d = 0; d < G; ++d) {
             result[d] = result[d] * this->grid_size_[d] + processor[d];
@@ -50,9 +49,9 @@ class cyclic_partitioning : public cartesian_partitioning<D, G> {
     index_type<D> local_size(index_type<G> idxs) override final {
         index_type<D> size;
         for (int dim = 0; dim < G; ++dim) {
-            size[dim] = (this->global_size_[dim] + this->grid_size_[dim] -
-                         idxs[dim] - 1) /
-                        this->grid_size_[dim];
+            size[dim] =
+            (this->global_size_[dim] + this->grid_size_[dim] - idxs[dim] - 1) /
+            this->grid_size_[dim];
         }
         for (int dim = G; dim < D; ++dim) {
             size[dim] = this->global_size_[dim];

@@ -11,7 +11,7 @@ namespace bulk::thread {
 class barrier {
   public:
     explicit barrier(std::size_t count)
-        : threshold_(count), count_(count), generation_(0) {}
+    : threshold_(count), count_(count), generation_(0) {}
 
     void wait() {
         auto gen = generation_;

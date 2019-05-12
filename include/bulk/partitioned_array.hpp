@@ -49,8 +49,8 @@ class partitioned_array {
   public:
     /** Construct a partitioned array from a given partitioning. */
     partitioned_array(bulk::world& world, multi_partitioning<D, G>& part)
-        : world_(world), partitioning_(part),
-          data_(world, partitioning_.local_count(world.rank())) {
+    : world_(world), partitioning_(part),
+      data_(world, partitioning_.local_count(world.rank())) {
         multi_id_ = util::unflatten<D>(partitioning_.grid(), world.rank());
     }
 
@@ -58,20 +58,17 @@ class partitioned_array {
     auto global(index_type<D> index) {
         auto owner = partitioning_.owner(index);
         auto local_idx = partitioning_.local(index);
-        return data_(owner)[util::flatten<D>(partitioning_.local_size(owner),
-                                             local_idx)];
+        return data_(owner)[util::flatten<D>(partitioning_.local_size(owner), local_idx)];
     }
 
     /** Get an element using its local index. */
     T& local(index_type<D> index) {
-        return data_[util::flatten<D>(partitioning_.local_size(multi_id_),
-                                      index)];
+        return data_[util::flatten<D>(partitioning_.local_size(multi_id_), index)];
     }
 
     /// ditto
     const T& local(index_type<D> index) const {
-        return data_[util::flatten<D>(partitioning_.local_size(multi_id_),
-                                      index)];
+        return data_[util::flatten<D>(partitioning_.local_size(multi_id_), index)];
     }
 
     /** Get a reference to the world of the array. */

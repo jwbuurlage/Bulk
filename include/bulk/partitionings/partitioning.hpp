@@ -32,8 +32,7 @@ class partitioning {
     /** the total count of elements on a processor */
     int local_count(int processor) {
         auto size = local_size(processor);
-        return std::accumulate(size.begin(), size.end(), 1,
-                               std::multiplies<int>());
+        return std::accumulate(size.begin(), size.end(), 1, std::multiplies<int>());
     }
 
     /** Get the owner of a global index. */
@@ -54,7 +53,7 @@ class multi_partitioning : public partitioning<D> {
     using partitioning<D>::local_size;
 
     multi_partitioning(index_type<D> global_size, index_type<G> grid_size)
-        : partitioning<D>(global_size), grid_size_(grid_size) {}
+    : partitioning<D>(global_size), grid_size_(grid_size) {}
 
     virtual ~multi_partitioning() = default;
 
@@ -95,7 +94,7 @@ class rectangular_partitioning : public multi_partitioning<D, G> {
     using multi_partitioning<D, G>::global;
 
     rectangular_partitioning(index_type<D> global_size, index_type<G> grid_size)
-        : multi_partitioning<D, G>(global_size, grid_size) {}
+    : multi_partitioning<D, G>(global_size, grid_size) {}
 
     /** Support origin queries by flattened, or multi-index */
     virtual index_type<D> origin(index_type<G> processor) const {
@@ -120,7 +119,7 @@ template <int D, int G = D>
 class cartesian_partitioning : public multi_partitioning<D, G> {
   public:
     cartesian_partitioning(index_type<D> global_size, index_type<G> grid_size)
-        : multi_partitioning<D, G>(global_size, grid_size) {}
+    : multi_partitioning<D, G>(global_size, grid_size) {}
 
     /** Obtain the owner of index i for the g-th dimension */
     using multi_partitioning<D, G>::owner;

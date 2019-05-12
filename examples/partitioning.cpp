@@ -7,7 +7,7 @@ int main() {
 
     env.spawn(env.available_processors(), [](bulk::world& world) {
         int s = world.rank();
-        
+
         auto part = bulk::cyclic_partitioning<2>({200, 200}, {2, 2});
         auto xs = bulk::partitioned_array<int, 2, 2>(world, part);
 

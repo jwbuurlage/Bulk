@@ -13,15 +13,13 @@ namespace psc {
 template <typename T>
 class matrix {
   public:
-    matrix(bulk::world& world, bulk::cartesian_partitioning<2, 2>& partitioning,
-           T value = 0)
-        : world_(world), partitioning_(partitioning),
-          data_(world_, partitioning.local_count(world_.rank()), value) {}
+    matrix(bulk::world& world, bulk::cartesian_partitioning<2, 2>& partitioning, T value = 0)
+    : world_(world), partitioning_(partitioning),
+      data_(world_, partitioning.local_count(world_.rank()), value) {}
 
     T& at(bulk::index_type<2> index) {
         return data_[bulk::util::flatten<2>(
-            partitioning_.local_size(partitioning_.multi_rank(world_.rank())),
-            index)];
+        partitioning_.local_size(partitioning_.multi_rank(world_.rank())), index)];
     }
 
     auto& partitioning() { return partitioning_; };
@@ -97,9 +95,9 @@ bulk::coarray<int> lu(matrix<T>& mat) {
             world.sync(); // (a)
 
             // (2) Find global maximum
-            auto best_index = std::distance(
-                pivot_values.begin(),
-                std::max_element(pivot_values.begin(), pivot_values.end()));
+            auto best_index =
+            std::distance(pivot_values.begin(),
+                          std::max_element(pivot_values.begin(), pivot_values.end()));
 
             // (3) Communicate global maximum with local processor row
             for (auto v = 0; v < psi.grid()[1]; ++v) {
@@ -112,12 +110,10 @@ bulk::coarray<int> lu(matrix<T>& mat) {
 
         // (4) Communicate permutation update
         if (psi.owner(0, k) == s) {
-            pi(psi.rank({psi.owner(0, r), t}))[psi.local(0, r)] =
-                pi[psi.local(0, k)];
+            pi(psi.rank({psi.owner(0, r), t}))[psi.local(0, r)] = pi[psi.local(0, k)];
         }
         if (psi.owner(0, r) == s) {
-            pi(psi.rank({psi.owner(0, k), t}))[psi.local(0, k)] =
-                pi[psi.local(0, r)];
+            pi(psi.rank({psi.owner(0, k), t}))[psi.local(0, k)] = pi[psi.local(0, r)];
         }
         world.sync();
 
@@ -128,13 +124,13 @@ bulk::coarray<int> lu(matrix<T>& mat) {
         if (psi.owner(0, k) == s) {
             for (auto j = 0; j < psi.local_size(1, t); ++j) {
                 row_swap_k(psi.rank({psi.owner(0, r), t}))[j] =
-                    mat.at({psi.local(0, k), j});
+                mat.at({psi.local(0, k), j});
             }
         }
         if (psi.owner(0, r) == s) {
             for (auto j = 0; j < psi.local_size(1, t); ++j) {
                 row_swap_r(psi.rank({psi.owner(0, k), t}))[j] =
-                    mat.at({psi.local(0, r), j});
+                mat.at({psi.local(0, r), j});
             }
         }
 
@@ -208,17 +204,15 @@ void spy(matrix<T>& mat) {
     auto& phi = mat.partitioning();
     auto [s, t] = phi.multi_rank(world.rank());
 
-    auto xs = bulk::coarray<T>(world,
-                               world.rank() == 0 ? mat.cols() * mat.rows() : 0);
+    auto xs = bulk::coarray<T>(world, world.rank() == 0 ? mat.cols() * mat.rows() : 0);
 
     auto x = phi.local_size(world.rank())[0];
     auto y = phi.local_size(world.rank())[1];
 
     for (auto i = 0; i < x; ++i) {
         for (auto j = 0; j < y; ++j) {
-            xs(0)[bulk::util::flatten<2>(phi.global_size(),
-                                         phi.global({i, j}, {s, t}))] =
-                mat.at({i, j});
+            xs(0)[bulk::util::flatten<2>(phi.global_size(), phi.global({i, j}, {s, t}))] =
+            mat.at({i, j});
         }
     }
 
@@ -228,9 +222,7 @@ void spy(matrix<T>& mat) {
         for (auto i = 0; i < mat.rows(); ++i) {
             std::cout << "[ " << std::fixed << std::setprecision(2);
             for (auto j = 0; j < mat.cols(); ++j) {
-                std::cout
-                    << xs[bulk::util::flatten<2>(phi.global_size(), {i, j})]
-                    << " ";
+                std::cout << xs[bulk::util::flatten<2>(phi.global_size(), {i, j})] << " ";
             }
             std::cout << "]\n";
         }

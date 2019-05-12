@@ -9,8 +9,7 @@ namespace bulk::detail {
 struct scale {
     std::size_t size = 0;
 
-    template <typename T,
-              typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
+    template <typename T, typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
     void operator|(const T&) {
         size += sizeof(T);
     }
@@ -28,21 +27,19 @@ struct scale {
 // non-owned buffer
 struct memory_buffer_base {
     memory_buffer_base(void* const buffer_)
-        : buffer((char*)buffer_), index(0) {}
+    : buffer((char*)buffer_), index(0) {}
     ~memory_buffer_base() {}
 
     char* const buffer;
     std::size_t index;
 
-    template <typename T,
-              typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
+    template <typename T, typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
     void operator<<(const T& value) {
         memcpy(buffer + index, &value, sizeof(T));
         index += sizeof(T);
     }
 
-    template <typename T,
-              typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
+    template <typename T, typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
     void operator>>(T& value) {
         memcpy(&value, buffer + index, sizeof(T));
         index += sizeof(T);
@@ -82,7 +79,7 @@ struct memory_buffer : public memory_buffer_base {
     ~memory_buffer() { delete[] buffer; }
 
     memory_buffer(std::size_t size, char* data)
-        : memory_buffer_base(new char[size]) {
+    : memory_buffer_base(new char[size]) {
         memcpy(buffer, data, size);
     }
 };
@@ -118,8 +115,7 @@ void fill(Buffer& buf, U& elem, Us&&... other) {
 template <typename Buffer>
 void fill(Buffer&) {}
 
-template <typename Buffer, typename Tuple,
-          typename Is = std::make_index_sequence<std::tuple_size<Tuple>::value>>
+template <typename Buffer, typename Tuple, typename Is = std::make_index_sequence<std::tuple_size<Tuple>::value>>
 void fill(Buffer& buf, Tuple& xs) {
     fill_tuple_(buf, xs, Is{});
 }

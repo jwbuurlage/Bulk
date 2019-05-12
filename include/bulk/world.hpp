@@ -52,8 +52,8 @@ class world {
         return next;
     }
 
-    [[deprecated(
-        "`world::next_processor` was renamed to `world::next_rank`")]] int
+    [[deprecated("`world::next_processor` was renamed to "
+                 "`world::next_rank`")]] int
     next_processor() const { return this->next_rank(); }
 
     /**
@@ -68,8 +68,8 @@ class world {
         return prev;
     }
 
-    [[deprecated(
-        "`world::prev_processor` was renamed to `world::prev_rank`")]] int
+    [[deprecated("`world::prev_processor` was renamed to "
+                 "`world::prev_rank`")]] int
     prev_processor() const { return prev_rank(); }
 
     /**
@@ -166,20 +166,18 @@ class world {
 
     virtual char* put_buffer_(int processor, int var_id, size_t size) = 0;
     // size is per element
-    virtual void put_(int processor, const void* values, size_t size,
-                      int var_id, size_t offset, size_t count) = 0;
+    virtual void
+    put_(int processor, const void* values, size_t size, int var_id, size_t offset, size_t count) = 0;
 
-    virtual void get_buffer_(int processor, int var_id,
-                             class future_base* future) = 0;
-    virtual void get_(int processor, int var_id, size_t size, void* target,
-                      size_t offset, size_t count) = 0;
+    virtual void get_buffer_(int processor, int var_id, class future_base* future) = 0;
+    virtual void
+    get_(int processor, int var_id, size_t size, void* target, size_t offset, size_t count) = 0;
 
     virtual int register_queue_(class queue_base* q) = 0;
     virtual void unregister_queue_(int id) = 0;
 
     // data consists of a complete message. size is total size.
-    virtual char* send_buffer_(int target, int queue_id,
-                               size_t buffer_size) = 0;
+    virtual char* send_buffer_(int target, int queue_id, size_t buffer_size) = 0;
 
     virtual void log_(std::string message) = 0;
 };

@@ -35,13 +35,13 @@ bulk::coarray<T> sort(vector<T>& x) {
                 std::inplace_merge(vec.begin() + offset,
                                    vec.begin() + offset + block_sizes[2 * i],
                                    vec.begin() + offset + block_sizes[2 * i] +
-                                       block_sizes[2 * i + 1]);
+                                   block_sizes[2 * i + 1]);
                 offset += block_sizes[2 * i] + block_sizes[2 * i + 1];
                 block_sizes[i] = block_sizes[2 * i] + block_sizes[2 * i + 1];
             }
             if (block_sizes.size() % 2 == 1) {
                 block_sizes[((block_sizes.size() + 1) / 2) - 1] =
-                    block_sizes[block_sizes.size() - 1];
+                block_sizes[block_sizes.size() - 1];
             }
             block_sizes.resize((block_sizes.size() + 1) / 2);
         }
@@ -84,13 +84,12 @@ bulk::coarray<T> sort(vector<T>& x) {
 
     // (5) communicate the blocks
     auto block_starts = std::vector<int>(p);
-    std::partial_sum(block_sizes.begin(), block_sizes.end() - 1,
-                     block_starts.begin() + 1);
+    std::partial_sum(block_sizes.begin(), block_sizes.end() - 1, block_starts.begin() + 1);
 
     auto q = bulk::queue<T[]>(world);
     for (int t = 0; t < p; ++t) {
-      q(t).send(std::vector<T>(x.begin() + block_starts[t],
-                               x.begin() + block_starts[t] + block_sizes[t]));
+        q(t).send(std::vector<T>(x.begin() + block_starts[t],
+                                 x.begin() + block_starts[t] + block_sizes[t]));
     }
     world.sync();
 
@@ -107,7 +106,7 @@ bulk::coarray<T> sort(vector<T>& x) {
 
     auto t = 0u;
     for (const auto& chunk : q) {
-      std::copy(chunk.begin(), chunk.end(), ys.begin() + receive_starts[t++]);
+        std::copy(chunk.begin(), chunk.end(), ys.begin() + receive_starts[t++]);
     }
 
     blocked_merge(ys, receive_sizes);

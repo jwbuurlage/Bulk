@@ -44,10 +44,12 @@ int main() {
 
         bulk::coarray<int> target(world, size);
 
-        std::vector<size_t> test_sizes = {
-            1'000u,     2'000u,     4'000u,     8'000u,     16'000u,  32'000u,
-            64'000u,    100'000u,   128'000u,   200'000u,   256'000u, 512'000u,
-            1'000'000u, 4'000'000u, 8'000'000u, 10'000'000u};
+        std::vector<size_t> test_sizes = {1'000u,     2'000u,     4'000u,
+                                          8'000u,     16'000u,    32'000u,
+                                          64'000u,    100'000u,   128'000u,
+                                          200'000u,   256'000u,   512'000u,
+                                          1'000'000u, 4'000'000u, 8'000'000u,
+                                          10'000'000u};
         std::vector<double> test_results;
 
         for (auto test_size : test_sizes) {
@@ -57,8 +59,7 @@ int main() {
                 auto t = (world.next_rank() + k * (p / sample_size)) % p;
 
                 auto clock = bulk::util::timer();
-                target.put(t, dummy_data.begin(),
-                           dummy_data.begin() + test_size);
+                target.put(t, dummy_data.begin(), dummy_data.begin() + test_size);
                 world.sync();
                 auto total_ms = clock.get();
 
@@ -89,7 +90,7 @@ int main() {
 
             if (s == 0) {
                 auto comm_report =
-                    bulk::util::table("Communication times", "size");
+                bulk::util::table("Communication times", "size");
                 comm_report.columns("time");
 
                 for (auto i = 0u; i < test_results.size(); ++i) {

@@ -51,8 +51,7 @@ class coarray {
          *
          * \param value the new value of each element in the slice
          */
-        void operator=(T value)
-        {
+        void operator=(T value) {
             for (int i = s_.first; i < s_.last; ++i) {
                 parent_.put(t_, i, value);
             }
@@ -69,8 +68,7 @@ class coarray {
          *   {x,x,3,2,4,3,2,4,3,2,x,x};
          * That is to say, the values will repeat to fill the slice.
          */
-        void operator=(const std::vector<T>& values)
-        {
+        void operator=(const std::vector<T>& values) {
             parent_.put(t_, s_, values);
         }
 
@@ -85,8 +83,7 @@ class coarray {
          *   {x,x,3,2,4,3,2,4,3,2,x,x};
          * That is to say, the values will repeat to fill the slice.
          */
-        void operator=(const bulk::span<T>& values)
-        {
+        void operator=(const bulk::span<T>& values) {
             parent_.put(t_, s_, values);
         }
 
@@ -97,9 +94,7 @@ class coarray {
         friend coarray<T>;
 
         slice_writer(coarray<T>& parent, int t, slice s)
-        : parent_(parent), t_(t), s_(s)
-        {
-        }
+        : parent_(parent), t_(t), s_(s) {}
 
         coarray<T>& parent_;
         int t_;
@@ -120,9 +115,8 @@ class coarray {
       private:
         friend coarray<T>;
 
-        writer(coarray<T>& parent, int t, int i) : parent_(parent), t_(t), i_(i)
-        {
-        }
+        writer(coarray<T>& parent, int t, int i)
+        : parent_(parent), t_(t), i_(i) {}
 
         coarray<T>& parent_;
         int t_;
@@ -142,8 +136,7 @@ class coarray {
          */
         writer operator[](int i) { return writer(parent_, t_, i); }
 
-        slice_writer operator[](slice s)
-        {
+        slice_writer operator[](slice s) {
             return slice_writer(parent_, t_, s);
         }
 
@@ -168,8 +161,7 @@ class coarray {
      * \param default_value the initial value of each local element
      */
     coarray(bulk::world& world, int local_size, T default_value)
-    : data_(world, local_size)
-    {
+    : data_(world, local_size) {
         for (int i = 0; i < local_size; ++i) {
             data_[i] = default_value;
         }
@@ -224,8 +216,7 @@ class coarray {
     /**
      * Put a range of data in a remote image.
      */
-    void put(int processor, slice s, const std::vector<T>& values)
-    {
+    void put(int processor, slice s, const std::vector<T>& values) {
         auto count = (int)values.size() < (s.last - s.first) ? values.size() :
                                                                (s.last - s.first);
         data_.put(processor, values.data(), s.first, count);
@@ -234,8 +225,7 @@ class coarray {
     /**
      * Put a span of data in a remote image.
      */
-    void put(int processor, slice s, const bulk::span<T>& values)
-    {
+    void put(int processor, slice s, const bulk::span<T>& values) {
         auto count = (int)values.size() < (s.last - s.first) ? values.size() :
                                                                (s.last - s.first);
         data_.put(processor, values.data(), s.first, count);
@@ -245,8 +235,7 @@ class coarray {
      * Put a range of data in a remote image.
      */
     template <typename FwdIterator>
-    void put(int processor, FwdIterator first, FwdIterator last, int offset = 0)
-    {
+    void put(int processor, FwdIterator first, FwdIterator last, int offset = 0) {
         data_.put(processor, first, last, offset);
     }
 
@@ -255,8 +244,7 @@ class coarray {
      */
     future<T> get(int t, int idx) { return data_.get(t, idx); }
 
-    future<T[]> get(int t, int first, int last)
-    {
+    future<T[]> get(int t, int first, int last) {
         return data_.get(t, first, last - first);
     }
 

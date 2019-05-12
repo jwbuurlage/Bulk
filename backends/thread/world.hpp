@@ -77,7 +77,7 @@ template <typename Barrier = spinning_barrier>
 class world : public bulk::world {
   public:
     world(world_state<Barrier>* state, int pid, int nprocs)
-        : state_(state), pid_(pid), nprocs_(nprocs) {}
+    : state_(state), pid_(pid), nprocs_(nprocs) {}
     ~world() {}
 
     // Needs a move for environment::spawn to work
@@ -257,8 +257,12 @@ class world : public bulk::world {
 
     // Offset and count are number of elements
     // Size is size per element
-    void put_(int processor, const void* values, std::size_t size, int var_id,
-              std::size_t offset, std::size_t count) override {
+    void put_(int processor,
+              const void* values,
+              std::size_t size,
+              int var_id,
+              std::size_t offset,
+              std::size_t count) override {
         auto& v = get_var_(var_id, processor);
         if (size * (offset + count) > v.capacity) {
             log("BULK ERROR: array put out of bounds");
@@ -266,22 +270,23 @@ class world : public bulk::world {
         }
         memcpy(v.receiveBuffer + size * offset, values, size * count);
         coarray_put_tasks_.push_back({(char*)v.buffer + size * offset,
-                                      v.receiveBuffer + size * offset,
-                                      size * count});
+                                      v.receiveBuffer + size * offset, size * count});
         return;
     }
 
-    void get_buffer_(int processor, int var_id,
-                     class future_base* future) override {
+    void get_buffer_(int processor, int var_id, class future_base* future) override {
         var_get_tasks_.push_back({future, get_var_(var_id, processor).base});
         return;
     }
     // Size is per element
-    void get_(int processor, int var_id, std::size_t size, void* target,
-              std::size_t offset, std::size_t count) override {
+    void get_(int processor,
+              int var_id,
+              std::size_t size,
+              void* target,
+              std::size_t offset,
+              std::size_t count) override {
         coarray_get_tasks_.push_back(
-            {target, (char*)get_location_(var_id, processor) + size * offset,
-             size * count});
+        {target, (char*)get_location_(var_id, processor) + size * offset, size * count});
         return;
     }
 

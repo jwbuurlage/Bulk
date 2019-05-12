@@ -46,12 +46,11 @@ int main(int argc, char** argv) {
         auto sorted_x = psc::sort(x);
 
         world.log("Middle elements of %i: [..., %i, %i, ...]", world.rank(),
-                  sorted_x[sorted_x.size() / 2],
-                  sorted_x[sorted_x.size() / 2 + 1]);
+                  sorted_x[sorted_x.size() / 2], sorted_x[sorted_x.size() / 2 + 1]);
         world.sync();
 
         world.log_once(
-            "> Example 3: Computing the LU decomposition of a matrix");
+        "> Example 3: Computing the LU decomposition of a matrix");
         auto n = 4;
         auto phi = bulk::cyclic_partitioning<2, 2>({n, n}, {M, N});
         auto A = psc::matrix<float>(world, phi, 1.0f);

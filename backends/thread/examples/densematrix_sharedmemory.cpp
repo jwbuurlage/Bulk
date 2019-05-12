@@ -70,28 +70,24 @@ int main() {
 
         auto end_time = clock::now();
 
-        times_ms[s] =
-            duration<double, std::milli>(end_time - begin_time).count();
+        times_ms[s] = duration<double, std::milli>(end_time - begin_time).count();
     });
     auto spawn_end = clock::now();
-    auto spawn_ms =
-        duration<double, std::milli>(spawn_end - spawn_begin).count();
+    auto spawn_ms = duration<double, std::milli>(spawn_end - spawn_begin).count();
     std::cout << "Entire SPMD took " << spawn_ms << " ms.\n";
 
-    std::cout << "Computation was "
-              << 2.0f * float(matrix_size * matrix_size * matrix_size) /
-                     1000000000.0f
-              << " GFlops in total --> "
-              << 2.0f * float(matrix_size * matrix_size * matrix_size) /
-                     (1000000.0f * spawn_ms)
-              << " GFlops/s.\n";
+    std::cout
+    << "Computation was "
+    << 2.0f * float(matrix_size * matrix_size * matrix_size) / 1000000000.0f
+    << " GFlops in total --> "
+    << 2.0f * float(matrix_size * matrix_size * matrix_size) / (1000000.0f * spawn_ms)
+    << " GFlops/s.\n";
 
     for (auto i = 0u; i < times_ms.size(); ++i) {
-        std::cout << "Computation took " << times_ms[i] << " ms on processor "
-                  << i << " --> "
-                  << 2.0f * float(block_size * block_size * matrix_size) /
-                         (1000.0f * times_ms[i])
-                  << " MFlops/s.\n";
+        std::cout
+        << "Computation took " << times_ms[i] << " ms on processor " << i << " --> "
+        << 2.0f * float(block_size * block_size * matrix_size) / (1000.0f * times_ms[i])
+        << " MFlops/s.\n";
     }
 
     return 0;

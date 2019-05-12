@@ -25,8 +25,7 @@ double average(Iterable& iter) {
 template <typename T, typename U>
 std::vector<std::pair<T, U>> zip(std::vector<T> xs, std::vector<U> ys) {
     std::vector<std::pair<T, U>> result;
-    for (size_t i = 0; i < (xs.size() < ys.size() ? xs.size() : ys.size());
-         ++i) {
+    for (size_t i = 0; i < (xs.size() < ys.size() ? xs.size() : ys.size()); ++i) {
         result.push_back(std::make_pair(xs[i], ys[i]));
     }
     return result;
@@ -38,18 +37,17 @@ std::vector<std::pair<T, U>> zip(std::vector<T> xs, std::vector<U> ys) {
  *
  * g = (sum x * (y - l)) / (sum x * x)
  */
-inline std::optional<double> fit_slope(const std::vector<size_t>& xs,
-                                       const std::vector<double>& ys,
-                                       float offset) {
+inline std::optional<double>
+fit_slope(const std::vector<size_t>& xs, const std::vector<double>& ys, float offset) {
     if (xs.size() < 2 || ys.size() != xs.size()) {
         return std::optional<double>();
     }
 
     auto points = zip(xs, ys);
 
-    auto num = std::accumulate(
-        points.begin(), points.end(), 0.0,
-        [=](double a, auto p) { return a + p.first * (p.second - offset); });
+    auto num = std::accumulate(points.begin(), points.end(), 0.0, [=](double a, auto p) {
+        return a + p.first * (p.second - offset);
+    });
 
     auto denum = std::accumulate(xs.begin(), xs.end(), 0.0,
                                  [=](double a, double x) { return a + x * x; });
@@ -77,15 +75,13 @@ fit(const std::vector<size_t>& xs, const std::vector<double>& ys) {
     auto avg_y = std::accumulate(ys.begin(), ys.end(), 0.0) / (double)ys.size();
     auto points = zip(xs, ys);
 
-    auto num = std::accumulate(
-        points.begin(), points.end(), 0.0, [=](double a, auto p) {
-            return a + (p.first - avg_x) * (p.second - avg_y);
-        });
+    auto num = std::accumulate(points.begin(), points.end(), 0.0, [=](double a, auto p) {
+        return a + (p.first - avg_x) * (p.second - avg_y);
+    });
 
-    auto denum =
-        std::accumulate(xs.begin(), xs.end(), 0.0, [=](double a, double x) {
-            return a + (x - avg_x) * (x - avg_x);
-        });
+    auto denum = std::accumulate(xs.begin(), xs.end(), 0.0, [=](double a, double x) {
+        return a + (x - avg_x) * (x - avg_x);
+    });
 
     auto g = num / denum;
     auto l = avg_y - g * avg_x;

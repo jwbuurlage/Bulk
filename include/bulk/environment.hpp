@@ -27,8 +27,7 @@ class environment {
      * \param processors the number of processors to run on
      * \param spmd the spmd function that gets run on each (virtual) processor
      */
-    virtual void spawn(int processors,
-                       std::function<void(bulk::world&)> spmd) = 0;
+    virtual void spawn(int processors, std::function<void(bulk::world&)> spmd) = 0;
 
     /**
      * Get the total number of processors available on the system
@@ -52,8 +51,7 @@ class environment {
      * callback at the same time, so there is no need for further
      * synchronization or locking mechanisms.
      */
-    virtual void
-    set_log_callback(std::function<void(int, const std::string&)> f) = 0;
+    virtual void set_log_callback(std::function<void(int, const std::string&)> f) = 0;
 };
 
 } // namespace bulk

@@ -51,7 +51,7 @@ class array : var_base {
      * Move an array.
      */
     array(array&& other)
-        : world_(other.world_), data_(std::move(other.data_)), id_(other.id_) {
+    : world_(other.world_), data_(std::move(other.data_)), id_(other.id_) {
         other.data_ = nullptr;
         other.id_ = -1;
     }
@@ -103,14 +103,12 @@ class array : var_base {
      * Put a range of values to another processor
      */
     template <typename FwdIterator>
-    void put(int processor, FwdIterator first, FwdIterator last,
-             int offset = 0) {
+    void put(int processor, FwdIterator first, FwdIterator last, int offset = 0) {
         std::vector<T> values;
         for (; first != last; ++first) {
             values.push_back(*first);
         }
-        world_.put_(processor, values.data(), sizeof(T), id_, offset,
-                    values.size());
+        world_.put_(processor, values.data(), sizeof(T), id_, offset, values.size());
     }
 
     /**
