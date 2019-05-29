@@ -295,6 +295,37 @@ void test_communication() {
             BULK_CHECK(zs[3] == 1234, "put to self with coarray");
         }
 
+        BULK_SECTION("Coarray with custom buffer") {
+            auto buffer = new int[10];
+            bulk::coarray<int> zs(world, 10, buffer);
+
+            zs(world.next_rank())[1] = s;
+
+            world.sync();
+
+            BULK_CHECK(zs[1] == world.prev_rank(),
+                       "putting to remote coarray image gives correct result "
+                       "with custom buffer");
+
+            zs[3] = 2;
+
+            BULK_CHECK(zs[3] == 2, "writing to local coarray gives correct "
+                                   "result with custom buffer");
+
+            auto a = zs(0)[1].get();
+            world.sync();
+
+            BULK_CHECK(a.value() == p - 1, "getting from coarray gives correct "
+                                           "result with custom buffer");
+
+            zs(s)[3] = 1234;
+            world.sync();
+            BULK_CHECK(zs[3] == 1234,
+                       "put to self with coarray with custom buffer");
+
+            delete[] buffer;
+        }
+
         BULK_SECTION("Coarray iteration") {
             auto xs = bulk::gather_all(world, s);
             int t = 0;

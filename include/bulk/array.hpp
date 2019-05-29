@@ -34,8 +34,22 @@ class array : var_base {
      * \param size the local size of the array
      */
     array(bulk::world& world, std::size_t size) : world_(world), size_(size) {
-        data_ = std::unique_ptr<T[]>(new T[size]);
+        data_ = new T[size];
         id_ = world_.register_variable_(this);
+    }
+
+    /**
+     * Construct an array, and register it with `world`.
+     *
+     * \param world the world in which the array is defined.
+     * \param size the local size of the array
+     * \param buffer an externally managed data buffer
+     */
+    array(bulk::world& world, std::size_t size, T* buffer)
+    : world_(world), size_(size) {
+        data_ = buffer;
+        id_ = world_.register_variable_(this);
+        external_delete_ = true;
     }
 
     /**
@@ -44,6 +58,10 @@ class array : var_base {
     ~array() {
         if (data_) {
             world_.unregister_variable_(id_);
+        }
+
+        if (!external_delete_) {
+            delete[] data_;
         }
     }
 
@@ -76,14 +94,14 @@ class array : var_base {
      *
      * \returns a pointer to the first element of the local data.
      */
-    T* begin() { return data_.get(); }
+    T* begin() { return data_; }
 
     /**
      * Get an iterator to the end of the local image of the array.
      *
      * \returns a pointer beyond the last element of the local data.
      */
-    T* end() { return data_.get() + size_; }
+    T* end() { return data_ + size_; }
 
     /**
      * Put raw values into a remote array image.
@@ -139,7 +157,7 @@ class array : var_base {
     void serialize(void*) {}
     size_t serialized_size() override final { return 0; }
     std::pair<void*, size_t> location_and_size() override final {
-        return {data_.get(), size_ * sizeof(T)};
+        return {data_, size_ * sizeof(T)};
     }
 
     /**
@@ -149,9 +167,10 @@ class array : var_base {
 
   private:
     bulk::world& world_;
-    std::unique_ptr<T[]> data_;
+    T* data_;
     std::size_t size_;
     int id_;
+    bool external_delete_ = false;
 };
 
 } // namespace bulk

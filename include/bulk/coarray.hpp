@@ -167,6 +167,16 @@ class coarray {
         }
     }
 
+    /**
+     * Initialize and registers the coarray with the world
+     *
+     * \param world the distributed layer in which the array is defined.
+     * \param local_size the size of the local array
+     * \param buffer the externally managed data buffer
+     */
+    coarray(bulk::world& world, int local_size, T* buffer)
+      : data_(world, local_size, buffer) {}
+
     coarray(coarray&& other) : data_(std::move(other.data_)) {}
 
     /**
@@ -252,6 +262,11 @@ class coarray {
      * Get the size of the coarray.
      */
     std::size_t size() const { return data_.size(); }
+
+    /**
+     * Get a raw pointer to the local underlying sequential data buffer.
+     */
+    void* data() { return std::get<0>(data_.location_and_size()); }
 
     /**
      * Check if the coarray is empty.

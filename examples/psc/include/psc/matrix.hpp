@@ -42,13 +42,13 @@ bulk::coarray<int> lu(matrix<T>& mat) {
     auto [s, t] = psi.multi_rank(world.rank());
 
     auto pivot = bulk::var<T>(world, (T)-1);
-    auto row_k = bulk::coarray<T>(world, psi.local_size(1, t), 0);
-    auto col_k = bulk::coarray<T>(world, psi.local_size(0, s), 0);
+    auto row_k = bulk::coarray<T>(world, psi.local_size(1, t));
+    auto col_k = bulk::coarray<T>(world, psi.local_size(0, s));
 
-    auto row_swap_k = bulk::coarray<T>(world, psi.local_size(1, t), 0);
-    auto row_swap_r = bulk::coarray<T>(world, psi.local_size(1, t), 0);
+    auto row_swap_k = bulk::coarray<T>(world, psi.local_size(1, t));
+    auto row_swap_r = bulk::coarray<T>(world, psi.local_size(1, t));
 
-    auto pi = bulk::coarray<int>(world, psi.local_size(0, s), 0);
+    auto pi = bulk::coarray<int>(world, psi.local_size(0, s));
     // partitioned according to psi_0
     for (auto i = 0; i < psi.local_size(0, s); ++i) {
         pi[i] = psi.global(0, s, i);

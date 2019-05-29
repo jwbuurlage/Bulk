@@ -12,6 +12,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Add `bulk::span` for coarrays, allowing contiguous sequences as slice data
   sources in addition to `std::vector`.
+- Add `coarray::data` to access the underlying (sequential) storage of coarrays.
+- Allow externally managed data buffers for `coarray`.
 
 ## [1.2.0] - 2018-11-02
 
