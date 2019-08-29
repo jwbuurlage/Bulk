@@ -40,8 +40,13 @@ template <typename T>
 class coarray {
   public:
     struct slice {
-        int first;
-        int last;
+        size_t first;
+        size_t last;
+
+        slice(int a, int b) {
+            first = (size_t)a;
+            last = (size_t)b;
+        }
     };
 
     class slice_writer {
@@ -52,7 +57,7 @@ class coarray {
          * \param value the new value of each element in the slice
          */
         void operator=(T value) {
-            for (int i = s_.first; i < s_.last; ++i) {
+            for (auto i = s_.first; i < s_.last; ++i) {
                 parent_.put(t_, i, value);
             }
         }
@@ -115,7 +120,7 @@ class coarray {
       private:
         friend coarray<T>;
 
-        writer(coarray<T>& parent, int t, int i)
+        writer(coarray<T>& parent, int t, size_t i)
         : parent_(parent), t_(t), i_(i) {}
 
         coarray<T>& parent_;
@@ -134,7 +139,7 @@ class coarray {
          *
          * \returns an object that can be used to write to the remote element
          */
-        writer operator[](int i) { return writer(parent_, t_, i); }
+        writer operator[](size_t i) { return writer(parent_, t_, i); }
 
         slice_writer operator[](slice s) {
             return slice_writer(parent_, t_, s);
@@ -151,7 +156,7 @@ class coarray {
      * \param world the distributed layer in which the array is defined.
      * \param local_size the size of the local array
      */
-    coarray(bulk::world& world, int local_size) : data_(world, local_size) {}
+    coarray(bulk::world& world, size_t local_size) : data_(world, local_size) {}
 
     /**
      * Initialize and registers the coarray with the world
@@ -160,9 +165,9 @@ class coarray {
      * \param local_size the size of the local array
      * \param default_value the initial value of each local element
      */
-    coarray(bulk::world& world, int local_size, T default_value)
+    coarray(bulk::world& world, size_t local_size, T default_value)
     : data_(world, local_size) {
-        for (int i = 0; i < local_size; ++i) {
+        for (auto i = 0u; i < local_size; ++i) {
             data_[i] = default_value;
         }
     }
@@ -174,8 +179,8 @@ class coarray {
      * \param local_size the size of the local array
      * \param buffer the externally managed data buffer
      */
-    coarray(bulk::world& world, int local_size, T* buffer)
-      : data_(world, local_size, buffer) {}
+    coarray(bulk::world& world, size_t local_size, T* buffer)
+    : data_(world, local_size, buffer) {}
 
     coarray(coarray&& other) : data_(std::move(other.data_)) {}
 
@@ -194,8 +199,8 @@ class coarray {
      * \param i index of the element
      * \returns reference to the i-th element of the local image
      */
-    T& operator[](int i) { return data_[i]; }
-    const T& operator[](int i) const { return data_[i]; }
+    T& operator[](size_t i) { return data_[i]; }
+    const T& operator[](size_t i) const { return data_[i]; }
 
     /**
      * Get a reference to the world of the coarray.
@@ -221,14 +226,14 @@ class coarray {
     /**
      * Put the value `value` into element `idx` on processor `t`.
      */
-    void put(int t, int idx, T value) { data_.put(t, &value, idx, 1); }
+    void put(int t, size_t idx, T value) { data_.put(t, &value, idx, 1); }
 
     /**
      * Put a range of data in a remote image.
      */
     void put(int processor, slice s, const std::vector<T>& values) {
-        auto count = (int)values.size() < (s.last - s.first) ? values.size() :
-                                                               (s.last - s.first);
+        auto count =
+        values.size() < (s.last - s.first) ? values.size() : (s.last - s.first);
         data_.put(processor, values.data(), s.first, count);
     }
 
@@ -236,8 +241,8 @@ class coarray {
      * Put a span of data in a remote image.
      */
     void put(int processor, slice s, const bulk::span<T>& values) {
-        auto count = (int)values.size() < (s.last - s.first) ? values.size() :
-                                                               (s.last - s.first);
+        auto count =
+        values.size() < (s.last - s.first) ? values.size() : (s.last - s.first);
         data_.put(processor, values.data(), s.first, count);
     }
 
@@ -245,16 +250,16 @@ class coarray {
      * Put a range of data in a remote image.
      */
     template <typename FwdIterator>
-    void put(int processor, FwdIterator first, FwdIterator last, int offset = 0) {
+    void put(int processor, FwdIterator first, FwdIterator last, size_t offset) {
         data_.put(processor, first, last, offset);
     }
 
     /**
      * Get a future to the value of element `idx` on processor `t`.
      */
-    future<T> get(int t, int idx) { return data_.get(t, idx); }
+    future<T> get(int t, size_t idx) { return data_.get(t, idx); }
 
-    future<T[]> get(int t, int first, int last) {
+    future<T[]> get(int t, size_t first, size_t last) {
         return data_.get(t, first, last - first);
     }
 
@@ -266,7 +271,7 @@ class coarray {
     /**
      * Get a raw pointer to the local underlying sequential data buffer.
      */
-    void* data() { return std::get<0>(data_.location_and_size()); }
+    T* data() { return std::get<0>(data_.location_and_size()); }
 
     /**
      * Check if the coarray is empty.

@@ -15,6 +15,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add `coarray::data` to access the underlying (sequential) storage of coarrays.
 - Allow externally managed data buffers for `coarray`.
 
+### Changed
+
+- Use `size_t` for indices in arrays and slices
+- `coarray::data` now returns a `T*` instead of `void*`
+- The iterator overload for `coarray::put` now requires an explicit offset
+
 ## [1.2.0] - 2018-11-02
 
 ### Added

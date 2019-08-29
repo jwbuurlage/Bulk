@@ -260,7 +260,7 @@ void test_communication() {
             std::iota(test.begin(), test.end(), 1);
 
             bulk::coarray<int> xs(world, 10, 5);
-            xs.put(world.next_rank(), test.begin(), test.end());
+            xs.put(world.next_rank(), test.begin(), test.end(), 0u);
             world.sync();
 
             BULK_CHECK(xs[5] == 6, "put iterator range");

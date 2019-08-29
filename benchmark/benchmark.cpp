@@ -59,7 +59,7 @@ int main() {
                 auto t = (world.next_rank() + k * (p / sample_size)) % p;
 
                 auto clock = bulk::util::timer();
-                target.put(t, dummy_data.begin(), dummy_data.begin() + test_size);
+                target.put(t, dummy_data.begin(), dummy_data.begin() + test_size, 0u);
                 world.sync();
                 auto total_ms = clock.get();
 

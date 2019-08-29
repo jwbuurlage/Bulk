@@ -79,8 +79,8 @@ class array : var_base {
      *
      * \returns a reference to element \c i in the local array
      */
-    T& operator[](int i) { return data_[i]; }
-    const T& operator[](int i) const { return data_[i]; }
+    T& operator[](size_t i) { return data_[i]; }
+    const T& operator[](size_t i) const { return data_[i]; }
 
     /**
      * Get a reference to the world of the array.
@@ -113,7 +113,7 @@ class array : var_base {
      * \param offset the element where the writing should start
      * \param count the number of elements to be written
      */
-    void put(int processor, const T* values, int offset, int count = 1) {
+    void put(int processor, const T* values, size_t offset, size_t count = 1) {
         world_.put_(processor, values, sizeof(T), id_, offset, count);
     }
 
@@ -121,7 +121,7 @@ class array : var_base {
      * Put a range of values to another processor
      */
     template <typename FwdIterator>
-    void put(int processor, FwdIterator first, FwdIterator last, int offset = 0) {
+    void put(int processor, FwdIterator first, FwdIterator last, size_t offset = 0) {
         std::vector<T> values;
         for (; first != last; ++first) {
             values.push_back(*first);
@@ -139,13 +139,13 @@ class array : var_base {
      *
      * \returns a `future` to the image.
      */
-    future<T> get(int processor, int offset) {
+    future<T> get(int processor, size_t offset) {
         future<T> result(world_);
         world_.get_(processor, id_, sizeof(T), &result.value(), offset, 1);
         return result;
     }
 
-    future<T[]> get(int processor, int offset, int count) {
+    future<T[]> get(int processor, size_t offset, size_t count) {
         future<T[]> result(world_, count);
         world_.get_(processor, id_, sizeof(T), result.buffer(), offset, count);
         return result;
