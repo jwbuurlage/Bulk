@@ -43,6 +43,11 @@ class coarray {
         size_t first;
         size_t last;
 
+	slice(size_t a, size_t b) {
+            first = a;
+            last = b;
+        }
+
         slice(int a, int b) {
             first = (size_t)a;
             last = (size_t)b;
