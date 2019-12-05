@@ -25,9 +25,9 @@ void test_partitioning() {
             auto part = bulk::cyclic_partitioning<2, 1>({5 * p * N, 5 * p * N}, {p});
             BULK_CHECK(part.owner({p + 2, 3}) == 2,
                        "compute correctly the cyclic from 2 -> 1 dim");
-            BULK_CHECK(part.local_size({s})[0] == 5 * N,
+            BULK_CHECK(part.local_size(s)[0] == 5 * N,
                        "compute correctly the extent in cyclic dim");
-            BULK_CHECK(part.local_size({s})[1] == 5 * p * N,
+            BULK_CHECK(part.local_size(s)[1] == 5 * p * N,
                        "compute correctly the extent in non-cyclic dim");
             BULK_CHECK(part.local({p + 2, 3})[0] == 1,
                        "compute correctly the local index");
@@ -97,7 +97,7 @@ void test_partitioning() {
 
             auto part = bulk::tree_partitioning<2>({10, 10}, 4, std::move(tree));
 
-            BULK_CHECK((part.local_size({0}) == std::array<int, 2>{5, 5}),
+            BULK_CHECK((part.local_size(0) == std::array<int, 2>{5, 5}),
                        "extent of bspart are correct");
 
             BULK_CHECK((part.owner({1, 1}) == part.owner({2, 2})),
@@ -138,5 +138,13 @@ void test_partitioning() {
 
             BULK_CHECK(glob.value() == 1234, "put remote value");
         }
+
+        BULK_SECTION("Irregular block partitioning") {
+          auto part = bulk::block_partitioning<1>({5}, {4});
+          BULK_CHECK(part.local_count(0) == 2, "large block comes first");
+          BULK_CHECK(part.multi_owner({3})[0] == 2, "owner of 4 is correct")
+        }
+
+
     });
 }

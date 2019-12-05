@@ -27,6 +27,8 @@ using namespace bulk::meta;
 // in a virtual function in `world`.
 class queue_base {
   public:
+    virtual ~queue_base() = default; 
+
     virtual void clear_() = 0;
     virtual void deserialize_push(size_t size, char* data) = 0;
 };
@@ -141,7 +143,7 @@ class queue {
             bulk::detail::fill(ibuf, args...);
         }
 
-        void deserialize_push(size_t, char* data) {
+        void deserialize_push(size_t, char* data) override {
             auto membuf = bulk::detail::memory_buffer_base(data);
             data_.push_back(message_type{});
             auto obuf = bulk::detail::omembuf(membuf);

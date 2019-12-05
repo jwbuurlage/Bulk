@@ -17,6 +17,8 @@ namespace bulk {
 
 class future_base {
   public:
+    virtual ~future_base() = default;
+
     virtual void deserialize_get(size_t size, char* data) = 0;
     virtual int id() const = 0;
 };

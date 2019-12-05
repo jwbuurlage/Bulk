@@ -154,7 +154,7 @@ class array : var_base {
     // FIXME: These are unusued..., once we use 'backend buffers' for arrays we
     // can redo this
     void deserialize_put(size_t, char*) override final {}
-    void serialize(void*) {}
+    void serialize(void*) override final {}
     size_t serialized_size() override final { return 0; }
     std::pair<void*, size_t> location_and_size() override final {
         return {data_, size_ * sizeof(T)};
