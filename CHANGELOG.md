@@ -21,6 +21,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - `coarray::data` now returns a `T*` instead of `void*`
 - The iterator overload for `coarray::put` now requires an explicit offset
 
+### Fixed
+
+- Fixed 'element owner' computation for block partitionings with sizes that are
+  not perfect divisors
+- Fixed virtual qualifications on a number of internal functions
+
 ## [1.2.0] - 2018-11-02
 
 ### Added

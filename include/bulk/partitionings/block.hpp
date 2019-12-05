@@ -68,8 +68,18 @@ class block_partitioning : public rectangular_partitioning<D, G> {
     index_type<G> multi_owner(index_type<D> xs) override final {
         index_type<G> result = {};
         for (int i = 0; i < G; ++i) {
-            auto d = axes_[i];
-            result[i] = xs[d] / block_size_[d];
+            auto d = this->axes_[i];
+            auto n = this->global_size_[d];
+            auto k = this->block_size_[d];
+            auto P = this->grid_size_[i];
+            // For irregular block partitionings, only the first 'l' processors will
+            // have block_size_, the other n - l processors have block_size - 1.
+            auto l = P - (k * P - n);
+            if (xs[d] <= k * l) {
+                result[i] = xs[d] / block_size_[d];
+            } else {
+                result[i] = l + (xs[d] - k * l) / (block_size_[d] - 1);
+            }
         }
         return result;
     }
