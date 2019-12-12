@@ -23,7 +23,7 @@ struct index {
     const int* begin() const { return indices_.begin(); }
     const int* end() const { return indices_.end(); }
 
-    std::array<int, D> indices_;
+    std::array<int, D> indices_ = {0};
 };
 
 // Specialize D = 1 to be an int

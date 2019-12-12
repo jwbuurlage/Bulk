@@ -37,7 +37,7 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
 
         // compute origins and extents here
         for (int proc = 0; proc < procs; ++proc) {
-            index_type<D> left_bound = {0};
+            index_type<D> left_bound{};
             index_type<D> right_bound = this->global_size_;
 
             auto node = splits_.root.get();

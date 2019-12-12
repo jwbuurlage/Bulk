@@ -44,10 +44,10 @@ class block_partitioning : public rectangular_partitioning<D, G> {
 
     /** Compute the local indices of a element using its global indices */
     index_type<D> local(index_type<D> index) override final {
+        auto t = this->owner(index);
         for (int d = 0; d < D; ++d) {
-            index[d] = index[d] % block_size_[d];
+            index[d] = index[d] - this->origin(t)[d];
         }
-
         return index;
     }
 
@@ -87,13 +87,21 @@ class block_partitioning : public rectangular_partitioning<D, G> {
     /** Obtain the block size in each dimension. */
     index_type<D> block_size() const { return block_size_; }
 
-    /** Obtain the origin of the block of processor `t`. */
-    index_type<D> origin(int t) const override {
-        auto multi_index = util::unflatten<G>(this->grid_size_, t);
+    /** Obtain the origin of the block of processor `multi_index'. */
+    index_type<D> origin(index_type<G> multi_index) const override {
         index_type<D> result = {};
         for (int i = 0; i < G; ++i) {
             auto d = axes_[i];
-            result[d] = block_size_[d] * multi_index[i];
+            auto n = this->global_size_[d];
+            auto k = this->block_size_[d];
+            auto P = this->grid_size_[i];
+            auto l = P - (k * P - n);
+            auto t = multi_index[i];
+            if (t <= l) {
+                result[d] = k * multi_index[i];
+            } else {
+                result[d] = k * l + (t - l) * (k - 1);
+            }
         }
         return result;
     }

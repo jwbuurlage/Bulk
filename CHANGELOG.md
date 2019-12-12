@@ -24,8 +24,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- Fixed 'element owner' computation for block partitionings with sizes that are
-  not perfect divisors
+- Fixed 'element owner' and 'local <-> global' computations for block
+  partitionings with sizes that are not perfect divisors
 - Fixed virtual qualifications on a number of internal functions
 
 ## [1.2.0] - 2018-11-02
