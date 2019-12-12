@@ -1977,9 +1977,16 @@
                 
                 <h1 id="partitionings">Partitionings</h1>
 <h2 id="bulkindex_type"><code>bulk::index_type</code></h2>
-<p>Defined in header <code>&lt;bulk/partitionings/partitioning.hpp&gt;</code>.</p>
+<p>Defined in header <code>&lt;bulk/util/indices.hpp&gt;</code>.</p>
+<p>Array-like type for <code>D &gt; 1</code>, and int for <code>D == 1</code>.</p>
 <div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="kt">int</span> <span class="n">D</span><span class="o">&gt;</span>
-<span class="k">using</span> <span class="n">index_type</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="n">D</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="k">struct</span> <span class="n">index</span><span class="p">;</span>
+</pre></div>
+
+
+<p>For backward compatibility, we have an alias <code>index_type</code> (deprecated).</p>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="kt">int</span> <span class="n">D</span><span class="o">&gt;</span>
+<span class="k">using</span> <span class="n">index_type</span> <span class="o">=</span> <span class="n">index</span><span class="o">&lt;</span><span class="n">D</span><span class="o">&gt;</span><span class="p">;</span>
 </pre></div>
 
 
