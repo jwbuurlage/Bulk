@@ -2,7 +2,7 @@
 
 
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="no-js">
   <head>
     
@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.0.6">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.0">
     
     
       
@@ -40,21 +40,50 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.1b62728e.css">
       
       
     
     
-      <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
+      <script src="../assets/javascripts/modernizr.268332fc.js"></script>
     
     
       
         <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
         <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
       
     
     <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+    
+      
+        
+<script>
+  window.ga = window.ga || function() {
+    (ga.q = ga.q || []).push(arguments)
+  }
+  ga.l = +new Date
+  /* Setup integration and send page view */
+  ga("create", "UA-59249373-1", "http://codu.in/bulk/docs")
+  ga("set", "anonymizeIp", true)
+  ga("send", "pageview")
+  /* Register handler to log search on blur */
+  document.addEventListener("DOMContentLoaded", () => {
+    if (document.forms.search) {
+      var query = document.forms.search.query
+      query.addEventListener("blur", function() {
+        if (this.value) {
+          var path = document.location.pathname;
+          ga("send", "pageview", path + "?q=" + this.value)
+        }
+      })
+    }
+  })
+</script>
+<script async src="https://www.google-analytics.com/analytics.js"></script>
+      
     
     
   </head>
@@ -65,24 +94,7 @@
       <defs>
         
         
-          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
-    viewBox="0 0 416 448" id="__github">
-  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
-        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
-        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
-        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
-        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
-        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
-        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
-        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
-        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
-        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
-        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
-        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
-        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
-        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
-        99.5z" />
-</svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
         
       </defs>
     </svg>
@@ -111,22 +123,21 @@
       <div class="md-flex__cell md-flex__cell--stretch">
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
-            
-              <span class="md-header-nav__topic">
-                Bulk
-              </span>
-              <span class="md-header-nav__topic">
+            <span class="md-header-nav__topic">
+              Bulk
+            </span>
+            <span class="md-header-nav__topic">
+              
                 Release Notes
-              </span>
-            
+              
+            </span>
           
         </div>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
         
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
           
-            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
-            
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
@@ -149,7 +160,6 @@
     </div>
   </div>
 </div>
-          
         
       </div>
       
@@ -160,20 +170,18 @@
 
   
 
-
-  <a href="https://github.com/jwbuurlage/Bulk/" title="Go to repository" class="md-source" data-md-source="github">
-    
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#__github" width="24" height="24"></use>
-        </svg>
-      </div>
-    
-    <div class="md-source__repository">
-      jwbuurlage/bulk
+<a href="https://github.com/jwbuurlage/Bulk/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
     </div>
-  </a>
-
+  
+  <div class="md-source__repository">
+    jwbuurlage/bulk
+  </div>
+</a>
           </div>
         </div>
       
@@ -186,7 +194,7 @@
         
       
       
-      <main class="md-main">
+      <main class="md-main" role="main">
         <div class="md-main__inner md-grid" data-md-component="container">
           
             
@@ -209,20 +217,18 @@
 
   
 
-
-  <a href="https://github.com/jwbuurlage/Bulk/" title="Go to repository" class="md-source" data-md-source="github">
-    
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#__github" width="24" height="24"></use>
-        </svg>
-      </div>
-    
-    <div class="md-source__repository">
-      jwbuurlage/bulk
+<a href="https://github.com/jwbuurlage/Bulk/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
     </div>
-  </a>
-
+  
+  <div class="md-source__repository">
+    jwbuurlage/bulk
+  </div>
+</a>
     </div>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -1592,7 +1598,41 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#120-2018-11-02" title="1.2.0 - 2018-11-02" class="md-nav__link">
+  <a href="#unreleased-yyyy-mm-dd" class="md-nav__link">
+    Unreleased - YYYY-MM-DD
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    Added
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    Changed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    Fixed
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#120-2018-11-02" class="md-nav__link">
     1.2.0 - 2018-11-02
   </a>
   
@@ -1600,21 +1640,21 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added" title="Added" class="md-nav__link">
+  <a href="#added_1" class="md-nav__link">
     Added
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed" title="Fixed" class="md-nav__link">
+  <a href="#fixed_1" class="md-nav__link">
     Fixed
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" title="Changed" class="md-nav__link">
+  <a href="#changed_1" class="md-nav__link">
     Changed
   </a>
   
@@ -1626,7 +1666,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#110-2018-10-10" title="1.1.0 - 2018-10-10" class="md-nav__link">
+  <a href="#110-2018-10-10" class="md-nav__link">
     1.1.0 - 2018-10-10
   </a>
   
@@ -1634,7 +1674,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_1" title="Added" class="md-nav__link">
+  <a href="#added_2" class="md-nav__link">
     Added
   </a>
   
@@ -1646,7 +1686,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#100-2018-02-27" title="1.0.0 - 2018-02-27" class="md-nav__link">
+  <a href="#100-2018-02-27" class="md-nav__link">
     1.0.0 - 2018-02-27
   </a>
   
@@ -1654,14 +1694,14 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_2" title="Added" class="md-nav__link">
+  <a href="#added_3" class="md-nav__link">
     Added
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed_1" title="Fixed" class="md-nav__link">
+  <a href="#fixed_2" class="md-nav__link">
     Fixed
   </a>
   
@@ -1673,7 +1713,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#020-2017-08-09" title="0.2.0 - 2017-08-09" class="md-nav__link">
+  <a href="#020-2017-08-09" class="md-nav__link">
     0.2.0 - 2017-08-09
   </a>
   
@@ -1681,14 +1721,14 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_3" title="Added" class="md-nav__link">
+  <a href="#added_4" class="md-nav__link">
     Added
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed_2" title="Fixed" class="md-nav__link">
+  <a href="#fixed_3" class="md-nav__link">
     Fixed
   </a>
   
@@ -1700,7 +1740,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#010-2017-06-01" title="0.1.0 - 2017-06-01" class="md-nav__link">
+  <a href="#010-2017-06-01" class="md-nav__link">
     0.1.0 - 2017-06-01
   </a>
   
@@ -1738,7 +1778,41 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#120-2018-11-02" title="1.2.0 - 2018-11-02" class="md-nav__link">
+  <a href="#unreleased-yyyy-mm-dd" class="md-nav__link">
+    Unreleased - YYYY-MM-DD
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    Added
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    Changed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    Fixed
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#120-2018-11-02" class="md-nav__link">
     1.2.0 - 2018-11-02
   </a>
   
@@ -1746,21 +1820,21 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added" title="Added" class="md-nav__link">
+  <a href="#added_1" class="md-nav__link">
     Added
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed" title="Fixed" class="md-nav__link">
+  <a href="#fixed_1" class="md-nav__link">
     Fixed
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" title="Changed" class="md-nav__link">
+  <a href="#changed_1" class="md-nav__link">
     Changed
   </a>
   
@@ -1772,7 +1846,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#110-2018-10-10" title="1.1.0 - 2018-10-10" class="md-nav__link">
+  <a href="#110-2018-10-10" class="md-nav__link">
     1.1.0 - 2018-10-10
   </a>
   
@@ -1780,7 +1854,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_1" title="Added" class="md-nav__link">
+  <a href="#added_2" class="md-nav__link">
     Added
   </a>
   
@@ -1792,7 +1866,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#100-2018-02-27" title="1.0.0 - 2018-02-27" class="md-nav__link">
+  <a href="#100-2018-02-27" class="md-nav__link">
     1.0.0 - 2018-02-27
   </a>
   
@@ -1800,14 +1874,14 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_2" title="Added" class="md-nav__link">
+  <a href="#added_3" class="md-nav__link">
     Added
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed_1" title="Fixed" class="md-nav__link">
+  <a href="#fixed_2" class="md-nav__link">
     Fixed
   </a>
   
@@ -1819,7 +1893,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#020-2017-08-09" title="0.2.0 - 2017-08-09" class="md-nav__link">
+  <a href="#020-2017-08-09" class="md-nav__link">
     0.2.0 - 2017-08-09
   </a>
   
@@ -1827,14 +1901,14 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added_3" title="Added" class="md-nav__link">
+  <a href="#added_4" class="md-nav__link">
     Added
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed_2" title="Fixed" class="md-nav__link">
+  <a href="#fixed_3" class="md-nav__link">
     Fixed
   </a>
   
@@ -1846,7 +1920,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#010-2017-06-01" title="0.1.0 - 2017-06-01" class="md-nav__link">
+  <a href="#010-2017-06-01" class="md-nav__link">
     0.1.0 - 2017-06-01
   </a>
   
@@ -1876,8 +1950,29 @@
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic
 Versioning</a>.</p>
-<h2 id="120-2018-11-02"><a href="https://github.com/jwbuurlage/bulk/compare/v1.1.0...v1.2.0">1.2.0</a> - 2018-11-02</h2>
+<h2 id="unreleased-yyyy-mm-dd"><a href="https://github.com/jwbuurlage/bulk/compare/v1.2.0...develop">Unreleased</a> - YYYY-MM-DD</h2>
 <h3 id="added">Added</h3>
+<ul>
+<li>Add <code>bulk::span</code> for coarrays, allowing contiguous sequences as slice data
+  sources in addition to <code>std::vector</code>.</li>
+<li>Add <code>coarray::data</code> to access the underlying (sequential) storage of coarrays.</li>
+<li>Allow externally managed data buffers for <code>coarray</code>.</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>Use <code>size_t</code> for indices in arrays and slices</li>
+<li><code>coarray::data</code> now returns a <code>T*</code> instead of <code>void*</code></li>
+<li>The iterator overload for <code>coarray::put</code> now requires an explicit offset</li>
+<li>Index type for D = 1 now wraps an <code>int</code>, instead of a singleton array</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>Fixed &lsquo;element owner&rsquo; and &lsquo;local &lt;-&gt; global&rsquo; computations for block
+  partitionings with sizes that are not perfect divisors</li>
+<li>Fixed virtual qualifications on a number of internal functions</li>
+</ul>
+<h2 id="120-2018-11-02"><a href="https://github.com/jwbuurlage/bulk/compare/v1.1.0...v1.2.0">1.2.0</a> - 2018-11-02</h2>
+<h3 id="added_1">Added</h3>
 <ul>
 <li>Add CMake targets <code>bulk</code> and <code>bulk_[backend]</code></li>
 <li>Add partitionings: cyclic, block, tree, rectangular, Cartesian</li>
@@ -1886,32 +1981,32 @@ Versioning</a>.</p>
 <li>Add Travis CI support</li>
 <li>Add <code>world::log_once</code></li>
 </ul>
-<h3 id="fixed">Fixed</h3>
+<h3 id="fixed_1">Fixed</h3>
 <ul>
 <li>Remove duplicate sync from <code>foldl</code></li>
 <li>Fix certain unittests relying on shared-memory access to <code>success</code> counter</li>
 <li>Fix coarray unittest relying on <code>p &gt; 2</code></li>
 <li>Fix <code>-Werror=format-security</code> issue in <code>world::log</code></li>
 </ul>
-<h3 id="changed">Changed</h3>
+<h3 id="changed_1">Changed</h3>
 <ul>
 <li>Update default value for <code>start_value</code> of <code>foldl</code> to <code>{}</code> from <code>0</code> for
   non-numeric types</li>
 <li>Allow different type for accumulator of <code>foldl</code></li>
 </ul>
 <h2 id="110-2018-10-10"><a href="https://github.com/jwbuurlage/bulk/compare/v1.0.0...v1.1.0">1.1.0</a> - 2018-10-10</h2>
-<h3 id="added_1">Added</h3>
+<h3 id="added_2">Added</h3>
 <ul>
 <li>Add a spinlock barrier <code>bulk::thread::spinning_barrier</code> to the thread
   backend, which is now used by default</li>
 <li>Add citation instruction to README</li>
 </ul>
 <h2 id="100-2018-02-27"><a href="https://github.com/jwbuurlage/bulk/compare/v0.2.0...v1.0.0">1.0.0</a> - 2018-02-27</h2>
-<h3 id="added_2">Added</h3>
+<h3 id="added_3">Added</h3>
 <ul>
 <li>Backend for the Epiphany coprocessor</li>
 </ul>
-<h3 id="fixed_1">Fixed</h3>
+<h3 id="fixed_2">Fixed</h3>
 <ul>
 <li>Let <code>coarray::image::put</code> take values by const reference</li>
 <li>Allow non-uniform local array sizes in <code>coarray</code> </li>
@@ -1921,14 +2016,14 @@ Versioning</a>.</p>
   allocation and copying, by making the memory buffer objects non-owning</li>
 </ul>
 <h2 id="020-2017-08-09"><a href="https://github.com/jwbuurlage/bulk/compare/v0.1.0...v0.2.0">0.2.0</a> - 2017-08-09</h2>
-<h3 id="added_3">Added</h3>
+<h3 id="added_4">Added</h3>
 <ul>
 <li>Add support for <code>std::string</code> variables and queues</li>
 <li>Add support for array components in messages, i.e. <code>queue&lt;T[], U, V, ...&gt;</code></li>
 <li>Deprecate <code>processor_id</code> in favor of <code>rank</code>, renamed <code>{next,prev}_processor</code>
   to <code>{next, prev}_rank</code></li>
 </ul>
-<h3 id="fixed_2">Fixed</h3>
+<h3 id="fixed_3">Fixed</h3>
 <ul>
 <li>Fixed bug in MPI backend where messages could get truncated</li>
 </ul>
@@ -1938,6 +2033,7 @@ Versioning</a>.</p>
 </ul>
                 
                   
+                
                 
               
               
@@ -1989,7 +2085,6 @@ Versioning</a>.</p>
           Material for MkDocs</a>
       </div>
       
-        
   <div class="md-footer-social">
     <link rel="stylesheet" href="../assets/fonts/font-awesome.css">
     
@@ -1999,23 +2094,17 @@ Versioning</a>.</p>
     
   </div>
 
-      
     </div>
   </div>
 </footer>
       
     </div>
     
-      <script src="../assets/javascripts/application.5e60981f.js"></script>
+      <script src="../assets/javascripts/application.808e90bb.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-      
-    
-    
-      
-        <script>!function(e,a,t,n,o,c,i){e.GoogleAnalyticsObject=o,e.ga=e.ga||function(){(e.ga.q=e.ga.q||[]).push(arguments)},e.ga.l=1*new Date,c=a.createElement(t),i=a.getElementsByTagName(t)[0],c.async=1,c.src="https://www.google-analytics.com/analytics.js",i.parentNode.insertBefore(c,i)}(window,document,"script",0,"ga"),ga("create","UA-59249373-1","http://codu.in/bulk/docs"),ga("set","anonymizeIp",!0),ga("send","pageview");var links=document.getElementsByTagName("a");if(Array.prototype.map.call(links,function(e){e.host!=document.location.host&&e.addEventListener("click",function(){var a=e.getAttribute("data-md-action")||"follow";ga("send","event","outbound",a,e.href)})}),document.forms.search){var query=document.forms.search.query;query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})}</script>
       
     
   </body>
