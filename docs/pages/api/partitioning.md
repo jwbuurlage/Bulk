@@ -2,11 +2,19 @@
 
 ## `bulk::index_type`
 
-Defined in header `<bulk/partitionings/partitioning.hpp>`.
+Defined in header `<bulk/util/indices.hpp>`.
+
+Array-like type for `D > 1`, and int for `D == 1`.
+```cpp
+template <int D>
+struct index;
+```
+
+For backward compatibility, we have an alias `index_type` (deprecated).
 
 ```cpp
 template <int D>
-using index_type = std::array<int, D>;
+using index_type = index<D>;
 ```
 
 ## `bulk::partitioning`
