@@ -93,7 +93,7 @@ class block_partitioning : public rectangular_partitioning<D, G> {
         index_type<D> result = {};
         for (int i = 0; i < G; ++i) {
             auto d = axes_[i];
-            result[d] = block_size_[d] * multi_index[d];
+            result[d] = block_size_[d] * multi_index[i];
         }
         return result;
     }

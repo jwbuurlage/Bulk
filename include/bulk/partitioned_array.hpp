@@ -75,7 +75,7 @@ class partitioned_array {
     auto world() const { return world_; }
 
   private:
-    std::array<int, D> multi_id_;
+    index<D> multi_id_;
 
     // world in which this array resides
     bulk::world& world_;

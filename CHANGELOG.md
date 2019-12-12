@@ -20,6 +20,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Use `size_t` for indices in arrays and slices
 - `coarray::data` now returns a `T*` instead of `void*`
 - The iterator overload for `coarray::put` now requires an explicit offset
+- Index type for D = 1 now wraps an `int`, instead of a singleton array
 
 ### Fixed
 

@@ -71,7 +71,7 @@ class tree_partitioning : public rectangular_partitioning<D, 1> {
     /** The total number of elements along each axis on the processor index with
      * `idxs...` */
     index_type<D> local_size(index_type<1> idxs) override final {
-        return extents_[idxs[0]];
+        return extents_[idxs.get()];
     }
 
     index_type<1> multi_owner(index_type<D> xs) override final {
