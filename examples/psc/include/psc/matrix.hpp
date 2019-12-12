@@ -39,7 +39,7 @@ bulk::coarray<int> lu(matrix<T>& mat) {
     auto& world = mat.world();
     auto& psi = mat.partitioning();
     auto n = mat.rows();
-    auto [s, t] = psi.multi_rank(world.rank());
+    auto [s, t] = psi.multi_rank(world.rank()).get();
 
     auto pivot = bulk::var<T>(world, (T)-1);
     auto row_k = bulk::coarray<T>(world, psi.local_size(1, t));
@@ -202,7 +202,7 @@ template <typename T>
 void spy(matrix<T>& mat) {
     auto& world = mat.world();
     auto& phi = mat.partitioning();
-    auto [s, t] = phi.multi_rank(world.rank());
+    auto [s, t] = phi.multi_rank(world.rank()).get();
 
     auto xs = bulk::coarray<T>(world, world.rank() == 0 ? mat.cols() * mat.rows() : 0);
 

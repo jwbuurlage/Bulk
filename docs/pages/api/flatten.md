@@ -2,7 +2,7 @@
 
 ```cpp
 template <int D>
-int flatten(std::array<int, D> volume, std::array<int, D> idxs);
+int flatten(index<D> volume, index<D> idxs);
 ```
 
 Flatten a multi-index in a D-dimensional volume.

@@ -308,7 +308,7 @@ Now that we have a distributed matrix class, we are ready to implement a paralle
 We will use a two-dimensional processor numbering, obtained as follows:
 
 ```cpp
-auto [s, t] = psi.multi_rank(world.rank());
+auto [s, t] = psi.multi_rank(world.rank()).get();
 ```
 
 Here, `psi` is a `cartesian_partitioning`.

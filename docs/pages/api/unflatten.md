@@ -2,7 +2,7 @@
 
 ```cpp
 template <int D>
-std::array<int, D> unflatten(std::array<int, D> volume, int flattened);
+index<D> unflatten(index<D> volume, int flattened);
 ```
 
 Unflatten a multi-index in a D-dimensional volume.
