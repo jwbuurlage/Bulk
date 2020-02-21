@@ -10,11 +10,12 @@ should appeal to BSP programmers who want to write fast, safe, clear, and portab
 
 ## About BSP
 
-In the bulk synchronous parallel (BSP) programming model, communication between processors
-(or nodes, or cores) does not happen asynchronously. Instead, all communication is staged and
-resolved at fixed _synchronization points_. These synchronizations delimit so-called _supersteps_.
-Although this means the implementation is not as free to overlap communication and computation,
-this way of structuring parallel programs has a number of advantages.
+In the bulk-synchronous parallel (BSP) programming model, communication between
+processors (or nodes, or cores) does not happen asynchronously. Instead, all
+communication is staged and resolved at fixed _synchronization points_. These
+synchronizations delimit so-called _supersteps_. This way of structuring
+parallel programs has a number of advantages, at the cost of limiting the
+application's freedom to overlap communication and computation.
 
 - The resulting programs are **structured**, easy to understand and maintain,
   and their performance and correctness can be reasoned about.
@@ -24,7 +25,7 @@ this way of structuring parallel programs has a number of advantages.
   fashion.
 - There are only two types of **communication mechanisms**, _message passing_
   and _named communication (through distributed variables)_. This makes BSP
-  based libraries very economic: you can accomplish a lot with little.
+  based libraries economic: you can accomplish a lot with few building blocks.
 - It has a **gentle learning curve**. It is easy to write _correct_ BSP
   programs, while it is notoriously hard to write correct asynchronous parallel
   programs.
@@ -145,6 +146,12 @@ citations to the following paper:
 
 [Buurlage JW., Bannink T., Bisseling R.H. (2018) Bulk: A Modern C++ Interface for Bulk-Synchronous Parallel Programs. In: Aldinucci M., Padovani L., Torquati M. (eds) Euro-Par 2018: Parallel Processing. Euro-Par 2018. Lecture Notes in Computer Science, vol 11014. Springer, Cham](https://doi.org/10.1007/978-3-319-96983-1_37)
 
+## Applications using Bulk
+
+| Article      |  Code  |
+|------------------|--------|
+| *A projection-based partitioning method for distributed tomographic reconstruction*. SIAM PP20. [DOI](https://doi.org/10.1137/1.9781611976137.6)  | [<img src="https://github.com/favicon.ico" width="24">](https://github.com/jwbuurlage/Pleiades) |
+
 ## Authors
 
 Bulk is developed at Centrum Wiskunde & Informatica (CWI) in Amsterdam by:
@@ -152,8 +159,16 @@ Bulk is developed at Centrum Wiskunde & Informatica (CWI) in Amsterdam by:
 * Jan-Willem Buurlage (@jwbuurlage)
 * Tom Bannink (@tombana)
 
+Also thanks to:
+
+* Rob Bisseling
+
 ## Contributing
 
-We welcome contributions. Please submit pull requests against the develop branch.
+We welcome contributions! Please submit pull requests against the `develop` branch. For each PR:
+
+- Describe the change in `CHANGELOG.md`
+- New authors may add their name to the 'thanks to' section in `README.md`
+- Format the code using `clang-format`, with the configuration found in the root of this project
 
 If you have any issues, questions, or remarks, then please open an issue on GitHub.
