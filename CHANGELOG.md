@@ -10,6 +10,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Add `foldl` and `foldl_each` for coarrays.
 - Add `bulk::span` for coarrays, allowing contiguous sequences as slice data
   sources in addition to `std::vector`.
 - Add `coarray::data` to access the underlying (sequential) storage of coarrays.
@@ -69,9 +70,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - Let `coarray::image::put` take values by const reference
-- Allow non-uniform local array sizes in `coarray` 
+- Allow non-uniform local array sizes in `coarray`
 - Require `T` to satisfy `is_trivially_copyable` for `coarray<T>`
-- Add more type safety checks to (de-)serialization 
+- Add more type safety checks to (de-)serialization
 - (De-)serialization in `var` and `future` now avoids redundant memory
   allocation and copying, by making the memory buffer objects non-owning
 

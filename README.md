@@ -114,7 +114,7 @@ the backend name, i.e. to run the `hello` example with the `thread` backend:
 
     ./bin/thread/thread_hello
 
-### Developing on top of Bulk 
+### Developing on top of Bulk
 
 The easiest way to get started using Bulk is to download the source code from
 [GitHub](https://www.github.com/jwbuurlage/bulk). If you use Bulk in a project
@@ -162,6 +162,7 @@ Bulk is developed at Centrum Wiskunde & Informatica (CWI) in Amsterdam by:
 Also thanks to:
 
 * Rob Bisseling
+* Sarita de Berg (@SdeBerg)
 
 ## Contributing
 
