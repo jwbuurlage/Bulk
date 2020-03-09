@@ -20,6 +20,7 @@ set(TEST_DIR "../../../test")
 
 set(
     TEST_SOURCES
+    "${TEST_DIR}/algorithm.cpp"
     "${TEST_DIR}/communication.cpp"
     "${TEST_DIR}/initialization.cpp"
     "${TEST_DIR}/partitioning.cpp"
