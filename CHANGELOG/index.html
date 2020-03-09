@@ -547,8 +547,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../api/foldl/" title="foldl" class="md-nav__link">
-      foldl
+    <a href="../api/foldl/" title="foldl / max / sum / ..." class="md-nav__link">
+      foldl / max / sum / ...
     </a>
   </li>
 
@@ -1948,6 +1948,7 @@ Versioning</a>.</p>
 <h3 id="added">Added</h3>
 <ul>
 <li>Add <code>foldl</code> and <code>foldl_each</code> for coarrays.</li>
+<li>Add aliases for common folds: <code>sum</code>, <code>product</code>, <code>min</code>, and <code>product</code>, for values, variables and coarrays. <em>Example</em>: <code>bulk::max(s + 1) == p</code>.</li>
 <li>Add <code>bulk::span</code> for coarrays, allowing contiguous sequences as slice data
   sources in addition to <code>std::vector</code>.</li>
 <li>Add <code>coarray::data</code> to access the underlying (sequential) storage of coarrays.</li>

@@ -36,7 +36,7 @@
     
     
       
-        <title>foldl - Bulk</title>
+        <title>foldl / max / sum / ... - Bulk</title>
       
     
     
@@ -116,7 +116,7 @@
                 Bulk
               </span>
               <span class="md-header-nav__topic">
-                foldl
+                foldl / max / sum / ...
               </span>
             
           
@@ -560,11 +560,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        foldl
+        foldl / max / sum / ...
       </label>
     
-    <a href="./" title="foldl" class="md-nav__link md-nav__link--active">
-      foldl
+    <a href="./" title="foldl / max / sum / ..." class="md-nav__link md-nav__link--active">
+      foldl / max / sum / ...
     </a>
     
       
@@ -1742,6 +1742,130 @@
 <h2 id="complexity-and-cost_1">Complexity and cost</h2>
 <ul>
 <li><strong>Cost</strong>: <code>costof(f) * p + sizeof(T) * xs.size() * p * g + l</code></li>
+</ul>
+<h1 id="bulkmax"><code>bulk::max</code></h1>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">max</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">world</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">T</span> <span class="n">t</span><span class="p">);</span> <span class="c1">// (1)</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">max</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">var</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">x</span><span class="p">);</span> <span class="c1">// (2)</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">max</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">xs</span><span class="p">);</span> <span class="c1">// (3)</span>
+</pre></div>
+
+
+<p>Compute the global maximum of local values.</p>
+<h2 id="template-parameters_2">Template parameters</h2>
+<ul>
+<li><code>T</code> - the value type of the value/variable/array</li>
+</ul>
+<h2 id="parameters_2">Parameters</h2>
+<ul>
+<li><code>t</code> - the value</li>
+<li><code>x</code> - the distributed variable</li>
+<li><code>xs</code> - the coarray</li>
+</ul>
+<h2 id="complexity-and-cost_2">Complexity and cost</h2>
+<ul>
+<li><strong>Cost</strong>:<ul>
+<li>(1), (2) <code>p + sizeof(T) * p * g + l</code></li>
+<li>(3) <code>xs.size() * (xs.size() * p + sizeof(T) * p * g) + l</code></li>
+</ul>
+</li>
+</ul>
+<h1 id="bulkmin"><code>bulk::min</code></h1>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">min</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">world</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">T</span> <span class="n">t</span><span class="p">);</span> <span class="c1">// (1)</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">min</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">var</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">x</span><span class="p">);</span> <span class="c1">// (2)</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">min</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">xs</span><span class="p">);</span> <span class="c1">// (3)</span>
+</pre></div>
+
+
+<p>Compute the global minimum of local values.</p>
+<h2 id="template-parameters_3">Template parameters</h2>
+<ul>
+<li><code>T</code> - the value type of the value/variable/array</li>
+</ul>
+<h2 id="parameters_3">Parameters</h2>
+<ul>
+<li><code>t</code> - the value</li>
+<li><code>x</code> - the distributed variable</li>
+<li><code>xs</code> - the coarray</li>
+</ul>
+<h2 id="complexity-and-cost_3">Complexity and cost</h2>
+<ul>
+<li><strong>Cost</strong>:<ul>
+<li>(1), (2) <code>p + sizeof(T) * p * g + l</code></li>
+<li>(3) <code>xs.size() * (xs.size() * p + sizeof(T) * p * g) + l</code></li>
+</ul>
+</li>
+</ul>
+<h1 id="bulksum"><code>bulk::sum</code></h1>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">sum</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">world</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">T</span> <span class="n">t</span><span class="p">);</span> <span class="c1">// (1)</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">sum</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">var</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">x</span><span class="p">);</span> <span class="c1">// (2)</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">sum</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">xs</span><span class="p">);</span> <span class="c1">// (3)</span>
+</pre></div>
+
+
+<p>Compute the global sum of local values.</p>
+<h2 id="template-parameters_4">Template parameters</h2>
+<ul>
+<li><code>T</code> - the value type of the value/variable/array</li>
+</ul>
+<h2 id="parameters_4">Parameters</h2>
+<ul>
+<li><code>t</code> - the value</li>
+<li><code>x</code> - the distributed variable</li>
+<li><code>xs</code> - the coarray</li>
+</ul>
+<h2 id="complexity-and-cost_4">Complexity and cost</h2>
+<ul>
+<li><strong>Cost</strong>:<ul>
+<li>(1), (2) <code>p + sizeof(T) * p * g + l</code></li>
+<li>(3) <code>xs.size() * (xs.size() * p + sizeof(T) * p * g) + l</code></li>
+</ul>
+</li>
+</ul>
+<h1 id="bulkproduct"><code>bulk::product</code></h1>
+<div class="codehilite"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">product</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">world</span><span class="o">&amp;</span> <span class="n">world</span><span class="p">,</span> <span class="n">T</span> <span class="n">t</span><span class="p">);</span> <span class="c1">// (1)</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">product</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">var</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">x</span><span class="p">);</span> <span class="c1">// (2)</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="n">product</span><span class="p">(</span><span class="n">bulk</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&amp;</span> <span class="n">xs</span><span class="p">);</span> <span class="c1">// (3)</span>
+</pre></div>
+
+
+<p>Compute the global product of local values.</p>
+<h2 id="template-parameters_5">Template parameters</h2>
+<ul>
+<li><code>T</code> - the value type of the value/variable/array</li>
+</ul>
+<h2 id="parameters_5">Parameters</h2>
+<ul>
+<li><code>t</code> - the value</li>
+<li><code>x</code> - the distributed variable</li>
+<li><code>xs</code> - the coarray</li>
+</ul>
+<h2 id="complexity-and-cost_5">Complexity and cost</h2>
+<ul>
+<li><strong>Cost</strong>:<ul>
+<li>(1), (2) <code>p + sizeof(T) * p * g + l</code></li>
+<li>(3) <code>xs.size() * (xs.size() * p + sizeof(T) * p * g) + l</code></li>
+</ul>
+</li>
 </ul>
                 
                   
