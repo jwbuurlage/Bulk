@@ -9,6 +9,8 @@
  */
 
 #include <algorithm>
+#include <limits>
+#include <numeric>
 #include <vector>
 
 #include "coarray.hpp"
@@ -171,6 +173,81 @@ std::vector<T> foldl_each(coarray<T>& xs, Func f, S start_value = {}) {
     }
 
     return result;
+}
+
+template <typename T>
+T max(bulk::world& world, T t) {
+    auto xs = bulk::gather_all(world, t);
+    return *std::max_element(xs.begin(), xs.end());
+}
+
+template <typename T>
+T min(bulk::world& world, T t) {
+    auto xs = bulk::gather_all(world, t);
+    return *std::min_element(xs.begin(), xs.end());
+}
+
+template <typename T>
+T sum(bulk::world& world, T t) {
+    auto xs = bulk::gather_all(world, t);
+    return std::accumulate(xs.begin(), xs.end(), 0);
+}
+
+template <typename T>
+T product(bulk::world& world, T t) {
+    auto xs = bulk::gather_all(world, t);
+    return std::accumulate(xs.begin(), xs.end(), 1,
+                           [](auto& lhs, auto& rhs) { return lhs * rhs; });
+}
+
+template <typename T>
+T max(bulk::var<T>& x) {
+    return bulk::foldl(
+    x, [](auto& lhs, auto& rhs) { lhs = std::max(lhs, rhs); },
+    std::numeric_limits<T>::min());
+}
+
+template <typename T>
+T min(bulk::var<T>& x) {
+    return bulk::foldl(
+    x, [](auto& lhs, auto& rhs) { lhs = std::min(lhs, rhs); },
+    std::numeric_limits<T>::max());
+}
+
+template <typename T>
+T sum(bulk::var<T>& x) {
+    return bulk::foldl(x, [](auto& lhs, auto& rhs) { lhs += rhs; });
+}
+
+template <typename T>
+T product(bulk::var<T>& x) {
+    return bulk::foldl(
+    x, [](auto& lhs, auto& rhs) { lhs *= rhs; }, (T)1);
+}
+
+template <typename T>
+T max(bulk::coarray<T>& xs) {
+    return bulk::foldl(
+    xs, [](auto& lhs, auto& rhs) { lhs = std::max(lhs, rhs); },
+    std::numeric_limits<T>::min());
+}
+
+template <typename T>
+T min(bulk::coarray<T>& xs) {
+    return bulk::foldl(
+    xs, [](auto& lhs, auto& rhs) { lhs = std::min(lhs, rhs); },
+    std::numeric_limits<T>::max());
+}
+
+template <typename T>
+T sum(bulk::coarray<T>& xs) {
+    return bulk::foldl(xs, [](auto& lhs, auto& rhs) { lhs += rhs; });
+}
+
+template <typename T>
+T product(bulk::coarray<T>& xs) {
+    return bulk::foldl(
+    xs, [](auto& lhs, auto& rhs) { lhs *= rhs; }, (T)1);
 }
 
 } // namespace bulk

@@ -58,3 +58,132 @@ The $i$th element of the result holds a left fold of `f` over the $i$th element 
 ## Complexity and cost
 
 - **Cost**: `costof(f) * p + sizeof(T) * xs.size() * p * g + l`
+
+# `bulk::max`
+
+```cpp
+template <typename T>
+T max(bulk::world& world, T t); // (1)
+
+template <typename T>
+T max(bulk::var<T>& x); // (2)
+
+template <typename T>
+T max(bulk::coarray<T>& xs); // (3)
+```
+
+Compute the global maximum of local values.
+
+## Template parameters
+
+* `T` - the value type of the value/variable/array
+
+## Parameters
+
+* `t` - the value
+* `x` - the distributed variable
+* `xs` - the coarray
+
+## Complexity and cost
+
+- **Cost**:
+    - (1), (2) `p + sizeof(T) * p * g + l`
+    - (3) `xs.size() * (xs.size() * p + sizeof(T) * p * g) + l`
+
+# `bulk::min`
+
+```cpp
+template <typename T>
+T min(bulk::world& world, T t); // (1)
+
+template <typename T>
+T min(bulk::var<T>& x); // (2)
+
+template <typename T>
+T min(bulk::coarray<T>& xs); // (3)
+```
+
+Compute the global minimum of local values.
+
+## Template parameters
+
+* `T` - the value type of the value/variable/array
+
+## Parameters
+
+* `t` - the value
+* `x` - the distributed variable
+* `xs` - the coarray
+
+## Complexity and cost
+
+- **Cost**:
+    - (1), (2) `p + sizeof(T) * p * g + l`
+    - (3) `xs.size() * (xs.size() * p + sizeof(T) * p * g) + l`
+
+# `bulk::sum`
+
+```cpp
+template <typename T>
+T sum(bulk::world& world, T t); // (1)
+
+template <typename T>
+T sum(bulk::var<T>& x); // (2)
+
+template <typename T>
+T sum(bulk::coarray<T>& xs); // (3)
+```
+
+Compute the global sum of local values.
+
+## Template parameters
+
+* `T` - the value type of the value/variable/array
+
+## Parameters
+
+* `t` - the value
+* `x` - the distributed variable
+* `xs` - the coarray
+
+## Complexity and cost
+
+- **Cost**:
+    - (1), (2) `p + sizeof(T) * p * g + l`
+    - (3) `xs.size() * (xs.size() * p + sizeof(T) * p * g) + l`
+
+
+# `bulk::product`
+
+```cpp
+template <typename T>
+T product(bulk::world& world, T t); // (1)
+
+template <typename T>
+T product(bulk::var<T>& x); // (2)
+
+template <typename T>
+T product(bulk::coarray<T>& xs); // (3)
+```
+
+Compute the global product of local values.
+
+## Template parameters
+
+* `T` - the value type of the value/variable/array
+
+## Parameters
+
+* `t` - the value
+* `x` - the distributed variable
+* `xs` - the coarray
+
+## Complexity and cost
+
+- **Cost**:
+    - (1), (2) `p + sizeof(T) * p * g + l`
+    - (3) `xs.size() * (xs.size() * p + sizeof(T) * p * g) + l`
+
+
+
+

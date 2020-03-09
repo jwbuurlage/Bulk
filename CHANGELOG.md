@@ -11,6 +11,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Add `foldl` and `foldl_each` for coarrays.
+- Add aliases for common folds: `sum`, `product`, `min`, and `max`, for values, variables and coarrays. _Example_: `bulk::max(world, s + 1) == p`.
 - Add `bulk::span` for coarrays, allowing contiguous sequences as slice data
   sources in addition to `std::vector`.
 - Add `coarray::data` to access the underlying (sequential) storage of coarrays.

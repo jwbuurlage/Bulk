@@ -26,37 +26,6 @@ enum class message_t : int {
     send_custom
 };
 
-// different approach
-// -> buffers should be some kind of memory pool
-//
-// put buffer
-// -> its a (large) binary data 'file', containing a header and data and so on
-// -> there is one for each remote (and local, treated differently) processor
-//
-// get buffer
-// -> two-phase protocol, request sends at sync, then the buffer is prepared and
-// sent
-//
-// message buffer
-// -> same as put basically
-//
-// want writers and readers for these formats
-// maybe reuse some of the ideas for the zmq server
-// this should simplify implementation somewhat
-// and limit the number of messages going around
-//
-// do we want one-sided communication? can make a test implementation based on
-// MPI windows later to compare
-//
-// - [x] define a memory buffer object
-// - [x] define readers and writers to this object for the different formats:
-//   * [x] put
-//   * [x] get_request
-//   * [x] get_response
-//   * [x] message
-// - [ ] Try to extract 'readers' and 'writers', and see if we can get better
-// code reuse and modularity here
-
 class world : public bulk::world {
   public:
     world() : bulk::world() {

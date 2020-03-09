@@ -52,5 +52,29 @@ void test_algorithm() {
 
             BULK_CHECK(f2.empty(), "calling foldl_each with non-constant size");
         }
+
+        BULK_SECTION("fold aliases") {
+            BULK_CHECK(bulk::max(world, s + 1) == p, "max of local values");
+            BULK_CHECK(bulk::min(world, s + 1) == 1, "min of local values");
+            BULK_CHECK(bulk::sum(world, s + 1) == p * (p + 1) / 2,
+                       "sum of local values");
+            BULK_CHECK(bulk::product(world, 1) == 1, "product of local values");
+
+            auto x = bulk::var<int>(world, s + 1);
+            BULK_CHECK(bulk::max(x) == p, "max of var");
+            BULK_CHECK(bulk::min(x) == 1, "min of var");
+            BULK_CHECK(bulk::sum(x) == p * (p + 1) / 2, "sum of var");
+            x = 1;
+            BULK_CHECK(bulk::product(x) == 1, "product of var");
+
+            bulk::coarray<int> xs(world, 2, 1);
+            BULK_CHECK(bulk::product(xs) == 1, "product of coarray");
+            xs[0] = 2 * s + 1;
+            xs[1] = 2 * s + 2;
+            BULK_CHECK(bulk::max(xs) == 2 * p, "max of coarray");
+            BULK_CHECK(bulk::min(xs) == 1, "min of coarray");
+            BULK_CHECK(bulk::sum(xs) == 2 * p * (2 * p + 1) / 2,
+                       "sum of coarray ");
+        }
     });
 }

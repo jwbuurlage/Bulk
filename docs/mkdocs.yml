@@ -44,7 +44,7 @@ nav:
         - 'timer': 'api/timer.md'
         - 'partitioning': 'api/partitioning.md'
     - Functions:
-        - 'foldl': 'api/foldl.md'
+        - 'foldl / max / sum / ...': 'api/foldl.md'
         - 'gather_all': 'api/gather_all.md'
         - 'flatten': 'api/flatten.md'
         - 'unflatten': 'api/unflatten.md'
