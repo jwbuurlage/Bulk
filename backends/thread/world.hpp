@@ -7,16 +7,20 @@
 #include <functional>
 #include <iostream>
 #include <limits>
+#include <map>
 #include <mutex>
+#include <set>
 #include <string>
 #include <thread>
 #include <vector>
 
 #include "barrier.hpp"
-#include <bulk/future.hpp>
-#include <bulk/messages.hpp>
-#include <bulk/variable.hpp>
-#include <bulk/world.hpp>
+
+#include "bulk/algorithm.hpp"
+#include "bulk/future.hpp"
+#include "bulk/messages.hpp"
+#include "bulk/variable.hpp"
+#include "bulk/world.hpp"
 
 // Mutexes need to be shared, i.e. single instance of the class
 // that is shared amongst threads.
@@ -76,7 +80,7 @@ class world_state {
 template <typename Barrier = spinning_barrier>
 class world : public bulk::world {
   public:
-    world(world_state<Barrier>* state, int pid, int nprocs)
+    world(std::shared_ptr<world_state<Barrier>> state, int pid, int nprocs)
     : state_(state), pid_(pid), nprocs_(nprocs) {}
     ~world() {}
 
@@ -183,6 +187,41 @@ class world : public bulk::world {
     void abort() override {
         // TODO
         return;
+    }
+
+    std::unique_ptr<bulk::world> split(int part) override {
+        // We gather information about the parts (redundantly)
+        auto part_for_rank = bulk::gather_all(*this, part);
+
+        std::map<int, std::set<int>> parts;
+        for (int t = 0; t < active_processors(); ++t) {
+            parts[part_for_rank[t]].insert(t);
+        }
+
+        // The split world states are based on a shared pointer. We communicate
+        // the address of this pointer from the master (i.e. subworld rank 0) of
+        // the part to the others in the part
+        bulk::var<std::shared_ptr<world_state<Barrier>>*> state(*this);
+
+        std::shared_ptr<world_state<Barrier>> shared_state = nullptr;
+
+        if (rank() == *parts[part].begin()) {
+            // For each part, the master thread creates a shared state and
+            // communicates it with the parts
+            shared_state = std::make_shared<world_state<Barrier>>(parts[part].size());
+
+            for (auto t : parts[part]) {
+                state(t) = &shared_state;
+            }
+        }
+
+        sync();
+
+        // Create a new world object with reference to the shared state and
+        // return it
+        return std::make_unique<bulk::thread::world<Barrier>>(
+        *state.value(), std::distance(parts[part].begin(), parts[part].find(rank())),
+        parts[part].size());
     }
 
   protected:
@@ -344,7 +383,7 @@ class world : public bulk::world {
   private:
     // This should be a reference but we can not assign it in the constructor
     // because `world` does not have a constructor. FIXME: Change this ?
-    world_state<Barrier>* state_;
+    std::shared_ptr<world_state<Barrier>> state_;
     int pid_;
     int nprocs_;
 

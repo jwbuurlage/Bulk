@@ -23,6 +23,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   sources in addition to `std::vector`.
 - Add `coarray::data` to access the underlying (sequential) storage of coarrays.
 - Allow externally managed data buffers for `coarray`.
+- Add support for splitting a world into multiple parts, allowing subset syncs and communication. See also `bulk::world::split`.
 
 ### Fixed
 

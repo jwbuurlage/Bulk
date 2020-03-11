@@ -28,9 +28,10 @@ enum class message_t : int {
 
 class world : public bulk::world {
   public:
-    world() : bulk::world() {
-        MPI_Comm_size(MPI_COMM_WORLD, &active_processors_);
-        MPI_Comm_rank(MPI_COMM_WORLD, &processor_id_);
+    world(MPI_Comm communicator = MPI_COMM_WORLD)
+    : bulk::world(), communicator_(communicator) {
+        MPI_Comm_size(communicator_, &active_processors_);
+        MPI_Comm_rank(communicator_, &processor_id_);
         MPI_Get_processor_name(name_, &name_length_);
 
         put_buffers_.resize(active_processors_);
@@ -45,7 +46,11 @@ class world : public bulk::world {
         std::fill(ones_.begin(), ones_.end(), 1);
     }
 
-    virtual ~world() {}
+    virtual ~world() {
+        if (communicator_ != MPI_COMM_WORLD) {
+            MPI_Comm_free(&communicator_);
+        }
+    }
 
     int active_processors() const override final { return active_processors_; }
     int rank() const override final { return processor_id_; }
@@ -73,14 +78,14 @@ class world : public bulk::world {
         // exchange gets, implicit barrier
         send_buffers_(get_request_buffers_, message_t::get_request, get_request_to_proc);
         MPI_Reduce_scatter(get_request_to_proc.data(), &remote_get_requests,
-                           ones_.data(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                           ones_.data(), MPI_INT, MPI_SUM, communicator_);
 
         receive_buffer_for_tag_(get_request_buffer_, message_t::get_request, remote_get_requests);
         send_get_responses_(get_request_buffer_, get_response_to_proc);
 
         // exchange gets, implicit barrier
         MPI_Reduce_scatter(get_response_to_proc.data(), &remote_get_responses,
-                           ones_.data(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                           ones_.data(), MPI_INT, MPI_SUM, communicator_);
 
         receive_buffer_for_tag_(get_response_buffer_, message_t::get_response,
                                 remote_get_responses);
@@ -91,7 +96,7 @@ class world : public bulk::world {
         send_buffers_(custom_get_request_buffers_,
                       message_t::custom_get_request, custom_get_request_to_proc);
         MPI_Reduce_scatter(custom_get_request_to_proc.data(), &remote_custom_get_requests,
-                           ones_.data(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                           ones_.data(), MPI_INT, MPI_SUM, communicator_);
 
         receive_buffer_for_tag_(custom_get_request_buffer_, message_t::custom_get_request,
                                 remote_custom_get_requests);
@@ -99,7 +104,7 @@ class world : public bulk::world {
 
         // exchange gets, implicit barrier
         MPI_Reduce_scatter(custom_get_response_to_proc.data(), &remote_custom_get_responses,
-                           ones_.data(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                           ones_.data(), MPI_INT, MPI_SUM, communicator_);
 
         receive_buffer_for_tag_(custom_get_response_buffer_, message_t::custom_get_response,
                                 remote_custom_get_responses);
@@ -109,7 +114,7 @@ class world : public bulk::world {
         // exchange puts, implicit barrier
         send_buffers_(put_buffers_, message_t::put, put_to_proc);
         MPI_Reduce_scatter(put_to_proc.data(), &remote_puts, ones_.data(),
-                           MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                           MPI_INT, MPI_SUM, communicator_);
 
         receive_buffer_for_tag_(put_receive_buffer_, message_t::put, remote_puts);
         process_put_buffer_(put_receive_buffer_);
@@ -118,7 +123,7 @@ class world : public bulk::world {
         // exchange puts, implicit barrier
         send_buffers_(custom_put_buffers_, message_t::custom_put, custom_put_to_proc);
         MPI_Reduce_scatter(custom_put_to_proc.data(), &remote_custom_puts,
-                           ones_.data(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                           ones_.data(), MPI_INT, MPI_SUM, communicator_);
         receive_buffer_for_tag_(custom_put_receive_buffer_,
                                 message_t::custom_put, remote_custom_puts);
         process_custom_puts_(custom_put_receive_buffer_);
@@ -126,7 +131,7 @@ class world : public bulk::world {
         // handle custom messages
         send_buffers_(custom_message_buffers_, message_t::send_custom, custom_messages_to_proc);
         MPI_Reduce_scatter(custom_messages_to_proc.data(), &remote_custom_messages,
-                           ones_.data(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                           ones_.data(), MPI_INT, MPI_SUM, communicator_);
         receive_buffer_for_tag_(custom_message_buffer_, message_t::send_custom,
                                 remote_custom_messages);
         process_custom_messages_(custom_message_buffer_);
@@ -134,9 +139,18 @@ class world : public bulk::world {
         barrier();
     }
 
-    void barrier() override final { MPI_Barrier(MPI_COMM_WORLD); }
+    void barrier() override final { MPI_Barrier(communicator_); }
 
     void abort() override final {}
+
+
+    std::unique_ptr<bulk::world> split(int part) override {
+        MPI_Comm split_comm;
+        if (MPI_Comm_split(communicator_, part, rank(), &split_comm) != MPI_SUCCESS) {
+            return nullptr;
+        }
+        return std::make_unique<bulk::mpi::world>(split_comm);
+    }
 
   protected:
     // Returns the id of the registered location
@@ -251,7 +265,7 @@ class world : public bulk::world {
         if (buf.size() > 0) {
             MPI_Request req;
             MPI_Isend(buf.data(), buf.size(), MPI_BYTE, processor,
-                      static_cast<int>(tag), MPI_COMM_WORLD, &req);
+                      static_cast<int>(tag), communicator_, &req);
             buf.clear();
 
             return true;
@@ -271,7 +285,7 @@ class world : public bulk::world {
         while (count--) {
             // getting buffers.. reuse membufs
             MPI_Status status = {};
-            MPI_Probe(MPI_ANY_SOURCE, static_cast<int>(tag), MPI_COMM_WORLD, &status);
+            MPI_Probe(MPI_ANY_SOURCE, static_cast<int>(tag), communicator_, &status);
 
             // count size of incoming message
             int incoming_size = 0;
@@ -280,7 +294,7 @@ class world : public bulk::world {
             buf.ensure_room(incoming_size);
 
             MPI_Recv(buf.buffer(), incoming_size, MPI_BYTE, status.MPI_SOURCE,
-                     static_cast<int>(tag), MPI_COMM_WORLD, &status);
+                     static_cast<int>(tag), communicator_, &status);
 
             buf.update(incoming_size);
         }
@@ -448,6 +462,8 @@ class world : public bulk::world {
 
     std::vector<memory_buffer> custom_message_buffers_;
     memory_buffer custom_message_buffer_;
+
+    MPI_Comm communicator_;
 };
 
 } // namespace bulk::mpi

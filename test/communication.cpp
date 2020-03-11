@@ -573,5 +573,27 @@ void test_communication() {
                 BULK_CHECK(str == "string" && size == 5, "can send string");
             }
         }
+
+        BULK_SKIP_SECTION_IF("Subworlds", p <= 1);
+
+        BULK_SECTION("Creating a subworld split") {
+            auto sub = world.split(s % 2);
+
+            BULK_CHECK(sub->rank() == world.rank() / 2,
+                       "reorder ranks in subworlds");
+
+            auto x = bulk::var<int>(*sub, s);
+            auto y = x(sub->next_rank()).get();
+            sub->sync();
+
+            BULK_CHECK(y.value() == ((s + 2) % p),
+                       "get future from subworld");
+
+            bulk::var<int> a(world, 3);
+            a(world.next_rank()) = s;
+            world.sync();
+            BULK_CHECK(a.value() == ((s + p - 1) % p),
+                       "can still use ambient world while split");
+        }
     });
 }

@@ -20,6 +20,7 @@ class world;
 | **Communication and coordination**                |                                                  |
 | [`sync`](world/sync.md)                           | performs a bulk synchronization                  |
 | [`barrier`](world/barrier.md)                     | performs a bulk barrier                          |
+| [`split`](world/split.md)                 | split the world in subsets |
 | **Logging**                                       |                                                  |
 | [`log`](world/log.md)                      | log a message                                    |
 | [`log_once`](world/log_once.md)            | log a message only with the first processor |

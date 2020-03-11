@@ -38,7 +38,9 @@ class world {
     virtual int rank() const = 0;
 
     [[deprecated("`world::processor_id` was renamed to `world::rank`")]] int
-    processor_id() const { return this->rank(); }
+    processor_id() const {
+        return this->rank();
+    }
 
     /**
      * Get the rank of the next logical processor
@@ -54,7 +56,9 @@ class world {
 
     [[deprecated("`world::next_processor` was renamed to "
                  "`world::next_rank`")]] int
-    next_processor() const { return this->next_rank(); }
+    next_processor() const {
+        return this->next_rank();
+    }
 
     /**
      * Get the rank of the previous logical processor
@@ -70,7 +74,9 @@ class world {
 
     [[deprecated("`world::prev_processor` was renamed to "
                  "`world::prev_rank`")]] int
-    prev_processor() const { return prev_rank(); }
+    prev_processor() const {
+        return prev_rank();
+    }
 
     /**
      * Perform a global barrier synchronization of the active processors
@@ -138,6 +144,18 @@ class world {
      * and `bulk::environment::spawn` will throw an exception.
      */
     virtual void abort() = 0;
+
+    /**
+     * Split into a number of 'subworlds'.
+     *
+     * Every processor in the same part after splitting get assigned consecutive
+     * 0-based ranks in the subworld in ascending order from their rank in the
+     * ambient world.
+     *
+     * The subworld is returned as a unique pointer, to ensure proper clean up
+     * when it is no longer needed.
+     */
+    virtual std::unique_ptr<bulk::world> split(int part) = 0;
 
   protected:
     // Internal functions
