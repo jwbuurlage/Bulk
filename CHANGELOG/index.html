@@ -799,6 +799,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../api/world/split/" title="world::split" class="md-nav__link">
+      world::split
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../api/world/log/" title="world::log" class="md-nav__link">
       world::log
     </a>
@@ -1600,15 +1612,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added" title="Added" class="md-nav__link">
-    Added
+  <a href="#breaking-changes" title="Breaking changes" class="md-nav__link">
+    Breaking changes
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" title="Changed" class="md-nav__link">
-    Changed
+  <a href="#added" title="Added" class="md-nav__link">
+    Added
   </a>
   
 </li>
@@ -1648,7 +1660,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_1" title="Changed" class="md-nav__link">
+  <a href="#changed" title="Changed" class="md-nav__link">
     Changed
   </a>
   
@@ -1780,15 +1792,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added" title="Added" class="md-nav__link">
-    Added
+  <a href="#breaking-changes" title="Breaking changes" class="md-nav__link">
+    Breaking changes
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" title="Changed" class="md-nav__link">
-    Changed
+  <a href="#added" title="Added" class="md-nav__link">
+    Added
   </a>
   
 </li>
@@ -1828,7 +1840,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_1" title="Changed" class="md-nav__link">
+  <a href="#changed" title="Changed" class="md-nav__link">
     Changed
   </a>
   
@@ -1945,6 +1957,13 @@
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic
 Versioning</a>.</p>
 <h2 id="unreleased-yyyy-mm-dd"><a href="https://github.com/jwbuurlage/bulk/compare/v1.2.0...develop">Unreleased</a> - YYYY-MM-DD</h2>
+<h3 id="breaking-changes">Breaking changes</h3>
+<ul>
+<li>Use <code>size_t</code> for indices in arrays and slices</li>
+<li><code>coarray::data</code> now returns a <code>T*</code> instead of <code>void*</code></li>
+<li>The iterator overload for <code>coarray::put</code> now requires an explicit offset</li>
+<li>Index type for D = 1 now wraps an <code>int</code>, instead of a singleton array</li>
+</ul>
 <h3 id="added">Added</h3>
 <ul>
 <li>Add <code>foldl</code> and <code>foldl_each</code> for coarrays.</li>
@@ -1953,13 +1972,7 @@ Versioning</a>.</p>
   sources in addition to <code>std::vector</code>.</li>
 <li>Add <code>coarray::data</code> to access the underlying (sequential) storage of coarrays.</li>
 <li>Allow externally managed data buffers for <code>coarray</code>.</li>
-</ul>
-<h3 id="changed">Changed</h3>
-<ul>
-<li>Use <code>size_t</code> for indices in arrays and slices</li>
-<li><code>coarray::data</code> now returns a <code>T*</code> instead of <code>void*</code></li>
-<li>The iterator overload for <code>coarray::put</code> now requires an explicit offset</li>
-<li>Index type for D = 1 now wraps an <code>int</code>, instead of a singleton array</li>
+<li>Add support for splitting a world into multiple parts, allowing subset syncs and communication. See also <code>bulk::world::split</code>.</li>
 </ul>
 <h3 id="fixed">Fixed</h3>
 <ul>
@@ -1984,7 +1997,7 @@ Versioning</a>.</p>
 <li>Fix coarray unittest relying on <code>p &gt; 2</code></li>
 <li>Fix <code>-Werror=format-security</code> issue in <code>world::log</code></li>
 </ul>
-<h3 id="changed_1">Changed</h3>
+<h3 id="changed">Changed</h3>
 <ul>
 <li>Update default value for <code>start_value</code> of <code>foldl</code> to <code>{}</code> from <code>0</code> for
   non-numeric types</li>
