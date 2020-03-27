@@ -16,3 +16,12 @@ double get()
 ```
 
 * **returns** the number of (by default) milliseconds that have passed since the construction of the timer.
+
+### `bulk::util::timer::get_change`
+
+```cpp
+template <typename resolution = std::milli>
+double get_change()
+```
+
+* **returns** the number of (by default) milliseconds that have passed since the last call to `get_change`, or (for the first call) since the construction of the timer.

@@ -24,6 +24,14 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add `coarray::data` to access the underlying (sequential) storage of coarrays.
 - Allow externally managed data buffers for `coarray`.
 - Add support for splitting a world into multiple parts, allowing subset syncs and communication. See also `bulk::world::split`.
+- Add `get_change` to timer class (@SdeBerg, #10)
+
+### Changed
+
+- Use `size_t` for indices in arrays and slices
+- `coarray::data` now returns a `T*` instead of `void*`
+- The iterator overload for `coarray::put` now requires an explicit offset
+- Index type for D = 1 now wraps an `int`, instead of a singleton array
 
 ### Fixed
 
