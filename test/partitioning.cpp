@@ -15,14 +15,16 @@ void test_partitioning() {
     auto N = (int)sqrt(env.available_processors());
     env.spawn(N * N, [](auto& world) {
         int s = world.rank();
-        int p = world.active_processors();
+        // Store the number of processors as 'size_t' for compatibility with
+        // partitioning indices.
+        size_t p = world.active_processors();
 
         BULK_SECTION("Index manipulations") {
             bulk::index<2> idx{2, 3};
             BULK_CHECK(idx[1] == 3, "can construct with initializer list");
         }
 
-        auto N = (int)sqrt(p);
+        auto N = static_cast<size_t>(sqrt(p));
         BULK_SKIP_SECTION_IF("Partitionings", N * N != p);
         BULK_SKIP_SECTION_IF("Partitionings", p <= 1);
 
@@ -132,7 +134,7 @@ void test_partitioning() {
             auto glob = xs.global({1, 1}).get();
             world.sync();
 
-            BULK_CHECK(glob.value() == N + 1, "obtain remote value");
+            BULK_CHECK(glob.value() == static_cast<int>(N) + 1, "obtain remote value");
             BULK_CHECK(xs.local({1, 1}) == s + 1, "obtain local value");
 
             xs.global({1, 1}) = 1234;

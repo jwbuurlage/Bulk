@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 namespace bulk::util {
 
 struct split {
@@ -7,7 +9,7 @@ struct split {
     int d;
 
     // voxel index at which the *second* subvolume begins
-    int a;
+    size_t a;
 };
 
 template <typename T>
@@ -21,8 +23,8 @@ struct binary_tree {
     struct node {
         node(T value_) : value(value_) {}
 
-        int size() {
-            int result = 1;
+        size_t size() {
+            size_t result = 1;
             if (left) {
                 result += left->size();
             }
@@ -52,7 +54,7 @@ struct binary_tree {
         }
     }
 
-    int size() {
+    size_t size() {
         if (root) {
             return root->size();
         }

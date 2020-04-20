@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <array>
 
 namespace bulk {
@@ -9,49 +10,49 @@ template <int D>
 struct index {
     index() = default;
 
-    index(std::initializer_list<int> xs) {
+    index(std::initializer_list<size_t> xs) {
         std::copy(xs.begin(), xs.end(), indices_.begin());
     }
 
-    int& operator[](int i) { return indices_[i]; }
-    const int& operator[](int i) const { return indices_[i]; }
+    size_t& operator[](int i) { return indices_[i]; }
+    const size_t& operator[](int i) const { return indices_[i]; }
 
     bool operator==(const index& rhs) const { return indices_ == rhs.indices_; }
 
-    int* begin() { return indices_.begin(); }
-    int* end() { return indices_.end(); }
-    const int* begin() const { return indices_.begin(); }
-    const int* end() const { return indices_.end(); }
+    size_t* begin() { return indices_.begin(); }
+    size_t* end() { return indices_.end(); }
+    const size_t* begin() const { return indices_.begin(); }
+    const size_t* end() const { return indices_.end(); }
 
-    std::array<int, D> get() { return indices_; }
-    std::array<int, D> indices_ = {0};
+    std::array<size_t, D> get() { return indices_; }
+    std::array<size_t, D> indices_ = {0};
 };
 
-// Specialize D = 1 to be an int
+// Specialize D = 1 to be 'size_t'
 template <>
 struct index<1> {
     index() = default;
-    index(int x) : index_(x) {}
+    index(size_t x) : index_(x) {}
     bool operator==(const index& rhs) const { return index_ == rhs.index_; }
 
     // For generic code using index<1>
-    int& operator[](int i) {
+    size_t& operator[](int i) {
         assert(i == 0);
         return index_;
     }
-    const int& operator[](int i) const {
+    const size_t& operator[](int i) const {
         assert(i == 0);
         return index_;
     }
 
-    int* begin() { return &index_;}
-    int* end() { return (&index_) + 1;}
-    const int* begin() const { return &index_;}
-    const int* end() const { return &index_ + 1;}
+    size_t* begin() { return &index_;}
+    size_t* end() { return (&index_) + 1;}
+    const size_t* begin() const { return &index_;}
+    const size_t* end() const { return &index_ + 1;}
 
-    int get() { return index_; }
+    size_t get() { return index_; }
 
-    int index_;
+    size_t index_;
 };
 
 template <int D>
@@ -62,9 +63,9 @@ namespace util {
 
 /** Free functions for flattening multi-indices in volumes. */
 template <int D>
-int flatten(index<D> volume, index<D> idxs) {
-    int flattened = 0;
-    int offset = 1;
+size_t flatten(index<D> volume, index<D> idxs) {
+    size_t flattened = 0;
+    size_t offset = 1;
     for (int d = 0; d < D; ++d) {
         flattened += idxs[d] * offset;
         offset *= volume[d];
@@ -73,7 +74,7 @@ int flatten(index<D> volume, index<D> idxs) {
 }
 
 template <int D>
-index<D> unflatten(index<D> volume, int flattened) {
+index<D> unflatten(index<D> volume, size_t flattened) {
     index<D> unflattened;
     for (int d = 0; d < D; ++d) {
         unflattened[d] = flattened % volume[d];

@@ -1,10 +1,10 @@
 # Partitionings
 
-## `bulk::index_type`
+## `bulk::index`
 
 Defined in header `<bulk/util/indices.hpp>`.
 
-Array-like type for `D > 1`, and int for `D == 1`.
+Array-like type for `D > 1`, and wrapper around `size_t` for `D == 1`.
 ```cpp
 template <int D>
 struct index;
@@ -16,6 +16,9 @@ For backward compatibility, we have an alias `index_type` (deprecated).
 template <int D>
 using index_type = index<D>;
 ```
+
+!!! note
+    In Bulk, `int` is the type used for processor counts ands indices, and `size_t` is used for sizes and indices in containers. Partitionings therefore return `int` when computing ranks and owners, and `size_t` in all other cases. The only exception is `multi_index` which is represented as `bulk::index` and thus unsigned.
 
 ## `bulk::partitioning`
 

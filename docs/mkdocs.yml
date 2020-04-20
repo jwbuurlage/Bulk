@@ -133,9 +133,4 @@ extra:
     palette:
         primary: 'blue grey'
         accent: 'orange'
-    social:
-        - type: 'github-alt'
-          link: 'https://github.com/jwbuurlage'
-        - type: 'twitter'
-          link: 'https://twitter.com/jwbuurlage'
     logo: 'images/logo.svg'

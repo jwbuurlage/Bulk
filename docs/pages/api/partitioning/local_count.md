@@ -1,7 +1,7 @@
 # `bulk::partitioning::local_count`
 
 ```cpp
-int local_count(int processor);
+size_t local_count(int processor);
 ```
 
 Returns the number of local elements for a given processor.
@@ -12,4 +12,4 @@ Returns the number of local elements for a given processor.
 
 ## Return value
 
-- `int`: the number of local elements
+- `size_t`: the number of local elements

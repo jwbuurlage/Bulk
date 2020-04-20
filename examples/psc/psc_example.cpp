@@ -15,15 +15,15 @@ using environment = bulk::thread::environment;
 
 int main(int argc, char** argv) {
     assert(argc > 2);
-    int M = std::atoi(argv[1]);
-    int N = std::atoi(argv[2]);
+    auto M = static_cast<size_t>(std::atoi(argv[1]));
+    auto N = static_cast<size_t>(std::atoi(argv[2]));
     int p = M * N;
 
     environment env;
 
     env.spawn(p, [&](bulk::world& world) {
-        auto p = world.active_processors();
-        auto size = 1'000'000;
+        auto p = static_cast<size_t>(world.active_processors());
+        auto size = 1'000'000ul;
 
         world.log_once("> Example 1: Basic vector operations");
         auto partitioning = bulk::cyclic_partitioning<1>({size}, {p});
@@ -51,10 +51,10 @@ int main(int argc, char** argv) {
 
         world.log_once(
         "> Example 3: Computing the LU decomposition of a matrix");
-        auto n = 4;
+        auto n = 4ul;
         auto phi = bulk::cyclic_partitioning<2, 2>({n, n}, {M, N});
         auto A = psc::matrix<float>(world, phi, 1.0f);
-        for (int i = 0; i < n; ++i) {
+        for (auto i = 0ul; i < n; ++i) {
             if (phi.owner({i, i}) == world.rank()) {
                 A.at(phi.local({i, i})) = 2.0f;
             }

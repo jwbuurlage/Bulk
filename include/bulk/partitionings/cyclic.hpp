@@ -68,19 +68,19 @@ class cyclic_partitioning : public cartesian_partitioning<D, G> {
         return result;
     }
 
-    virtual int owner(int g, int i) override final {
+    virtual int owner(int g, size_t i) override final {
         return i % this->grid_size_[g];
     }
 
-    virtual int local(int g, int i) override final {
+    virtual size_t local(int g, size_t i) override final {
         return i / this->grid_size_[g];
     }
 
-    virtual int global(int g, int u, int i) override final {
+    virtual size_t global(int g, int u, size_t i) override final {
         return i * this->grid_size_[g] + u;
     }
 
-    virtual int local_size(int g, int u) override final {
+    virtual size_t local_size(int g, int u) override final {
         if (g < G) {
             return (this->global_size_[g] + this->grid_size_[g] - u - 1) /
                    this->grid_size_[g];

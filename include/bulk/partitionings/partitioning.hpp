@@ -27,7 +27,7 @@ class partitioning {
     virtual index_type<D> local_size(int processor) = 0;
 
     /** the total count of elements on a processor */
-    int local_count(int processor) {
+    size_t local_count(int processor) {
         auto size = local_size(processor);
         return std::accumulate(size.begin(), size.end(), 1, std::multiplies<int>());
     }
@@ -120,19 +120,19 @@ class cartesian_partitioning : public multi_partitioning<D, G> {
 
     /** Obtain the owner of index i for the g-th dimension */
     using multi_partitioning<D, G>::owner;
-    virtual int owner(int g, int i) = 0;
+    virtual int owner(int g, size_t i) = 0;
 
     /** Obtain the local index of global index i for the g-th dimension */
     using multi_partitioning<D, G>::local;
-    virtual int local(int g, int i) = 0;
+    virtual size_t local(int g, size_t i) = 0;
 
     /** Obtain the global index of local index i for the g-th dimension */
     using multi_partitioning<D, G>::global;
-    virtual int global(int g, int u, int i) = 0;
+    virtual size_t global(int g, int u, size_t i) = 0;
 
     /** Obtain the local size for the g-th dimension */
     using multi_partitioning<D, G>::local_size;
-    virtual int local_size(int g, int u) = 0;
+    virtual size_t local_size(int g, int u) = 0;
 };
 
 } // namespace bulk
