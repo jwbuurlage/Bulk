@@ -1,4 +1,6 @@
 #include <chrono>
+#include <cstdint>
+#include <limits>
 #include <thread>
 
 #include "bulk_test_common.hpp"
@@ -75,6 +77,11 @@ void test_algorithm() {
             BULK_CHECK(bulk::min(xs) == 1, "min of coarray");
             BULK_CHECK(bulk::sum(xs) == 2 * p * (2 * p + 1) / 2,
                        "sum of coarray ");
+
+            BULK_CHECK(bulk::sum(world, (std::int64_t)std::numeric_limits<std::int32_t>::max()) ==
+                       (std::int64_t)p *
+                       (std::int64_t)std::numeric_limits<std::int32_t>::max(),
+                       "sum of large values");
         }
     });
 }

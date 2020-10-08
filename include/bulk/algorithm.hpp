@@ -190,7 +190,7 @@ T min(bulk::world& world, T t) {
 template <typename T>
 T sum(bulk::world& world, T t) {
     auto xs = bulk::gather_all(world, t);
-    return std::accumulate(xs.begin(), xs.end(), 0);
+    return std::accumulate(xs.begin(), xs.end(), T{});
 }
 
 template <typename T>

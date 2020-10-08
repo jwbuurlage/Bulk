@@ -12,6 +12,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `bulk::index` now represents indices as `size_t`
 
+### Fixed
+
+- Prevent `bulk::sum` from silently truncating values.
+
 ## [2.0.0] - 2020-03-27
 
 ### Breaking changes
