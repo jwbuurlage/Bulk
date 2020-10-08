@@ -196,7 +196,7 @@ T sum(bulk::world& world, T t) {
 template <typename T>
 T product(bulk::world& world, T t) {
     auto xs = bulk::gather_all(world, t);
-    return std::accumulate(xs.begin(), xs.end(), 1,
+    return std::accumulate(xs.begin(), xs.end(), (T)1,
                            [](auto& lhs, auto& rhs) { return lhs * rhs; });
 }
 

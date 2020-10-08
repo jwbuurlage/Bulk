@@ -82,6 +82,11 @@ void test_algorithm() {
                        (std::int64_t)p *
                        (std::int64_t)std::numeric_limits<std::int32_t>::max(),
                        "sum of large values");
+            BULK_CHECK(bulk::product(world, s == 0 ?
+                                            (std::int64_t)std::numeric_limits<std::int32_t>::max() + 1 :
+                                            1) ==
+                       (std::int64_t)std::numeric_limits<std::int32_t>::max() + 1,
+                       "large product");
         }
     });
 }

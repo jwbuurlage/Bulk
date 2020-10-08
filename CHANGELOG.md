@@ -14,7 +14,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- Prevent `bulk::sum` from silently truncating values.
+- Prevent `bulk::sum` and `bulk::product` from silently truncating values.
 
 ## [2.0.0] - 2020-03-27
 
