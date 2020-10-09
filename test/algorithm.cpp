@@ -1,5 +1,4 @@
 #include <chrono>
-#include <cstdint>
 #include <limits>
 #include <thread>
 
@@ -78,14 +77,13 @@ void test_algorithm() {
             BULK_CHECK(bulk::sum(xs) == 2 * p * (2 * p + 1) / 2,
                        "sum of coarray ");
 
-            BULK_CHECK(bulk::sum(world, (std::int64_t)std::numeric_limits<std::int32_t>::max()) ==
-                       (std::int64_t)p *
-                       (std::int64_t)std::numeric_limits<std::int32_t>::max(),
+            BULK_CHECK(bulk::sum(world, (int64_t)std::numeric_limits<int32_t>::max()) ==
+                       (int64_t)p * (int64_t)std::numeric_limits<int32_t>::max(),
                        "sum of large values");
             BULK_CHECK(bulk::product(world, s == 0 ?
-                                            (std::int64_t)std::numeric_limits<std::int32_t>::max() + 1 :
+                                            (int64_t)std::numeric_limits<int32_t>::max() + 1 :
                                             1) ==
-                       (std::int64_t)std::numeric_limits<std::int32_t>::max() + 1,
+                       (int64_t)std::numeric_limits<int32_t>::max() + 1,
                        "large product");
         }
     });
