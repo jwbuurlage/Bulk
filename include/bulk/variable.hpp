@@ -177,14 +177,19 @@ class var {
         void operator=(var_impl&& other) = delete;
 
         virtual void put(int t, const value_type& source) {
-            bulk::detail::scale ruler;
-            bulk::detail::fill(ruler, source);
-            auto size = ruler.size;
-            auto target_buffer = world_.put_buffer_(t, id_, size);
-            // use non-owning memory buffer
-            auto tbuf = bulk::detail::memory_buffer_base(target_buffer);
-            auto ibuf = bulk::detail::imembuf(tbuf);
-            bulk::detail::fill(ibuf, source);
+            if constexpr (std::is_trivially_copyable_v<value_type>) {
+                auto target_buffer = world_.put_buffer_(t, id_, sizeof(source));
+                memcpy(target_buffer, &source, sizeof(source));
+            } else {
+                bulk::detail::scale ruler;
+                bulk::detail::fill(ruler, source);
+                auto size = ruler.size;
+                auto target_buffer = world_.put_buffer_(t, id_, size);
+                // use non-owning memory buffer
+                auto tbuf = bulk::detail::memory_buffer_base(target_buffer);
+                auto ibuf = bulk::detail::imembuf(tbuf);
+                bulk::detail::fill(ibuf, source);
+            }
         }
 
         virtual future<T> get(int processor) const {
@@ -193,11 +198,15 @@ class var {
             return result;
         }
 
-        void deserialize_put(size_t, char* data) override {
-            // use non-owning memory buffer
-            auto membuf = bulk::detail::memory_buffer_base(data);
-            auto obuf = bulk::detail::omembuf(membuf);
-            bulk::detail::fill(obuf, value_);
+        void deserialize_put(size_t size, char* data) override {
+            if constexpr (std::is_trivially_copyable_v<value_type>) {
+                memcpy(&value_, data, size);
+            } else {
+                // use non-owning memory buffer
+                auto membuf = bulk::detail::memory_buffer_base(data);
+                auto obuf = bulk::detail::omembuf(membuf);
+                bulk::detail::fill(obuf, value_);
+            }
         }
 
         size_t serialized_size() override final {

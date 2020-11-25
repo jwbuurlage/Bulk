@@ -117,14 +117,17 @@ class world : public bulk::world {
         }
         coarray_get_tasks_.clear();
 
-        // TODO: optimize the redundant buffer away
+        size_t max_size = 0;
+        for (auto& t : var_get_tasks_) {
+            max_size = std::max(max_size, t.var->serialized_size());
+        }
+        char* buffer = new char[max_size];
         for (auto& t : var_get_tasks_) {
             auto size = t.var->serialized_size();
-            char* buffer = new char[size];
             t.var->serialize(buffer);
             t.future->deserialize_get(size, buffer);
-            delete[] buffer;
         }
+        delete[] buffer;
         var_get_tasks_.clear();
 
         barrier();
