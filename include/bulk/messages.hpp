@@ -114,6 +114,11 @@ class queue {
     bool empty() { return impl_->data_.empty(); }
 
     /**
+     * Clear the messages in the queue.
+     */
+    void clear() { impl_->clear(); }
+
+    /**
      * Get a reference to the world of the queue.
      *
      * \returns a reference to the world of the queue

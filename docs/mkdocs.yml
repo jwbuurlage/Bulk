@@ -94,6 +94,7 @@ nav:
         - 'queue::end': 'api/queue/end.md'
         - 'queue::size': 'api/queue/size.md'
         - 'queue::empty': 'api/queue/empty.md'
+        - 'queue::clear': 'api/queue/clear.md'
         - 'queue::world': 'api/queue/world.md'
         - 'queue::sender::send': 'api/queue/sender/send.md'
         - 'partitioning::constructor': 'api/partitioning/constructor.md'

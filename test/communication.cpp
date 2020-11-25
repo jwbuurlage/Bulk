@@ -593,6 +593,10 @@ void test_communication() {
                 BULK_CHECK(content == contents[k++],
                            "multiple messages passed succesfully");
             }
+
+            BULK_CHECK(!q.empty(), "messages not consumed");
+            q.clear();
+            BULK_CHECK(q.empty(), "queue can be cleared");
         }
 
         BULK_SKIP_SECTION_IF("Subworlds", p <= 1);

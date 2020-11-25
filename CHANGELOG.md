@@ -16,6 +16,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Add `clear_queues` argument to `world::sync`, to optionally retain all messages
   from the previous superstep.
+- Expose `clear` method of `queue`.
 
 ### Fixed
 
