@@ -198,7 +198,7 @@ class var {
             return result;
         }
 
-        void deserialize_put(size_t size, char* data) override {
+        void deserialize_put([[maybe_unused]] size_t size, char* data) override {
             if constexpr (std::is_trivially_copyable_v<value_type>) {
                 memcpy(&value_, data, size);
             } else {
