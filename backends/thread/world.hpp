@@ -100,7 +100,7 @@ class world : public bulk::world {
 
     void barrier() override { state_->sync_barrier.wait(); }
 
-    void sync() override {
+    void sync(bool clear_queues = true) override {
         barrier();
 
         // core A: x = 5;
@@ -147,7 +147,9 @@ class world : public bulk::world {
         for (auto i = 0u; i < qs.size(); i += nprocs_) {
             auto& rq = qs[i + pid_];
             if (rq.base) { // If this is a registered queue
-                rq.base->clear_();
+                if (clear_queues) {
+                    rq.base->clear_();
+                }
                 for (auto& p : rq.receiveBuffers) {
                     rq.base->deserialize_push(p.second, p.first);
                     delete[] p.first;

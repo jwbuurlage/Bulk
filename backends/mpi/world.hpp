@@ -55,8 +55,10 @@ class world : public bulk::world {
     int active_processors() const override final { return active_processors_; }
     int rank() const override final { return processor_id_; }
 
-    void sync() override final {
-        clear_messages_();
+    void sync(bool clear_queues = true) override final {
+        if (clear_queues) {
+            clear_messages_();
+        }
 
         int remote_puts = 0;
         int remote_custom_puts = 0;

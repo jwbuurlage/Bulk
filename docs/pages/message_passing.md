@@ -41,6 +41,12 @@ for (auto [tag, content] : queue) {
 };
 ```
 
+!!! warning
+    Message queues get cleared when calling `world::sync`. The messages
+    in a queue therefore correspond only to those sent in the previous
+    superstep. You can disable the clearing of queues using the
+    `clear_queues` parameter of `world::sync`.
+
 It is perfectly legal, and even encouraged, to make a separate queue for
 different types of messages. Each message queue has its own independent
 types. In addition, you are not limited to 'tag + content' type of messages, you can also send untagged data, or custom data such as index tuples, or even your own structs. For example:

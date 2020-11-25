@@ -79,14 +79,14 @@ class world {
     }
 
     /**
-     * Perform a global barrier synchronization of the active processors
-     * and resolves any outstanding communication. Messages previously
-     * received in queues are cleared for the next superstep.
-     * The function must be called by all processors.
-     * When some processors call `sync` while others call `barrier`
-     * at the same time, behaviour is undefined.
+     * Perform a global barrier synchronization of the active processors and
+     * resolves any outstanding communication. Messages previously received in
+     * queues are cleared for the next superstep, unless `clear_queues` is set
+     * to false. The function must be called by all processors. When some
+     * processors call `sync` while others call `barrier` at the same time,
+     * behaviour is undefined.
      */
-    virtual void sync() = 0;
+    virtual void sync(bool clear_queues = true) = 0;
 
     /**
      * Perform a global barrier synchronization of the active processors

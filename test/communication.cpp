@@ -574,6 +574,27 @@ void test_communication() {
             }
         }
 
+        BULK_SECTION("Clear queue behaviour") {
+            auto q = bulk::queue<int>(world);
+            q(world.next_rank()).send(0);
+            world.sync();
+            world.sync();
+            BULK_CHECK(q.empty(), "queue gets cleared after a sync")
+
+            std::vector<int> contents = {1337, 12345, 1230519, 5, 8};
+            for (auto x : contents) {
+                q(world.next_rank()).send(x);
+            }
+            world.sync();
+            world.sync(false);
+            BULK_CHECK(!q.empty(), "multiple messages arrived after not clearing queue");
+            int k = 0;
+            for (auto content : q) {
+                BULK_CHECK(content == contents[k++],
+                           "multiple messages passed succesfully");
+            }
+        }
+
         BULK_SKIP_SECTION_IF("Subworlds", p <= 1);
 
         BULK_SECTION("Creating a subworld split") {

@@ -12,6 +12,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `bulk::index` now represents indices as `size_t`
 
+### Added
+
+- Add `clear_queues` argument to `world::sync`, to optionally retain all messages
+  from the previous superstep.
+
 ### Fixed
 
 - Prevent `bulk::sum` and `bulk::product` from silently truncating values (@TimoMaarse, #11)
