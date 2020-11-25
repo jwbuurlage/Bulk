@@ -590,7 +590,7 @@ void test_communication() {
             BULK_CHECK_ONCE(!q.empty(), "multiple messages arrived after not clearing queue");
             int k = 0;
             for (auto content : q) {
-                BULK_CHECK(content == contents[k++],
+                BULK_CHECK_ONCE(content == contents[k++],
                            "multiple messages passed succesfully");
             }
 
