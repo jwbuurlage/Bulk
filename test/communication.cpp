@@ -587,16 +587,16 @@ void test_communication() {
             }
             world.sync();
             world.sync(false);
-            BULK_CHECK(!q.empty(), "multiple messages arrived after not clearing queue");
+            BULK_CHECK_ONCE(!q.empty(), "multiple messages arrived after not clearing queue");
             int k = 0;
             for (auto content : q) {
                 BULK_CHECK(content == contents[k++],
                            "multiple messages passed succesfully");
             }
 
-            BULK_CHECK(!q.empty(), "messages not consumed");
+            BULK_CHECK_ONCE(!q.empty(), "messages not consumed");
             q.clear();
-            BULK_CHECK(q.empty(), "queue can be cleared");
+            BULK_CHECK_ONCE(q.empty(), "queue can be cleared");
         }
 
         BULK_SKIP_SECTION_IF("Subworlds", p <= 1);
