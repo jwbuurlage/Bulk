@@ -40,7 +40,7 @@ set(
 add_library(bulk INTERFACE)
 
 target_include_directories(bulk INTERFACE "include")
-target_compile_features(bulk INTERFACE cxx_std_17)
+target_compile_features(bulk INTERFACE cxx_std_20)
 
 add_subdirectory("backends/mpi/build" "bin/mpi" EXCLUDE_FROM_ALL)
 add_subdirectory("backends/thread/build" "bin/thread" EXCLUDE_FROM_ALL)
