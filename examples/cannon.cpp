@@ -11,15 +11,15 @@
 //  |_                          _|
 //
 //  Then we can write for the block C_ij :
-//    C_ij = Sum_(k = 1)^N A_ik B_kj
+//    C_ij = \sum_{k = 1}^N A_ik B_kj
 //
 //  The idea of Cannon's algorithm is to let processor (s, t) compute block
-//  C_st. If that processor starts with blocks A_(s, (s + t) % N) and B_((s + t)
-//  % N,t), then initially each processor has a unique block assigned. After
-//  each iteration a processor sends its A-block to the processor 'to the right'
-//  (i.e. at ((s + 1) % N, t)) and the B-block down. After N iterations, each
-//  processor has computed C_ij, so that the result is available distributed
-//  over the processors.
+//  C_st. If that processor starts with blocks A_(1 + s, 1 + (s + t) % N) and
+//  B_(1 + (s + t) % N, t), then initially each processor has a unique block
+//  assigned. After each iteration a processor sends its A-block to the
+//  processor 'to the right' (i.e. at ((s + 1) % N, t)) and similarly sends its
+//  B-block down. After N iterations, each processor has computed C_ij, so that
+//  the result is available distributed over the processors.
 
 #include <cassert>
 #include <random>
