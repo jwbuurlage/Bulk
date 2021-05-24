@@ -29,6 +29,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Prevent `bulk::sum` and `bulk::product` from silently truncating values (@TimoMaarse, #11)
 - Fix const correctness of `bulk::product(bulk::world&, T)`.
+- Fix data race in shared state creation for `world::split` in the thread backend.
 
 ## [2.0.0] - 2020-03-27
 

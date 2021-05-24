@@ -84,6 +84,7 @@ class world : public bulk::world {
   public:
     world(std::shared_ptr<world_state<B>> state, int pid, int nprocs)
     : state_(state), pid_(pid), nprocs_(nprocs) {}
+
     ~world() {}
 
     // Needs a move for environment::spawn to work
@@ -224,10 +225,16 @@ class world : public bulk::world {
 
         sync();
 
+        // Allow each thread to increment the arc of the shared state.
+        shared_state = *state;
+
+        barrier();
+
         // Create a new world object with reference to the shared state and
-        // return it
+        // return it.
         return std::make_unique<bulk::thread::world<B>>(
-        *state.value(), std::distance(parts[part].begin(), parts[part].find(rank())),
+        std::move(shared_state),
+        std::distance(parts[part].begin(), parts[part].find(rank())),
         parts[part].size());
     }
 

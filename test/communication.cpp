@@ -587,11 +587,12 @@ void test_communication() {
             }
             world.sync();
             world.sync(false);
-            BULK_CHECK_ONCE(!q.empty(), "multiple messages arrived after not clearing queue");
+            BULK_CHECK_ONCE(!q.empty(), "multiple messages arrived after not "
+                                        "clearing queue");
             int k = 0;
             for (auto content : q) {
                 BULK_CHECK_ONCE(content == contents[k++],
-                           "multiple messages passed succesfully");
+                                "multiple messages passed succesfully");
             }
 
             BULK_CHECK_ONCE(!q.empty(), "messages not consumed");
@@ -611,8 +612,7 @@ void test_communication() {
             auto y = x(sub->next_rank()).get();
             sub->sync();
 
-            BULK_CHECK(y.value() == ((s + 2) % p),
-                       "get future from subworld");
+            BULK_CHECK(y.value() == ((s + 2) % p), "get future from subworld");
 
             bulk::var<int> a(world, 3);
             a(world.next_rank()) = s;
