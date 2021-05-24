@@ -9,11 +9,11 @@
 
 #include <cassert>
 #include <cstddef>
+#include <span>
 #include <vector>
 
 #include "array.hpp"
 #include "communication.hpp"
-#include "util/span.hpp"
 
 namespace bulk {
 
@@ -93,7 +93,7 @@ class coarray {
          *   {x,x,3,2,4,3,2,4,3,2,x,x};
          * That is to say, the values will repeat to fill the slice.
          */
-        void operator=(const bulk::span<T>& values) {
+        void operator=(const std::span<T>& values) {
             parent_.put(t_, s_, values);
         }
 
@@ -245,7 +245,7 @@ class coarray {
     /**
      * Put a span of data in a remote image.
      */
-    void put(int processor, slice s, const bulk::span<T>& values) {
+    void put(int processor, slice s, const std::span<T>& values) {
         auto count =
         values.size() < (s.last - s.first) ? values.size() : (s.last - s.first);
         data_.put(processor, values.data(), s.first, count);
@@ -276,7 +276,9 @@ class coarray {
     /**
      * Get a raw pointer to the local underlying sequential data buffer.
      */
-    T* data() { return static_cast<T*>(std::get<0>(data_.location_and_size())); }
+    T* data() {
+        return static_cast<T*>(std::get<0>(data_.location_and_size()));
+    }
 
     /**
      * Check if the coarray is empty.

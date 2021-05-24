@@ -72,13 +72,13 @@ int main() {
 
         for (int iteration = 0; iteration < kGridDimension; ++iteration) {
             world.log_once("Iteration: %i", iteration);
-            detail::local_matrix_product(P, A, B, C);
+            local_matrix_product(P, A, B, C);
 
             A(horizontal_neighbour)
-            [{0u, m * n}] = bulk::span(A.data(), A.size());
+            [{0u, m * n}] = std::span(A.data(), A.size());
 
             B(vertical_neighbour)
-            [{0u, m * n}] = bulk::span(B.data(), B.size());
+            [{0u, m * n}] = std::span(B.data(), B.size());
 
             world.sync();
         }

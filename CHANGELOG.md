@@ -18,18 +18,25 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add `clear_queues` argument to `world::sync`, to optionally retain all messages
   from the previous superstep.
 - Expose `clear` method of `queue`.
+- Add DGEMM example (Cannon's algorithm).
 
 ### Changed
 
 - Default barrier for thread backend is now `std::barrier`.
 - Added `Barrier` concept, and constrain the associated `environment` and
   `world` parameters.
+- Span based coarray puts are now based on `std::span`.
+  
+### Removed
+
+- `bulk::span` was removed in favor of `std::span`.
 
 ### Fixed
 
 - Prevent `bulk::sum` and `bulk::product` from silently truncating values (@TimoMaarse, #11)
 - Fix const correctness of `bulk::product(bulk::world&, T)`.
 - Fix data race in shared state creation for `world::split` in the thread backend.
+- Explicitly cast to `T*` in the implementation of `bulk::coarray:data`.
 
 ## [2.0.0] - 2020-03-27
 
