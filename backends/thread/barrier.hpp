@@ -13,7 +13,7 @@ class barrier {
     explicit barrier(std::size_t count)
     : threshold_(count), count_(count), generation_(0) {}
 
-    void wait() {
+    void arrive_and_wait() {
         auto gen = generation_;
         std::unique_lock<std::mutex> lock{mutex_};
         if (!--count_) {
@@ -39,7 +39,7 @@ class spinning_barrier {
   public:
     spinning_barrier(unsigned int n) : n_(n), nwait_(0), step_(0) {}
 
-    bool wait() {
+    void arrive_and_wait() {
         // arrived at the barrier, store the superstep we are in
         unsigned int step = step_.load();
 
@@ -48,12 +48,10 @@ class spinning_barrier {
             // the counter
             nwait_.store(0);
             step_.fetch_add(1);
-            return true;
         } else {
             // check if we are still in the same superstep
             while (step_.load() == step) {
             }
-            return false;
         }
     }
 

@@ -10,6 +10,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Breaking changes
 
+- Bulk now requires C++20.
 - `bulk::index` now represents indices as `size_t`
 
 ### Added
@@ -18,9 +19,16 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   from the previous superstep.
 - Expose `clear` method of `queue`.
 
+### Changed
+
+- Default barrier for thread backend is now `std::barrier`.
+- Added `Barrier` concept, and constrain the associated `environment` and
+  `world` parameters.
+
 ### Fixed
 
 - Prevent `bulk::sum` and `bulk::product` from silently truncating values (@TimoMaarse, #11)
+- Fix const correctness of `bulk::product(bulk::world&, T)`.
 
 ## [2.0.0] - 2020-03-27
 

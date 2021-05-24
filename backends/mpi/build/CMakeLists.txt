@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.0.0)
-
 set(BACKEND_NAME mpi)
 project(bulk_${BACKEND_NAME})
 

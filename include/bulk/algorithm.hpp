@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <limits>
 #include <numeric>
+#include <ranges>
 #include <vector>
 
 #include "coarray.hpp"
@@ -177,14 +178,14 @@ std::vector<T> foldl_each(coarray<T>& xs, Func f, S start_value = {}) {
 
 template <typename T>
 T max(bulk::world& world, T t) {
-    auto xs = bulk::gather_all(world, t);
-    return *std::max_element(xs.begin(), xs.end());
+    bulk::coarray<T> xs = bulk::gather_all(world, t);
+    return *std::ranges::max_element(xs);
 }
 
 template <typename T>
 T min(bulk::world& world, T t) {
     auto xs = bulk::gather_all(world, t);
-    return *std::min_element(xs.begin(), xs.end());
+    return *std::ranges::min_element(xs);
 }
 
 template <typename T>
@@ -195,9 +196,9 @@ T sum(bulk::world& world, T t) {
 
 template <typename T>
 T product(bulk::world& world, T t) {
-    auto xs = bulk::gather_all(world, t);
+    bulk::coarray<T> xs = bulk::gather_all(world, t);
     return std::accumulate(xs.begin(), xs.end(), (T)1,
-                           [](auto& lhs, auto& rhs) { return lhs * rhs; });
+                           [](const T& lhs, const T& rhs) { return lhs * rhs; });
 }
 
 template <typename T>

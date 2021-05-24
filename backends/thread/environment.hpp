@@ -1,17 +1,20 @@
 #pragma once
 
 #include <algorithm>
+#include <barrier>
 #include <iostream>
 #include <memory>
 #include <thread>
 #include <vector>
 
+#include "concepts.hpp"
 #include "world.hpp"
+
 #include <bulk/environment.hpp>
 
 namespace bulk::thread {
 
-template <typename Barrier = spinning_barrier>
+template <Barrier B = std::barrier<>>
 class environment_ : public bulk::environment {
   public:
     void spawn(int processors, std::function<void(bulk::world&)> spmd) override {
@@ -19,11 +22,11 @@ class environment_ : public bulk::environment {
         std::vector<std::thread> threads;
 
         // Shared world_state object
-        auto state = std::make_shared<world_state<Barrier>>(processors);
+        auto state = std::make_shared<world_state<B>>(processors);
         state->log_callback = log_callback;
 
         // Create the threads and thereby start them
-        std::vector<bulk::thread::world<Barrier>> ws;
+        std::vector<bulk::thread::world<B>> ws;
         ws.reserve(processors);
         for (int i = 0; i < processors; i++) {
             ws.emplace_back(state, i, processors);
