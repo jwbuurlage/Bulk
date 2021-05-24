@@ -1,3 +1,26 @@
+// Cannon's algorithm is a way to compute C = AB on a square grid of N x N
+// processors. If all matrices M \in {A, B, C} are split up as follows:
+//   _                          _
+//  |  M_11 | M_12 | ... | M_1N  |
+//  |  -----+------+-----+-----  |
+//  |  M_21 | M_22 | ... | M_2N  |
+//  |  -----+------+-----+-----  |
+//  |  ...  | ...  | ... | ...
+//  |  -----+------+-----+-----  |
+//  |  M_N1 | M_N2 | ... | M_NN  |
+//  |_                          _|
+//
+//  Then we can write for the block C_ij :
+//    C_ij = Sum_(k = 1)^N A_ik B_kj
+//
+//  The idea of Cannon's algorithm is to let processor (s, t) compute block
+//  C_st. If that processor starts with blocks A_(s, (s + t) % N) and B_((s + t)
+//  % N,t), then initially each processor has a unique block assigned. After
+//  each iteration a processor sends its A-block to the processor 'to the right'
+//  (i.e. at ((s + 1) % N, t)) and the B-block down. After N iterations, each
+//  processor has computed C_ij, so that the result is available distributed
+//  over the processors.
+
 #include <cassert>
 #include <random>
 #include <ranges>
@@ -10,8 +33,6 @@ using T = float;
 
 constexpr int kDimension = 1024;
 constexpr int kGridDimension = 4;
-
-namespace {
 
 auto rand01() {
   static std::uniform_real_distribution<T> distr(0.0, 1.0);
@@ -37,8 +58,6 @@ auto local_matrix_product(const bulk::block_partitioning<2, 2>& P,
     }
   }
 }
-
-}  // namespace
 
 int main() {
   environment env;
@@ -82,7 +101,7 @@ int main() {
     }
 
     // C now contains the (local block of) the matrix product
-    world.log("%f", C[0]);
+    world.log_once("Finished computing C = AB.");
   });
 
   return 0;
