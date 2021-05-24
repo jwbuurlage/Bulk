@@ -81,7 +81,7 @@ for (auto [tag, content] : q) {
 
 ## Building
 
-Bulk should work across all major Linux distributions. It requires an up-to-date compiler that supports C++17, e.g. GCC >= 7.0, or Clang >= 4.0.
+Bulk should work across all major Linux distributions. It requires an up-to-date compiler that supports C++20, e.g. GCC >= 11.0, or Clang >= 12.0.
 
 ### Backends
 
