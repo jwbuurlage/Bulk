@@ -1,7 +1,7 @@
 .PHONY: all get-deps test
 
 all:
-	@mkdir build && cd build && cmake -G Ninja .. && VERBOSE=1 make thread
+	@mkdir build && cd build && cmake .. && VERBOSE=1 make thread
 
 get-deps:
 	@git submodule update --remote --init
