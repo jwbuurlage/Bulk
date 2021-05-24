@@ -24,7 +24,7 @@ namespace bulk {
  */
 template <typename T>
 void put(int processor, const T& value, var<T>& x) {
-    x(processor) = value;
+  x(processor) = value;
 }
 
 /**
@@ -39,7 +39,7 @@ void put(int processor, const T& value, var<T>& x) {
  */
 template <typename T>
 future<T> get(int processor, var<T>& x) {
-    return x(processor).get();
+  return x(processor).get();
 }
 
-} // namespace bulk
+}  // namespace bulk

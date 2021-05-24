@@ -38,258 +38,251 @@ namespace bulk {
  */
 template <typename T>
 class coarray {
-  public:
-    struct slice {
-        size_t first;
-        size_t last;
+ public:
+  struct slice {
+    size_t first;
+    size_t last;
 
-        slice(size_t a, size_t b) {
-            first = a;
-            last = b;
-        }
+    slice(size_t a, size_t b) {
+      first = a;
+      last = b;
+    }
 
-        slice(int a, int b) {
-            first = static_cast<size_t>(a);
-            last = static_cast<size_t>(b);
-        }
-    };
+    slice(int a, int b) {
+      first = static_cast<size_t>(a);
+      last = static_cast<size_t>(b);
+    }
+  };
 
-    class slice_writer {
-      public:
-        /**
-         * Assign a value to a slice of a remote image.
-         *
-         * \param value the new value of each element in the slice
-         */
-        void operator=(T value) {
-            for (auto i = s_.first; i < s_.last; ++i) {
-                parent_.put(t_, i, value);
-            }
-        }
+  class slice_writer {
+   public:
+    /**
+     * Assign a value to a slice of a remote image.
+     *
+     * \param value the new value of each element in the slice
+     */
+    void operator=(T value) {
+      for (auto i = s_.first; i < s_.last; ++i) {
+        parent_.put(t_, i, value);
+      }
+    }
 
-        /**
-         * Assign values to a slice of a remote image.
-         *
-         * \param values the new values of the slice
-         *
-         * Note: when sizes do not match, the rule is that
-         *   array[{2,10}] = {3,2,4};
-         * will fill the array as
-         *   {x,x,3,2,4,3,2,4,3,2,x,x};
-         * That is to say, the values will repeat to fill the slice.
-         */
-        void operator=(const std::vector<T>& values) {
-            parent_.put(t_, s_, values);
-        }
+    /**
+     * Assign values to a slice of a remote image.
+     *
+     * \param values the new values of the slice
+     *
+     * Note: when sizes do not match, the rule is that
+     *   array[{2,10}] = {3,2,4};
+     * will fill the array as
+     *   {x,x,3,2,4,3,2,4,3,2,x,x};
+     * That is to say, the values will repeat to fill the slice.
+     */
+    void operator=(const std::vector<T>& values) {
+      parent_.put(t_, s_, values);
+    }
 
-        /**
-         * Assign values to a slice of a remote image.
-         *
-         * \param values a span that refers to the elements
-         *
-         * Note: when sizes do not match, the rule is that
-         *   array[{2,10}] = {3,2,4};
-         * will fill the array as
-         *   {x,x,3,2,4,3,2,4,3,2,x,x};
-         * That is to say, the values will repeat to fill the slice.
-         */
-        void operator=(const std::span<T>& values) {
-            parent_.put(t_, s_, values);
-        }
+    /**
+     * Assign values to a slice of a remote image.
+     *
+     * \param values a span that refers to the elements
+     *
+     * Note: when sizes do not match, the rule is that
+     *   array[{2,10}] = {3,2,4};
+     * will fill the array as
+     *   {x,x,3,2,4,3,2,4,3,2,x,x};
+     * That is to say, the values will repeat to fill the slice.
+     */
+    void operator=(const std::span<T>& values) { parent_.put(t_, s_, values); }
 
+    future<T[]> get() { return parent_.get(t_, s_.first, s_.last); }
 
-        future<T[]> get() { return parent_.get(t_, s_.first, s_.last); }
+   private:
+    friend coarray<T>;
 
-      private:
-        friend coarray<T>;
-
-        slice_writer(coarray<T>& parent, int t, slice s)
+    slice_writer(coarray<T>& parent, int t, slice s)
         : parent_(parent), t_(t), s_(s) {}
 
-        coarray<T>& parent_;
-        int t_;
-        slice s_;
-    };
+    coarray<T>& parent_;
+    int t_;
+    slice s_;
+  };
 
-    class writer {
-      public:
-        /**
-         * Assign a value to a remote image element.
-         *
-         * \param value the new value of the element
-         */
-        void operator=(T value) { parent_.put(t_, i_, value); }
+  class writer {
+   public:
+    /**
+     * Assign a value to a remote image element.
+     *
+     * \param value the new value of the element
+     */
+    void operator=(T value) { parent_.put(t_, i_, value); }
 
-        auto get() { return parent_.get(t_, i_); }
+    auto get() { return parent_.get(t_, i_); }
 
-      private:
-        friend coarray<T>;
+   private:
+    friend coarray<T>;
 
-        writer(coarray<T>& parent, int t, size_t i)
+    writer(coarray<T>& parent, int t, size_t i)
         : parent_(parent), t_(t), i_(i) {}
 
-        coarray<T>& parent_;
-        int t_;
-        int i_;
-    };
+    coarray<T>& parent_;
+    int t_;
+    int i_;
+  };
 
-    class image {
-      public:
-        image(coarray<T>& parent, int t) : parent_(parent), t_(t) {}
-
-        /**
-         * Obtain a writer to the remote element.
-         *
-         * \param i the index of the remote element
-         *
-         * \returns an object that can be used to write to the remote element
-         */
-        writer operator[](size_t i) { return writer(parent_, t_, i); }
-
-        slice_writer operator[](slice s) {
-            return slice_writer(parent_, t_, s);
-        }
-
-      private:
-        coarray<T>& parent_;
-        int t_;
-    };
+  class image {
+   public:
+    image(coarray<T>& parent, int t) : parent_(parent), t_(t) {}
 
     /**
-     * Initialize and registers the coarray with the world
+     * Obtain a writer to the remote element.
      *
-     * \param world the distributed layer in which the array is defined.
-     * \param local_size the size of the local array
+     * \param i the index of the remote element
+     *
+     * \returns an object that can be used to write to the remote element
      */
-    coarray(bulk::world& world, size_t local_size) : data_(world, local_size) {}
+    writer operator[](size_t i) { return writer(parent_, t_, i); }
 
-    /**
-     * Initialize and registers the coarray with the world
-     *
-     * \param world the distributed layer in which the array is defined.
-     * \param local_size the size of the local array
-     * \param default_value the initial value of each local element
-     */
-    coarray(bulk::world& world, size_t local_size, T default_value)
-    : data_(world, local_size) {
-        for (auto i = 0u; i < local_size; ++i) {
-            data_[i] = default_value;
-        }
+    slice_writer operator[](slice s) { return slice_writer(parent_, t_, s); }
+
+   private:
+    coarray<T>& parent_;
+    int t_;
+  };
+
+  /**
+   * Initialize and registers the coarray with the world
+   *
+   * \param world the distributed layer in which the array is defined.
+   * \param local_size the size of the local array
+   */
+  coarray(bulk::world& world, size_t local_size) : data_(world, local_size) {}
+
+  /**
+   * Initialize and registers the coarray with the world
+   *
+   * \param world the distributed layer in which the array is defined.
+   * \param local_size the size of the local array
+   * \param default_value the initial value of each local element
+   */
+  coarray(bulk::world& world, size_t local_size, T default_value)
+      : data_(world, local_size) {
+    for (auto i = 0u; i < local_size; ++i) {
+      data_[i] = default_value;
     }
+  }
 
-    /**
-     * Initialize and registers the coarray with the world
-     *
-     * \param world the distributed layer in which the array is defined.
-     * \param local_size the size of the local array
-     * \param buffer the externally managed data buffer
-     */
-    coarray(bulk::world& world, size_t local_size, T* buffer)
-    : data_(world, local_size, buffer) {}
+  /**
+   * Initialize and registers the coarray with the world
+   *
+   * \param world the distributed layer in which the array is defined.
+   * \param local_size the size of the local array
+   * \param buffer the externally managed data buffer
+   */
+  coarray(bulk::world& world, size_t local_size, T* buffer)
+      : data_(world, local_size, buffer) {}
 
-    coarray(coarray&& other) : data_(std::move(other.data_)) {}
+  coarray(coarray&& other) : data_(std::move(other.data_)) {}
 
-    /**
-     * Retrieve the coarray image with index t
-     *
-     * \param t index of the target image
-     *
-     * \returns the coarray image with index t
-     */
-    image operator()(int t) { return image(*this, t); }
+  /**
+   * Retrieve the coarray image with index t
+   *
+   * \param t index of the target image
+   *
+   * \returns the coarray image with index t
+   */
+  image operator()(int t) { return image(*this, t); }
 
-    /**
-     * Access the `i`th element of the local coarray image
-     *
-     * \param i index of the element
-     * \returns reference to the i-th element of the local image
-     */
-    T& operator[](size_t i) { return data_[i]; }
-    const T& operator[](size_t i) const { return data_[i]; }
+  /**
+   * Access the `i`th element of the local coarray image
+   *
+   * \param i index of the element
+   * \returns reference to the i-th element of the local image
+   */
+  T& operator[](size_t i) { return data_[i]; }
+  const T& operator[](size_t i) const { return data_[i]; }
 
-    /**
-     * Get a reference to the world of the coarray.
-     *
-     * \returns a reference to the world of the coarray
-     */
-    bulk::world& world() { return data_.world(); }
+  /**
+   * Get a reference to the world of the coarray.
+   *
+   * \returns a reference to the world of the coarray
+   */
+  bulk::world& world() { return data_.world(); }
 
-    /**
-     * Get an iterator to the beginning of the local image of the coarray.
-     *
-     * \returns a pointer to the first element of the local data.
-     */
-    T* begin() { return data_.begin(); }
+  /**
+   * Get an iterator to the beginning of the local image of the coarray.
+   *
+   * \returns a pointer to the first element of the local data.
+   */
+  T* begin() { return data_.begin(); }
 
-    /**
-     * Get an iterator to the end of the local image of the coarray.
-     *
-     * \returns a pointer beyond the last element of the local data.
-     */
-    T* end() { return data_.end(); }
+  /**
+   * Get an iterator to the end of the local image of the coarray.
+   *
+   * \returns a pointer beyond the last element of the local data.
+   */
+  T* end() { return data_.end(); }
 
-    /**
-     * Put the value `value` into element `idx` on processor `t`.
-     */
-    void put(int t, size_t idx, T value) { data_.put(t, &value, idx, 1); }
+  /**
+   * Put the value `value` into element `idx` on processor `t`.
+   */
+  void put(int t, size_t idx, T value) { data_.put(t, &value, idx, 1); }
 
-    /**
-     * Put a range of data in a remote image.
-     */
-    void put(int processor, slice s, const std::vector<T>& values) {
-        auto count =
+  /**
+   * Put a range of data in a remote image.
+   */
+  void put(int processor, slice s, const std::vector<T>& values) {
+    auto count =
         values.size() < (s.last - s.first) ? values.size() : (s.last - s.first);
-        data_.put(processor, values.data(), s.first, count);
-    }
+    data_.put(processor, values.data(), s.first, count);
+  }
 
-    /**
-     * Put a span of data in a remote image.
-     */
-    void put(int processor, slice s, const std::span<T>& values) {
-        auto count =
+  /**
+   * Put a span of data in a remote image.
+   */
+  void put(int processor, slice s, const std::span<T>& values) {
+    auto count =
         values.size() < (s.last - s.first) ? values.size() : (s.last - s.first);
-        data_.put(processor, values.data(), s.first, count);
-    }
+    data_.put(processor, values.data(), s.first, count);
+  }
 
-    /**
-     * Put a range of data in a remote image.
-     */
-    template <typename FwdIterator>
-    void put(int processor, FwdIterator first, FwdIterator last, size_t offset) {
-        data_.put(processor, first, last, offset);
-    }
+  /**
+   * Put a range of data in a remote image.
+   */
+  template <typename FwdIterator>
+  void put(int processor, FwdIterator first, FwdIterator last, size_t offset) {
+    data_.put(processor, first, last, offset);
+  }
 
-    /**
-     * Get a future to the value of element `idx` on processor `t`.
-     */
-    future<T> get(int t, size_t idx) { return data_.get(t, idx); }
+  /**
+   * Get a future to the value of element `idx` on processor `t`.
+   */
+  future<T> get(int t, size_t idx) { return data_.get(t, idx); }
 
-    future<T[]> get(int t, size_t first, size_t last) {
-        return data_.get(t, first, last - first);
-    }
+  future<T[]> get(int t, size_t first, size_t last) {
+    return data_.get(t, first, last - first);
+  }
 
-    /**
-     * Get the size of the coarray.
-     */
-    std::size_t size() const { return data_.size(); }
+  /**
+   * Get the size of the coarray.
+   */
+  std::size_t size() const { return data_.size(); }
 
-    /**
-     * Get a raw pointer to the local underlying sequential data buffer.
-     */
-    T* data() {
-        return static_cast<T*>(std::get<0>(data_.location_and_size()));
-    }
+  /**
+   * Get a raw pointer to the local underlying sequential data buffer.
+   */
+  T* data() { return static_cast<T*>(std::get<0>(data_.location_and_size())); }
 
-    /**
-     * Check if the coarray is empty.
-     */
-    bool empty() const { return size() == 0; }
+  /**
+   * Check if the coarray is empty.
+   */
+  bool empty() const { return size() == 0; }
 
-  private:
-    friend image;
-    friend writer;
+ private:
+  friend image;
+  friend writer;
 
-    array<T> data_;
+  array<T> data_;
 };
 
-} // namespace bulk
+}  // namespace bulk

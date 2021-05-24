@@ -38,15 +38,15 @@ namespace bulk {
  */
 template <typename T>
 bulk::coarray<T> gather_all(bulk::world& world, T value) {
-    bulk::coarray<T> xs(world, world.active_processors());
+  bulk::coarray<T> xs(world, world.active_processors());
 
-    for (int t = 0; t < world.active_processors(); ++t) {
-        xs(t)[world.rank()] = value;
-    }
+  for (int t = 0; t < world.active_processors(); ++t) {
+    xs(t)[world.rank()] = value;
+  }
 
-    world.sync();
+  world.sync();
 
-    return xs;
+  return xs;
 }
 
 /**
@@ -69,16 +69,16 @@ bulk::coarray<T> gather_all(bulk::world& world, T value) {
  */
 template <typename T, typename Func, typename S = T>
 S foldl(var<T>& x, Func f, S start_value = {}) {
-    auto& world = x.world();
-    auto result = start_value;
+  auto& world = x.world();
+  auto result = start_value;
 
-    auto images = bulk::gather_all(world, x.value());
+  auto images = bulk::gather_all(world, x.value());
 
-    for (int t = 0; t < world.active_processors(); ++t) {
-        // apply f iteratively to the current value, and each remote value
-        f(result, images[t]);
-    }
-    return result;
+  for (int t = 0; t < world.active_processors(); ++t) {
+    // apply f iteratively to the current value, and each remote value
+    f(result, images[t]);
+  }
+  return result;
 }
 
 /**
@@ -101,22 +101,22 @@ S foldl(var<T>& x, Func f, S start_value = {}) {
  */
 template <typename T, typename Func, typename S = T>
 S foldl(coarray<T>& xs, Func f, S start_value = {}) {
-    auto& world = xs.world();
-    auto local_result = start_value;
-    auto result = start_value;
+  auto& world = xs.world();
+  auto local_result = start_value;
+  auto result = start_value;
 
-    for (auto i = 0u; i < xs.size(); ++i) {
-        // apply f iteratively to each local value
-        f(local_result, xs[i]);
-    }
+  for (auto i = 0u; i < xs.size(); ++i) {
+    // apply f iteratively to each local value
+    f(local_result, xs[i]);
+  }
 
-    auto images = bulk::gather_all(world, local_result);
+  auto images = bulk::gather_all(world, local_result);
 
-    for (int t = 0; t < world.active_processors(); ++t) {
-        // apply f iteratively to the current value, and each remote value
-        f(result, images[t]);
-    }
-    return result;
+  for (int t = 0; t < world.active_processors(); ++t) {
+    // apply f iteratively to the current value, and each remote value
+    f(result, images[t]);
+  }
+  return result;
 }
 
 /**
@@ -125,7 +125,8 @@ S foldl(coarray<T>& xs, Func f, S start_value = {}) {
  * This function applies a function to the images of the elements of a coarray.
  *
  * The cost is `F * p * X + p * g * X + l`, where `F` is the number of
- * flops performed during a single call to `f` and `X` is the size of the coarray.
+ * flops performed during a single call to `f` and `X` is the size of the
+ * coarray.
  *
  * Requires the local sizes of 'xs' to be the same everywhere.
  *
@@ -136,119 +137,120 @@ S foldl(coarray<T>& xs, Func f, S start_value = {}) {
  * \param f a binary function that takes two arguments of type `T`.
  *
  * \returns a vector with the result of the expression
- *              \f[ f(f(f(f(xs(0)[i], xs(1)[i]), xs(2)[i]), ...), xs(p-1)[i]). \f]
- *          for each i, which is computed at each core.
+ *              \f[ f(f(f(f(xs(0)[i], xs(1)[i]), xs(2)[i]), ...), xs(p-1)[i]).
+ * \f] for each i, which is computed at each core.
  */
 template <typename T, typename Func, typename S = T>
 std::vector<T> foldl_each(coarray<T>& xs, Func f, S start_value = {}) {
-    auto& world = xs.world();
+  auto& world = xs.world();
 
 #ifndef NDEBUG
-    auto sizes = bulk::gather_all(world, xs.size());
-    for (int t = 1; t < world.active_processors(); ++t) {
-        if (sizes[t] != sizes[0]) {
-            world.log_once("'foldl_each' called with coarray with non-constant "
-                           "size.");
-            return {};
-        }
+  auto sizes = bulk::gather_all(world, xs.size());
+  for (int t = 1; t < world.active_processors(); ++t) {
+    if (sizes[t] != sizes[0]) {
+      world.log_once(
+          "'foldl_each' called with coarray with non-constant "
+          "size.");
+      return {};
     }
+  }
 #endif
 
-    auto result = std::vector<T>(xs.size(), start_value);
+  auto result = std::vector<T>(xs.size(), start_value);
 
-    bulk::coarray<T> images(world, world.active_processors() * xs.size());
+  bulk::coarray<T> images(world, world.active_processors() * xs.size());
 
+  for (int t = 0; t < world.active_processors(); ++t) {
+    for (auto i = 0u; i < xs.size(); ++i) {
+      images(t)[i + world.rank() * xs.size()] = xs[i];
+    }
+  }
+
+  world.sync();
+
+  for (auto i = 0u; i < xs.size(); i++) {
     for (int t = 0; t < world.active_processors(); ++t) {
-        for (auto i = 0u; i < xs.size(); ++i) {
-            images(t)[i + world.rank() * xs.size()] = xs[i];
-        }
+      // apply f iteratively to the current value, and each remote value
+      f(result[i], images[t * xs.size() + i]);
     }
+  }
 
-    world.sync();
-
-    for (auto i = 0u; i < xs.size(); i++) {
-        for (int t = 0; t < world.active_processors(); ++t) {
-            // apply f iteratively to the current value, and each remote value
-            f(result[i], images[t * xs.size() + i]);
-        }
-    }
-
-    return result;
+  return result;
 }
 
 template <typename T>
 T max(bulk::world& world, T t) {
-    bulk::coarray<T> xs = bulk::gather_all(world, t);
-    return *std::ranges::max_element(xs);
+  bulk::coarray<T> xs = bulk::gather_all(world, t);
+  return *std::ranges::max_element(xs);
 }
 
 template <typename T>
 T min(bulk::world& world, T t) {
-    auto xs = bulk::gather_all(world, t);
-    return *std::ranges::min_element(xs);
+  auto xs = bulk::gather_all(world, t);
+  return *std::ranges::min_element(xs);
 }
 
 template <typename T>
 T sum(bulk::world& world, T t) {
-    auto xs = bulk::gather_all(world, t);
-    return std::accumulate(xs.begin(), xs.end(), T{});
+  auto xs = bulk::gather_all(world, t);
+  return std::accumulate(xs.begin(), xs.end(), T{});
 }
 
 template <typename T>
 T product(bulk::world& world, T t) {
-    bulk::coarray<T> xs = bulk::gather_all(world, t);
-    return std::accumulate(xs.begin(), xs.end(), (T)1,
-                           [](const T& lhs, const T& rhs) { return lhs * rhs; });
+  bulk::coarray<T> xs = bulk::gather_all(world, t);
+  return std::accumulate(xs.begin(), xs.end(), (T)1,
+                         [](const T& lhs, const T& rhs) { return lhs * rhs; });
 }
 
 template <typename T>
 T max(bulk::var<T>& x) {
-    return bulk::foldl(
-    x, [](auto& lhs, auto& rhs) { lhs = std::max(lhs, rhs); },
-    std::numeric_limits<T>::min());
+  return bulk::foldl(
+      x, [](auto& lhs, auto& rhs) { lhs = std::max(lhs, rhs); },
+      std::numeric_limits<T>::min());
 }
 
 template <typename T>
 T min(bulk::var<T>& x) {
-    return bulk::foldl(
-    x, [](auto& lhs, auto& rhs) { lhs = std::min(lhs, rhs); },
-    std::numeric_limits<T>::max());
+  return bulk::foldl(
+      x, [](auto& lhs, auto& rhs) { lhs = std::min(lhs, rhs); },
+      std::numeric_limits<T>::max());
 }
 
 template <typename T>
 T sum(bulk::var<T>& x) {
-    return bulk::foldl(x, [](auto& lhs, auto& rhs) { lhs += rhs; });
+  return bulk::foldl(x, [](auto& lhs, auto& rhs) { lhs += rhs; });
 }
 
 template <typename T>
 T product(bulk::var<T>& x) {
-    return bulk::foldl(
-    x, [](auto& lhs, auto& rhs) { lhs *= rhs; }, (T)1);
+  return bulk::foldl(
+      x, [](auto& lhs, auto& rhs) { lhs *= rhs; }, (T)1);
 }
 
 template <typename T>
 T max(bulk::coarray<T>& xs) {
-    return bulk::foldl(
-    xs, [](auto& lhs, auto& rhs) { lhs = std::max(lhs, rhs); },
-    std::numeric_limits<T>::min());
+  return bulk::foldl(
+      xs, [](auto& lhs, auto& rhs) { lhs = std::max(lhs, rhs); },
+      std::numeric_limits<T>::min());
 }
 
 template <typename T>
 T min(bulk::coarray<T>& xs) {
-    return bulk::foldl(
-    xs, [](auto& lhs, auto& rhs) { lhs = std::min(lhs, rhs); },
-    std::numeric_limits<T>::max());
+  return bulk::foldl(
+      xs, [](auto& lhs, auto& rhs) { lhs = std::min(lhs, rhs); },
+      std::numeric_limits<T>::max());
 }
 
 template <typename T>
 T sum(bulk::coarray<T>& xs) {
-    return bulk::foldl(xs, [](auto& lhs, auto& rhs) { lhs += rhs; });
+  return bulk::foldl(xs, [](auto& lhs, auto& rhs) { lhs += rhs; });
 }
 
 template <typename T>
 T product(bulk::coarray<T>& xs) {
-    return bulk::foldl(
-    xs, [](auto& lhs, auto& rhs) { lhs *= rhs; }, (T)1);
+  return bulk::foldl(
+      xs, [](auto& lhs, auto& rhs) { lhs *= rhs; }, (T)1);
 }
 
-} // namespace bulk
+}  // namespace bulk

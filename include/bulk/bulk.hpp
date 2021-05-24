@@ -16,17 +16,16 @@
 #include <bulk/future.hpp>
 #include <bulk/messages.hpp>
 #include <bulk/partitioned_array.hpp>
-#include <bulk/world.hpp>
-
 #include <bulk/partitionings/block.hpp>
 #include <bulk/partitionings/cyclic.hpp>
 #include <bulk/partitionings/partitioning.hpp>
 #include <bulk/partitionings/tree.hpp>
-
 #include <bulk/util/binary_tree.hpp>
 #include <bulk/util/fit.hpp>
 #include <bulk/util/indices.hpp>
 #include <bulk/util/report.hpp>
 #include <bulk/util/timer.hpp>
+#include <bulk/world.hpp>
 
-namespace experimental {}
+namespace experimental {
+}

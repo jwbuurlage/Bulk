@@ -46,45 +46,47 @@ namespace bulk {
  */
 template <typename T, int D, int G>
 class partitioned_array {
-  public:
-    /** Construct a partitioned array from a given partitioning. */
-    partitioned_array(bulk::world& world, multi_partitioning<D, G>& part)
-    : world_(world), partitioning_(part),
-      data_(world, partitioning_.local_count(world.rank())) {
-        multi_id_ = util::unflatten<D>(partitioning_.grid(), world.rank());
-    }
+ public:
+  /** Construct a partitioned array from a given partitioning. */
+  partitioned_array(bulk::world& world, multi_partitioning<D, G>& part)
+      : world_(world),
+        partitioning_(part),
+        data_(world, partitioning_.local_count(world.rank())) {
+    multi_id_ = util::unflatten<D>(partitioning_.grid(), world.rank());
+  }
 
-    /** Get an image to a (possibly remote) element using a global index. */
-    auto global(index_type<D> index) {
-        auto owner = partitioning_.owner(index);
-        auto local_idx = partitioning_.local(index);
-        return data_(owner)[util::flatten<D>(partitioning_.local_size(owner), local_idx)];
-    }
+  /** Get an image to a (possibly remote) element using a global index. */
+  auto global(index_type<D> index) {
+    auto owner = partitioning_.owner(index);
+    auto local_idx = partitioning_.local(index);
+    return data_(
+        owner)[util::flatten<D>(partitioning_.local_size(owner), local_idx)];
+  }
 
-    /** Get an element using its local index. */
-    T& local(index_type<D> index) {
-        return data_[util::flatten<D>(partitioning_.local_size(multi_id_), index)];
-    }
+  /** Get an element using its local index. */
+  T& local(index_type<D> index) {
+    return data_[util::flatten<D>(partitioning_.local_size(multi_id_), index)];
+  }
 
-    /// ditto
-    const T& local(index_type<D> index) const {
-        return data_[util::flatten<D>(partitioning_.local_size(multi_id_), index)];
-    }
+  /// ditto
+  const T& local(index_type<D> index) const {
+    return data_[util::flatten<D>(partitioning_.local_size(multi_id_), index)];
+  }
 
-    /** Get a reference to the world of the array. */
-    auto world() const { return world_; }
+  /** Get a reference to the world of the array. */
+  auto world() const { return world_; }
 
-  private:
-    index<D> multi_id_;
+ private:
+  index<D> multi_id_;
 
-    // world in which this array resides
-    bulk::world& world_;
+  // world in which this array resides
+  bulk::world& world_;
 
-    // underlying partitioning
-    multi_partitioning<D, G>& partitioning_;
+  // underlying partitioning
+  multi_partitioning<D, G>& partitioning_;
 
-    // linear storage
-    bulk::coarray<T> data_;
+  // linear storage
+  bulk::coarray<T> data_;
 };
 
-} // namespace bulk
+}  // namespace bulk

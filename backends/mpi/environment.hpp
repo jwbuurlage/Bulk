@@ -1,9 +1,9 @@
 #pragma once
 
-#include <iostream>
+#include <mpi.h>
 
 #include <bulk/environment.hpp>
-#include <mpi.h>
+#include <iostream>
 
 #include "world.hpp"
 
@@ -15,30 +15,32 @@ namespace bulk::mpi {
  * MPI).
  */
 class environment : public bulk::environment {
-  public:
-    environment() { MPI_Init(nullptr, nullptr); }
-    ~environment() { MPI_Finalize(); }
+ public:
+  environment() { MPI_Init(nullptr, nullptr); }
+  ~environment() { MPI_Finalize(); }
 
-    void spawn(int processors, std::function<void(bulk::world&)> spmd) override final {
-        if (processors < available_processors()) {
-            std::cout << "Running with fewer processors than available is not "
-                         "yet implemented in MPI.\n";
-            return;
-        }
-        bulk::mpi::world world;
-        spmd(world);
+  void spawn(int processors,
+             std::function<void(bulk::world&)> spmd) override final {
+    if (processors < available_processors()) {
+      std::cout << "Running with fewer processors than available is not "
+                   "yet implemented in MPI.\n";
+      return;
     }
+    bulk::mpi::world world;
+    spmd(world);
+  }
 
-    int available_processors() const override final {
-        int world_size;
-        MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-        return world_size;
-    }
+  int available_processors() const override final {
+    int world_size;
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+    return world_size;
+  }
 
-    void set_log_callback(std::function<void(int, const std::string&)> f) override final {
-        // do nothing
-        (void)f;
-    }
+  void set_log_callback(
+      std::function<void(int, const std::string&)> f) override final {
+    // do nothing
+    (void)f;
+  }
 };
 
-} // namespace bulk::mpi
+}  // namespace bulk::mpi
