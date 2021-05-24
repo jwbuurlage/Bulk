@@ -49,8 +49,8 @@ class coarray {
         }
 
         slice(int a, int b) {
-            first = (size_t)a;
-            last = (size_t)b;
+            first = static_cast<size_t>(a);
+            last = static_cast<size_t>(b);
         }
     };
 
@@ -276,7 +276,7 @@ class coarray {
     /**
      * Get a raw pointer to the local underlying sequential data buffer.
      */
-    T* data() { return std::get<0>(data_.location_and_size()); }
+    T* data() { return static_cast<T*>(std::get<0>(data_.location_and_size())); }
 
     /**
      * Check if the coarray is empty.
