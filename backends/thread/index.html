@@ -1607,14 +1607,17 @@
                 <h1 id="thread"><code>&lt;thread&gt;</code></h1>
 <p>This backend uses the shared-memory parallelism provided by the standard C++
 library <code>&lt;thread&gt;</code>. To use it on Linux, link against the <code>pthread</code> library.</p>
-<p>There are two supported barrier implementations, a mutex-based barrier and
-the (default) spinlock-based barrier. The mutex barrier is more energy
-efficient, while the spinlock barrier is significantly faster. Choosing
-the barrier can be done by passing a template argument to 
+<p>There are three supported barrier implementations, a mutex-based barrier, a 
+spinlock-based barrier, and <code>std::barier</code>. The mutex barrier is more
+energy efficient, however the spinlock barrier is significantly faster. Choosing
+the barrier can be done by passing a template argument to
 <code>bulk::thread::environment_</code>, while <code>bulk::thread::environment</code> is a
 non-template type alias to the environment using the default barrier
 implementation.</p>
-<div class="codehilite"><pre><span></span><code><span class="c1">// default (with spinning barrier)</span>
+<p>A custom barrier implementation can also be supplied. It requires a constructor
+that takes a single <code>std::ptrdiff_t</code>, and a function <code>void wait()</code> to make a
+thread enter the barrier.</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// default (with std::barrier)</span>
 <span class="k">auto</span> <span class="n">env</span> <span class="o">=</span> <span class="n">bulk</span><span class="o">::</span><span class="kr">thread</span><span class="o">::</span><span class="n">environment</span><span class="p">;</span> 
 
 <span class="c1">// explicit (with spinning barrier)</span>

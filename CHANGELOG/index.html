@@ -1586,11 +1586,11 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased-yyyy-mm-dd" class="md-nav__link">
-    Unreleased - YYYY-MM-DD
+  <a href="#300-2021-08-19" class="md-nav__link">
+    3.0.0 - 2021-08-19
   </a>
   
-    <nav class="md-nav" aria-label="Unreleased - YYYY-MM-DD">
+    <nav class="md-nav" aria-label="3.0.0 - 2021-08-19">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1603,6 +1603,20 @@
           <li class="md-nav__item">
   <a href="#added" class="md-nav__link">
     Added
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    Changed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    Removed
   </a>
   
 </li>
@@ -1642,7 +1656,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" class="md-nav__link">
+  <a href="#changed_1" class="md-nav__link">
     Changed
   </a>
   
@@ -1683,7 +1697,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_1" class="md-nav__link">
+  <a href="#changed_2" class="md-nav__link">
     Changed
   </a>
   
@@ -1806,11 +1820,11 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased-yyyy-mm-dd" class="md-nav__link">
-    Unreleased - YYYY-MM-DD
+  <a href="#300-2021-08-19" class="md-nav__link">
+    3.0.0 - 2021-08-19
   </a>
   
-    <nav class="md-nav" aria-label="Unreleased - YYYY-MM-DD">
+    <nav class="md-nav" aria-label="3.0.0 - 2021-08-19">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1823,6 +1837,20 @@
           <li class="md-nav__item">
   <a href="#added" class="md-nav__link">
     Added
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    Changed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    Removed
   </a>
   
 </li>
@@ -1862,7 +1890,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" class="md-nav__link">
+  <a href="#changed_1" class="md-nav__link">
     Changed
   </a>
   
@@ -1903,7 +1931,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed_1" class="md-nav__link">
+  <a href="#changed_2" class="md-nav__link">
     Changed
   </a>
   
@@ -2017,9 +2045,10 @@
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic
 Versioning</a>.</p>
-<h2 id="unreleased-yyyy-mm-dd"><a href="https://github.com/jwbuurlage/bulk/compare/v2.0.0...develop">Unreleased</a> - YYYY-MM-DD</h2>
+<h2 id="300-2021-08-19"><a href="https://github.com/jwbuurlage/bulk/compare/v2.0.0...v3.0.0">3.0.0</a> - 2021-08-19</h2>
 <h3 id="breaking-changes">Breaking changes</h3>
 <ul>
+<li>Bulk now requires C++20.</li>
 <li><code>bulk::index</code> now represents indices as <code>size_t</code></li>
 </ul>
 <h3 id="added">Added</h3>
@@ -2027,10 +2056,25 @@ Versioning</a>.</p>
 <li>Add <code>clear_queues</code> argument to <code>world::sync</code>, to optionally retain all messages
   from the previous superstep.</li>
 <li>Expose <code>clear</code> method of <code>queue</code>.</li>
+<li>Add DGEMM example (Cannon&rsquo;s algorithm).</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>Default barrier for thread backend is now <code>std::barrier</code>.</li>
+<li>Added <code>Barrier</code> concept, and constrain the associated <code>environment</code> and
+  <code>world</code> parameters.</li>
+<li>Span based coarray puts are now based on <code>std::span</code>.</li>
+</ul>
+<h3 id="removed">Removed</h3>
+<ul>
+<li><code>bulk::span</code> was removed in favor of <code>std::span</code>.</li>
 </ul>
 <h3 id="fixed">Fixed</h3>
 <ul>
 <li>Prevent <code>bulk::sum</code> and <code>bulk::product</code> from silently truncating values (@TimoMaarse, #11)</li>
+<li>Fix const correctness of <code>bulk::product(bulk::world&amp;, T)</code>.</li>
+<li>Fix data race in shared state creation for <code>world::split</code> in the thread backend.</li>
+<li>Explicitly cast to <code>T*</code> in the implementation of <code>bulk::coarray:data</code>.</li>
 </ul>
 <h2 id="200-2020-03-27"><a href="https://github.com/jwbuurlage/bulk/compare/v1.2.0...v2.0.0">2.0.0</a> - 2020-03-27</h2>
 <h3 id="breaking-changes_1">Breaking changes</h3>
@@ -2051,7 +2095,7 @@ Versioning</a>.</p>
 <li>Add support for splitting a world into multiple parts, allowing subset syncs and communication. See also <code>bulk::world::split</code>.</li>
 <li>Add <code>get_change</code> to timer class (@SdeBerg, #10)</li>
 </ul>
-<h3 id="changed">Changed</h3>
+<h3 id="changed_1">Changed</h3>
 <ul>
 <li>Use <code>size_t</code> for indices in arrays and slices</li>
 <li><code>coarray::data</code> now returns a <code>T*</code> instead of <code>void*</code></li>
@@ -2081,7 +2125,7 @@ Versioning</a>.</p>
 <li>Fix coarray unittest relying on <code>p &gt; 2</code></li>
 <li>Fix <code>-Werror=format-security</code> issue in <code>world::log</code></li>
 </ul>
-<h3 id="changed_1">Changed</h3>
+<h3 id="changed_2">Changed</h3>
 <ul>
 <li>Update default value for <code>start_value</code> of <code>foldl</code> to <code>{}</code> from <code>0</code> for
   non-numeric types</li>
