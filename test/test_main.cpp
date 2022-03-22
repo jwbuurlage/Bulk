@@ -10,6 +10,7 @@ extern void test_initialization();
 extern void test_communication();
 extern void test_partitioning();
 extern void test_algorithm();
+extern void test_array();
 
 environment env;
 
@@ -18,6 +19,7 @@ int main() {
   test_communication();
   test_partitioning();
   test_algorithm();
+  test_array();
 
   BULK_FINALIZE_TESTS(env);
 }

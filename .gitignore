@@ -14,3 +14,18 @@ examples/bin/*
 *.pdf
 docs/doxygen/output
 docs/site
+
+### Files and folders created by using JetBrains IDE-applications. ###
+.idea
+cmake-build-*/
+out/
+
+### Files and folders created by VisualStudioCode. ###
+.vscode
+.history
+
+### Files and folders created by MacOS. ###
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon

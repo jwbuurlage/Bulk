@@ -26,6 +26,7 @@ set(
     "${TEST_DIR}/initialization.cpp"
     "${TEST_DIR}/partitioning.cpp"
     "${TEST_DIR}/test_main.cpp"
+    "${TEST_DIR}/array.cpp"
     )
 
 set(
