@@ -69,7 +69,10 @@ class array : var_base {
    * Move an array.
    */
   array(array&& other)
-      : world_(other.world_), data_(std::move(other.data_)), id_(other.id_) {
+      : world_(other.world_),
+        data_(std::move(other.data_)),
+        size_(other.size_),
+        id_(other.id_) {
     other.data_ = nullptr;
     other.id_ = -1;
   }
