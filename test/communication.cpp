@@ -575,7 +575,7 @@ void test_communication() {
         q(world.next_rank()).send(x);
       }
       world.sync();
-      world.sync(false);
+      world.sync({.clear_queues = false});
       BULK_CHECK_ONCE(!q.empty(),
                       "multiple messages arrived after not "
                       "clearing queue");
@@ -608,6 +608,67 @@ void test_communication() {
       world.sync();
       BULK_CHECK(a.value() == ((s + p - 1) % p),
                  "can still use ambient world while split");
+    }
+
+    BULK_SECTION("Add tag behavior") {
+      BULK_CHECK_ONCE(world.sync_count() != 0, "previous sync are recorded");
+      world.reset_sync_counter();
+      BULK_CHECK_ONCE(world.sync_count() == 0, "sync counter can be reset");
+
+      auto q = bulk::queue<int>(world);
+      q(world.next_rank()).send(0);
+
+      // default : clear_queues == true, tag == ""
+      world.sync();
+      world.sync();
+      BULK_CHECK_ONCE(world.sync_count("") == 2,
+                 "2 sync() with an empty tag were called since last reset");
+      BULK_CHECK_ONCE(world.sync_count() == 2,
+                 "2 sync() with tag defaults to \"\" were called since last reset");
+      BULK_CHECK(q.empty(), "queue gets cleared after a sync");
+
+      // note that world.sync() in bulk::foldl, which is included in BULK_CHECK
+      world.reset_sync_counter();
+
+      // set clear_queues to false : clear_queues == false, tag == ""
+      std::vector<int> contents = {8411, 313, 20230221};
+      for (auto x : contents) {
+        q(world.next_rank()).send(x);
+      }
+      world.sync();
+      world.sync({.clear_queues = false});
+      BULK_CHECK_ONCE(!q.empty(),
+                      "multiple messages arrived after not "
+                      "clearing queue");
+      BULK_CHECK_ONCE(world.sync_count("") == 2,
+                 "2 sync() with an empty tag were called since last reset");
+
+      q.clear();
+      
+      // set tag to arbitrary string : clear_queues == true, tag == arbitrary string
+
+      q(world.next_rank()).send(1);
+      world.sync({.tag="send"});
+      world.sync({.tag="clear"});
+      BULK_CHECK(q.empty(), "queue gets cleared after a sync "
+                            "as clear_queues defaults to false");
+      BULK_CHECK_ONCE(world.sync_count("send") == 1, 
+                      "1 sync() with a tag \'send\' was called");
+      BULK_CHECK_ONCE(world.sync_count("clear") == 1, 
+                      "1 sync() with a tag \'clear\' was called");
+
+      // both clear_queues and tag are modified :
+      // clear_queues == false, tag == "stop"
+      
+      q.clear();
+      q(world.next_rank()).send(2);
+      world.sync();
+      // world.sync({.clear_queues=false, .tag="stop"});
+      world.sync({false, "stop"}); // for short
+      BULK_CHECK_ONCE(q.size() == 1, "clearing queue is prohibited");
+      BULK_CHECK_ONCE(world.sync_count("stop") == 1,
+                      "1 sync() with a tag \'stop\' was called");
+
     }
   });
 }

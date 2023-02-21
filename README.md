@@ -162,6 +162,7 @@ Also thanks to:
 
 * Rob Bisseling
 * Sarita de Berg (@SdeBerg)
+* Chong Yee Hin (@yuxuan-z19)
 
 ## Contributing
 

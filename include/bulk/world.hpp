@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <string>
+#include <unordered_map>
 
 /**
  * \file world.hpp
@@ -10,6 +11,23 @@
  */
 
 namespace bulk {
+
+/**
+ * This object provides optional arguments to be set in world::sync()
+*/
+struct sync_options {
+  /**
+   * @brief Clear all queues in the next superstep. 
+   * Defaults to true.
+  */
+  bool clear_queues = true;
+
+  /**
+   * @brief Add a tag to label sync() called at the moment. 
+   * Defaults to an empty string.
+  */
+  std::string tag = "";
+};
 
 /**
  * This objects represents the world of a processor and its place within it.
@@ -81,12 +99,28 @@ class world {
   /**
    * Perform a global barrier synchronization of the active processors and
    * resolves any outstanding communication. Messages previously received in
-   * queues are cleared for the next superstep, unless `clear_queues` is set
-   * to false. The function must be called by all processors. When some
+   * queues are cleared for the next superstep, 
+   * unless the member `clear_queues` of sync_options` is set
+   * to false. One may provide a tag to label the current call.
+   * The function must be called by all processors. When some
    * processors call `sync` while others call `barrier` at the same time,
    * behaviour is undefined.
    */
-  virtual void sync(bool clear_queues = true) = 0;
+  virtual void sync(sync_options option={}) = 0;
+  void sync(bool clear_queues) { sync({.clear_queues = clear_queues}); }
+
+  /**
+   * Obtain the number of calls of world::sync with tag specified.
+   * The tag defaults to an empty string.
+  */
+  uint64_t sync_count(std::string tag="") {
+    return sync_counter_with_tag[tag];
+  }
+
+  /**
+   * Reset the sync counter
+  */
+  void reset_sync_counter() { sync_counter_with_tag.clear(); }
 
   /**
    * Perform a global barrier synchronization of the active processors
@@ -199,6 +233,9 @@ class world {
   virtual char* send_buffer_(int target, int queue_id, size_t buffer_size) = 0;
 
   virtual void log_(std::string message) = 0;
+
+  // helper for recording the world::sync
+  std::unordered_map<std::string, uint64_t> sync_counter_with_tag;
 };
 
 }  // namespace bulk

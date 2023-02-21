@@ -6,6 +6,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2023-02-21
+
+### Added
+
+- - `world.sync()` now supports custom string tag that has no impact on behaviour, but can be used for bookkeeping.
+- An `unordered_map` to maintain the number of calls of `world::sync()` with tag specified
+  It can be obtained using `world.sync_count(tag)` and 
+  reset to 0 using `world.reset_sync_counter()`
+
+### Changed
+
+- Arguments of `world::sync` are now maintained as `struct sync_options`
+  custom argument can be added for further development.
+
+  ```cpp
+  // include/bulk/world.hpp
+
+  /**
+   * This object provides optional arguments to be set in world::sync()
+  */
+  struct sync_options {
+    /**
+     * @brief Clear all queues in the next superstep. 
+     * Defaults to true.
+    */
+    bool clear_queues = true;
+
+    /**
+     * @brief Add a tag to label sync() called at the moment. 
+     * Defaults to an empty string.
+    */
+    std::string tag = "";
+  };
+  ```
+
+  And now
+
+  ```cpp
+  void sync(sync_options option={}) {...}
+  ```
+
+  where `option` defaults to `{.clear_queues=true, .tag=""}` as mentioned above.
+
+  Please refer to the `BULK_SECTION("Add tag behavior")` in `test/communication.cpp`
+  for the usage. Both MPI and `<thread>` tests are passed.
+
 ## [3.0.0] - 2021-08-19
 
 ### Breaking changes
