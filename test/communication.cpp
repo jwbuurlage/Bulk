@@ -645,7 +645,7 @@ void test_communication() {
 
       q.clear();
       
-      // set tag to random string : clear_queues == true, tag == random string
+      // set tag to arbitrary string : clear_queues == true, tag == arbitrary string
 
       q(world.next_rank()).send(1);
       world.sync({.tag="send"});

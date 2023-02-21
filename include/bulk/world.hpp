@@ -100,13 +100,14 @@ class world {
    * Perform a global barrier synchronization of the active processors and
    * resolves any outstanding communication. Messages previously received in
    * queues are cleared for the next superstep, 
-   * unless the member `clear_queues` of sync_option is set
+   * unless the member `clear_queues` of sync_options` is set
    * to false. One may provide a tag to label the current call.
    * The function must be called by all processors. When some
    * processors call `sync` while others call `barrier` at the same time,
    * behaviour is undefined.
    */
   virtual void sync(sync_options option={}) = 0;
+  void sync(bool clear_queues) { sync({.clear_queues = clear_queues}); }
 
   /**
    * Obtain the number of calls of world::sync with tag specified.

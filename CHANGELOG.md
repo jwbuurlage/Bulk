@@ -10,7 +10,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- `world.sync()` now supports custom string tag
+- - `world.sync()` now supports custom string tag that has no impact on behaviour, but can be used for bookkeeping.
 - An `unordered_map` to maintain the number of calls of `world::sync()` with tag specified
   It can be obtained using `world.sync_count(tag)` and 
   reset to 0 using `world.reset_sync_counter()`
@@ -47,7 +47,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   void sync(sync_options option={}) {...}
   ```
 
-  where `option` defaults to `{.clear_queue=true, .tag=""}` as mentioned above.
+  where `option` defaults to `{.clear_queues=true, .tag=""}` as mentioned above.
 
   Please refer to the `BULK_SECTION("Add tag behavior")` in `test/communication.cpp`
   for the usage. Both MPI and `<thread>` tests are passed.
