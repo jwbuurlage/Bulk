@@ -1,4 +1,4 @@
-name: CMake
+name: Tests
 
 on:
   push:
@@ -17,6 +17,5 @@ jobs:
       run: make
 
     - name: Test
-      working-directory: ${{github.workspace}}/build
       run: make test
 
