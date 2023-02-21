@@ -54,10 +54,12 @@ class world : public bulk::world {
   int active_processors() const override final { return active_processors_; }
   int rank() const override final { return processor_id_; }
 
-  void sync(bool clear_queues = true) override final {
-    if (clear_queues) {
+  void sync(sync_options option={}) override final {
+    if (option.clear_queues) {
       clear_messages_();
     }
+
+    ++sync_counter_with_tag[std::move(option.tag)];
 
     int remote_puts = 0;
     int remote_custom_puts = 0;

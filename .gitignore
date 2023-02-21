@@ -14,3 +14,5 @@ examples/bin/*
 *.pdf
 docs/doxygen/output
 docs/site
+
+.vscode/*

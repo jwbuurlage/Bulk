@@ -102,8 +102,10 @@ class world : public bulk::world {
 
   void barrier() override { state_->sync_barrier.arrive_and_wait(); }
 
-  void sync(bool clear_queues = true) override {
+  void sync(sync_options option={}) override {
     barrier();
+
+    ++sync_counter_with_tag[std::move(option.tag)];
 
     // core A: x = 5;
     // core B: put(A, 18, x);
@@ -152,7 +154,7 @@ class world : public bulk::world {
     for (auto i = 0u; i < qs.size(); i += nprocs_) {
       auto& rq = qs[i + pid_];
       if (rq.base) {  // If this is a registered queue
-        if (clear_queues) {
+        if (option.clear_queues) {
           rq.base->clear_();
         }
         for (auto& p : rq.receiveBuffers) {
